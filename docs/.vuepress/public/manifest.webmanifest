@@ -1,0 +1,21 @@
+{
+    "name": "yasewang故事会",
+    "short_name": "yasewang",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#fff",
+    "description": "yasewang的博客",
+    "icons": [{
+      "src": "favicon-16.icon",
+      "sizes": "16x16",
+      "type": "image/icon"
+    },{
+      "src": "favicon-32.icon",
+      "sizes": "32x32",
+      "type": "image/icon"
+    }, {
+      "src": "avatar.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }]
+  }
