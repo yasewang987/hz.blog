@@ -1,15 +1,6 @@
 # JAVA开发环境搭建
 
-## 目录
-
-* [JDK安装](#jdk)
-* [Maven安装](#maven)
-* [VSCode](#vscode)
-* [Gradle](#gradle)
-
----
-
-<h2 id="jdk">JDK安装</h2>
+## JDK安装
 
 * JDK下载地址：    http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 * 地址2：https://www.oracle.com/technetwork/java/javase/downloads/index.html
@@ -43,7 +34,7 @@
        1. 编辑：`PATH`，新增二行`%JAVA_HOME%\bin`，`%JAVA_HOME%\jre\bin`
        1. 新增: `CLASSPATH:.;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar`
 
-<h2 id="maven">Maven安装</h2>
+## Maven安装
 
 * 下载地址：https://maven.apache.org/download.cgi
 * maven仓库：https://mvnrepository.com
@@ -68,7 +59,7 @@
         > 直接在我的电脑右键-属性-高级系统设置-高级-环境变量-系统环境变量中作如下操作：
         1. 编辑：`PATH`，新增`D:\Program Files\Java\tools\apache-maven-3.5.4\bin`
 
-<h2 id="gradle">Gradle</h2>
+## Gradle
 
 * 官方地址：https://gradle.org/install/
 
@@ -86,7 +77,7 @@
         1. `bash: ~/.bashrc` # 生效配置`source ~/.bashrc`
         1. `zsh: ~/.zshrc` #生效配置`source ~/.zshrc`
 
-<h2 id="vscode">VSCode</h2>
+## VSCode
 
 * JAVA基础开发插件
   1. 直接在插件中搜索`java`，然后选`Java Extension Pack`即可安装所有依赖组件

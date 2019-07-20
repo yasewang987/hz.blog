@@ -1,21 +1,6 @@
 # Linux常用命令
 
-## 目录
----
-* [权限相关](#permission)
-* [查看远程端口是否可用](#serverport)
-* [查看端口使用情况](#port)
-* [文件压缩](#filecompress)
-* [复制-移动文件](#copyfile)
-* [查看安装的软件包](#dpkg)
-* [chmod](#chmod)
-* [添加开机启动](#openstart)
-* [centos](#centos)
-* [iso u盘镜像制作](#iso)
-* [SSH免密登录](#sshlogin)
----
-
-<h2 id="permission">权限相关</h2>
+## 权限相关
 
 ```bash
 chmod 777 filename
@@ -25,13 +10,13 @@ passwd username #添加密码
 
 ---
 
-<h2 id="port">端口使用情况</h2>
+## 端口使用情况
 
 ```bash
 nc -vz 12.12.12.12 28301
 ```
 
-<h2 id="port">端口使用情况</h2>
+## 端口使用情况
 
 1、lsof -i:端口号 用于查看某一端口的占用情况，比如查看8000端口使用情况，`lsof -i:8000`
 ```bash
@@ -63,7 +48,7 @@ tcp        0      0 0.0.0.0:8000                0.0.0.0:*                   LIST
 -p 显示建立相关链接的程序名
 ```
 
-<h2 id="filecompress">文件压缩解压</h2>
+## 文件压缩解压
 
 ##### 一、TAR
 
@@ -113,14 +98,14 @@ tar xvf xxx.tar
 
 ---
 
-<h2 id="dpkg">查看安装的软件包</h2>
+## 查看安装的软件包
 
 使用dpkg命令  
 `sudo dpkg --list | grep -i jdk`
 
 ---
 
-<h2 id="chmod">chmod相关</h2>
+## chmod相关
 
 常见格式：`sudo chmod 777 /home/xxx`  
 777对应的用户：文件所有者、群组用户、其他用户  
@@ -133,7 +118,7 @@ x|1|执行execute
 
 ---
 
-<h2 id="openstart">开机启动服务</h2>
+## 开机启动服务
 
 1. 增加开机启动脚本：`sudo vim /etc/init.d/aria2c`
 
@@ -174,14 +159,14 @@ x|1|执行execute
 
 ---
 
-<h2 id="centos">查看安装的软件包</h2>
+## 查看安装的软件包
 
 查看所有的已安装软件名称:`rpm -qa`
 显示软件的安装路径:`rpm -ql 软件名称`
 
 ---
 
-<h2 id="copyfile">复制文件</h2>
+## 复制文件
 
 ```bash
 # 复制
@@ -194,7 +179,7 @@ mv -f newproject /home
 mv oldname newname
 ```
 
-<h2 id="iso">iso u盘镜像制作</h2>
+## iso u盘镜像制作
 
 ```bash
 # 查看所有存储设备，注意记录u盘名称 /dev/sdc
@@ -213,7 +198,7 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
 
 ---
 
-<h2 id="sshlogin">SSH免密登录</h2>
+## SSH免密登录
 
 在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户（比如gitlab-runner运行的默认帐号是gitlab-runner，我们就需要切换到这个用户下面做免密登录配置）
 

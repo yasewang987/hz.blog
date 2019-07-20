@@ -1,12 +1,7 @@
 # Windows服务器常用操作记录
 
-* [Windows-服务](#windowsserver)
-* [Windows-IIS操作命令](#iis)
-* [Windows-文件操作](#file)
 
----
-
-<h2 id="windowsserver">Windows服务</h2>
+## Windows服务
 
 服务注册(等号后面的空格必须)：  
 ```bash
@@ -25,7 +20,7 @@ sc delete ServiceName
 
 ---
 
-<h2 id="iis">Windows-IIS操作命令</h2>
+## Windows-IIS操作命令
 
 ```bash
 # 停止IIS站点
@@ -41,7 +36,7 @@ C:\Windows\System32\inetsrv\appcmd.exe start apppool /apppool.name:xxxx
 
 ---
 
-<h2 id="file">Windows-文件操作</h2>
+## Windows-文件操作
 
 ```bash
 call xcopy ./out E:\test /e /y

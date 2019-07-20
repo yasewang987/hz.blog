@@ -1,12 +1,6 @@
 # Consul配置文件
 
-* [Consul常用配置文件](#configfile)
-* [Consul配置文件参数](#configparams)
-* [Consul多集群配置](#configwan)
-
----
-
-<h2 id="configfile">Consul常用配置文件<h2>
+## Consul常用配置文件
 
 ### 一、服务端配置文件
 
@@ -75,7 +69,7 @@
     ```
 ---
 
-<h2 id="configparams">Consul常用配置文件</h2>
+# Consul常用配置文件
 
 * 参考官网即可：https://www.consul.io/docs/agent/options.html
 
@@ -90,7 +84,7 @@
 
 ---
 
-<h2 id="configwan">Consul多集群配置</h2>
+# Consul多集群配置
 
 注意：对于不在同一局域网集群的节点，需要在每个局域网开通一个consul server，通过server同步数据。
 

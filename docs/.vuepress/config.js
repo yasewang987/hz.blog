@@ -85,17 +85,16 @@ module.exports = {
         ],
         sidebar: {
             '/dotnet/common/': [
+                'code',
                 'common',
                 'config',
                 'email',
-                'code',
                 'middleware',
                 'polly',
                 'reflection',
                 'signalr',
                 'swagger',
-                'wcf',
-
+                'wcf'
             ],
             '/dotnet/tools/': [
                 'install',
@@ -113,10 +112,6 @@ module.exports = {
                 'config',
                 'docker'
             ],
-            '/microservices/ocelot/': [
-                'middleware',
-                'base'
-            ],
             '/microservices/elk/': [
                 'install',
                 'install-one'
@@ -124,11 +119,15 @@ module.exports = {
             '/microservices/identity/': [
                 'client',
             ],
-            '/microservices/skywalking/': [
-                'base'
-            ],
             '/microservices/mq/': [
                 'rabbitmq-install'
+            ],
+            '/microservices/ocelot/': [
+                'middleware',
+                'base'
+            ],
+            '/microservices/skywalking/': [
+                'base'
             ],
             '/web/npm/': [
                 'base',
@@ -138,29 +137,31 @@ module.exports = {
                 'base',
                 'install'
             ],
-            '/web/vue/': [],
+            '/web/vue/': [
+                'vscode'
+            ],
             '/test/jmeter/': [
                 'install-docker',
-            ],
-            '/devops/k8s/': [
-                'k8s-cmd',
-                'k8s-install',
-                'k8s-problem',
-                'k8s-netcore'
             ],
             '/devops/docker/': [
                 'cmd',
                 'compose-netcore',
                 'install'
             ],
-            '/devops/jenkins/': [
-                'dotnet',
-                'install'
-            ],
             '/devops/gitlabrunner/': [
                 'base',
                 'netcore',
                 'yml'
+            ],
+            '/devops/jenkins/': [
+                'dotnet',
+                'install'
+            ],
+            '/devops/k8s/': [
+                'k8s-cmd',
+                'k8s-install',
+                'k8s-problem',
+                'k8s-netcore'
             ],
             '/devops/shell/': [
                 'sh-common.md',
@@ -179,12 +180,13 @@ module.exports = {
             ],
             '/other/linux/': [
                 'cmd',
+                'error',
                 'firewall',
                 'info',
                 'install',
                 'sql',
                 'systemd',
-                'vim'
+                'vim',
             ],
             '/other/tools/': [
                 'chrome',

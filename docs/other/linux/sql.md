@@ -1,6 +1,6 @@
 # Linux数据库管理工具
 
-<h2 id="datagrip">Jetbrains DataGrip</h2>
+## Jetbrains DataGrip
 
 * 下载地址：https://www.jetbrains.com/datagrip/download/#section=linux
 * 可以直接下载压缩包，也可以使用`snap`下载安装（具体页面上有提示）
@@ -62,7 +62,7 @@
 
 ---
 
-<h2 id="dbeaver">DBeaver</h2>
+## DBeaver
 
 * 下载地址：https://dbeaver.io/download/
 

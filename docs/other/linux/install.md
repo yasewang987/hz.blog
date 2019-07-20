@@ -1,34 +1,6 @@
 # Linux系统优化及常用软件安装
 
-## Linux安装
----
-* [系统安装](#install)
-* [修改下载源](#repository)
-* [查看系统版本](#release)
-* [微信](#webchat)
-* [钉钉](#dingtalk)
-* [shadowsocks代理](#shadowsocks)
-* [Mint修改系统默认字体](#font)
-* [Linux下禁用GPU](#disablegpu)
-* [zsh安装](#zsh)
-* [其他常用软件安装](#other)
-* [输入法安装](#inputmethod)
-* [Mint关机卡死（很慢）等](#problemclose)
-* [Mint开机卡死（黑屏）等](#problemopen)
-* [Linux忘记root重置密码](#password)
-* [Linux激活root账户](#root)
-* [snap相关](#snap)
-* [快捷方式](#quicklink)
-* [截图工具](#shutcat)
-* [VMWare](#vmware)
-* [文件传输工具](#sendfile)
-* [下载工具](#download)
-* [面板图标显示](#panel)
-* [邮件管理](#mail)
-* [思维导图](#mind)
----
-
-<h2 id="install">安装</h2>
+## 安装
 
 1. 使用UISO刻录光盘的时候选择RAW模式
 1. 如果grub-efi-amd64的问题（这个是因为之前Windows系统使用的是BIOS引导，如果U盘使用EFI引导就会出错），需要使用`rufus`软件刻录安装盘，记得格式选择`BIOS或EFI`。记得在启动盘选择的时候不要选择`EFI`带头的U盘，要直接选择这个U盘。  
@@ -38,8 +10,7 @@
 1. 然后设置字体等
 
 ---
-
-<h2 id="repository">下载源修改</h2>
+## 下载源修改
 
 * Ubuntu
 
@@ -95,25 +66,25 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="release">查看系统版本</h2>
+## 查看系统版本
 
 1. 查看发行版本：`cat /etc/os-release`
 1. 查看内核版本：`uname -r`
 
 ---
 
-<h2 id="wechat">微信</h2>
+## 微信
 
 使用`snap`安装：`sudo snap install electronic-wechat`
 
-<h2 id="dingtalk">钉钉</h2>
+## 钉钉
 
 * 网站地址：https://github.com/nashaofu/dingtalk#readme
 * 直接下载`appimage`文件格式即可
 
 ---
 
-<h2 id="shadowsocks">ShadowSocks</h2>
+## ShadowSocks
 
 * 资料地址
   > https://github.com/shadowsocks/shadowsocks-qt5  
@@ -129,7 +100,7 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="font">Mint修改默认字体</h2>
+## Mint修改默认字体
 
 1. 安装字体管理器:`sudo apt install font-manager`
 1. 删除默认字体：打开字体管理器，删除所有以`AR PL`带头的所有字体
@@ -137,7 +108,7 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="disablegpu">Linux禁用GPU加速</h2>
+## Linux禁用GPU加速
 
 * 问题：在虚拟机中使用Linux系统的时候在使用VSCode和谷歌浏览器的时候，在切换输入法时经常出现屏幕假死
 
@@ -152,7 +123,7 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="zsh">zsh安装</h2>
+## zsh安装
 
 ##### zsh
 1. 查看当前环境shell
@@ -190,8 +161,7 @@ sudo apt-get upgrade
 1. 安装完成之后使用的是默认主题，如果需要其他主题参考官网切换主题即可
 
 ---
-
-<h2 id="other">其他常用软件软件安装</h2>
+## 其他常用软件软件安装
 
 |软件|下载地址|功能|备注|
 |---|-----|----|---|
@@ -204,7 +174,7 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="inputmethod">输入法安装</h2>
+## 输入法安装
 
 1. 控制中心-输入法-选择fcitx（简体中文）-安装
 1. 安装完之后打开`终端`，输入`im-config`
@@ -214,13 +184,13 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="problemclose">Linux 关机问题 </h2>
+## Linux 关机问题
 
 1. 安装watchdog：`sudo apt install watchdog`
 1. 配置开机启动：`sudo systemctl enable watchdog`
 1. 启动dog：`sudo systemctl start watchdog`
 
-<h2 id="problemopen">Linux 开机问题</h2>
+## Linux 开机问题
 
 * linux开机卡死或者登录之后黑屏
   > 出现这个问题一般是显卡驱动（NVIDIA）问题  
@@ -228,13 +198,12 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="root">Linux激活root</h2>
+## Linux激活root
 
 激活root用户 `sudo passwd root` 输入新密码
 
 ---
-
-<h2 id="password">Linux忘记root账号密码处理</h2>
+## Linux忘记root账号密码处理
 
 ##### 不用重启直接修改（非grub方法）
 
@@ -276,7 +245,7 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="snap">SNAP</h2>
+## SNAP
 
 * 输入`snap help`查看具体命令  
 安装snap: `sudo apt install snapd`  
@@ -285,7 +254,7 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="shutcat">截图工具</h2>
+## 截图工具
 
 1. flameshot:
     安装工具flameshot：`sudo apt install flameshot`  
@@ -294,7 +263,7 @@ sudo apt-get upgrade
     安装：`sudo apt install shutter`
 ---
 
-<h2 id="quicklink">创建快捷方式</h2>
+## 创建快捷方式
 
 1. 创建`desktop`文件
 
@@ -316,7 +285,7 @@ sudo apt-get upgrade
 1. 双击`DataGrip.desktop`，选择`信任并运行`
 1. 移动文件到应用列表中`sudo mv ~/桌面/DataGrip.desktop /usr/share/applications/`
 
-<h2 id="vmware">VMWare</h2>
+## VMWare
 
 * 安装
 1. 官网下载vmware workstation pro
@@ -331,38 +300,34 @@ sudo apt-get upgrade
 
 ---
 
-<h2 id="sendfile">文件传输</h2>
+## 文件传输
 
 软件名：Dukto  
 下载地址：https://software.opensuse.org/download.html?project=home:colomboem&package=dukto
 
 ---
 
-<h2 id="download">下载工具</h2>
+## 下载工具
 
 软件名：Motrix
 下载地址：https://github.com/agalwood/Motrix/releases
 
 ---
 
-<h2 id="panel">面板显示调整</h2>
+## 面板显示调整
 
 1. 添加面板小程序-》窗口列表
 1. 右键面板，打开面板编辑模式（可以拖动图标到面板的指定位置左中右即可）
 
 ---
 
-<h2 id="mail">邮箱管理</h2>
+## 邮箱管理
 
 1. evolution
 
 ---
 
-<h2 id="mind">思维导图</h2>
+## 思维导图
 
 1. XMind ZEN
-
----
-
-### [返回](../目录.md)
 
