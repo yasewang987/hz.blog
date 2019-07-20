@@ -20,7 +20,35 @@ module.exports = {
             {
                 text: 'Dotnet',
                 items: [
-                    { text: '常用功能', link: '/dotnet/common/' }
+                    { text: '常用功能', link: '/dotnet/common/' },
+                    { text: '其他', link: '/dotnet/tools/' }
+                ]
+            },
+            {
+                text: 'Java',
+                items: [
+                    { text: '常用功能', link: '/java/common/' },
+                    { text: 'Spring', link: '/java/spring/' },
+                    { text: '其他', link: '/java/tools/' }
+                ]
+            },
+            {
+                text: 'MicroServices',
+                items: [
+                    { text: 'Consul', link: '/microservices/consul/' },
+                    { text: 'Ocelot', link: '/microservices/ocelot/' },
+                    { text: 'ELK', link: '/microservices/elk/' },
+                    { text: 'Identity', link: '/microservices/identity/' },
+                    { text: 'Skywalking', link: '/microservices/skywalking/' },
+                    { text: 'MQ', link: '/microservices/mq/' }
+                ]
+            },
+            {
+                text: 'Web',
+                items: [
+                    { text: 'Npm', link: '/web/npm/' },
+                    { text: 'TypeScript', link: '/web/ts/' },
+                    { text: 'Vue', link: '/web/vue/' }
                 ]
             },
             { 
@@ -38,12 +66,79 @@ module.exports = {
                     { text: 'GitLab-Runner', link: '/devops/gitlabrunner/' },
                     { text: '脚本', link: '/devops/shell/' }
                 ]
+            },
+            {
+                text: 'SQL',
+                items: [
+                    { text: 'MSSQL', link: '/sql/mssql/' },
+                    { text: 'MYSQL', link: '/sql/mysql/' }
+                ]
+            },
+            {
+                text: 'Other',
+                items: [
+                    { text: 'Git', link: '/other/git/' },
+                    { text: 'Linux', link: '/other/linux/' },
+                    { text: '实用工具', link: '/other/tools/' }
+                ]
             }
         ],
         sidebar: {
             '/dotnet/common/': [
-                'core'
+                'common',
+                'config',
+                'email',
+                'code',
+                'middleware',
+                'polly',
+                'reflection',
+                'signalr',
+                'swagger',
+                'wcf',
+
             ],
+            '/dotnet/tools/': [
+                'install',
+                'jexus',
+                'nuget'
+            ],
+            '/java/common/': [],
+            '/java/spring/': [],
+            '/java/tools/' : [
+                'install'
+            ],
+            '/microservices/consul/': [
+                'base',
+                'cmd',
+                'config',
+                'docker'
+            ],
+            '/microservices/ocelot/': [
+                'middleware',
+                'base'
+            ],
+            '/microservices/elk/': [
+                'install',
+                'install-one'
+            ],
+            '/microservices/identity/': [
+                'client',
+            ],
+            '/microservices/skywalking/': [
+                'base'
+            ],
+            '/microservices/mq/': [
+                'rabbitmq-install'
+            ],
+            '/web/npm/': [
+                'base',
+                'ci'
+            ],
+            '/web/ts/': [
+                'base',
+                'install'
+            ],
+            '/web/vue/': [],
             '/test/jmeter/': [
                 'install-docker',
             ],
@@ -54,17 +149,47 @@ module.exports = {
                 'k8s-netcore'
             ],
             '/devops/docker/': [
-                'docker1'
+                'cmd',
+                'compose-netcore',
+                'install'
             ],
             '/devops/jenkins/': [
-                'jenkins1'
+                'dotnet',
+                'install'
             ],
             '/devops/gitlabrunner/': [
-                'gitlabrunner1'
+                'base',
+                'netcore',
+                'yml'
             ],
             '/devops/shell/': [
                 'sh-common.md',
                 'sh-gitbranch.md'
+            ],
+            '/sql/mssql/': [
+                'usesul'
+            ],
+            '/sql/mysql/': [
+                'install'
+            ],
+            '/other/git/': [
+                'history',
+                'cmd',
+                'gl-hook',
+            ],
+            '/other/linux/': [
+                'cmd',
+                'firewall',
+                'info',
+                'install',
+                'sql',
+                'systemd',
+                'vim'
+            ],
+            '/other/tools/': [
+                'chrome',
+                'win-cmd',
+                'win-tools'
             ]
         },
         sidebarDepth: 2
