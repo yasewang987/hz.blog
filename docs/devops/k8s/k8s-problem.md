@@ -1,8 +1,6 @@
 # K8s问题排查
 
-## minikube安装问题处理
-
-### 问题定位：
+## k8s问题定位
 
 1. 查看所有pod运行情况
     
@@ -16,9 +14,7 @@
     ```
 1. 根据报错信息查找解决方案
 
-### 问题列表
-
-* connect: no route to host
+## connect: no route to host
     [参考资料](https://github.com/kubernetes/kubeadm/issues/193)
     
     ```bash
@@ -29,3 +25,8 @@
     systemctl start kubelet
     systemctl start docker
     ```
+
+## no kind "Deployment" is registered for version "apps/v1"
+
+将`apiVersion`改成 `extensions/v1beta1`
+

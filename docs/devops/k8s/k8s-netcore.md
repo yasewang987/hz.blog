@@ -270,7 +270,177 @@ Deployment表示用户对Kubernetes集群的一次更新操作。可以是创建
 
     删除了一个pod之后发现又马上重新创建了一个Pod:`k8stest-deployment-84d64dd896-vtht7`, k8s会监控Deployment创建的Pod，保持Pod的数量与Deployment中设定的预期数量相等。
 
-    
+## 六、Deployment版本升级、回滚
+
+  ### 升级
+  1. 修改配置文件`k8stest-deployment.yaml`内容如下：
+
+      ```yaml
+      ...
+      image: 你的docker仓库用户名/k8stest:v2
+      ...
+      ```
+      * v2版本的镜像里面修改了values控制器的返回值
+  1. 运行升级命令：
+
+      ```bash
+      # --record设置为true可以在annotation中记录当前命令创建或者升级了该资源
+      kubectl apply -f k8stest-deployment.yaml --record
+
+      # 检查服务升级状态
+      kubectl rollout status deployment demo-web-deployment
+      ```
+      * 等升级完成之后刷新浏览器就能看到内容已经变成v2版本的了
+
+  ### 回滚
+  1. 查看历史版本：
+
+      ```bash
+      kubectl rollout history deployment k8stest-deployment
+
+      # REVISION	CHANGE-CAUSE
+      # 1		<none>
+      # 2		kubectl apply -f k8stest-deployment.yaml --record --validate=false
+      ```
+  1. 回滚版本：
+
+      ```bash
+      kubectl rollout undo deployment k8stest-deployment --to-revision=1
+      # deployment "k8stest-deployment" rolled back
+      ```
+      * 刷新浏览器查看版本已经回退
+## k8s多服务调用
+
+新建一个服务调用上一个服务
+
+### 部署新webapi镜像
+
+1. 新建webapi:`dotnet new webapi -n k8stest2 --no-https`，主要修改内容如下：
+
+  ```csharp
+  // startup.cs
+  public void ConfigureServices(IServiceCollection services)
+  {
+      // 注意这里的Uri取的是k8s环境变量的值
+      services.AddHttpClient("k8stest", cl => {
+          cl.BaseAddress = new Uri(Configuration["k8stestUrl"]);
+      });
+  }
+
+  // valuescontroller.cs
+  private readonly HttpClient _client;
+
+  public ValuesController(IHttpClientFactory httpClientFactory)
+  {
+      _client = httpClientFactory.CreateClient("k8stest");
+  }
+  [HttpGet]
+  public async Task<ActionResult<IEnumerable<string>>> Get()
+  {
+      var rest = await _client.GetStringAsync("/api/values/1");
+      return new string[] { "value1", "value2", rest };
+  }
+  ```
+1. 新建`Dockerfile`内容如下：
+
+  ```dockerfile
+  FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
+  WORKDIR /app
+  COPY bin/Release/netcoreapp2.2/publish .
+  ENTRYPOINT ["dotnet", "k8stest2.dll"]
+  ```
+1. 编译生成镜像并上传：
+
+  ```bash
+  # 编译项目
+  dotnet publish -c Release
+
+  # 打包镜像
+  docker build -t 你的docker仓库用户名/k8stest2:v1
+
+  # 上传镜像
+  docker publish 你的docker仓库用户名/k8stest2:v1
+  ```
+
+### 给新的api创建deployment
+
+1. 新建`k8stest2-deployment.yaml`内容如下：
+
+  ```yaml
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: k8stest2-deployment
+    labels:
+      app: k8stest2-deployment
+  spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        app: k8stest2
+    minReadySeconds: 5
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
+        maxSurge: 1
+    template:
+      metadata:
+        labels:
+          app: k8stest2
+      spec:
+        containers:
+          - name: k8stest2
+            image: 你的docker仓库用户名/k8stest2:v1
+            imagePullPolicy: Always
+            ports:
+              - containerPort: 80
+            env:
+              - name: k8stestUrl # 这里名称与webapi中注入的一致
+                value: "http://k8stest-service" # 这里使用前面一个服务的service
+  ```
+  * 这里可以直接使用service的名称是因为CoreDNS(Kube-DNS)帮我们完成了域名解析
+
+  DNS服务器监控kubernetes创建服务的API, 并为每个服务创建一组dns记录。如果在整个群集中启用了dns, 所有Pod都会使用它作为DNS服务器。比如我们的k8stest-service服务，DNS服务器会创建一条"my-service.my-ns"也就是10.107.96.166:k8stest-service.default的dns记录，因为我们的2个Api应用在同一个命名空间(default)中，所以可以直接使用k8stest-service来访问
+
+1. 启动deployment:
+
+  ```bash
+  kubectl create -f k8stest2-deployment.yaml --validate=false
+  ```
+
+### 为新的api创建新的service
+
+1. 创建`k8stest2-service.yaml`文件，内容如下：
+
+  ```yaml
+  appVersion: v1
+  kind: Service
+  metadata:
+    name: k8stest2-service
+  spec:
+    selector:
+      app: k8stest2
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 31112
+    type: NodePort
+  ```
+1. 启动service：
+
+  ```
+  kubectl create -f k8stest2-service.yaml --validate=false
+  ```
+### 验证请求
+
+在网页中直接输入`Node节点ip地址:31112/api/values`可以看到返回内容如下：
+
+  ```text
+  ["value1","value2","172.17.0.9"]
+  ```
+
 
 
 
