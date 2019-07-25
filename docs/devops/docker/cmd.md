@@ -1,4 +1,6 @@
-# Docker常用命令
+# Docker常用方法
+
+## docker常用命令
 
 ```bash
 # 删除所有容器
@@ -24,4 +26,31 @@ docker logs xxx
 # 进入容器bash
 docker exec -it xxx /bin/bash
 
+```
+
+## docker常用功能
+
+### docker容器中使用docker命令
+
+```bash
+docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --name hello helloworld
+```
+
+### docker时区问题
+
+```bash
+docker run -d -v /etc/localtime:/etc/localtime --name hello helloworld
+```
+
+### docker中文乱码问题
+
+```bash
+# 查看所有编码
+locale -a
+
+# 查看当前所使用的编码
+locale
+
+# 这里设置哪种编码需要根据容器环境确定
+docker run -d -e LANG="C.UTF-8" --name hello helloworld
 ```

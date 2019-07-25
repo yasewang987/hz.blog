@@ -11,14 +11,16 @@
 
     ```bash
     docker run -i -d -v /j/jmx:/j/jmx -v /j/csv:/j/csv -v /j/html:/j/html --name jclient yasewang/jclient:01
+    chmod 766 /j/jmx
+    chmod 766 /j/csv
     ```
 1. jmeter管理网站部署：
 
     ```bash
-    docker run -d -p 19998:80 -v /j:/j -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker -v /etc/localtime:/etc/localtime --name jsite yasewang/jsite:01
+    docker run -d -p 19998:80 -v /j:/j -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker -v /etc/localtime:/etc/localtime -e LANG="C.UTF-8" --name jsite yasewang/jsite:01
     ```
     * 这里需要特别注意一下，管理网站必须和客户端部署在同一台服务器。
-1. 经过上面的流程已经全部部署完了，可以使用 ``
+1. 经过上面的流程已经全部部署完了，可以使用 `客户端服务器ip：19998` 访问
 
 
 * 如果你想要了解整个制作过程，可以继续往下看
@@ -245,6 +247,7 @@
     WORKDIR /app
     EXPOSE 80
     COPY ./bin/Release/netcoreapp2.2/publish .
+    RUN apt-get update && apt-get libltdl7
     ENTRYPOINT ["dotnet", "jmeterSite.dll"]
     ```
 1. 编译网站生成Release版本
