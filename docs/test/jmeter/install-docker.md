@@ -10,9 +10,10 @@
 1. jmeter客户端容器部署：
 
     ```bash
-    docker run -i -d -v /j/jmx:/j/jmx -v /j/csv:/j/csv -v /j/html:/j/html --name jclient yasewang/jclient:01
+    docker run -i -d -v /j/jmx:/j/jmx -v /j/csv:/j/csv -v /j/html:/j/html -v /etc/localtime:/etc/localtime --name jclient jclient
     chmod 766 /j/jmx
     chmod 766 /j/csv
+    chmod 766 /j/html
     ```
 1. jmeter管理网站部署：
 
