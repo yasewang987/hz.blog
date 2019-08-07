@@ -10,6 +10,12 @@ passwd username #添加密码
 
 ---
 
+## 查看linux系统编码
+
+```bash
+locale
+```
+
 ## 端口使用情况
 
 ```bash
