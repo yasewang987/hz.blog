@@ -1,4 +1,4 @@
-# K8s - Minikube
+# Kubernetes - 单机部署Minikube
 
 ## Minikube - Kubernetes本地实验环境
 
