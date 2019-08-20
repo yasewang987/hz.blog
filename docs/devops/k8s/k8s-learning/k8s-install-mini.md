@@ -1,4 +1,4 @@
-# K8s安装
+# K8s - Minikube
 
 ## Minikube - Kubernetes本地实验环境
 

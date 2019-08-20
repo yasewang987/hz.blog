@@ -1,7 +1,7 @@
 # K8s-从0开始部署AspNet.Core
 
 ## 一、准备镜像
-1. 准备k8s集群，如果单机部署可以[参考我的部署教程](./k8s-install.md)
+1. 准备k8s集群，如果单机部署可以[参考我的部署教程](../k8s-learning/k8s-install-mini.md)
 
 1. 新建webapi项目:
 

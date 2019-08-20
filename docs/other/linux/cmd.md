@@ -1,11 +1,31 @@
 # Linux常用命令
 
+## 修改root密码
+
+```bash
+sudo passwd root
+```
+
+## 允许root用户远程登陆
+
+```bash
+sudo vim /etc/ssh/sshd_config
+#找到PermitRootLogin without-password 修改为PermitRootLogin yes
+
+# 重启ssh服务
+sudo systemctl restart ssh
+# 或者
+service ssh restart
+```
+
 ## 权限相关
 
 ```bash
 chmod 777 filename
 adduser username #添加用户
 passwd username #添加密码
+
+chmod u+x filename # 给用户添加执行权限
 ```
 
 ---

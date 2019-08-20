@@ -60,7 +60,8 @@ module.exports = {
             {
                 text: 'DevOps',
                 items: [
-                    { text: 'K8s', link: '/devops/k8s/' },
+                    { text: 'K8s-其他', link: '/devops/k8s/k8s-normal/' },
+                    { text: 'K8s-从0开始系列', link: '/devops/k8s/k8s-learning/' },
                     { text: 'Docker', link: '/devops/docker/' },
                     { text: 'Jenkins', link: '/devops/jenkins/' },
                     { text: 'GitLab-Runner', link: '/devops/gitlabrunner/' },
@@ -157,11 +158,15 @@ module.exports = {
                 'dotnet',
                 'install'
             ],
-            '/devops/k8s/': [
+            '/devops/k8s/k8s-normal/': [
                 'k8s-cmd',
-                'k8s-install',
                 'k8s-problem',
                 'k8s-netcore'
+            ],
+            '/devops/k8s/k8s-learning/': [
+                'k8s-base',
+                'k8s-install-mini',
+                'k8s-install-adm'
             ],
             '/devops/shell/': [
                 'sh-common.md',
