@@ -192,6 +192,7 @@ module.exports = {
                 'sql',
                 'systemd',
                 'vim',
+                'common',
             ],
             '/other/tools/': [
                 'chrome',
