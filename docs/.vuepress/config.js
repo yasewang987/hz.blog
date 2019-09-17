@@ -17,19 +17,29 @@ module.exports = {
     themeConfig: {
         nav: [
             { text: '首页', link: '/' },
-            {
-                text: 'Dotnet',
-                items: [
-                    { text: '常用功能', link: '/dotnet/common/' },
-                    { text: '其他', link: '/dotnet/tools/' }
-                ]
-            },
-            {
-                text: 'Java',
-                items: [
-                    { text: '常用功能', link: '/java/common/' },
-                    { text: 'Spring', link: '/java/spring/' },
-                    { text: '其他', link: '/java/tools/' }
+            { 
+                text: 'Code', items: [
+                    {
+                        text: 'Dotnet',
+                        items: [
+                            { text: '常用功能', link: '/code/dotnet/common/' },
+                            { text: '其他', link: '/code/dotnet/tools/' }
+                        ]
+                    },
+                    {
+                        text: 'Java',
+                        items: [
+                            { text: '常用功能', link: '/code/java/common/' },
+                            { text: 'Spring', link: '/code/java/spring/' },
+                            { text: '其他', link: '/code/java/tools/' }
+                        ]
+                    },
+                    {
+                        text: 'Go',
+                        items: [
+                            { text: '其他', link: '/code/go/tools/' }
+                        ]
+                    }
                 ]
             },
             {
@@ -85,7 +95,7 @@ module.exports = {
             }
         ],
         sidebar: {
-            '/dotnet/common/': [
+            '/code/dotnet/common/': [
                 'code',
                 'common',
                 'config',
@@ -97,14 +107,17 @@ module.exports = {
                 'swagger',
                 'wcf'
             ],
-            '/dotnet/tools/': [
+            '/code/dotnet/tools/': [
                 'install',
                 'jexus',
                 'nuget'
             ],
-            '/java/common/': [],
-            '/java/spring/': [],
-            '/java/tools/' : [
+            '/code/java/common/': [],
+            '/code/java/spring/': [],
+            '/code/java/tools/' : [
+                'install'
+            ],
+            '/code/go/tools/': [
                 'install'
             ],
             '/microservices/consul/': [
@@ -166,7 +179,8 @@ module.exports = {
             '/devops/k8s/k8s-learning/': [
                 'k8s-base',
                 'k8s-install-mini',
-                'k8s-install-adm'
+                'k8s-install-adm',
+                'k8s-deployment'
             ],
             '/devops/shell/': [
                 'sh-common.md',
@@ -197,7 +211,8 @@ module.exports = {
             '/other/tools/': [
                 'chrome',
                 'win-cmd',
-                'win-tools'
+                'win-tools',
+                'vscode'
             ]
         },
         sidebarDepth: 2

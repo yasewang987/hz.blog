@@ -261,6 +261,8 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
     PermitEmptyPasswords no #不允许空密码登录
     PasswordAuthentication yes # 设置是否使用口令验证。
     StrictModes yes
+    PubkeyAuthentication yes
+    AuthorizedKeysFile .ssh/authorized_keys
     # 修改完毕之后需要重启sshd服务`systemctl restart sshd`
     ```
 
