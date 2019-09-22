@@ -180,7 +180,9 @@ module.exports = {
                 'k8s-base',
                 'k8s-install-mini',
                 'k8s-install-adm',
-                'k8s-deployment'
+                'k8s-deployment',
+                'k8s-daemonset',
+                'k8s-job'
             ],
             '/devops/shell/': [
                 'sh-common.md',
