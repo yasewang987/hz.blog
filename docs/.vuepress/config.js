@@ -182,7 +182,8 @@ module.exports = {
                 'k8s-install-adm',
                 'k8s-deployment',
                 'k8s-daemonset',
-                'k8s-job'
+                'k8s-job',
+                'k8s-service'
             ],
             '/devops/shell/': [
                 'sh-common.md',
