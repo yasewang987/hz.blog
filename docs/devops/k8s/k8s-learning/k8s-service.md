@@ -92,7 +92,7 @@ spec:
 
 ### 三、LoadBalancer
 
-oadBalancer 服务是暴露服务到 internet 的标准方式，它借助Cloud Provider创建一个外部的负载均衡器，并将请求转发到<NodeIP>:NodePort（向节点导流）：
+oadBalancer 服务是暴露服务到 internet 的标准方式，它借助Cloud Provider创建一个外部的负载均衡器，并将请求转发到`<NodeIP>:NodePort`（向节点导流）：
 
 ```yaml
 apiVersion: v1
