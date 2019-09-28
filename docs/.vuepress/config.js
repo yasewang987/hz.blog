@@ -105,7 +105,8 @@ module.exports = {
                 'reflection',
                 'signalr',
                 'swagger',
-                'wcf'
+                'wcf',
+                'error'
             ],
             '/code/dotnet/tools/': [
                 'install',
@@ -183,7 +184,8 @@ module.exports = {
                 'k8s-deployment',
                 'k8s-daemonset',
                 'k8s-job',
-                'k8s-service'
+                'k8s-service',
+                'k8s-rollingupdate'
             ],
             '/devops/shell/': [
                 'sh-common.md',

@@ -7,3 +7,4 @@
 ### [Kubernetes - DaemonSet](./k8s-daemonset.md)
 ### [Kubernetes - Job](./k8s-job.md)
 ### [Kubernetes - Service](./k8s-service.md)
+### [Kubernetes - Rolling Update](./k8s-rollingupdate.md)

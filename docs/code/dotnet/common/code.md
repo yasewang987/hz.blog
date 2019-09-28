@@ -1,4 +1,4 @@
-# 验证码
+# NetCore验证码
 
 ## NetCore WebAPI+Vue前后台分离使用Google验证码reCAPTCHA
 

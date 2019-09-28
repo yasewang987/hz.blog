@@ -10,3 +10,4 @@
 * [Dotnet实时通讯SignalR](./signalr.md)
 * [NetCore的WebAPI项目添加Swagger](./swagger.md)
 * [NetCore调用WCF服务](./wcf.md)
+* [NetCore常见错误](./error.md)

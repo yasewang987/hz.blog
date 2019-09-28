@@ -34,6 +34,10 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 在项目跟目录创建`NuGet.Config`文件，内容如下：
 
+```bash
+dotnet new nugetconfig
+```
+
 ```config
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -46,6 +50,13 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
   <!-- used to store credentials -->
   <packageSourceCredentials />
 </configuration>
+```
+
+## NetCore SDK版本切换
+
+执行命令切换版本、新建`global.json`文件：
+```bash
+dotnet new globaljson --sdk-version 3.0.100 --force
 ```
 
 
