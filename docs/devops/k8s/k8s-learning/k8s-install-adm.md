@@ -245,7 +245,7 @@ sudo apt-get -y install docker-ce=5:18.09.8~3-0~ubuntu-bionic
 1. 通过 `kubectl get pods --all-namespaces` 命令，应该可以看到 `CoreDNS pod` 处于 pending 状态，安装网网络以后，它才能处于 running 状态。我们选择 calico 为 pod 提供网络，pod 网络组件本身以 k8s 应用的形式运行，执行下面命令进行安装
 
   ```bash
-  kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+  sudo kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
   ```
 1. 安装了pod网络后，可以通过`kubectl get pods --all-namespaces`检查 CoreDNS pod 是否在输出中运行来确认它是否正常工作(这里需要等几分钟)
 
