@@ -185,7 +185,8 @@ module.exports = {
                 'k8s-daemonset',
                 'k8s-job',
                 'k8s-service',
-                'k8s-rollingupdate'
+                'k8s-rollingupdate',
+                'k8s-healthcheck'
             ],
             '/devops/shell/': [
                 'sh-common.md',
