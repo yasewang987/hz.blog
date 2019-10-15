@@ -90,7 +90,8 @@ module.exports = {
                 items: [
                     { text: 'Git', link: '/other/git/' },
                     { text: 'Linux', link: '/other/linux/' },
-                    { text: '实用工具', link: '/other/tools/' }
+                    { text: '实用工具', link: '/other/tools/' },
+                    { text: 'Mac', link: '/other/mac/' }
                 ]
             }
         ],
@@ -213,6 +214,9 @@ module.exports = {
                 'systemd',
                 'vim',
                 'common',
+            ],
+            '/other/mac/': [
+                'install'
             ],
             '/other/tools/': [
                 'chrome',
