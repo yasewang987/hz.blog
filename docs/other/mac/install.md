@@ -14,6 +14,9 @@
     ```bash
     #BREW_REPO = "https://github.com/Homebrew/brew".freeze
     BREW_REPO = "https://mirrors.ustc.edu.cn/brew.git".freeze
+
+    # 如果有homebrew-core修改如下
+    CORE_TAP_REPO = "https://mirrors.ustc.edu.cn/homebrew-core.git".freeze
     ```
 1. 执行安装命令：
 
@@ -26,6 +29,49 @@
 
     ```bash
     brew update
+    ```
+1. 修改软件安装源
+
+    中科大的源：
+
+    ```bash
+    cd "$(brew --repo)"
+    git remote set-url origin git://mirrors.ustc.edu.cn/brew.git
+
+    cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core"
+    git remote set-url origin git://mirrors.ustc.edu.cn/homebrew-core.git
+
+    cd "$(brew --repo)/Library/Taps/homebrew/homebrew-cask"
+    git remote set-url origin git://mirrors.ustc.edu.cn/homebrew-cask.git
+    ```
+
+    还原为默认源：
+
+    ```bash
+    cd "$(brew --repo)"
+    git remote set-url origin https://github.com/Homebrew/brew.git
+
+    cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core"
+    git remote set-url origin https://github.com/Homebrew/homebrew-core.git
+
+    cd "$(brew --repo)/Library/Taps/homebrew/homebrew-cask"
+    git remote set-url origin https://github.com/Homebrew/homebrew-cask.git
+    ```
+
+    修改二进制源：
+
+    ```bash
+    # 对于bash用户：
+
+    echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' >> ~/.bash_profile
+    source ~/.bash_profile
+
+    # 对于zsh用户
+
+    echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' >> ~/.zshrc
+    source ~/.zshrc
+
+    source ~/.zshrc
     ```
 ## Oh-My-Zsh 安装
 
