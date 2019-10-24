@@ -54,6 +54,9 @@
     cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core"
     git remote set-url origin https://github.com/Homebrew/homebrew-core.git
 
+    # 先安装cask才能修改下面软件源
+    brew cask # 会自动安装
+
     cd "$(brew --repo)/Library/Taps/homebrew/homebrew-cask"
     git remote set-url origin https://github.com/Homebrew/homebrew-cask.git
     ```
@@ -95,4 +98,16 @@
 
     ```bash
     nvm install --lts
+    ```
+
+## Docker 安装
+
+    ```bash
+    brew cask install docker
+    ```
+
+## java 安装
+
+    ```bash
+    brew cask install java
     ```

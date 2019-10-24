@@ -9,3 +9,4 @@
 ### [Kubernetes - Service](./k8s-service.md)
 ### [Kubernetes - Rolling Update](./k8s-rollingupdate.md)
 ### [Kubernetes - HealthCheck](./k8s-healthcheck.md)
+### [Kubernetes - Volume](./k8s-volume.md)
