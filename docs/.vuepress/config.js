@@ -198,7 +198,8 @@ module.exports = {
                 'usesul'
             ],
             '/sql/mysql/': [
-                'install'
+                'install',
+                'gh-ost'
             ],
             '/other/git/': [
                 'history',
