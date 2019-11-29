@@ -143,7 +143,7 @@ rm /tmp/ghost.postpone.flag
 --master-password string :MySQL 主密码
 --master-user string:MysQL主账号
 --max-lag-millis int:主从复制最大延迟时间，当主从复制延迟时间超过该值后，gh-ost将采取节流(throttle)措施，默认值：1500s。
---max-load string:逗号分隔状态名称=阈值，如：'Threads_running=100,Threads_connected=500'. When status exceeds threshold, app throttles writes
+--max-load string:逗号分隔状态名称=阈值，如：'Threads_running=100,Threads_connected=500'. 可以指定多个指标来限速,每个chunk拷贝完会检查，超过阀值会暂停复制
 --migrate-on-replica:gh-ost的数据迁移(migrate)运行在从库上，而不是主库上。 
 --nice-ratio float:每次chunk时间段的休眠时间，范围[0.0…100.0]。0：每个chunk时间段不休眠，即一个chunk接着一个chunk执行；1：每row-copy 1毫秒，则另外休眠1毫秒；0.7：每row-copy 10毫秒，则另外休眠7毫秒。
 --ok-to-drop-table:gh-ost操作结束后，删除旧表，默认状态是不删除旧表，会存在_tablename_del表。

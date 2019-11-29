@@ -216,6 +216,7 @@ module.exports = {
                 'systemd',
                 'vim',
                 'common',
+                'screen'
             ],
             '/other/mac/': [
                 'install'
