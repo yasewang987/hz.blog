@@ -40,34 +40,39 @@ gh-ost 作为一个伪装的备库，可以从主库/备库上拉取 binlog，�
 gh-ost 拥有众多特性，比如：轻量级、可暂停、可动态控制、可审计、可测试等等，我们可以通过操作特定的文件对正在执行的 gh-ost 命令进行动态调整。
 
 ### 暂停/恢复
-我们可以通过创建/删除 `throttle-additional-flag-file` 指定的文件 `/tmp/gh-ost.throttle` 控制 gh-ost 对 binlog 应用。
+gh-ost.库名.表明.sock，这个文件在脚本启动的时候会自动创建，注意执行命令的时候自己替换一下库名和表明
+
+```bash
+#暂停
+echo throttle | socat - /tmp/gh-ost.库名.表明.sock
+#恢复
+echo no-throttle | socat - /tmp/gh-ost.库名.表明.sock
+```
 
 ### 限流
 
 gh-ost 可以通过 unix socket 文件或者 TCP 端口（可配置）的方式来监听请求，DBA 可以在命令运行后更改相应的参数，参考下面的例子（gh-ost.db.table.sock会自动生成）:
 
-```bash
-# 打开限流
-echo throttle | socat - /tmp/gh-ost.xb.sign.sock
-# _b_ghc 中会多一条记录
-331 | 2019-08-31 23:23:00 | throttle at 1567264980930907070 | done throttling
+可配置参数：chunk-size; max-lag-millis; dml-batch-size; max-load; critical-load; nice-ratio
 
+```bash
 # 改变执行参数：chunk-size= 1024, max-lag-millis=100, max-load=Thread_running=23 这些参数都可以在运行时动态调整。
-echo chunk-size=1024 | socat - /tmp/gh-ost.xb.sign.sock
+echo chunk-size=1024 | socat - /tmp/gh-ost.库名.表明.sock
+# 主动同步延时
 echo max-lag-millis=100 | socat - /tmp/gh-ost.xb.sign.sock
-echo max-load=Thread_running=23 | socat - /tmp/gh-ost.xb.sign.sock
+echo max-load=Thread_running=3 | socat - /tmp/gh-ost.库名.表明.sock
 
 # 关闭限流
-no-throttle | socat - /tmp/gh-ost.xb.sign.sock
+echo no-throttle | socat - /tmp/gh-ost.库名.表明.sock
 # _b_ghc 中会多一条记录
 347 | 2019-08-31 23:24:09 | throttle at 1567265049830789079 | commanded by user
 ```
 
-### 终止运行
+### 强行退出
 
-通过来过创建 panic-flag-file 指定的文件，立即终止正在执行的 gh-ostmin
+通过来过创建 panic-flag-file 指定的文件，立即终止正在执行的 gh-ost
 
-* 临时文件需要自行清理
+强行退出，无法继续执行，需要删除临时表【_表名_gho】，并且需要确认/tmp文件夹下的【ghost.panic.flag】、【gh-ost.库名.表明.sock】不存在才能重新开始同步（重新开始是从0开始）
 
 ```bash
 touch /tmp/ghost.panic.flag
@@ -75,12 +80,24 @@ touch /tmp/ghost.panic.flag
 2019-08-31 22:50:52.701 FATAL Found panic-file /tmp/ghost.panic.flag. Aborting without cleanup
 ```
 
-* 注意：停止 gh-ost 操作会有遗留表 xxx_ghc，xxx_gho还有 socket 文件，管理 cut-over 的文件，如果你需要执行两次请务必检查指定目录是否存在这些文件，并且清理掉文件和表
-
 ### 结束不自动
 
-创建文件延迟cut-over进行，即推迟切换操作。例子中创建/tmp/ghost.postpone.flag文件，gh-ost 会完成行复制，但并不会切换表，它会持续的将原表的数据更新操作同步到临时表中
+创建文件延迟cut-over进行，即推迟切换操作。创建`/tmp/ghost.postpone.flag`文件，gh-ost 会完成行复制，但并不会切换表，它会持续的将原表的数据更新操作同步到临时表中
 
+执行了rm，确认同步动作之后脚本会自动将2个同步的表删掉，老业务表会重命名为：_表名_时间戳_del,同步表会重命名成业务表名，如果确认没问题，可以人工删除del表
+
+```bash
+# 开始执行脚本之前执行
+touch /tmp/ghost.postpone.flag
+
+# 在确认要替换同步表为主表时删除这个文件
+rm /tmp/ghost.postpone.flag
+```
+
+### 注意事项
+
+* 数据订正脚本中不能出新 ` 字符
+* 订正脚本中不用出现 alter table xxx，直接用之后的ddl语句
 
 ## gh-ost参数含义
 
@@ -223,55 +240,60 @@ touch /tmp/ghost.panic.flag
 
 ## 例子
 
+* 执行脚本之后会自动生成2个表：
+    * _表名_gho:  订正表的同步表
+    * _表名_ghc:  同步时的动作记录表
 ```bash
 # 本地数据库
-~/Downloads/gh-ost \
---max-load=Threads_running=20 \
---critical-load=Threads_running=50 \
+gh-ost \
+--max-load=Threads_running=50 \
+--critical-load=Threads_running=100 \
 --critical-load-interval-millis=5000 \
---chunk-size=100 \
---user="root" \
---password="123456" \
---host='127.0.0.1' \
+--chunk-size=1000 \
+--user="账号" \
+--password="密码" \
+--host='数据库连接' \
 --port=3306 \
---database="testdb" \
---table="log" \
+--database="数据库" \
+--table="订正的表" \
 --verbose \
---alter="MODIFY COLUMN Id BIGINT(20) NOT NULL AUTO_INCREMENT,ADD COLUMN SourceType tinyint(4)  Not Null Default 3 COMMENT '学员来源：1.插班，2.补课，3.在读，4.约课' AFTER StufeeDocId;" \
+--alter="这里替换成数据订正sql脚本" \
 --assume-rbr \
 --cut-over=default \
 --cut-over-lock-timeout-seconds=1 \
 --dml-batch-size=10 \
 --allow-on-master \
+--assume-rbr \
 --concurrent-rowcount \
 --default-retries=10 \
 --heartbeat-interval-millis=2000 \
 --panic-flag-file=/tmp/ghost.panic.flag \
 --postpone-cut-over-flag-file=/tmp/ghost.postpone.flag \
 --timestamp-old-table \
---execute 2>&1 | tee  /tmp/rebuild_t1.log
+--execute 2>&1 | tee  /tmp/rebuild_表名.log
 ```
 
 ```bash
 # 阿里云
-~/Downloads/gh-ost \
---max-load=Threads_running=20 \
---critical-load=Threads_running=50 \
+gh-ost \
+--max-load=Threads_running=50 \
+--critical-load=Threads_running=100 \
 --critical-load-interval-millis=5000 \
---chunk-size=100 \
---user="xb" \
---password="g1nti23" \
---host='dop1b9bkz12rom0x43s7.mysql.rds.aliyuncs.com' \
---port=3363 \
---database="xb" \
---table="sign" \
+--chunk-size=1000 \
+--user="账号" \
+--password="密码" \
+--host='数据库连接' \
+--port=3306 \
+--database="数据库" \
+--table="订正的表" \
 --verbose \
---alter="MODIFY COLUMN Id BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'Id'" \
+--alter="这里替换成数据订正sql脚本" \
 --assume-rbr \
 --cut-over=default \
 --cut-over-lock-timeout-seconds=1 \
 --dml-batch-size=10 \
 --allow-on-master \
+# 主要是这一句
 --aliyun-rds \
 --assume-rbr \
 --concurrent-rowcount \
@@ -280,5 +302,5 @@ touch /tmp/ghost.panic.flag
 --panic-flag-file=/tmp/ghost.panic.flag \
 --postpone-cut-over-flag-file=/tmp/ghost.postpone.flag \
 --timestamp-old-table \
---execute 2>&1 | tee  /tmp/rebuild_t1.log
+--execute 2>&1 | tee  /tmp/rebuild_表名.log
 ```
