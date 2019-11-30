@@ -15,3 +15,24 @@
 1. 配置完之后会在vscode的左边工具栏远程服务器中出现对应的服务器
 1. 点击服务器，输入密码即可登陆（要输入2次）
 1. 每次都要输入密码很麻烦，可以通过 [【SSH免密登陆】](../linux/cmd.md) 解决
+
+## C# Extensions
+这个插件最有用的功能是可以右键新建C#类和C#接口，同时支持各种code snippets，例如 ctor 、prop等，具体功能特性，可以查看插件的说明
+![2](./img/vscode/2.png)
+
+## Auto-Using for C#
+这个插件自动添加using引用
+![3](./img/vscode/3.png)
+
+## vscode-solution-explorer
+这个插件给VS Code增加了解决方案tab, 支持新建解决方案、新建工程、添加引用、Nuget包，这个插件非常有用
+![4](./img/vscode/4.png)
+
+## Code Runner
+即选中一段代码，直接run
+![5](./img/vscode/5.png)
+
+## Visual Studio IntelliCode
+VS代码智能提示，根据上下文语境，自动推荐你下一步用到的代码，后台基于AI的
+![6](./img/vscode/6.png)
+
