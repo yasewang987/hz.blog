@@ -91,7 +91,8 @@ module.exports = {
                     { text: 'Git', link: '/other/git/' },
                     { text: 'Linux', link: '/other/linux/' },
                     { text: '实用工具', link: '/other/tools/' },
-                    { text: 'Mac', link: '/other/mac/' }
+                    { text: 'Mac', link: '/other/mac/' },
+                    { text: 'Cloud', link: '/other/cloud/'}
                 ]
             }
         ],
@@ -226,6 +227,9 @@ module.exports = {
                 'win-cmd',
                 'win-tools',
                 'vscode'
+            ],
+            '/other/cloud/': [
+                'vmware-vsphere'
             ]
         },
         sidebarDepth: 2
