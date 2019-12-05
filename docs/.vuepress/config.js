@@ -220,7 +220,8 @@ module.exports = {
                 'screen'
             ],
             '/other/mac/': [
-                'install'
+                'install',
+                'disk'
             ],
             '/other/tools/': [
                 'chrome',
