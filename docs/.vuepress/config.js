@@ -216,7 +216,6 @@ module.exports = {
                 'sql',
                 'systemd',
                 'vim',
-                'common',
                 'screen'
             ],
             '/other/mac/': [
