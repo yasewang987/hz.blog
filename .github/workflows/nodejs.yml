@@ -1,4 +1,4 @@
-name: Node CI
+name: build
 
 on: [push]
 
@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x]
+        node-version: [10.x]
 
     steps:
     - uses: actions/checkout@v1
@@ -17,9 +17,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, build, and test
+    - name: npm install, build
       run: |
-        npm install
+        npm i
         npm run docs:build
       env:
         CI: true
+    - name: show
+      run: |
+        ls docs/.vuepress
