@@ -20,7 +20,7 @@ jobs:
     - name: npm install, build
       run: |
         npm install -g yarn
-        yarn -v
+        yarn
         yarn run docs:build
       env:
         CI: true
