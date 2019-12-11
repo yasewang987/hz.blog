@@ -45,4 +45,4 @@ jobs:
         host: ${{ secrets.MOR2_HOST }}
         username: ${{ secrets.MOR2_USERNAME }}
         password: ${{ secrets.MOR2_PASSWORD }}
-        script: whoami
+        script: docker -v
