@@ -26,8 +26,8 @@ jobs:
         CI: true
     - name: build image
       run: |
-        docker build -t yasewang/blog:$(date +%s) .
+        docker build -t yasewang/blog:${{ github.sha }} .
     - name: push image
       run: |
         docker login -u yasewang -p ${{ secrets.DOCKER_PWD }}
-        docker push yasewang/blog:$(date +%s)
+        docker push yasewang/blog:${{ github.sha }}
