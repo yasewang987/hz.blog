@@ -45,5 +45,5 @@ jobs:
           port: ${{ secrets.MOR2_PORT }}
           script: |
             docker pull yasewang/blog:${{ github.sha }}
-            docker rm -f blog
+            if [ $(docker ps -a | grep blog | awk '{print $1}') ] then docker rm -f blog fi
             docker run -d -p 8888:80 --name blog yasewang/blog:${{ github.sha }}
