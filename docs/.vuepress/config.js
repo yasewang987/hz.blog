@@ -39,6 +39,14 @@ module.exports = {
                         items: [
                             { text: '其他', link: '/code/go/tools/' }
                         ]
+                    },
+                    {
+                        text: 'Web',
+                        items: [
+                            { text: 'Npm', link: '/web/npm/' },
+                            { text: 'TypeScript', link: '/web/ts/' },
+                            { text: 'Vue', link: '/web/vue/' }
+                        ]
                     }
                 ]
             },
@@ -51,14 +59,6 @@ module.exports = {
                     { text: 'Identity', link: '/microservices/identity/' },
                     { text: 'Skywalking', link: '/microservices/skywalking/' },
                     { text: 'MQ', link: '/microservices/mq/' }
-                ]
-            },
-            {
-                text: 'Web',
-                items: [
-                    { text: 'Npm', link: '/web/npm/' },
-                    { text: 'TypeScript', link: '/web/ts/' },
-                    { text: 'Vue', link: '/web/vue/' }
                 ]
             },
             { 
@@ -123,6 +123,17 @@ module.exports = {
             '/code/go/tools/': [
                 'install'
             ],
+            '/code/web/npm/': [
+                'base',
+                'ci'
+            ],
+            '/code/web/ts/': [
+                'base',
+                'install'
+            ],
+            '/code/web/vue/': [
+                'vscode'
+            ],
             '/microservices/consul/': [
                 'base',
                 'cmd',
@@ -145,17 +156,6 @@ module.exports = {
             ],
             '/microservices/skywalking/': [
                 'base'
-            ],
-            '/web/npm/': [
-                'base',
-                'ci'
-            ],
-            '/web/ts/': [
-                'base',
-                'install'
-            ],
-            '/web/vue/': [
-                'vscode'
             ],
             '/test/jmeter/': [
                 'install-docker',
