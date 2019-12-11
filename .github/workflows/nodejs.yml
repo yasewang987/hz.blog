@@ -24,7 +24,8 @@ jobs:
         yarn run docs:build
     - name: show
       run: |
-        ls -a ./docs/
+        ls -a ./docs/.vuepress
+        docker -v
   image:
     runs-on: ubuntu-latest
     needs: build-docs
