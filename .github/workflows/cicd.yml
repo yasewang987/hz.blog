@@ -8,4 +8,4 @@ jobs:
     steps:
     - name: ping
       run: |
-        ping 193.112.60.204 -c 3
+        ping www.baidu.com -c 3
