@@ -1,8 +1,0 @@
-version: '2.1'
-
-services:
-  hz.blog:
-    image: hz.blog
-    build: .
-    ports:
-      - 9999:9999
