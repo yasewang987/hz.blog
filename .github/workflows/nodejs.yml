@@ -22,10 +22,12 @@ jobs:
         npm install -g yarn
         yarn
         yarn run docs:build
+      env:
+        CI: true
     - name: build image
       run: |
         docker build -t yasewang/blog:$(date +%s) .
     - name: push image
       run: |
-        docker login -u yasewang -p ${{DOCKER_PWD}}
+        docker login -u yasewang -p ${{ secrets.DOCKER_PWD }}
         docker push yasewang/blog:$(date +%s)
