@@ -45,4 +45,6 @@ jobs:
         host: ${{ secrets.MOR2_HOST }}
         username: ${{ secrets.MOR2_USERNAME }}
         password: ${{ secrets.MOR2_PASSWORD }}
-        script: docker -v
+        script: |
+          docker pull yasewang/blog:${{ github.sha }}
+          docker run -d -p 8888:80 --name blog yasewang/blog:${{ github.sha }}
