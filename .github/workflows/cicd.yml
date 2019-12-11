@@ -3,9 +3,46 @@ name: build
 on: [push]
 
 jobs:
-  deploy:
+  build:
+
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
     steps:
-    - name: ping
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, build
       run: |
-        ping -h
+        npm install -g yarn
+        yarn
+        yarn run docs:build
+      env:
+        CI: true
+    - name: build image
+      run: |
+        docker build -t yasewang/blog:${{ github.sha }} .
+    - name: push image
+      run: |
+        docker login -u yasewang -p ${{ secrets.DOCKER_PWD }}
+        docker push yasewang/blog:${{ github.sha }}
+  
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+    - name: SSH Remote Commands
+      uses: appleboy/ssh-action@v0.0.6
+      with:
+        host: ${{ secrets.MOR2_HOST }}
+        username: ${{ secrets.MOR2_USERNAME }}
+        password: ${{ secrets.MOR2_PASSWORD }}
+        script: whoami
