@@ -31,3 +31,19 @@ jobs:
       run: |
         docker login -u yasewang -p ${{ secrets.DOCKER_PWD }}
         docker push yasewang/blog:${{ github.sha }}
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: SSH Commands
+        uses: appleboy/ssh-action@v0.0.2
+        with:
+          host: ${{ secrets.MOR2_HOST }}
+          username: ${{ secrets.MOR2_USERNAME }}
+          password: ${{ secrets.MOR2_PASSWORD }}
+          port: ${{ secrets.MOR2_PORT }}
+          script: |
+            docker pull yasewang/blog:${{ github.sha }}
+            docker rm -f blog
+            docker run -d -p 8888:80 --name blog yasewang/blog:${{ github.sha }}

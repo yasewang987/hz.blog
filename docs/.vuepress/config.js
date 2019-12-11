@@ -43,9 +43,9 @@ module.exports = {
                     {
                         text: 'Web',
                         items: [
-                            { text: 'Npm', link: '/web/npm/' },
-                            { text: 'TypeScript', link: '/web/ts/' },
-                            { text: 'Vue', link: '/web/vue/' }
+                            { text: 'Npm', link: '/code/web/npm/' },
+                            { text: 'TypeScript', link: '/code/web/ts/' },
+                            { text: 'Vue', link: '/code/web/vue/' }
                         ]
                     }
                 ]
