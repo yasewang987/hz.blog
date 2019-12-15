@@ -58,7 +58,8 @@ module.exports = {
                     { text: 'ELK', link: '/microservices/elk/' },
                     { text: 'Identity', link: '/microservices/identity/' },
                     { text: 'Skywalking', link: '/microservices/skywalking/' },
-                    { text: 'MQ', link: '/microservices/mq/' }
+                    { text: 'MQ', link: '/microservices/mq/' },
+                    { text: '随笔', link: '/microservices/other/' }
                 ]
             },
             { 
@@ -156,6 +157,9 @@ module.exports = {
             ],
             '/microservices/skywalking/': [
                 'base'
+            ],
+            '/microservices/other/': [
+                'hash'
             ],
             '/test/jmeter/': [
                 'install-docker',
