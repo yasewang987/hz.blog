@@ -233,7 +233,8 @@ module.exports = {
                 'vscode'
             ],
             '/other/cloud/': [
-                'vmware-vsphere'
+                'vmware-vsphere',
+                'proxmox'
             ]
         },
         sidebarDepth: 2
