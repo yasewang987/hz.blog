@@ -30,6 +30,19 @@ chmod u+x filename # 给用户添加执行权限
 
 ---
 
+## chmod相关
+
+常见格式：`sudo chmod 777 /home/xxx`  
+777对应的用户：文件所有者、群组用户、其他用户  
+
+权限|权限数字|含义
+---|---|---
+r|4|读取read
+w|2|写入write
+x|1|执行execute
+
+---
+
 ## 查看linux系统编码
 
 ```bash
@@ -131,19 +144,6 @@ tar xvf xxx.tar
 
 ---
 
-## chmod相关
-
-常见格式：`sudo chmod 777 /home/xxx`  
-777对应的用户：文件所有者、群组用户、其他用户  
-
-权限|权限数字|含义
----|---|---
-r|4|读取read
-w|2|写入write
-x|1|执行execute
-
----
-
 ## 开机启动服务
 
 1. 增加开机启动脚本：`sudo vim /etc/init.d/aria2c`
@@ -182,13 +182,6 @@ x|1|执行execute
 1. 删除开机启动：`update-rc.d -f aria2c remove`
 1. 启动服务:`sudo service aria2c start`
 1. 查看服务aria2c的运行状态:`sudo systemctl status aria2c`
-
----
-
-## 查看安装的软件包
-
-查看所有的已安装软件名称:`rpm -qa`
-显示软件的安装路径:`rpm -ql 软件名称`
 
 ---
 
@@ -258,43 +251,10 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
     
     ```bash
     PermitRootLogin yes #允许root登录
-    PermitEmptyPasswords no #不允许空密码登录
-    PasswordAuthentication yes # 设置是否使用口令验证。
     StrictModes yes
     PubkeyAuthentication yes
     AuthorizedKeysFile .ssh/authorized_keys
+    PasswordAuthentication yes # 设置是否使用口令验证。
+    PermitEmptyPasswords no #不允许空密码登录
     # 修改完毕之后需要重启sshd服务`systemctl restart sshd`
     ```
-
-## NFS安装
-
-centos： https://yq.aliyun.com/articles/610391
-
-ubuntu：
-
-```bash
-sudo apt-get install nfs-kernel-server
-
-vim /etc/exports
-# 加入如下内容 *表示所有ip都可以访问
-/data/fileshare   *(rw,sync,no_subtree_check,no_root_squash)
-
-mkdir -p   /data/fileshare
-
-# nfs是一个RPC程序，第一步安装成功后，使用它时需要映射提前映射好端口，映射端口，通过rpcbind 设定
-sudo /etc/init.d/rpcbind restart
-
-# 重启nfs服务
-sudo /etc/init.d/nfs-kernel-server restart 
-
-#---------------
-# 挂载上面的共享
-vim /etc/fstab
-# 添加
-192.168.22.22:/data/fileshare /data/fileshare               nfs    rw,tcp,soft  0  0
-# 保存
-# 执行
-mount -a
-# 取消挂载
-umount   /data/fileshare   
-```

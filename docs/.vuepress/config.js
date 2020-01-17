@@ -213,14 +213,13 @@ module.exports = {
             ],
             '/other/linux/': [
                 'cmd',
-                'error',
                 'firewall',
                 'info',
                 'install',
-                'sql',
                 'systemd',
                 'vim',
-                'screen'
+                'screen',
+                'ubuntu'
             ],
             '/other/mac/': [
                 'install',
