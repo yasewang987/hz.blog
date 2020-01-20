@@ -186,6 +186,7 @@ module.exports = {
             '/devops/k8s/k8s-learning/': [
                 'k8s-base',
                 'k8s-install-mini',
+                'k8s-install-microk8s',
                 'k8s-install-adm',
                 'k8s-deployment',
                 'k8s-daemonset',

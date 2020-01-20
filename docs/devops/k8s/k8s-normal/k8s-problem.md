@@ -1,5 +1,9 @@
 # K8s问题排查
 
+## k8s.gcr.io镜像无法拉取问题
+
+将镜像名的`k8s.gcr.io`改为`gcr.azk8s.cn/google-containers`
+
 ## k8s问题定位
 
 1. 查看所有pod运行情况

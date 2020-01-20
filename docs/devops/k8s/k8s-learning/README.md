@@ -2,6 +2,7 @@
 
 ### [Kubernetes - 基础知识](./k8s-base.md)
 ### [Kubernetes - 集群部署Kubeadm](./k8s-install-adm.md)
+### [Kubernetes - Microk8s](./k8s-install-microk8s.md)
 ### [Kubernetes - 单机部署Minikube](./k8s-install-mini.md)
 ### [Kubernetes - Deployment](./k8s-deployment.md)
 ### [Kubernetes - DaemonSet](./k8s-daemonset.md)

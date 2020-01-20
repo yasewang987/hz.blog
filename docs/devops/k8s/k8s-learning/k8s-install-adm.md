@@ -13,6 +13,8 @@ Minikube是一个工具，可以在本地快速运行一个单点的K8S，供初
 
 Kubeadm是K8S官方社区推出的一套用于简化快速部署K8S集群的工具，Kubeadm的设计目的是为新用户开始尝试K8S提供一种简单的方法。
 
+K8s官网安装参考：https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
 （3）二进制包
 
 除了以上两种方式外，我们还可以通过从官方下载二进制包，手动部署每个组件组成K8S集群，这也是目前企业生产环境中广为使用的方式，但对K8S管理人员的要求较高。
@@ -34,6 +36,8 @@ xb-node2|2G|99.99.99.102|docker,kubeadm,kubelet
 K8S 支持多种容器运行时环境，这里选择 docker 作为运行时环境，首先为所有节点服务器安装 docker，目前 kubernetes 最新版(v1.15.2) 可以完全兼容支持的 docker 最高版本为 v18.09，所以这里安装 v18.09 这个版本。
 
 [版本对应关系查看官网的Release Notes](https://kubernetes.io/docs/home/)
+
+安装步骤可以参考K8s官网，只需要注意关键步骤即可（https://kubernetes.io/docs/setup/production-environment/container-runtimes/）
 
 ```bash
 # 删除旧版本docker
@@ -67,30 +71,30 @@ sudo apt-get update
 sudo apt-get install docker-ce=5:18.09.8~3-0~ubuntu-bionic docker-ce-cli=5:18.09.8~3-0~ubuntu-bionic containerd.io
 ```
 
-有时候因为网络原因无法拉取docker镜像，可以使用阿里云镜像仓库：
+* 有时候因为网络原因无法拉取docker镜像，可以使用阿里云镜像仓库：
 
-```bash
-# step 1: 安装必要的一些系统工具
-sudo apt-get update
-sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+    ```bash
+    # step 1: 安装必要的一些系统工具
+    sudo apt-get update
+    sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
 
-# step 2: 安装GPG证书
-curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+    # step 2: 安装GPG证书
+    curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
 
-# Step 3: 写入软件源信息
-sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+    # Step 3: 写入软件源信息
+    sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
 
-# Step 4: 更新并安装 Docker-CE
-sudo apt-get -y update
+    # Step 4: 更新并安装 Docker-CE
+    sudo apt-get -y update
 
-# 选择安装版本，这里选择 5:18.09.8~3-0~ubuntu-bionic
-apt-cache madison docker-ce
+    # 选择安装版本，这里选择 5:18.09.8~3-0~ubuntu-bionic
+    apt-cache madison docker-ce
 
-# sudo apt-get -y install docker-ce=[version]
-sudo apt-get -y install docker-ce=5:18.09.8~3-0~ubuntu-bionic
-```
+    # sudo apt-get -y install docker-ce=[version]
+    sudo apt-get -y install docker-ce=5:18.09.8~3-0~ubuntu-bionic
+    ```
 
-### 其他准备工作
+### 其他准备工作（也可以参考k8s官网安装步骤）
 
 * 当前用户加入`docker`用户组
 
