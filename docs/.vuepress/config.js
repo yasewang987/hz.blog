@@ -114,7 +114,8 @@ module.exports = {
             '/code/dotnet/tools/': [
                 'install',
                 'jexus',
-                'nuget'
+                'nuget',
+                'openapi',
             ],
             '/code/java/common/': [],
             '/code/java/spring/': [],
