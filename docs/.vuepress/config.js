@@ -114,7 +114,8 @@ module.exports = {
             '/code/dotnet/tools/': [
                 'install',
                 'jexus',
-                'nuget'
+                'nuget',
+                'openapi',
             ],
             '/code/java/common/': [],
             '/code/java/spring/': [],
@@ -159,7 +160,8 @@ module.exports = {
                 'base'
             ],
             '/microservices/other/': [
-                'hash'
+                'hash',
+                'note'
             ],
             '/test/jmeter/': [
                 'install-docker',
@@ -186,6 +188,7 @@ module.exports = {
             '/devops/k8s/k8s-learning/': [
                 'k8s-base',
                 'k8s-install-mini',
+                'k8s-install-microk8s',
                 'k8s-install-adm',
                 'k8s-deployment',
                 'k8s-daemonset',
@@ -213,14 +216,13 @@ module.exports = {
             ],
             '/other/linux/': [
                 'cmd',
-                'error',
                 'firewall',
                 'info',
                 'install',
-                'sql',
                 'systemd',
                 'vim',
-                'screen'
+                'screen',
+                'ubuntu'
             ],
             '/other/mac/': [
                 'install',
@@ -233,7 +235,8 @@ module.exports = {
                 'vscode'
             ],
             '/other/cloud/': [
-                'vmware-vsphere'
+                'vmware-vsphere',
+                'proxmox'
             ]
         },
         sidebarDepth: 2
