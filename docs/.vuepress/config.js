@@ -160,7 +160,8 @@ module.exports = {
                 'base'
             ],
             '/microservices/other/': [
-                'hash'
+                'hash',
+                'note'
             ],
             '/test/jmeter/': [
                 'install-docker',
