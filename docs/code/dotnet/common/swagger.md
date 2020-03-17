@@ -65,3 +65,120 @@
         app.UseMvc();
     }
     ```
+
+## 生成多版本Swagger API文档
+
+[Nswag官方Wiki](https://github.com/RicoSuter/NSwag/wiki/AspNetCore-Middleware)
+[官方实现多版本示例](https://github.com/RicoSuter/NSwag/blob/master/src/NSwag.Generation.AspNetCore.Tests.Web)
+[多版本Issue讨论](https://github.com/RicoSuter/NSwag/pull/1701)
+
+封装了NetCore3.1版本的帮助类代码
+
+```csharp
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Extensions.DependencyInjection;
+using NSwag;
+using NSwag.Generation.Processors.Security;
+
+namespace Xiaobao.Ddd.Template.API
+{
+    public static class NswagExtensions
+    {
+        /// <summary>
+        /// 开放
+        /// </summary>
+        public const string OPEN = "2";
+        /// <summary>
+        /// 内部
+        /// </summary>
+        public const string INNER = "1";
+
+        /// <summary>
+        /// 添加多版本的swagger api文档生成
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddNswagMultiApiDocuments(this IServiceCollection services)
+        {
+            services.AddApiVersioning(option => {
+                option.AssumeDefaultVersionWhenUnspecified = true;
+                option.ApiVersionReader = new UrlSegmentApiVersionReader();
+            })
+            .AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
+            services.AddSwaggerDocument(document => {
+                document.Title = "Xiaobao.Ddd.Template HTTP API";
+                document.Description = "The Xiaobao.Ddd.Template Service HTTP API";
+                document.Version = $"v{INNER}";
+                document.DocumentName = $"v{INNER}";
+                document.ApiGroupNames = new[] { INNER };
+                // 这里可以添加oauth认证
+            }).AddSwaggerDocument(document => {
+                document.Title = "Xiaobao.Ddd.Template HTTP API";
+                document.Description = "The Xiaobao.Ddd.Template Service HTTP API";
+                document.Version = $"v{OPEN}";
+                document.DocumentName = $"v{OPEN}";
+                document.ApiGroupNames = new[] { OPEN };
+            });
+
+            return services;
+        }
+
+        public static IApplicationBuilder UseNswag(this IApplicationBuilder app, string pathBase = "")
+        {
+            app.UseOpenApi();
+            app.UseSwaggerUi3(config => {
+                config.TransformToExternalPath = (internalUiRoute, request) => {
+                    if (internalUiRoute.StartsWith("/") == true && internalUiRoute.StartsWith(request.PathBase) == false)
+                    {
+                        return request.PathBase + internalUiRoute;
+                    }
+                    else
+                    {
+                        return internalUiRoute;
+                    }
+                };
+            });
+            return app;
+        }
+    }
+}
+```
+
+使用步骤：
+
+1. StartUp中注入swaggerdoc文档，并且使用中间件
+
+    ```csharp
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // 其他注入
+        // 添加多版本swagger api文档支持
+        services.AddNswagMultiApiDocuments();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+    {
+        // 其他管道
+        app.UseNswag(pathBase);
+    }
+    ```
+1. 在Controller中使用
+
+    ```csharp
+    // ApiVersion这个属性可以添加在Controller或者Action上
+    // 不添加版本标记默认为INNER版本（1）
+    // 对外暴露的服务需要加上ApiVersion为OPEN的标记
+    [ApiVersion(NswagExtensions.OPEN)]
+    [Route("open/[controller]/[action]")]
+    [ApiController]
+    public class OpenController : ControllerBase
+    {
+    }
+    ```
