@@ -212,6 +212,7 @@ module.exports = {
             '/other/git/': [
                 'history',
                 'cmd',
+                'git-hook',
                 'gl-hook',
             ],
             '/other/linux/': [
