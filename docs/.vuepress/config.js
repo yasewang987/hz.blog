@@ -169,7 +169,8 @@ module.exports = {
             '/devops/docker/': [
                 'cmd',
                 'compose-netcore',
-                'install'
+                'install',
+                'dockerfiles'
             ],
             '/devops/gitlabrunner/': [
                 'base',
@@ -181,6 +182,7 @@ module.exports = {
                 'install'
             ],
             '/devops/k8s/k8s-normal/': [
+                'k8s-yamls',
                 'k8s-cmd',
                 'k8s-problem',
                 'k8s-netcore'
