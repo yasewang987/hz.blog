@@ -1,0 +1,14 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: normal-virtualserver
+spec:
+  host: xxx.yyy.com
+  upstreams:
+  - name: normal
+    service: normal-service
+    port: 80
+  routes:
+  - path: /
+    action:
+      pass: normal
