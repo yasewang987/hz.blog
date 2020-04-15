@@ -224,24 +224,24 @@ sudo apt-get install docker-ce=5:18.09.8~3-0~ubuntu-bionic docker-ce-cli=5:18.09
   k8s.gcr.io/etcd:3.3.10
   k8s.gcr.io/coredns:1.3.1
   ```
-
-  docker hub 中的 mirrorgooglecontainers 拉取镜像副本，然后更新tag，再删除镜像副本，脚本如下（这里测试的时候有点问题，amd64的镜像在`kubeadm init`的时候无法使用）：
+  新建`pullk8s.sh`文件，添加如下内容，并且执行拉取需要的镜像
 
   ```bash
-  images=(kube-proxy:v1.15.2 kube-scheduler-amd64:v1.15.2 kube-controller-manager-amd64:v1.15.2 kube-apiserver:v1.15.2 etcd:3.3.10 pause:3.1)
-  for imageName in ${images[@]} ; do
-    docker pull mirrorgooglecontainers/$imageName  
-    docker tag mirrorgooglecontainers/$imageName k8s.gcr.io/$imageName  
-    docker rmi mirrorgooglecontainers/$imageName
-  done
+  for  i  in  `kubeadm config images list`;  do
+    imageName=${i#k8s.gcr.io/}
+    docker pull registry.aliyuncs.com/google_containers/$imageName
+    docker tag registry.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
+    docker rmi registry.aliyuncs.com/google_containers/$imageName
+  done;
   ```
-
-  mirrorgooglecontainers 下面没有 coredns，我们可以从另一个位置单独拉取，命令如下：
-
+  
   ```bash
-  docker pull coredns/coredns:1.3.1
-  docker tag coredns/coredns:1.3.1 k8s.gcr.io/coredns:1.3.1
-  docker rmi coredns/coredns:1.3.1
+  chmod +x pullk8s.sh
+
+  sh pullk8s.sh
+
+  # 稍微等几分钟之后就可以查看服务运行情况了
+  kubectl get svc -n kube-system
   ```
 
 ### 安装网络
@@ -275,12 +275,12 @@ CoreDNS pod 启动并运行后，我们可以为集群添加工作节点。工�
 工作节点服务器需要至少启动两个 pod ，用到的镜像为 `kube-proxy 、 pause` ，同理我们无法直接从 k8s.grc.io 下载，需要提前拉取镜像并修改 tag ，执行下面命令：
 
 ```bash
-images=(kube-proxy:v1.15.2 pause:3.1)
-for imageName in ${images[@]} ; do
-  docker pull mirrorgooglecontainers/$imageName  
-  docker tag mirrorgooglecontainers/$imageName k8s.gcr.io/$imageName  
-  docker rmi mirrorgooglecontainers/$imageName
-done
+for  i  in  `kubeadm config images list`;  do
+  imageName=${i#k8s.gcr.io/}
+  docker pull registry.aliyuncs.com/google_containers/$imageName
+  docker tag registry.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
+  docker rmi registry.aliyuncs.com/google_containers/$imageName
+done;
 ```
 
 ### 加入集群

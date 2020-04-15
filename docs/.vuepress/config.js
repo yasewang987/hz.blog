@@ -212,6 +212,7 @@ module.exports = {
             '/other/git/': [
                 'history',
                 'cmd',
+                'git-hook',
                 'gl-hook',
             ],
             '/other/linux/': [
@@ -222,7 +223,8 @@ module.exports = {
                 'systemd',
                 'vim',
                 'screen',
-                'ubuntu'
+                'ubuntu',
+                'manjaro'
             ],
             '/other/mac/': [
                 'install',
