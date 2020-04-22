@@ -198,7 +198,8 @@ module.exports = {
                 'k8s-service',
                 'k8s-rollingupdate',
                 'k8s-healthcheck',
-                'k8s-volume'
+                'k8s-volume',
+                'k8s-secret-configmap'
             ],
             '/devops/shell/': [
                 'sh-common.md',

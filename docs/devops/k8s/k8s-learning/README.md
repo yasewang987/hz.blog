@@ -1,9 +1,10 @@
 # Kubernetes - 从0开始系列
 
 ### [Kubernetes - 基础知识](./k8s-base.md)
+### [Kubernetes - 单机部署Minikube](./k8s-install-mini.md)
+### [Kubernetes - Microk8s](./k8s-install-microk8s.md)
 ### [Kubernetes - 集群部署Kubeadm](./k8s-install-adm.md)
 ### [Kubernetes - Microk8s](./k8s-install-microk8s.md)
-### [Kubernetes - 单机部署Minikube](./k8s-install-mini.md)
 ### [Kubernetes - Deployment](./k8s-deployment.md)
 ### [Kubernetes - DaemonSet](./k8s-daemonset.md)
 ### [Kubernetes - Job](./k8s-job.md)
@@ -11,3 +12,4 @@
 ### [Kubernetes - Rolling Update](./k8s-rollingupdate.md)
 ### [Kubernetes - HealthCheck](./k8s-healthcheck.md)
 ### [Kubernetes - Volume](./k8s-volume.md)
+### [Kubernetes - Secret & ConfigMap](./k8s-secret-configmap.md)
