@@ -239,7 +239,8 @@ module.exports = {
                 'chrome',
                 'win-cmd',
                 'win-tools',
-                'vscode'
+                'vscode',
+                'resource'
             ],
             '/other/cloud/': [
                 'vmware-vsphere',
