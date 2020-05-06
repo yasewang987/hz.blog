@@ -201,7 +201,8 @@ module.exports = {
                 'k8s-healthcheck',
                 'k8s-volume',
                 'k8s-secret-configmap',
-                'k8s-ingress'
+                'k8s-ingress',
+                'k8s-helm'
             ],
             '/devops/shell/': [
                 'sh-common.md',
