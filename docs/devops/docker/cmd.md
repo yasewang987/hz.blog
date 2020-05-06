@@ -54,3 +54,10 @@ locale
 # 这里设置哪种编码需要根据容器环境确定
 docker run -d -e LANG="C.UTF-8" --name hello helloworld
 ```
+
+### docker替换国内镜像源
+
+```bash
+# 在dockerfile中加入如下内容，stretch这个需要注意看一下构建镜像的时候提示的默认版本是什么
+RUN echo "deb http://mirrors.aliyun.com/debian/ stretch main" >/etc/apt/sources.list && echo "deb http://mirrors.aliyun.com/debian-security stretch/updates main" >>/etc/apt/sources.list && echo "deb http://mirrors.aliyun.com/debian/ stretch-updates main" >>/etc/apt/sources.list
+```

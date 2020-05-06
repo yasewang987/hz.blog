@@ -116,6 +116,7 @@ module.exports = {
                 'jexus',
                 'nuget',
                 'openapi',
+                'template'
             ],
             '/code/java/common/': [],
             '/code/java/spring/': [],
@@ -199,7 +200,8 @@ module.exports = {
                 'k8s-rollingupdate',
                 'k8s-healthcheck',
                 'k8s-volume',
-                'k8s-secret-configmap'
+                'k8s-secret-configmap',
+                'k8s-ingress'
             ],
             '/devops/shell/': [
                 'sh-common.md',
