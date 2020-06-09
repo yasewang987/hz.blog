@@ -201,6 +201,7 @@ module.exports = {
                 'k8s-healthcheck',
                 'k8s-volume',
                 'k8s-secret-configmap',
+                'k8s-network',
                 'k8s-ingress',
                 'k8s-helm'
             ],
