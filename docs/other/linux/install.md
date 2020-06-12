@@ -15,30 +15,17 @@
 * Ubuntu
 
 ```bash
+
+# 查看系统版本
+lsb_release -a
+
+# 根据查到的版本去阿里的镜像源中找对应版本
+http://mirrors.aliyun.com/
+
 默认下载源很慢，改成阿里的下载速度超快
 sudo vim /etc/apt/sources.list
 
-将文件内容替换成
-
-deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
-
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
-
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
-
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
-
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
-
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+将文件内容替换成 国内源
 
 更新
 sudo apt-get update
