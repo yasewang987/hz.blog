@@ -1,5 +1,24 @@
 # Ubuntu服务器常用操作
 
+## 下载源修改
+
+```bash
+
+# 查看系统版本
+lsb_release -a
+
+# 根据查到的版本去阿里的镜像源中找对应版本
+http://mirrors.aliyun.com/
+
+默认下载源很慢，改成阿里的下载速度超快
+sudo vim /etc/apt/sources.list
+
+将文件内容替换成 国内源
+
+更新
+sudo apt-get update
+sudo apt-get upgrade
+```
 
 ## 修改IP，DNS
 
@@ -12,6 +31,15 @@ nameservices:
 # 生效
 netplan apply
 ```
+
+## SNAP
+
+* 输入`snap help`查看具体命令  
+安装snap: `sudo apt install snapd`  
+启动snap安装的程序：`snap run xxxx`  
+查看snap安装的程序：`snap list`  
+
+---
 
 ## NFS
 
