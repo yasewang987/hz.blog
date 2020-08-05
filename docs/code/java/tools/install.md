@@ -2,8 +2,7 @@
 
 ## JDK安装
 
-* JDK下载地址：    http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-* 地址2：https://www.oracle.com/technetwork/java/javase/downloads/index.html
+* JDK下载地址：https://www.oracle.com/technetwork/java/javase/downloads/index.html
 * linux系统一般都有自带的`openjdk`可以先删除自带的jdk
   > 查看安装的jdk包：`sudo dpkg --list | grep -i jdk`
   > 删除相关包：`sudo apt purge openjdk-*`
@@ -22,7 +21,6 @@
        export JAVA_HOME=$HOME/java/jdk1.8.0_181 #这里填写的是jdk解压后的地址
        export JRE_HOME=$JAVA_HOME/jre
        export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
-       export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib
        ```
      > 全局配置（/etc/profile） #重启电脑
      > 按用户配置（按默认终端区分）
@@ -32,7 +30,6 @@
      > 直接在我的电脑右键-属性-高级系统设置-高级-环境变量-系统环境变量中作如下操作：
        1. 新建：`JAVA_HOME:D:\Program Files\Java\jdk1.8.0_181` （jdk的安装地址）
        1. 编辑：`PATH`，新增二行`%JAVA_HOME%\bin`，`%JAVA_HOME%\jre\bin`
-       1. 新增: `CLASSPATH:.;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar`
 
 ## Maven安装
 

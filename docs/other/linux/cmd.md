@@ -49,6 +49,11 @@ x|1|执行execute
 locale
 ```
 
+## 查看系统版本
+
+1. 查看发行版本：`cat /etc/os-release`
+1. 查看内核版本：`uname -r`
+
 ## 端口使用情况
 
 ```bash
@@ -258,3 +263,4 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
     PermitEmptyPasswords no #不允许空密码登录
     # 修改完毕之后需要重启sshd服务`systemctl restart sshd`
     ```
+---
