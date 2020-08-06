@@ -36,3 +36,12 @@
 VS代码智能提示，根据上下文语境，自动推荐你下一步用到的代码，后台基于AI的
 ![6](./img/vscode/6.png)
 
+
+
+
+
+## VSCode错误处理
+
+### The SDK 'Microsoft.NET.Sdk.Web' specified could not be found
+
+setting "omnisharp.path": "latest" in VS Code's setting.json.
