@@ -44,4 +44,9 @@ VS代码智能提示，根据上下文语境，自动推荐你下一步用到的
 
 ### The SDK 'Microsoft.NET.Sdk.Web' specified could not be found
 
+export MSBuildSDKsPath=$HOME/dotnet/sdk/$(dotnet --version)/Sdks
+
+或者
+
 setting "omnisharp.path": "latest" in VS Code's setting.json.
+
