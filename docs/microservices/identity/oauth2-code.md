@@ -1,7 +1,7 @@
 # OAuth2 - 授权码模式
 
 * 参考资料：[rfc6749](https://tools.ietf.org/html/rfc6749)
-* dotnet完整代码参考：https://github.com/yasewang987/hz.identityserver
+* dotnet完整代码参考：[https://github.com/yasewang987/hz.identityserver](https://github.com/yasewang987/hz.identityserver)
 
 授权码授予类型用于同时获得两个访问权限令牌和刷新令牌，并针对机密客户端进行了优化。由于这是基于重定向的流程，因此客户端必须能够与资源所有者的用户代理（通常是浏览器）进行交互，并能够通过重定向从授权服务器接收传入请求。
 

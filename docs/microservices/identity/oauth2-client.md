@@ -1,7 +1,7 @@
 # OAuth2 - 客户端授权
 
 * 参考资料：[rfc6749](https://tools.ietf.org/html/rfc6749)
-* dotnet完整代码参考：https://github.com/yasewang987/hz.identityserver
+* dotnet完整代码参考：[https://github.com/yasewang987/hz.identityserver](https://github.com/yasewang987/hz.identityserver)
 
 客户端模式指客户端以自己的名义，而不是以用户的名义，向服务提供商进行认证。会出现多个用户使用同一个访问令牌（因为是以客户端的名字申请的令牌）
 

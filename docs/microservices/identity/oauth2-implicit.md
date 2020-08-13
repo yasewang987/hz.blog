@@ -1,7 +1,7 @@
 # OAuth2 - 隐式授权
 
 * 参考资料：[rfc6749](https://tools.ietf.org/html/rfc6749)
-* dotnet完整代码参考：https://github.com/yasewang987/hz.identityserver
+* dotnet完整代码参考：[https://github.com/yasewang987/hz.identityserver](https://github.com/yasewang987/hz.identityserver)
 
 隐式模式是授权码模式的简化版，不需要通过客户端后台服务器，直接在浏览器中向认证服务器申请令牌，跳过了 `授权码` 这个步骤。
 
