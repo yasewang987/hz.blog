@@ -208,4 +208,3 @@ access Token：访问令牌，由identityServer服务器签发的，客户端使
 ## 总结
 
 客户端授权模式使用下来其实很简单，自己跟着写一次基本上就明白如何使用了。  
-这次的测试源码已经上传到了Github,需要的同学[【猛戳这里下载】](https://github.com/yasewang987/Hz.DonetDemo/tree/master/Hz.Identity)

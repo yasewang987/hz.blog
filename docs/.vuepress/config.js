@@ -148,7 +148,14 @@ module.exports = {
                 'install-one'
             ],
             '/microservices/identity/': [
-                'client',
+                'oauth2-info',
+                'oauth2-code',
+                'oauth2-implicit',
+                'oauth2-password',
+                'oauth2-client',
+                'oauth2-refresh',
+                'idnetityserver4-client',
+                'jwt'
             ],
             '/microservices/mq/': [
                 'rabbitmq-install'
