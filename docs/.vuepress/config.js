@@ -241,7 +241,8 @@ module.exports = {
                 'vim',
                 'screen',
                 'ubuntu',
-                'manjaro'
+                'manjaro',
+                'ddns'
             ],
             '/other/mac/': [
                 'install',

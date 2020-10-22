@@ -176,7 +176,11 @@ sudo apt-get install docker-ce=5:18.09.8~3-0~ubuntu-bionic docker-ce-cli=5:18.09
   1. 初始化`kubeadm`:
 
     ```bash
-    kubeadm init --kubernetes-version v1.15.2 --apiserver-advertise-address=99.99.99.100 --pod-network-cidr=192.192.0.0/16 --image-repository registry.aliyuncs.com/google_containers
+    # 查看kubernetes版本
+    kubelet --version
+    
+    # 初始化 或 重置
+    kubeadm init --kubernetes-version v1.17.4 --apiserver-advertise-address=99.99.99.100 --pod-network-cidr=192.192.0.0/16 --image-repository registry.aliyuncs.com/google_containers
     ```
 
   1. 如果一切正常，安装成功，将输入类似下面的结果信息
@@ -386,3 +390,7 @@ Dashboard的版本与k8s要匹配，具体的版本对应关系查看dashboard�
     ```
 1. 拿到token在登录界面的令牌区域输入，然后点击登录
     ![install-adm1](./img/install-adm1.png)
+
+## 五、重置配置，重新部署集群
+
+参考官方reset资料：https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-reset/
