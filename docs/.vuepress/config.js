@@ -29,7 +29,7 @@ module.exports = {
                     {
                         text: 'Java',
                         items: [
-                            { text: '常用功能', link: '/code/java/common/' },
+                            { text: '基础知识', link: '/code/java/basics/' },
                             { text: 'Spring', link: '/code/java/spring/' },
                             { text: '其他', link: '/code/java/tools/' }
                         ]
@@ -118,7 +118,9 @@ module.exports = {
                 'openapi',
                 'template'
             ],
-            '/code/java/common/': [],
+            '/code/java/basics/': [
+                'volatile'
+            ],
             '/code/java/spring/': [],
             '/code/java/tools/' : [
                 'install'
