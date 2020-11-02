@@ -95,6 +95,12 @@ module.exports = {
                     { text: 'Mac', link: '/other/mac/' },
                     { text: 'Cloud', link: '/other/cloud/'}
                 ]
+            },
+            {
+                text: '读书',
+                items: [
+                    { text: '经典文章摘录', link: '/book/classicals/' }
+                ]
             }
         ],
         sidebar: {
@@ -258,6 +264,9 @@ module.exports = {
             '/other/cloud/': [
                 'vmware-vsphere',
                 'proxmox'
+            ],
+            '/book/classicals/': [
+                'classical1'
             ]
         },
         sidebarDepth: 2
