@@ -147,7 +147,6 @@ module.exports = {
                 'vscode'
             ],
             '/code/web/css/': [
-                'grid'
             ],
             '/microservices/consul/': [
                 'base',
