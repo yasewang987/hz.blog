@@ -45,7 +45,8 @@ module.exports = {
                         items: [
                             { text: 'Npm', link: '/code/web/npm/' },
                             { text: 'TypeScript', link: '/code/web/ts/' },
-                            { text: 'Vue', link: '/code/web/vue/' }
+                            { text: 'Vue', link: '/code/web/vue/' },
+                            { text: 'CSS', link: '/code/web/css/' }
                         ]
                     }
                 ]
@@ -144,6 +145,9 @@ module.exports = {
             ],
             '/code/web/vue/': [
                 'vscode'
+            ],
+            '/code/web/css/': [
+                'grid'
             ],
             '/microservices/consul/': [
                 'base',
