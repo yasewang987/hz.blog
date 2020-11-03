@@ -29,7 +29,7 @@ module.exports = {
                     {
                         text: 'Java',
                         items: [
-                            { text: '常用功能', link: '/code/java/common/' },
+                            { text: '基础知识', link: '/code/java/basics/' },
                             { text: 'Spring', link: '/code/java/spring/' },
                             { text: '其他', link: '/code/java/tools/' }
                         ]
@@ -45,7 +45,8 @@ module.exports = {
                         items: [
                             { text: 'Npm', link: '/code/web/npm/' },
                             { text: 'TypeScript', link: '/code/web/ts/' },
-                            { text: 'Vue', link: '/code/web/vue/' }
+                            { text: 'Vue', link: '/code/web/vue/' },
+                            { text: 'CSS', link: '/code/web/css/' }
                         ]
                     }
                 ]
@@ -95,6 +96,12 @@ module.exports = {
                     { text: 'Mac', link: '/other/mac/' },
                     { text: 'Cloud', link: '/other/cloud/'}
                 ]
+            },
+            {
+                text: '读书',
+                items: [
+                    { text: '经典文章摘录', link: '/book/classicals/' }
+                ]
             }
         ],
         sidebar: {
@@ -118,7 +125,9 @@ module.exports = {
                 'openapi',
                 'template'
             ],
-            '/code/java/common/': [],
+            '/code/java/basics/': [
+                'volatile'
+            ],
             '/code/java/spring/': [],
             '/code/java/tools/' : [
                 'install'
@@ -136,6 +145,9 @@ module.exports = {
             ],
             '/code/web/vue/': [
                 'vscode'
+            ],
+            '/code/web/css/': [
+                'grid'
             ],
             '/microservices/consul/': [
                 'base',
@@ -239,7 +251,8 @@ module.exports = {
                 'vim',
                 'screen',
                 'ubuntu',
-                'manjaro'
+                'manjaro',
+                'ddns'
             ],
             '/other/mac/': [
                 'install',
@@ -255,6 +268,9 @@ module.exports = {
             '/other/cloud/': [
                 'vmware-vsphere',
                 'proxmox'
+            ],
+            '/book/classicals/': [
+                'classical1'
             ]
         },
         sidebarDepth: 2
