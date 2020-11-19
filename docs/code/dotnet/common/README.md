@@ -11,3 +11,6 @@
 * [NetCore的WebAPI项目添加Swagger](./swagger.md)
 * [NetCore调用WCF服务](./wcf.md)
 * [NetCore常见错误](./error.md)
+
+* [WebApi请求出入参修改](./webapimodel.md)
+* [Builder,Factory,Provider区别](./builder-fac-provider.md)

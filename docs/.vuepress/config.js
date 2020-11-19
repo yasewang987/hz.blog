@@ -117,7 +117,9 @@ module.exports = {
                 'signalr',
                 'swagger',
                 'wcf',
-                'error'
+                'error',
+                'builder-fac-provider',
+                'webapimodel'
             ],
             '/code/dotnet/tools/': [
                 'install',
