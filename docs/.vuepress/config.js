@@ -90,6 +90,7 @@ module.exports = {
             {
                 text: 'Other',
                 items: [
+                    { text: '设计模式', link: '/other/designpattern/' },
                     { text: 'Git', link: '/other/git/' },
                     { text: 'Linux', link: '/other/linux/' },
                     { text: '实用工具', link: '/other/tools/' },
@@ -116,7 +117,9 @@ module.exports = {
                 'signalr',
                 'swagger',
                 'wcf',
-                'error'
+                'error',
+                'builder-fac-provider',
+                'webapimodel'
             ],
             '/code/dotnet/tools/': [
                 'install',
@@ -234,6 +237,11 @@ module.exports = {
             '/sql/mysql/': [
                 'install',
                 'gh-ost'
+            ],
+            '/other/designpattern/': [
+                'factory',
+                'facade',
+                'observer'
             ],
             '/other/git/': [
                 'history',
