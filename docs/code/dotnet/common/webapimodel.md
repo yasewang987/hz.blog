@@ -15,6 +15,7 @@
 
 * 响应：mvc的 `JsonOptions` 配置中可以设置在将请求结果序列化为 `string` 的时候如果处理对应类型数据（即重写 `DateTime` 的 `Json` 反序列化配置）。
 
+使用集成测试：https://docs.microsoft.com/zh-cn/aspnet/core/test/integration-tests?view=aspnetcore-5.0
 
 代码如下：
 

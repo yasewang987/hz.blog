@@ -9,3 +9,4 @@ USB启动盘刻录：https://rufus.ie/zh_CN.html  或者 UISO
 终端：https://github.com/Eugeny/terminus/releases  
 Windows子系统WSL: https://sspai.com/post/47719
 
+PowerToys : https://github.com/microsoft/PowerToys
