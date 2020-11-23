@@ -7,7 +7,7 @@ microsoft资料地址：https://docs.microsoft.com/zh-cn/aspnet/core/signalr/int
 这里只记录强类型的服务端
 1. 新建空的web项目：`dotnet new web -n Hz.SignalR`
 1. 目录结构  
-    ![img](./img/signalr/p1.png)
+    ![img](http://cdn.go99.top/docs/code/dotnet/common/signalrp1.png)
 
     * 这里将Hubs放在文件夹中是为了多个hub划分清晰一点
 

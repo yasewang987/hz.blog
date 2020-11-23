@@ -4,7 +4,7 @@
 
 应用官方的说法：**Apache SkyWalking**是观察性分析平台和应用性能管理系统。提供分布式追踪、服务网格遥测分析、度量聚合和可视化一体化解决方案
 
-![img](./img/base/1.jpeg)
+![img](http://cdn.go99.top/docs/microservices/skywalking/base1.jpeg)
 
 GitHub地址：https://github.com/apache/skywalking
 
@@ -191,4 +191,4 @@ ui              bash docker-entrypoint.sh        Up      0.0.0.0:8080->8080/tcp
     ```
 1. F5或者`dotnet run`运行项目即可看到在skywalking的管理页面里看到多了一个`service`
 1. 访问`localhost:10009/api/values`和`localhost:10009/api/values/1`就会看到相关访问的记录以及统计信息。
-    ![img](./img/base/2.png)
+    ![img](http://cdn.go99.top/docs/microservices/skywalking/base2.png)

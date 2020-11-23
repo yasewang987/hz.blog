@@ -2,3 +2,5 @@
 
 * [一致性Hash算法](./hash.md)
 * [随笔](./note.md)
+
+* [CAP & BASE 理论](./cap-base.md)

@@ -9,10 +9,10 @@
 ### 白嫖前准备
 
 1. 使用 https://www.google.com/recaptcha/admin/create ，注册网站（需要有谷歌账号，能KX上网）
-    ![code](./img/code/1.png)
+    ![code](http://cdn.go99.top/docs/code/dotnet/common/code1.png)
     * 注意需要选择`v3`版本，填写的域名可以多个，可以一次性将本地`localhost`和`xxxx.com`域名一次都加入
 1. 提交之后保存`site key`和`secret key`
-    ![code](./img/code/2.png)
+    ![code](http://cdn.go99.top/docs/code/dotnet/common/code2.png)
     * 注意将2个key都保存到本地文件里
 
 ### WebAPI
@@ -90,12 +90,12 @@
 1. 创建前台项目`vue create web`(选择默认的模板即可)
 1. 引入`recaptcha-v3`：`npm i recaptcha-v3`
 1. 修改`App.vue`代码，内容如下
-    ![code](./img/code/3.png)
+    ![code](http://cdn.go99.top/docs/code/dotnet/common/code3.png)
     * `useRecaptchaNet`:参数表示使用`recaptcha.net`，`autoHideBadge`：表示自动隐藏reCAPTCHA徽章
 
 ### 测试结果
 
-![code](./img/code/4.png)
-![code](./img/code/5.png)
+![code](http://cdn.go99.top/docs/code/dotnet/common/code4.png)
+![code](http://cdn.go99.top/docs/code/dotnet/common/code5.png)
 
 **所有测试代码已经上传到Github,需要的同学[【戳此下载】](https://github.com/yasewang987/Hz.DonetDemo/tree/master/Hz.GooleToken)**

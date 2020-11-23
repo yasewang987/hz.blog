@@ -8,7 +8,7 @@
 github地址：https://github.com/github/gh-ost
 
 gh-ost 作为一个伪装的备库，可以从主库/备库上拉取 binlog，过滤之后重新应用到主库上去，相当于主库上的增量操作通过 binlog 又应用回主库本身，不过是应用在幽灵表上。
-![1](./img/gh-ost/1.png)
+![1](http://cdn.go99.top/docs/sql/mysql/gh-ost1.png)
 
 **gh-ost 首先连接到主库上，根据 alter 语句创建幽灵表，然后作为一个”备库“连接到其中一个真正的备库上，一边在主库上拷贝已有的数据到幽灵表，一边从备库上拉取增量数据的 binlog，然后不断的把 binlog 应用回主库。**图中 cut-over 是最后一步，锁住主库的源表，等待 binlog 应用完毕，然后替换 gh-ost 表为源表。gh-ost 在执行中，会在原本的 binlog event 里面增加以下 hint 和心跳包，用来控制整个流程的进度，检测状态等。这种架构带来诸多好处，例如：
 
@@ -17,7 +17,7 @@ gh-ost 作为一个伪装的备库，可以从主库/备库上拉取 binlog，�
 * **可停止**：binlog 有位点记录，如果变更过程发现主库性能受影响，可以立刻停止拉binlog，停止应用 binlog，稳定之后继续应用。
 * **可测试**：gh-ost 提供了测试功能，可以连接到一个备库上直接做 Online DDL，在备库上观察变更结果是否正确，再对主库操作，心里更有底
 
-![2](./img/gh-ost/2.png)
+![2](http://cdn.go99.top/docs/sql/mysql/gh-ost2.png)
 
 ### a.连接到从库，在主库做迁移
 这是 gh-ost 默认的工作方式。gh-ost 将会检查从库状态，找到集群结构中的主库并连接，接下来进行迁移操作：

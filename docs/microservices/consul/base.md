@@ -8,7 +8,7 @@ Consul用Golang实现，因此具有天然可移植性（支持Linux、windows�
 
 关于Consul的架构以及相关的角色，如下图所示：
 
-![img](./img/base/c1.png)
+![img](http://cdn.go99.top/docs/microservices/consul/basec1.png)
 
 要想利用Consul提供的服务实现服务的注册与发现，我们需要建立Consul Cluster。在Consul方案中，每个提供服务的节点上都要部署和运行Consul的Client Agent，所有运行Consul Agent节点的集合构成Consul Cluster。Consul Agent有两种运行模式：Server和Client。这里的Server和Client只是Consul集群层面的区分，与搭建在Cluster之上的应用服务无关。以Server模式运行的Consul Agent节点用于维护Consul集群的状态，官方建议每个Consul Cluster至少有3个或以上的运行在Server Mode的Agent，Client节点不限。
 
@@ -48,7 +48,7 @@ Consul支持多数据中心，每个数据中心的Consul Cluster都会在运行
 1. 访问`http://192.168.80.100:5000`通过webui查看集群状态
 1. 关闭100服务器测试集群功能
 1. 通过命令查看各个`server`状态：`consul members`或者`consul operator raft list-peers`
-![img](./img/base/c2.png)
+![img](http://cdn.go99.top/docs/microservices/consul/basec2.png)
    虽然这里80.100这个原leader节点挂掉了，但是只要超过一半的Server（这里是2/3还活着）还活着，集群是可以正常工作的，这也是为什么像Consul、ZooKeeper这样的分布式管理组件推荐我们使用3个或5个节点来部署的原因。
 
 ## 3. Consul客户端服务注册
@@ -226,7 +226,7 @@ Consul的客户端注册分2种：
 1. Consul不仅仅提供了服务注册，还提供了服务发现，我们可以通过调用其提供的API来发现服务的IP和Port:`192.168.80.100:8500/v1/catalog/service/CAS Client Service`  
     **我们可以看到返回了ClientService的ServiceAddress和ServicePort，就可以通过其组成URL进行服务调用了。当然，我们可能会对一个服务部署多个实例，以组成集群来实现负载均衡。我们可以设置一些负载均衡的策略，假设通过取模运算随机选择一个服务地址返回给服务消费者**
 
-    ![img](./img/base/c3.png)
+    ![img](http://cdn.go99.top/docs/microservices/consul/basec3.png)
     可以看到返回了两个服务实例的信息，当然，这里建议服务名还是不要有空格为好。此外，在服务发现的过程中，会加以一定的负载均衡策略，从这两个服务实例中选择一个返回给服务消费端，比如：随机、轮询、加权轮询、基于性能的最小连接数等等
 
 ## 4. Consul集群之Key/Value存储
@@ -234,7 +234,7 @@ Consul的客户端注册分2种：
 Consul除了可以实现服务注册和服务发现之外，还提供了强大的KV（Key/Value）存储。我们可以使用Consul的分层KV存储干任何事情，比如：动态配置，特征标记，协调，leader选举等。KV存储的API是基于http的。
 
 * 查看所有KV:`curl -v http://192.168.80.100:8500/v1/kv/?recurse`
-![img](./img/base/c4.png)
+![img](http://cdn.go99.top/docs/microservices/consul/basec4.png)
 可以看到，返回的是404 Not Found，可见现在木有一个Key/Value存储项。  
 *.关于?recurse参数=>用来指定查看多个KV  
 当然我们也可以通过WebUI来查看和管理KV  
@@ -242,7 +242,7 @@ Consul除了可以实现服务注册和服务发现之外，还提供了强大�
 * 新增KV(key:vhallaccount, value:edisonchou):`curl -X PUT -d 'edisonchou' http://192.168.80.100:8500/v1/kv/web/vhallaccount`
 
 * 查看KV：`curl http://192.168.80.100:8500/v1/kv/web/vhallaccount`
-![img](./img/base/c5.png)
+![img](http://cdn.go99.top/docs/microservices/consul/basec5.png)
 **.由于Consul的Value是经过Base64编码的（主要是为了允许非UTF-8的字符），所以这里看到的是编码后的结果。我们可以通过解码得到最终的Value值。*
 
 * 验证KV同步：由于我们调用的是Leader节点进行的KV存储，我们想要验证一下是否在另外两个节点进行了同步，否则KV只存在一个节点达不到同步的效果。  
@@ -278,7 +278,7 @@ Consul除了可以实现服务注册和服务发现之外，还提供了强大�
 1. 将文件放到config目录下，重启Consul Clinet Agent即可
 1. 添加NoticeService服务，新写一个ASP.NET Core WebAPI程序，其主要功能就是接受Consul POST过来的参数并调用方法发送电子邮件（[消息发送参考](../../DotNet/sendmessage.md)）。
 1. Consul官方文档中watches页中的checks类型如下图：
-![img](./img/base/c6.png)
+![img](http://cdn.go99.top/docs/microservices/consul/basec6.png)
 1. 发布NoticeService到192.168.80.71服务器中，同样也可以加入Consul配置文件中：
 ```bash
 {

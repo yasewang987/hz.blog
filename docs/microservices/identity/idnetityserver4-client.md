@@ -84,9 +84,9 @@ access Token：访问令牌，由identityServer服务器签发的，客户端使
     }
     ```
 1. 查看配置发现文档： http://localhost:5000/.well-known/openid-configuration
-    ![img](./img/client/1.png)
+    ![img](http://cdn.go99.top/docs/microservices/identity/client1.png)
 1. 使用`Postman`测试获取`access_token`
-    ![img](./img/client/2.png)
+    ![img](http://cdn.go99.top/docs/microservices/identity/client2.png)
     > 注意body中的参数
 
 ## 测试webapi资源服务
@@ -148,9 +148,9 @@ access Token：访问令牌，由identityServer服务器签发的，客户端使
 1. `Postman`访问测试
     
     未认证：
-    ![img](./img/client/3.png)
+    ![img](http://cdn.go99.top/docs/microservices/identity/client3.png)
     认证后：
-    ![img](./img/client/4.png)
+    ![img](http://cdn.go99.top/docs/microservices/identity/client4.png)
 
 ## 测试客户端
 
@@ -203,7 +203,7 @@ access Token：访问令牌，由identityServer服务器签发的，客户端使
     } 
     ```
 1. 运行结果：
-    ![img](./img/client/5.png)
+    ![img](http://cdn.go99.top/docs/microservices/identity/client5.png)
 
 ## 总结
 

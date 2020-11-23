@@ -24,15 +24,15 @@
 
 1. 【New Item】新建项目`Hz.JsLib`。
 1. 填写项目描述及Github项目地址：
-    ![img](./img/ci/6-1.png)
+    ![img](http://cdn.go99.top/docs/code/web/npm/ci6-1.png)
 1. 【Source Code Management】源代码管理配置：
-    ![img](./img/ci/6-2.png)
+    ![img](http://cdn.go99.top/docs/code/web/npm/ci6-2.png)
     > 由于我使用的是https协议，所以需要先新增一下github的账号密码。如果使用SSH的请自行baidu
 1. 触发构建
-    ![img](./img/ci/6-3.png)
+    ![img](http://cdn.go99.top/docs/code/web/npm/ci6-3.png)
     > 这里只是做简单测试就使用webhook了
 1. 构建
-    ![img](./img/ci/6-4.png)
+    ![img](http://cdn.go99.top/docs/code/web/npm/ci6-4.png)
     > 【Source files】：表示哪些文件需要上传到远程服务器（位置是相对于项目位置的）；  
     > 【Remote directory】：表示上传的原件放在远程服务器的哪个位置（相对于全局设置的位置）  
     > 执行的命令看到我们执行的是一个sh批处理文件（这个批处理文件会一起放在项目里），因为我将基本的操作都写在这个文件里了
@@ -72,12 +72,12 @@
 # 这里一定要使用-i以交互模式运行容器，不然容器启动之后就会退出
 docker run -d -i -u root -v /home/node:/node --name node-builder docker.io/node
 ```
-![img](./img/ci/8-1.png)
-![img](./img/ci/8-2.png)
+![img](http://cdn.go99.top/docs/code/web/npm/ci8-1.png)
+![img](http://cdn.go99.top/docs/code/web/npm/ci8-2.png)
 
 有其他问题也可以参考我的[【使用NPM库管理前端通用库】 ](./base.md) 文章
 
 ## 运行效果
 
-![img](./img/ci/7-1.png)
-![img](./img/ci/7-2.png)
+![img](http://cdn.go99.top/docs/code/web/npm/ci7-1.png)
+![img](http://cdn.go99.top/docs/code/web/npm/ci7-2.png)

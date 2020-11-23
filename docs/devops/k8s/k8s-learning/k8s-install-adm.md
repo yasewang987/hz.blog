@@ -389,7 +389,7 @@ Dashboard的版本与k8s要匹配，具体的版本对应关系查看dashboard�
     kubectl describe secrets -n kube-system $(kubectl -n kube-system get secret | awk '/dashboard-admin/{print $1}')
     ```
 1. 拿到token在登录界面的令牌区域输入，然后点击登录
-    ![install-adm1](./img/install-adm1.png)
+    ![install-adm1](http://cdn.go99.top/docs/devops/k8s/k8s-learning/install-1.jpeg)
 
 ## 五、重置配置，重新部署集群
 

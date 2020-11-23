@@ -26,7 +26,7 @@
 
     按照常用的hash算法来将对应的key哈希到一个具有2^32次方个桶的空间中，即0~（2^32）-1的数字空间。现在我们可以将这些数字头尾相连，想象成一个闭合的环形。如下图
 
-    ![1](./img/hash/1.png)
+    ![1](http://cdn.go99.top/docs/microservices/other/hash1.png)
 
 1. 把数据(对象)通过一定的hash算法处理后映射到环上
 
@@ -37,7 +37,7 @@
     Hash(object3)=key3;
     Hash(object4)=key4;
     ```
-    ![1](./img/hash/2.png)
+    ![1](http://cdn.go99.top/docs/microservices/other/hash2.png)
 
 1. 将机器通过hash算法映射到环上
 
@@ -47,7 +47,7 @@
     ```
     Hash（NODE1）=KEY1;Hash（NODE2）=KEY2;Hash（NODE3）=KEY3;
     ```
-    ![1](./img/hash/3.png)
+    ![1](http://cdn.go99.top/docs/microservices/other/hash3.png)
     通过上图可以看出对象与机器处于同一个哈希空间中，这样按顺时针转动object1（对象）存储到了NODE1（机器）中,object3（对象）存储到了NODE2（机器）中,object2、object4（对象）存储到了NODE3（机器）中。在这样的部署环境中，hash环是不会变更的，因此，通过算出对象的hash值就能快速的定位到对应的机器中，这样就能找到对象真正的存储位置了。
 
 1. 机器删除与添加
@@ -57,12 +57,12 @@
     * 节点（机器）的删除
 
         以上面的分布式集群为例，如果NODE2出现故障被删除了，那么按照顺时针迁移的方法，object3将会被迁移到NODE3中，这样仅仅是object3的映射位置发生了变化，其他的对象没有任何的变动，如下图
-        ![1](./img/hash/4.png)
+        ![1](http://cdn.go99.top/docs/microservices/other/hash4.png)
     
     * 节点（机器）的添加
 
         如果往集群中添加一个新的节点NODE4,通过对应的Hash算法得到KEY4，并映射到环中，如下图：
-        ![1](./img/hash/5.png)
+        ![1](http://cdn.go99.top/docs/microservices/other/hash5.png)
         通过按照顺时针迁移的规则，那么object2被迁移到NODE4中，其他对象还保持这原有的存储位置。通过对节点的添加和删除的分析，一致性哈希算法在保持了单调性的同时，还是数据的迁移达到了最小，这样的算法对分布式集群来说非常合适的，避免了大量收数据迁移，减少了服务器的压力。 
 
 1. 平衡性
@@ -72,10 +72,10 @@
     何为虚拟节点？虚拟节点（Virtual node）是实际节点（机器）在hash空间的复制品（replica），一个实际节点对应了若干个“虚拟节点”，这个对应个数也称为“复制个数”，“虚拟节点”在hash空间中以hash值排列。
 
     在上面只部署了NODE1和NODE3的情况（NODE2被删除的图）为例，之前的对象在机器上的分布很不均衡，现在我们以2个副本（每个节点复制2个）为例，这样整个hash环就存在4个虚拟节点，最后对象映射的关系图如下：
-    ![1](./img/hash/6.png)
+    ![1](http://cdn.go99.top/docs/microservices/other/hash6.png)
 
     根据上图可知对象的映射关系：object1->NODE1-1,object2->NODE1-2 ,object3->NODE3-2,object4->NODE3-1，通过虚拟节点的引入，对象的分布就比较均衡了。那么在实际操作中，真正的对象查询是如何工作的呢？对象从hash到虚拟节点到实际节点的转换如下图：
-    ![1](./img/hash/7.png)
+    ![1](http://cdn.go99.top/docs/microservices/other/hash7.png)
     虚拟节点”的hash计算可以采用对应节点的IP地址加数字后缀的方式。例如假设NODE1的IP地址为192.168.1.100。引入“虚拟节点”前，计算 cache A 的 hash 值：
     ```
     Hash(“192.168.1.100”);

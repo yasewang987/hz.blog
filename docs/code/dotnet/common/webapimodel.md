@@ -6,7 +6,7 @@
 
 代码结构如下：
 
-![1](./img/webapimodel/1.png)
+![1](http://cdn.go99.top/docs/code/dotnet/common/webapimodel1.png)
 
 
 思路：

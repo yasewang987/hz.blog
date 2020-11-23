@@ -10,7 +10,7 @@ Systemd即为`system daemon`，是linux的一种init软件，用来启动和管�
 看一下Systemd管理防火墙的命令：`systemctl enable firewalld`这条命令的作用是让防火墙开机自启，执行这条命令时会在`/etc/systemd/system/`添加一个符号链接，指向`/lib/systemd/system`下的`firewalld.service`。开机时只会执行`/etc/systemd/system/`目录下的配置文件,通过防火墙配置文件的符号链接，执行`/lib/systemd/system`下的`firewalld.service`。相对的`systemctl disable firewalld`用于让防火墙开机不自启，实质上就是撤销`/etc/systemd/system/`目录下的符号链接。
 
 通过`systemctl list-unit-files`查看配置文件
-![img](./img/systemd/1.png)
+![img](http://cdn.go99.top/docs/other/linux/systemd1.png)
 绿色的enabled表示开机启动，红色的disabled表示开机不启动，static表示不能执行，只能作为其他配置文件的依赖，masked表示禁止执行。
 
 ## Unit配置文件
@@ -44,7 +44,7 @@ Systemd即为`system daemon`，是linux的一种init软件，用来启动和管�
 1. 启动服务：`sudo systemctl start netcoretest.service`
 1. 设置开机启动：`sudo systemctl enable netcoretest.service`
 1. 查看服务是否启动成功`sudo systemctl status netcoretest.service`
-    ![img](./img/systemd/2.png)
+    ![img](http://cdn.go99.top/docs/other/linux/systemd2.png)
 
 ## 配置参数详解
 

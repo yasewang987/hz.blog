@@ -31,7 +31,7 @@
 
 ## 类图
 
-![1](./img/observer1.png)
+![1](http://cdn.go99.top/docs/other/designpattern/observer1.png)
 
 ## dotnet代码实现
 

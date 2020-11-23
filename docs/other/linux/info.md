@@ -2,5 +2,5 @@
 
 ## Linux目录结构
 
-![img](./img/info/1.png)
+![img](http://cdn.go99.top/docs/other/linux/info1.png)
 

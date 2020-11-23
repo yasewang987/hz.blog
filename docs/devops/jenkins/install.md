@@ -30,9 +30,9 @@
         二、 使用`jenkins`中的`SSH`连接到服务器执行`docker`命令
 
 1. 解锁`Jenkins`,访问`http://localhost:13333`,解锁密码在可以查看`jenkins`容器的`/var/jenkins_home/secrets/initialAdminPassword`文件内容
-    ![img](./img/install/1.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/install1.png)
 1. 选择需要安装的插件
-    ![img](./img/install/2.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/install2.png)
     > Generic WebHook Trigger => 触发WebHook必备  
     MSTest & xUnit => 进行基于MSTest或基于xUnit的单元测试  
     Nuget Plugin => 拉取Nuget包必备  
@@ -44,12 +44,12 @@
 ## Jenkins系统配置
 
 * SSH站点配置：
-    ![img](./img/install/3.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/install3.png)
     > 需要先添加ssh登录的账号，再点击【check connection】如果提示Successfull说明成功。
 
 * 配置jenkins地址和管理员邮箱
-    ![img](./img/install/4.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/install4.png)
 
 * `Publish over SSH`插件全局配置：
-    ![img](./img/install/5.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/install5.png)
     > `Jenkins SSH Key Passphrase` 如果使用的是rsa验证方式登录，这里是私钥密码，如果是账号密码登录这里是密码。`Remote Directory` 是指登录之后的默认位置。配置完成之后点击【Test Connection】提示`Success`说明配置成功

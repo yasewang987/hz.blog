@@ -55,7 +55,7 @@ Polly的策略主要由“故障”和“动作”两个部分组成，“故障
         });
     }
     ```
-    ![img](./img/polly/polly1.png)
+    ![img](http://cdn.go99.top/docs/code/dotnet/common/polly1.png)
 1. Retry：重试
 
     ```csharp
@@ -81,7 +81,7 @@ Polly的策略主要由“故障”和“动作”两个部分组成，“故障
         }
     }
     ```
-    ![img](./img/polly/polly2.png)
+    ![img](http://cdn.go99.top/docs/code/dotnet/common/polly2.png)
 1. CircuitBreaker: 短路保护,当一块业务代码/服务 出现了N次错误，则把“熔断器”（保险丝）熔断，等待一段时间后才允许再次执行，在这段等待的时间内如果再执行则直接抛出BrokenCircuitException异常.
 
     ```csharp
@@ -112,7 +112,7 @@ Polly的策略主要由“故障”和“动作”两个部分组成，“故障
     }
     ```
     发生了故障的时候，则重试了5次还是有故障（代码中的6代表的是在执行短路保护策略之前允许6次故障），那么久停止服务10s钟，10s之后再允许重试。
-    ![img](./img/polly/polly3.png)
+    ![img](http://cdn.go99.top/docs/code/dotnet/common/polly3.png)
 1. Timeout 与 Wrap => Wrap是指策略封装，可以把多个ISyncPolicy合并到一起执行。Timeout则是指超时处理，但是超时策略一般不能直接使用，而是其其他策略封装到一起使用。这里我们封装两个策略，一个是基本的Fallback，另一个则是超时策略，如果调用执行时间超过2s则触发Fallback。这里涉及到Polly中关于超时的两个策略：一个是悲观策略（Pessimistic），一个是乐观策略（Optimistic）。其中，悲观策略超时后会直接抛异常，而乐观策略则不会，而只是触发CancellationTokenSource.Cancel函数，需要等待委托自行终止操作。一般情况下，我们都会用悲观策略。
 
     ```csharp
@@ -141,7 +141,7 @@ Polly的策略主要由“故障”和“动作”两个部分组成，“故障
         }
     }
     ```
-    ![img](./img/polly/polly4.png)
+    ![img](http://cdn.go99.top/docs/code/dotnet/common/polly4.png)
 
 1. 除此之外，Polly还提供了一些异步方法供调用以实现以上介绍的功能，比如在业务代码中有一些Http的调用或者IO操作时，不妨用用异步操作来提高一点效率，可以看下面这个例子：
     ```csharp
@@ -176,7 +176,7 @@ Polly的策略主要由“故障”和“动作”两个部分组成，“故障
         Console.WriteLine($"Length of bytes : {bytes.Length}");
     }
     ```
-    ![img](./img/polly/polly5.png)
+    ![img](http://cdn.go99.top/docs/code/dotnet/common/polly5.png)
 
 ## 三、AspectCore的基本使用
 
@@ -257,7 +257,7 @@ public class Program
     }
 }
 ```
-![img](./img/polly/polly6.png)
+![img](http://cdn.go99.top/docs/code/dotnet/common/polly6.png)
 代码很清晰，不再解释。直到这里，我们看到了不管是Polly的使用，还是AspectCore的使用，都存在一些业务无关的声明代码，而且我们需要结合Polly和AspectCore才能完整地实现适合ASP.NET Core的熔断降级组件，下面我们就来模仿Spring Cloud中的Hystrix
 
 ## 四、Polly+AspectCore的结合使用
@@ -516,6 +516,6 @@ if (IsEnableCircuitBreaker)
 Step1.借助命令行启动一个WebAPI程序
 
 Step2.借助Postman/SoapUI等API测试工具，输入我们的URL，测试结果如下图所示：
-![img](./img/polly/polly1.gif)
+![img](http://cdn.go99.top/docs/code/dotnet/common/polly1.gif)
 可以看到我们通过在Postman中访问这个URL从而触发Service中的异常，两次异常之后，便进入了熔断保护时间，此后5s内的访问都没有再进行实际代码的执行，而直接进入了Fallback方法执行降级后的逻辑。5s保护时间之后，则再次进入实际代码的执行。目前，这个Hystrix还存在一些问题，需继续完善，还无法正式投入使用，后续会结合Polly和Ocelot，在API网关处做统一熔断保护
 

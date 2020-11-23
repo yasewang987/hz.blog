@@ -8,7 +8,7 @@
 
 **准备工作** 在gitlab创建个人项目，注意查看如下信息，在注册runner的时候会用到（必须是项目的管理员才能看到）
 
-![3](./img/base/1.png)
+![3](http://cdn.go99.top/docs/devops/gitlabrunner/base1.png)
 
 gitlab-runner提供windows和linux版本的安装客户端，我这边使用`docker`的方式安装举例
 
@@ -65,7 +65,7 @@ docker pull gitlab/gitlab-runner
 
 按照上面的顺序操作下来，如果顺利的话就会在gitlab项目的ci里面看到这个runner已经上线
 
-![3](./img/base/2.png)
+![3](http://cdn.go99.top/docs/devops/gitlabrunner/base2.png)
 
 * `发布`runner安装注册
 
@@ -221,18 +221,18 @@ deploy-master-job:
 
 各个阶段效果图如下：
 1. 构建
-![3](./img/base/3.png)
-![4](./img/base/4.png)
+![3](http://cdn.go99.top/docs/devops/gitlabrunner/base3.png)
+![4](http://cdn.go99.top/docs/devops/gitlabrunner/base4.png)
 1. 发布
-![5](./img/base/5.png)
+![5](http://cdn.go99.top/docs/devops/gitlabrunner/base5.png)
 
 服务器运行之后docker容器状态：
 
-![3](./img/base/6.png)
+![3](http://cdn.go99.top/docs/devops/gitlabrunner/base6.png)
 
 网页访问api效果图：
 
-![3](./img/base/7.png)
+![3](http://cdn.go99.top/docs/devops/gitlabrunner/base7.png)
 
 整个过程走下来会发现其实耗时的操作都是拉取镜像，这个情况只有第一次的时候才会出现，后续构建就不会有这个问题了。
 

@@ -29,7 +29,7 @@
     ```
     * `--output-file`指定的文件名称建议写成 `服务名+Service.json`，后面生成客户端代码的时候会根据文件名去命名客户端
     * 运行成功之后，可以在调用方项目中看到生成了`ErpService.json`文件，并且`csproj`文件中添加`<OpenApiReference />` 元素
-    ![1](./img/openapi/1.png)
+    ![1](http://cdn.go99.top/docs/code/dotnet/tools/openapi1.png)
 
 1. 生成后端服务客户端cs文件
 

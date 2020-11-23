@@ -183,7 +183,8 @@ module.exports = {
             ],
             '/microservices/other/': [
                 'hash',
-                'note'
+                'note',
+                'cap-base'
             ],
             '/test/jmeter/': [
                 'install-docker',

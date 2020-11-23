@@ -64,3 +64,12 @@ call xcopy ./out E:\test /e /y
     "useAcrylic": false // 是否开启透明度
 }
 ```
+
+## Windows - 设置terminal中wsl默认目录
+
+```json
+{
+    // Ubuntu 这个可以修改看你用的是哪个版本 wsl -l
+    "startingDirectory": "//wsl$/Ubuntu/home/hz"
+}
+```

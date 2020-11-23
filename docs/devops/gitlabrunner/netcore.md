@@ -96,7 +96,7 @@ $ sudo docker pull gitlab/gitlab-runner
     ```
     *一定要确保`volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]`存在，不然无法使用`docker`命令*
 1. 打开gitlab查看是否注册成功
-    ![img](./img/netcore/1.png)
+    ![img](http://cdn.go99.top/docs/devops/gitlabrunner/netcore1.png)
 
 ## WebAPI创建配置
 
@@ -152,13 +152,13 @@ $ sudo docker pull gitlab/gitlab-runner
 ## 运行结果查看
 
 1. 上传代码，查看gitlab的ci作业是否正常，如果顺利的话运行结果如下图
-    ![img](./img/netcore/2.png)
-    ![img](./img/netcore/3.png)
-    ![img](./img/netcore/4.png)
+    ![img](http://cdn.go99.top/docs/devops/gitlabrunner/netcore2.png)
+    ![img](http://cdn.go99.top/docs/devops/gitlabrunner/netcore3.png)
+    ![img](http://cdn.go99.top/docs/devops/gitlabrunner/netcore4.png)
 1. 查看docker容器运行状态
-    ![img](./img/netcore/5.png)
+    ![img](http://cdn.go99.top/docs/devops/gitlabrunner/netcore5.png)
 1. 查看网站运行状态
-    ![img](./img/netcore/6.png)
+    ![img](http://cdn.go99.top/docs/devops/gitlabrunner/netcore6.png)
 
 
 ## 方案2
@@ -272,7 +272,7 @@ fi
 
 ### 查看测试结果
 
-![img](./img/netcore/7.png)
+![img](http://cdn.go99.top/docs/devops/gitlabrunner/netcore7.png)
 
 发现使用runtime镜像编译生成之后的webapi镜像比原来小很多。
 

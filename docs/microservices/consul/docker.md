@@ -2,7 +2,7 @@
 
 ## 介绍
 
-![img](./img/docker/ck1.png)
+![img](http://cdn.go99.top/docs/microservices/consul/dockerck1.png)
 * **Client:** 表示 Consul 客户端模式，是 Consul 节点的一种模式，所有注册到 Client 节点的服务会被转发到 Server 。本身无状态不持久化如何数据。Client 通过 HTTP、DNS、GRPC 接口请求转发给局域网内的服务端集群。
 
 * **Server:** 表示 Consul 的服务端模式， Server 功能和 Client 都一样，不同的是 Server 持久化数据到本地。在局域网内与本地 Client 通讯，通过广域网与其他数据中心通讯。每个数据中心的 Server 数量推荐为 3 个或是 5 个。

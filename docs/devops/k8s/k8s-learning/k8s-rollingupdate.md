@@ -29,7 +29,7 @@ K8S提供了Rolling Update机制，它可以使得服务近乎无缝地平滑升
     docker push yasewang/k8s-demo:1.1
     docker push yasewang/k8s-demo:1.2
     ```
-    ![1](./img/k8s-rollingupdate/1.png)
+    ![1](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate1.png)
 
 ## Deployment、Service部署
 
@@ -71,7 +71,7 @@ K8S提供了Rolling Update机制，它可以使得服务近乎无缝地平滑升
     ```bash
     kubectl get deployment -n aspnetcore -o wide
     ```
-    ![2](./img/k8s-rollingupdate/2.png)
+    ![2](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate2.png)
 1. 创建Service配置文件`demo-service.yaml`,内容如下：
 
     ```yaml
@@ -97,9 +97,9 @@ K8S提供了Rolling Update机制，它可以使得服务近乎无缝地平滑升
     ```bash
     kubectl get service -n aspnetcore -o wide
     ```
-    ![3](./img/k8s-rollingupdate/3.png)
+    ![3](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate3.png)
 1. 查看网页效果:
-    ![4](./img/k8s-rollingupdate/4.png)
+    ![4](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate4.png)
 
 
 ## Rolling Update测试
@@ -141,21 +141,21 @@ K8S提供了Rolling Update机制，它可以使得服务近乎无缝地平滑升
     ```bash
     kubectl apply -f demo-deployment.yaml
     ```
-    ![5](./img/k8s-rollingupdate/5.png)
+    ![5](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate5.png)
 1. 验证deployment使用的镜像是否更新成1.1：
     
     ```bash
     kubectl get deployment -n aspnetcore -o wide
     ```
-    ![6](./img/k8s-rollingupdate/6.png)
+    ![6](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate6.png)
     访问网页查看效果
-    ![7](./img/k8s-rollingupdate/7.png)
+    ![7](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate7.png)
 
 ### 应用回滚
 
 kubectl每次更新应用时都会保存一个`revision`,这样我们就可以根据revision回滚到指定版本了。
 
-![9](./img/k8s-rollingupdate/9.png)
+![9](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate9.png)
 
 * 可以通过修改Deployment配置文件中的`revisionHistoryLimit`属性设置revision保存的数量：
     ```yaml
@@ -174,8 +174,8 @@ kubectl每次更新应用时都会保存一个`revision`,这样我们就可以�
   ```bash
   kubectl rollout undo deployment k8s-demo-deployment -n aspnetcore
   ```
-  ![8](./img/k8s-rollingupdate/8.png)
-  ![4](./img/k8s-rollingupdate/4.png)
+  ![8](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate8.png)
+  ![4](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate4.png)
 
 其实我们会发现上面的`revision`历史纪录里面没有明显的信息可以让我们区分每个版本有什么区别，这样对于回滚到指定版本很不方便，这个时候就需要通过`--record`命令解决这个问题了,`--record`会记录本次执行的命令内容。
 
@@ -194,7 +194,7 @@ kubectl每次更新应用时都会保存一个`revision`,这样我们就可以�
     ```bash
     kubectl rollout history deployment k8s-demo-deployment -n aspnetcore
     ```
-    ![10](./img/k8s-rollingupdate/10.png)
+    ![10](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate10.png)
     加上`--record`的作用在于将当前命令记录到revision（版次）记录中，这样可以方便我们在后面通过kubectl rollback时去指定revision
 
 1. 知道了每次更新的版本命令就能很清楚的知道我们需要回滚的版本了，然后通过如下命令回滚版本：
@@ -202,7 +202,7 @@ kubectl每次更新应用时都会保存一个`revision`,这样我们就可以�
     ```bash
     kubectl rollout undo deployment k8s-demo-deployment --to-revision=2 -n aspnetcore
     ```
-    ![11](./img/k8s-rollingupdate/11.png)
+    ![11](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate11.png)
 
 ## Rolling Update原理
 
@@ -211,7 +211,7 @@ K8S中对于更Rolling Update的操作主要是针对ReplicaSet的操作，可�
 ```bash
 kubectl get replicaset -n aspnetcore -o wide
 ```
-![13](./img/k8s-rollingupdate/13.png)
+![13](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate13.png)
 可以看到1.0和1.2版本的ReplicaSet创建之后然后被清理了，已经没有正在运行的Pod了。转而创建了新的1.1版本的ReplicaSet，它有两个正在运行的Pod。
 
 具体过程我们还可以通过以下命令查看：
@@ -219,7 +219,7 @@ kubectl get replicaset -n aspnetcore -o wide
 ```bash
 kubectl describe deployment k8s-demo-deployment -n aspnetcore
 ```
-![14](./img/k8s-rollingupdate/14.png)
+![14](http://cdn.go99.top/docs/devops/k8s/k8s-learning/rollingupdate14.png)
 通过日志可以看到，在进行对ReplicaSet的伸缩过程中，ReplicaSet会随之增加或减少一个Pod，从而完成Pod的替换以实现滚动更新的结果。
 
 * 滚动更新的最大好处在于零停机，整个更新过程始终有副本在运行，从而保证了业务的连续性

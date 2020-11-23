@@ -78,7 +78,7 @@ spec:
     protocol: TCP
 ```
 访问node1或者node2节点的ip+地址验证：
-![2](./img/k8s-service/2.png)
+![2](http://cdn.go99.top/docs/devops/k8s/k8s-learning/service2.png)
 
 **PS：** 这种方式顾名思义需要一个额外的端口来进行暴露，且端口范围只能是 30000-32767，如果节点/VM 的 IP 地址发生变化，你需要能处理这种情况。
 

@@ -18,7 +18,7 @@
 
 下面是一个时区上下文的目录结构
 
-![1](./img/builderfacprovider/1.png)
+![1](http://cdn.go99.top/docs/code/dotnet/common/builderfacprovider1.png-mark)
 
 每个文件对应代码展示
 
