@@ -274,7 +274,6 @@ module.exports = {
                 'resource'
             ],
             '/other/cloud/': [
-                'vmware-vsphere',
                 'proxmox'
             ],
             '/book/classicals/': [
