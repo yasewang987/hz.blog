@@ -18,7 +18,7 @@
 
 下面是一个时区上下文的目录结构
 
-![1](./img/builderfacprovider/1.png)
+![1](http://cdn.go99.top/docs/code/dotnet/common/builderfacprovider1.png-mark)
 
 每个文件对应代码展示
 
@@ -28,18 +28,17 @@
 // TimezoneContext
 public class TimezoneContext
 {
+    public const int BaseTimezone = 8;
     public int CurrentTimeZone { get; set; }
-
-    public static readonly TimezoneContext Empty = new TimezoneContext { CurrentTimeZone = DefaultTimezone.BaseTimezone };
 }
 
-// DefaultTimezone
-public class DefaultTimezone
+// DefaultTimezoneContextProvider
+public class DefaultTimezoneContextProvider
 {
-    /// <summary>
-    /// 基准时区：东八区
-    /// </summary>
-    public const int BaseTimezone = 8;
+    public TimezoneContext GetTimezoneContext()
+    {
+        return new TimezoneContext() { CurrentTimeZone = TimezoneContext.BaseTimezone };
+    }
 }
 
 // ITimezoneContextProvider
@@ -94,7 +93,7 @@ public class TimezoneContextFactory : ITimezoneContextFactory
             }
         }
 
-        return TimezoneContext.Empty;
+        return null;
     }
 }
 
@@ -126,10 +125,11 @@ public static class TimezoneServiceCollectionExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
-        services.TryAdd(ServiceDescriptor.Singleton<ITimezoneContextFactory, TimezoneContextFactory>());
-        services.TryAdd(ServiceDescriptor.Scoped(sp => sp.GetRequiredService<ITimezoneContextFactory>().GetTimezoneContext()));
-
         builderAction?.Invoke(new TimezoneContextBuilder(services));
+
+        services.TryAdd(ServiceDescriptor.Singleton<ITimezoneContextFactory, TimezoneContextFactory>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<ITimezoneContextProvider, DefaultTimezoneContextProvider>());
+        services.TryAdd(ServiceDescriptor.Scoped(sp => sp.GetRequiredService<ITimezoneContextFactory>().GetTimezoneContext()));
 
         return services;
     }

@@ -5,9 +5,9 @@
 
 1. 打开vscode设置
 1. 禁用Vetur的“特权”
-    ![img](./img/vscode/1.png)
+    ![img](http://cdn.go99.top/docs/code/web/vue/vscode1.png)
 1. 配置使用eslint
-    ![img](./img/vscode/2.png)
+    ![img](http://cdn.go99.top/docs/code/web/vue/vscode2.png)
 ---
 ## vue文件`import`路径提示
 1. 安装插件：`Path Intellisense`

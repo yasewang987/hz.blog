@@ -227,11 +227,11 @@ Nuget> Install-Package Ocelot
 
 1. 启动ClientService和ProductService
 1. 再启动网关APIGateway
-![img](./img/base/o1.png)
-![img](./img/base/o2.png)
+![img](http://cdn.go99.top/docs/microservices/ocelot/baseo1.png)
+![img](http://cdn.go99.top/docs/microservices/ocelot/baseo2.png)
 ## 三、Ocelot+Consul组合
 
-![img](./img/base/o3.png)
+![img](http://cdn.go99.top/docs/microservices/ocelot/baseo3.png)
 
 1. 使用consul注册3个服务，与上面例子一致
 1. 引入Polly和Consul库到APIGateway项目：`Ocelot.Provider.Consul`、`Consul`、`Ocelot.Provider.Polly`、`Polly`

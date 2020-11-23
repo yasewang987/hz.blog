@@ -34,7 +34,7 @@ kubectl apply -f health-check.yaml
 ```
 
 运行效果图如下：
-![1](./img/k8s-healthcheck/1.png)
+![1](http://cdn.go99.top/docs/devops/k8s/k8s-learning/healthcheck1.png)
 可以看到，该容器已经重启了2次。也可以看出，restartPolicy简单直接暴力有效。
 但是，这样做会有一个问题：必须等到进程退出后的返回值是非零才会触发重启策略，不能直接监测容器是否是健康。
 
@@ -96,7 +96,7 @@ sudo kubectl apply -f liveness-demo.yaml
 ```bash
 kubectl get pod liveness-demo
 ```
-![2](./img/k8s-healthcheck/2.png)
+![2](http://cdn.go99.top/docs/devops/k8s/k8s-learning/healthcheck2.png)
 
 `/tmp/healthy` 被删除了，liveness探测失败，又过了几十秒，重复探测均失败后，开启了重启容器。
 
@@ -131,7 +131,7 @@ spec:
       timeoutSeconds: 10
 ```
 过一段时间查看pod是否有重启，没有重启说明正常
-![3](./img/k8s-healthcheck/3.png)
+![3](http://cdn.go99.top/docs/devops/k8s/k8s-learning/healthcheck3.png)
 
 httpGet探针测试(检测index.html文件是否可以正常访问):
 
@@ -159,7 +159,7 @@ spec:
 ```
 
 过一段时间查看pod是否有重启，没有重启说明正常
-![4](./img/k8s-healthcheck/4.png)
+![4](http://cdn.go99.top/docs/devops/k8s/k8s-learning/healthcheck4.png)
 
 ## Readiness探测
 
@@ -192,7 +192,7 @@ spec:
 ```
 
 运行效果图如下：
-![5](./img/k8s-healthcheck/5.png)
+![5](http://cdn.go99.top/docs/devops/k8s/k8s-learning/healthcheck5.png)
 
 可以看出readiness和liveness运行的效果不同：
 

@@ -28,7 +28,7 @@
 
 ## 类图
 
-![1](./img/factory1.png)
+![1](http://cdn.go99.top/docs/other/designpattern/facade1.png)
 
 ## dotnet代码实现
 

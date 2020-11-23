@@ -78,4 +78,4 @@ kubectl proxy --address='0.0.0.0' --disable-filter=true
 
 ### minikube运行原理
 
-![1](./img/install-1.jpeg)
+![1](http://cdn.go99.top/docs/devops/k8s/k8s-learning/install-1.jpeg)

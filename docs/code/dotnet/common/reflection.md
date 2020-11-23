@@ -142,15 +142,15 @@ static void Main(string[] args)
 
 第一次：
 
-![img](./img/reflection/1.png)
+![img](http://cdn.go99.top/docs/code/dotnet/common/reflection1.png)
 
 第二次：
 
-![img](./img/reflection/2.png)
+![img](http://cdn.go99.top/docs/code/dotnet/common/reflection2.png)
 
 第三次：
 
-![img](./img/reflection/3.png)
+![img](http://cdn.go99.top/docs/code/dotnet/common/reflection3.png)
 
 通过测试可以很明显的看出来，通过生成反射的委托去调用方法，速度上与直接调用相差不大，可以说大幅度提升了发射调用的性能。
 

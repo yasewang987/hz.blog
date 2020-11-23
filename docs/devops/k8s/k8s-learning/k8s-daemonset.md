@@ -19,7 +19,7 @@ DaemonSet保证 **每个Node上都只运行一个Pod副本**
 ```bash
 kubectl get daemonset --namespace=kube-system
 ```
-![1](./img/k8s-daemonset/1.png)
+![1](http://cdn.go99.top/docs/devops/k8s/k8s-learning/daemonset1.png)
 
 可以看到，`calico-node` 和 `kube-proxy` 是K8S以DaemonSet方式运行的系统组件，分别为K8S集群负责提供网络连接支持和代理支持
 
@@ -28,7 +28,7 @@ kubectl get daemonset --namespace=kube-system
 ```bash
 kubectl get pod --namespace=kube-system -o wide
 ```
-![2](./img/k8s-daemonset/2.png)
+![2](http://cdn.go99.top/docs/devops/k8s/k8s-learning/daemonset2.png)
 可以看到，它们两分布在各个Node节点上（这里是我的K8S集群中的所有节点了），且每个节点上只有一个Pod副本。
 
 ## DaemonSet创建、运行
@@ -96,5 +96,5 @@ kubectl get pod --namespace=kube-system -o wide
       # 查看Pod在节点Node中的分布
       kubectl get pod -o wide -n aspnetcore
       ```
-      ![3](./img/k8s-daemonset/3.png)
+      ![3](http://cdn.go99.top/docs/devops/k8s/k8s-learning/daemonset3.png)
       可以看出，我们的Prometheus Node Exporter部署成功，且分别在两个Node节点都只部署了一个Pod副本

@@ -41,7 +41,7 @@
     ```bash
     kubectl get pod -n aspnetcore
     ```
-    ![1](./img/k8s-job/1.png)
+    ![1](http://cdn.go99.top/docs/devops/k8s/k8s-learning/job1.png)
     通过查看Job运行情况可以知道，其运行结束就结束了，如下图所示，变成了Completed状态。
 
 1. 还可以通过查看Log看看这个Job执行的情况：
@@ -49,7 +49,7 @@
     ```bash
     kubectl logs hello-job-j2dxl -n aspnetcore
     ```
-    ![2](./img/k8s-job/2.png)
+    ![2](http://cdn.go99.top/docs/devops/k8s/k8s-learning/job2.png)
 
 1. 并行Job（如果希望能够同时并行运行多个Pod以提高Job的执行效率，Job提供了一个配置：parallesim。例如下面的配置，我们将上面的小Job改为并行运行的Pod数量设置为3。）
     ```yaml
@@ -78,7 +78,7 @@
     kubectl get job -n aspnetcore
     kubectl get pod -o wide -n aspnetcore
     ```
-    ![3](./img/k8s-job/3.png)
+    ![3](http://cdn.go99.top/docs/devops/k8s/k8s-learning/job3.png)
     可以看出，Job一共启动了3个Pod，都是同时结束的（可以看到三个Pod的AGE都是相同的）。
 1. 此外，Job还提供了一个`completions`属性使我们可以设置Job完成的Pod总数（默认completions也为1），还是上面的例子：
     
@@ -111,7 +111,7 @@
     kubectl get job -n aspnetcore
     kubectl get pod -o wide -n aspnetcore
     ```
-    ![4](./img/k8s-job/4.png)
+    ![4](http://cdn.go99.top/docs/devops/k8s/k8s-learning/job4.png)
 1. 可以看到，状态和AGE都符合预期，第一批3个Pod的AGE为47s，第二批3个Pod的AGE为53s。
 
 ## CronJob创建、运行
@@ -141,5 +141,5 @@ K8S中提供了一个CronJob帮助我们实现定时任务
     ```
 1. 需要注意的是schedule，它的格式和Linux Cron一样，这里的"*/1 * * * *"代表每一分钟启动执行一次。对于CronJob，它需要的是jobTemplate来定义Job的模板。
 
-    ![5](./img/k8s-job/5.png)
+    ![5](http://cdn.go99.top/docs/devops/k8s/k8s-learning/job5.png)
     可以看到，在过去的二分钟里，每一分钟都启动了一个Pod，符合预期。

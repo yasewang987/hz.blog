@@ -2,8 +2,8 @@
 
 文章来源于findyi
 
-![2-1](./img/classical1-2-1.png)
-![2-2](./img/classical1-2-2.png)
+![2-1](http://cdn.go99.top/docs/book/classical1-2.png-mark)
+![2-2](http://cdn.go99.top/docs/book/classical1-3.png-mark)
 
 **如果把你的思维比做操作系统，那思维模型就是一个个App。**
 
@@ -104,7 +104,7 @@ Flint回答道：“知道了。我现在会马上开始着手实现这5个目�
 
 **根据金字塔原理，将思想组织成金字塔结构，同时学会用金字塔结构去沟通：**
 
-![1](./img/classical1-1.jpg)
+![1](http://cdn.go99.top/docs/book/classical1-1.jpg-mark)
 
 金字塔原理中的三个核心思想是：
 

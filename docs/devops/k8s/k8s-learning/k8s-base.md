@@ -70,7 +70,7 @@ K8S中会自动创建两个Namespace：
 ## K8s架构解析
 
 下面展示了一个最小化的K8S集群，一个master节点和两个node节点
-![1](./img/base1.png)
+![1](http://cdn.go99.top/docs/devops/k8s/k8s-learning/base1.png)
 
 ### 1. Master节点
 

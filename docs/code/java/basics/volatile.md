@@ -32,7 +32,7 @@
 
 为了解决CPU处理速度和内存不匹配的问题，CPU Cache出现了。
 
-![1](./img/volatile1.png)
+![1](http://cdn.go99.top/docs/code/java/basics/volatile1.png)
 
 ### 缓存一致性问题
 
@@ -76,7 +76,7 @@ i = i + 1;
 
 > 基于MESI一致性协议，每个处理器需要不断从主内存嗅探和CAS不断循环，无效交互会导致总线带宽达到峰值，出现**总线风暴**。
 
-![2](./img/volatile2.png)
+![2](http://cdn.go99.top/docs/code/java/basics/volatile2.png)
 
 ## JMM内存模型是什么
 

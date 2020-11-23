@@ -283,5 +283,5 @@
 
 最后来一张最终效果图：
 
-![id1](./img/id1.png)
+![id1](http://cdn.go99.top/docs/test/jmeter/id1.png)
 

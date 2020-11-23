@@ -28,7 +28,7 @@
 
 ## 类图
 
-![1](./img/facade1.png)
+![1](http://cdn.go99.top/docs/other/designpattern/facade1.png)
 
 ## dotnet实现代码
 

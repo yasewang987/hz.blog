@@ -34,9 +34,9 @@
         二、 使用`jenkins`中的`SSH`连接到服务器执行`docker`命令
 
 1. 解锁`Jenkins`,访问`http://localhost:13333`,解锁密码在可以查看`jenkins`容器的`/var/jenkins_home/secrets/initialAdminPassword`文件内容
-    ![img](./img/dotnet/1.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet1.png)
 1. 选择需要安装的插件
-    ![img](./img/dotnet/2.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet2.png)
     > Generic WebHook Trigger => 触发WebHook必备  
     MSTest & xUnit => 进行基于MSTest或基于xUnit的单元测试  
     Nuget Plugin => 拉取Nuget包必备  
@@ -71,29 +71,29 @@
 ### 方案1：集成部署全部在发布服务器
 
 1. 配置全局ssh：
-    ![img](./img/dotnet/3.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet3.png)
 
 1. 新建job：`jenkinsTest`
 
 1. 配置job里的git：
-    ![img](./img/dotnet/3-1.png)
-    ![img](./img/dotnet/3-2.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet3-1.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet3-2.png)
     **我这边使用https连接，需要点击`Add`填写`github`的账号密码。最好还是使用`ssh`的方式。**
 1. 选择触发方式
-    ![img](./img/dotnet/3-3.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet3-3.png)
     * 自己选择需要哪个的构建触发方式，如果需要`Generic WebHook Trigger`需要安装这个插件
 
 1. 配置job里的ssh：
-    ![img](./img/dotnet/3-4.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet3-4.png)
     > `Source files`：指需要将哪些文件拷贝到目标位置（相对于当前项目位置,这里指：`/var/jenkins_home/workspace/jenkinsTest`）  
     > `Remote directory`：相对于全局配置`remote directory`中的位置，这里指的位置就是：`/jenkins_websites/jenkinsTest`
     > 注意：由于在使用docker构建镜像的时候在没有缓存镜像时会比较慢，这里需要将执行超时设置长一点。
-    ![img](./img/dotnet/3-5.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet3-5.png)
 
 1. 测试运行：
-    ![img](./img/dotnet/4.png)
-    ![img](./img/dotnet/4-1.png)
-    ![img](./img/dotnet/4-2.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet4.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet4-1.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet4-2.png)
 
 1. 上面这5步中看到要执行的命令都写在了`Exec command`中，其实也可以在项目中添加`deploy.sh`文件，然后`Exec command`中调用一下`deploy.sh`即可。
 
@@ -115,7 +115,7 @@
     sh /jenkins_websites/jenkinsTest/deply.sh
     ```
 1. 执行结果：
-    ![img](./img/dotnet/4-3.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet4-3.png)
 
 ### 方案2：使用阿里云打包镜像、发布服务器拉取镜像运行容器
 
@@ -123,16 +123,16 @@
 
 1. 登录阿里云-》选择容器镜像服务-》创建空间（一般用公司名做空间）
 1. 创建仓库
-    ![img](./img/dotnet/5.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet5.png)
 1. 绑定github账号
-    ![img](./img/dotnet/6.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet6.png)
 1. 选择代码变更自动构建
 1. 进入创建好的仓库选择构建
-    ![img](./img/dotnet/7.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet7.png)
 1. 查看构建日志
-    ![img](./img/dotnet/8.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet8.png)
 1. 查看镜像版本
-    ![img](./img/dotnet/9.png)
+    ![img](http://cdn.go99.top/docs/devops/jenkins/dotnet9.png)
 1. 设置触发器（由于我没有将jenkins映射到外网，这里就不继续了），只需要将触发器的url设置成jenkins的外网的触发url即可（jenkins里要安装`Generic WebHook Trigger`插件，并做相关配置）
 
 #### 发布服务器配置
