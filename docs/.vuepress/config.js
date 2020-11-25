@@ -241,6 +241,7 @@ module.exports = {
             ],
             '/other/designpattern/': [
                 'factory',
+                'abstractoryfactory',
                 'facade',
                 'observer'
             ],
