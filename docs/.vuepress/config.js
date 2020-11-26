@@ -243,6 +243,7 @@ module.exports = {
                 'factory',
                 'abstractoryfactory',
                 'singleton',
+                'builder',
                 'facade',
                 'observer'
             ],
