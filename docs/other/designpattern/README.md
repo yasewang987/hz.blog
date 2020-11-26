@@ -1,7 +1,7 @@
 ## 设计模式
 
 * [工厂模式](./factory.md)
-* [抽象工厂模式](./abstractoryfactory.md)
+* [抽象工厂模式](./abstractfactory.md)
 * [单例模式](./singleton.md)
 * [建造者](./builder.md)
 

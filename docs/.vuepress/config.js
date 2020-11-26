@@ -241,7 +241,7 @@ module.exports = {
             ],
             '/other/designpattern/': [
                 'factory',
-                'abstractoryfactory',
+                'abstractfactory',
                 'singleton',
                 'builder',
                 'facade',
