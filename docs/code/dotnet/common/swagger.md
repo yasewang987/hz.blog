@@ -130,6 +130,49 @@ namespace Xiaobao.Ddd.Template.API
             return services;
         }
 
+
+        /// <summary>
+        /// 添加多端的swagger api文档生成
+        /// </summary>
+        /// <returns></returns>
+        public static IServiceCollection AddNswagMultiClientApiDocuments(this IServiceCollection services, List<ClientRouteInfo> clients, string title = "Xiaobao API", string description = "Xiaobao API")
+        {
+            services.AddApiVersioning(option =>
+            {
+                option.AssumeDefaultVersionWhenUnspecified = true;
+                option.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            })
+            .AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
+            foreach (var client in clients)
+            {
+                services.AddSwaggerDocument(document =>
+                {
+                    document.Title = client.ClientName;
+                    document.Description = client.ClientName;
+                    document.Version = client.RouteKey;
+                    document.DocumentName = client.ClientName;
+                    document.AddOperationFilter(p =>
+                    {
+                        return p.OperationDescription.Path.StartsWith(client.RouteKey);
+                    });
+                });
+            }
+            services.AddSwaggerDocument(document =>
+            {
+                document.Title = "所有接口";
+                document.Description = "所有接口";
+                document.Version = $"All-Apis";
+                document.DocumentName = $"All-Apis";
+            });
+
+            return services;
+        }
+
         public static IApplicationBuilder UseNswag(this IApplicationBuilder app, string pathBase = "")
         {
             app.UseOpenApi();
@@ -148,6 +191,19 @@ namespace Xiaobao.Ddd.Template.API
             return app;
         }
     }
+
+    public class ClientRouteInfo
+    {
+        /// <summary>
+        /// 路由标识
+        /// </summary>
+        public string RouteKey { get; set; }
+
+        /// <summary>
+        /// 客户端名称
+        /// </summary>
+        public string ClientName { get; set; }
+    }
 }
 ```
 
@@ -161,6 +217,18 @@ namespace Xiaobao.Ddd.Template.API
         // 其他注入
         // 添加多版本swagger api文档支持
         services.AddNswagMultiApiDocuments();
+
+        // 方式2
+        services.AddNswagMultiClientApiDocuments(new List<ClientRouteInfo>
+        {
+            new ClientRouteInfo{ RouteKey="/ToB", ClientName="ToB" },
+            new ClientRouteInfo{ RouteKey="/ToB/PC", ClientName="ToB-PC" },
+            new ClientRouteInfo{ RouteKey="/ToB/App", ClientName="ToB-App" },
+
+            new ClientRouteInfo{ RouteKey="/ToC", ClientName="ToC" },
+            new ClientRouteInfo{ RouteKey="/ToC/WechatH5", ClientName="ToC-WechatH5" },
+            new ClientRouteInfo{ RouteKey="/ToC/WechatApp", ClientName="ToC-WechatApp" }
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
