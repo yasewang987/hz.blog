@@ -73,3 +73,27 @@ call xcopy ./out E:\test /e /y
     "startingDirectory": "//wsl$/Ubuntu/home/hz"
 }
 ```
+
+## WSL2 默认启动Docker
+
+1. 修改 `/etc/sudoers` 配置，允许用户执行`sudo`不需要输入密码就可以启动`dockerd `
+
+    ```
+    yourusername ALL=(ALL) NOPASSWD: /usr/bin/dockerd
+    ```
+1. 修改 `zshrc`
+
+    ```bash
+    echo '# Start Docker daemon automatically when logging in if not running.' >> ~/.zshrc
+    echo 'RUNNING=`ps aux | grep dockerd | grep -v grep`' >> ~/.zshrc
+    echo 'if [ -z "$RUNNING" ]; then' >> ~/.zshrc
+    echo '    sudo dockerd > /dev/null 2>&1 &' >> ~/.zshrc
+    echo '    disown' >> ~/.zshrc
+    echo 'fi' >> ~/.zshrc
+    ```
+
+1. 将用户加入docker组织
+
+    ```bash
+    sudo usermod -a -G docker $USER
+    ```
