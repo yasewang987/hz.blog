@@ -1,5 +1,8 @@
 # JAVA开发环境搭建
 
+Spring Boot, Maven, Gradle, Java等都可以使用SDKMAN安装
+sdkman官网地址：https://sdkman.io
+
 ## JDK安装
 
 * OracleJDK下载地址：https://www.oracle.com/technetwork/java/javase/downloads/index.html
@@ -9,6 +12,7 @@
   > 删除相关包：`sudo apt purge openjdk-*`
 
 * 安装JDK
+    1. 建议使用sdkman直接安装，安装参考下面的gradle
     1. Linux:
         > 使用命令解压：`sudo tar zxvf jdk-XXX-linux-XXX.tar.gz`
         > 解压到指定目录：`sudo tar zxvf jdk-xxx.tar.gz -C 指定目录`
