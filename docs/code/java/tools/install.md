@@ -66,19 +66,32 @@
 
 * 安装配置
    1. Linux
-      1. 下载解压:`unzip -d /opt/gradle gradle-5.2.1-bin.zip`
-      1. 配置环境变量：
+      * 使用sdkman安装（https://sdkman.io/）
          ```bash
-         export GRADLE_HOME=$HOME/soft/gradle-5.2.1
-         export PATH=$GRADLE_HOME/bin:$PATH
+         #### 安装sdkman
+         $ curl -s "https://get.sdkman.io" | bash
+
+         source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+         # 验证 出现如sdkman 5.0.0+51字样即sdkman安装完成
+         sdk version
+
+
+         ##### 安装gradle
+         sdk install gradle
          ```
-      1. 启用配置
-        > 全局配置（/etc/profile） #重启电脑
-        > 按用户配置（按默认终端区分）
-        1. `bash: ~/.bashrc` # 生效配置`source ~/.bashrc`
-        1. `zsh: ~/.zshrc` #生效配置`source ~/.zshrc`
-   
-   或者直接使用apt等管理工具安装 `apt install gradle`
+      * 手动安装
+         1. 下载解压:`unzip -d /opt/gradle gradle-5.2.1-bin.zip`
+         1. 配置环境变量：
+            ```bash
+            export GRADLE_HOME=$HOME/soft/gradle-5.2.1
+            export PATH=$GRADLE_HOME/bin:$PATH
+            ```
+         1. 启用配置
+         > 全局配置（/etc/profile） #重启电脑
+         > 按用户配置（按默认终端区分）
+         1. `bash: ~/.bashrc` # 生效配置`source ~/.bashrc`
+         1. `zsh: ~/.zshrc` #生效配置`source ~/.zshrc`
 
 ## VSCode
 
