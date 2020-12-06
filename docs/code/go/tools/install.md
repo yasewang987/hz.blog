@@ -6,6 +6,9 @@
 1. 下载`go1.13.linux-amd64`版本，版本可以自行选择：
     ```bash
     wget https://dl.google.com/go/go1.13.linux-amd64.tar.gz
+    
+    # 由于某些原因无法下载使用下面地址
+    wget https://studygolang.com/dl/golang/go1.15.6.linux-amd64.tar.gz
     ```
 1. 解压压缩包：
     ```bash

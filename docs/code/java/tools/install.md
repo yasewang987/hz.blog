@@ -2,7 +2,8 @@
 
 ## JDK安装
 
-* JDK下载地址：https://www.oracle.com/technetwork/java/javase/downloads/index.html
+* OracleJDK下载地址：https://www.oracle.com/technetwork/java/javase/downloads/index.html
+* OpenJDK下载地址：https://adoptopenjdk.net/
 * linux系统一般都有自带的`openjdk`可以先删除自带的jdk
   > 查看安装的jdk包：`sudo dpkg --list | grep -i jdk`
   > 删除相关包：`sudo apt purge openjdk-*`
@@ -13,6 +14,9 @@
         > 解压到指定目录：`sudo tar zxvf jdk-xxx.tar.gz -C 指定目录`
     1. Windows：
         > 直接下载exe安装包安装或者压缩包直接解压
+    1. WSL:
+        > 查询相应版本jdk `apt search openjdk-版本-jdk`
+        > 安装jdk `apt install openjdk-版本-jdk`
 * 配置环境变量
   1. Linux：
      > 配置文件末尾添加如下内容
@@ -73,6 +77,8 @@
         > 按用户配置（按默认终端区分）
         1. `bash: ~/.bashrc` # 生效配置`source ~/.bashrc`
         1. `zsh: ~/.zshrc` #生效配置`source ~/.zshrc`
+   
+   或者直接使用apt等管理工具安装 `apt install gradle`
 
 ## VSCode
 
