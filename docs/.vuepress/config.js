@@ -129,7 +129,8 @@ module.exports = {
                 'template'
             ],
             '/code/java/basics/': [
-                'volatile'
+                'volatile',
+                'clone'
             ],
             '/code/java/spring/': [],
             '/code/java/tools/' : [
@@ -245,6 +246,7 @@ module.exports = {
                 'abstractfactory',
                 'singleton',
                 'builder',
+                'prototype',
                 'facade',
                 'observer'
             ],
