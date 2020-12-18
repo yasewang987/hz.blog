@@ -239,7 +239,8 @@ module.exports = {
             ],
             '/sql/mysql/': [
                 'install',
-                'gh-ost'
+                'gh-ost',
+                'announcements'
             ],
             '/other/designpattern/': [
                 'factory',
