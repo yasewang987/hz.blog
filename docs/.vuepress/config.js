@@ -119,7 +119,8 @@ module.exports = {
                 'wcf',
                 'error',
                 'builder-fac-provider',
-                'webapimodel'
+                'webapimodel',
+                'unittest'
             ],
             '/code/dotnet/tools/': [
                 'install',
