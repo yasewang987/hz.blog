@@ -119,7 +119,8 @@ module.exports = {
                 'wcf',
                 'error',
                 'builder-fac-provider',
-                'webapimodel'
+                'webapimodel',
+                'unittest'
             ],
             '/code/dotnet/tools/': [
                 'install',
@@ -129,7 +130,8 @@ module.exports = {
                 'template'
             ],
             '/code/java/basics/': [
-                'volatile'
+                'volatile',
+                'clone'
             ],
             '/code/java/spring/': [],
             '/code/java/tools/' : [
@@ -214,6 +216,7 @@ module.exports = {
             '/devops/k8s/k8s-learning/': [
                 'k8s-base',
                 'k8s-install-mini',
+                'k8s-install-kind',
                 'k8s-install-microk8s',
                 'k8s-install-adm',
                 'k8s-deployment',
@@ -237,13 +240,15 @@ module.exports = {
             ],
             '/sql/mysql/': [
                 'install',
-                'gh-ost'
+                'gh-ost',
+                'announcements'
             ],
             '/other/designpattern/': [
                 'factory',
                 'abstractfactory',
                 'singleton',
                 'builder',
+                'prototype',
                 'facade',
                 'observer'
             ],

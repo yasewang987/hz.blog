@@ -264,3 +264,23 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
     # 修改完毕之后需要重启sshd服务`systemctl restart sshd`
     ```
 ---
+
+## 查看命令安装位置
+
+下面以`java`命令为例子查询jdk安装路径
+
+```bash
+# 1. 查看命令位置
+which java
+# 输出内容   /usr/bin/java
+
+# 2. 查看执行文件详细信息
+ls -l /usr/bin/java
+# output: lrwxrwxrwx 1 root root 22 Dec  6 10:42 /usr/bin/java -> /etc/alternatives/java
+
+# 3. 继续查看执行文件位置
+ls -l /etc/alternatives/java
+# output: lrwxrwxrwx 1 root root 43 Dec  6 10:42 /etc/alternatives/java -> /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+
+# 到这里就已经是java命令的最终目录了
+```
