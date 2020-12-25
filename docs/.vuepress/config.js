@@ -282,7 +282,8 @@ module.exports = {
                 'resource'
             ],
             '/other/cloud/': [
-                'proxmox'
+                'proxmox',
+                'theia'
             ],
             '/book/classicals/': [
                 'classical1'
