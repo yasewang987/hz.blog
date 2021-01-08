@@ -186,7 +186,8 @@ module.exports = {
             '/microservices/other/': [
                 'hash',
                 'note',
-                'cap-base'
+                'cap-base',
+                'idgenerater'
             ],
             '/test/jmeter/': [
                 'install-docker',
