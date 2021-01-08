@@ -84,3 +84,5 @@ private long generateId(long epochSecond, long next)
     return 0;
 }
 ```
+
+完整代码参考: [Client53BitIdGeneraterImp](https://github.com/hz-microservices/hz.util/blob/main/lib/src/main/java/hz/util/idgenerater/Client53BitIdGeneraterImp.java)
