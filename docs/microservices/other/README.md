@@ -5,3 +5,4 @@
 
 * [CAP & BASE 理论](./cap-base.md)
 * [分布式id生成器](./idgenerater.md)
+* [DDD领域驱动设计](./ddd.md)

@@ -187,7 +187,8 @@ module.exports = {
                 'hash',
                 'note',
                 'cap-base',
-                'idgenerater'
+                'idgenerater',
+                'ddd'
             ],
             '/test/jmeter/': [
                 'install-docker',
