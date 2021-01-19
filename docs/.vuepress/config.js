@@ -186,7 +186,9 @@ module.exports = {
             '/microservices/other/': [
                 'hash',
                 'note',
-                'cap-base'
+                'cap-base',
+                'idgenerater',
+                'ddd'
             ],
             '/test/jmeter/': [
                 'install-docker',
@@ -241,7 +243,8 @@ module.exports = {
             '/sql/mysql/': [
                 'install',
                 'gh-ost',
-                'announcements'
+                'announcements',
+                'explain'
             ],
             '/other/designpattern/': [
                 'factory',
@@ -282,7 +285,8 @@ module.exports = {
                 'resource'
             ],
             '/other/cloud/': [
-                'proxmox'
+                'proxmox',
+                'theia'
             ],
             '/book/classicals/': [
                 'classical1'
