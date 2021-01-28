@@ -287,7 +287,8 @@ module.exports = {
             ],
             '/other/cloud/': [
                 'proxmox',
-                'theia'
+                'theia',
+                'cloudbeaver'
             ],
             '/book/classicals/': [
                 'classical1'
