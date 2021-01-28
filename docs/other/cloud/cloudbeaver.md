@@ -33,3 +33,7 @@ cloudbeaver是一款云数据库管理软件
 
   podman run --name cloudbeaver -d -p 4444:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
   ```
+
+## Cloudbeaver访问
+
+http://localhost:4444
