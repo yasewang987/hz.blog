@@ -197,7 +197,8 @@ module.exports = {
                 'cmd',
                 'compose-netcore',
                 'install',
-                'dockerfiles'
+                'dockerfiles',
+                'podman'
             ],
             '/devops/gitlabrunner/': [
                 'base',
