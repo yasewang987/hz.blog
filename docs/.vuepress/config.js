@@ -197,7 +197,8 @@ module.exports = {
                 'cmd',
                 'compose-netcore',
                 'install',
-                'dockerfiles'
+                'dockerfiles',
+                'podman'
             ],
             '/devops/gitlabrunner/': [
                 'base',
@@ -286,7 +287,8 @@ module.exports = {
             ],
             '/other/cloud/': [
                 'proxmox',
-                'theia'
+                'theia',
+                'cloudbeaver'
             ],
             '/book/classicals/': [
                 'classical1'
