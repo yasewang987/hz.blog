@@ -106,8 +106,6 @@
     brew cask install docker
     ```
 
-## java 安装
+## redisClient
 
-    ```bash
-    brew cask install java
-    ```
+https://gitee.com/qishibo/AnotherRedisDesktopManager/releases
