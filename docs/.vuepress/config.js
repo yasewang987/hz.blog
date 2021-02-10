@@ -142,7 +142,8 @@ module.exports = {
             ],
             '/code/web/npm/': [
                 'base',
-                'ci'
+                'ci',
+		'install'
             ],
             '/code/web/ts/': [
                 'base',
