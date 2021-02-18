@@ -292,7 +292,8 @@ module.exports = {
                 'cloudbeaver'
             ],
             '/book/classicals/': [
-                'classical1'
+                'classical1',
+                'regular'
             ]
         },
         sidebarDepth: 2
