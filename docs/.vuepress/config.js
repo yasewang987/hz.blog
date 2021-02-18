@@ -131,7 +131,8 @@ module.exports = {
             ],
             '/code/java/basics/': [
                 'volatile',
-                'clone'
+                'clone',
+                'concurrence'
             ],
             '/code/java/spring/': [],
             '/code/java/tools/' : [
