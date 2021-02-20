@@ -77,7 +77,8 @@ module.exports = {
                     { text: 'Docker', link: '/devops/docker/' },
                     { text: 'Jenkins', link: '/devops/jenkins/' },
                     { text: 'GitLab-Runner', link: '/devops/gitlabrunner/' },
-                    { text: '脚本', link: '/devops/shell/' }
+                    { text: '脚本', link: '/devops/shell/' },
+                    { text: '其他', link: '/devops/other/' }
                 ]
             },
             {
@@ -238,8 +239,11 @@ module.exports = {
                 'k8s-helm'
             ],
             '/devops/shell/': [
-                'sh-common.md',
-                'sh-gitbranch.md'
+                'sh-common',
+                'sh-gitbranch'
+            ],
+            '/devops/other/': [
+                'nginx'
             ],
             '/sql/mssql/': [
                 'usesul'
