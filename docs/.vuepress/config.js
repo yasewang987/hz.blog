@@ -202,7 +202,7 @@ module.exports = {
                 'compose-netcore',
                 'install',
                 'dockerfiles',
-                'podman'
+                'dockerfilebest'
             ],
             '/devops/gitlabrunner/': [
                 'base',
@@ -243,7 +243,8 @@ module.exports = {
                 'sh-gitbranch'
             ],
             '/devops/other/': [
-                'nginx'
+                'nginx',
+                'podman'
             ],
             '/sql/mssql/': [
                 'usesul'
