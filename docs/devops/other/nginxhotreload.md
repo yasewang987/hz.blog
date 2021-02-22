@@ -2,6 +2,8 @@
 
 ## consul-template
 
+![1](http://cdn.go99.top/docs/devops/other/consultemplate1.png)
+
 ### 安装consul，consul-template
 
 直接到官网下载可执行文件或者使用docker安装
