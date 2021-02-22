@@ -244,6 +244,7 @@ module.exports = {
             ],
             '/devops/other/': [
                 'nginx',
+                'nginxhotreload',
                 'podman'
             ],
             '/sql/mssql/': [
