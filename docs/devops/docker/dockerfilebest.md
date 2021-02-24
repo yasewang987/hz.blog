@@ -148,6 +148,12 @@ jenkins:x:1000:1000:Linux User,,,:/var/jenkins_home:/bin/bash
     推荐使用更为简单的COPY指令。
 
     ADD命令虽然可以提供额外的下载和解压等功能，但是下载可以通过curl命令，解压可以通过tar -zxvf指令来操作。
+
+    ```dockerfile
+    # 可以从远程位置下载文件复制到容器中
+    ADD https://www.python.org/ftp/python/3.5.1/python-3.5.1.exe /temp/python-3.5.1.exe
+    ```
+
 1. VOLUME
 
     在Dockerfile中VOLUME指令在docker run 时会在宿主机下的/var/lib/docker/volumes目录下新建`<volume_id>`的持久卷目录。如果是下次docker start时则会重用之前的持久卷。
