@@ -76,7 +76,7 @@ module.exports = {
                     { text: 'K8s-从0开始系列', link: '/devops/k8s/k8s-learning/' },
                     { text: 'Docker', link: '/devops/docker/' },
                     { text: 'Jenkins', link: '/devops/jenkins/' },
-                    { text: 'GitLab-Runner', link: '/devops/gitlabrunner/' },
+                    { text: 'GitLab', link: '/devops/gitlab/' },
                     { text: '脚本', link: '/devops/shell/' },
                     { text: '其他', link: '/devops/other/' }
                 ]
@@ -204,7 +204,8 @@ module.exports = {
                 'dockerfiles',
                 'dockerfilebest'
             ],
-            '/devops/gitlabrunner/': [
+            '/devops/gitlab/': [
+                'gitlab-install',
                 'base',
                 'netcore',
                 'yml'
@@ -244,6 +245,7 @@ module.exports = {
             ],
             '/devops/other/': [
                 'nginx',
+                'nginx-docker',
                 'nginxhotreload',
                 'podman'
             ],
