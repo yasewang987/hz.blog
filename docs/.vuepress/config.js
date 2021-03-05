@@ -85,7 +85,8 @@ module.exports = {
                 text: 'SQL',
                 items: [
                     { text: 'MSSQL', link: '/sql/mssql/' },
-                    { text: 'MYSQL', link: '/sql/mysql/' }
+                    { text: 'MYSQL', link: '/sql/mysql/' },
+                    { text: 'MongoDB', link: '/sql/mongo/'}
                 ]
             },
             {
@@ -257,6 +258,9 @@ module.exports = {
                 'gh-ost',
                 'announcements',
                 'explain'
+            ],
+            '/sql/mongo/': [
+                'install'
             ],
             '/other/designpattern/': [
                 'factory',

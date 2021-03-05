@@ -38,9 +38,9 @@
 ```bash
 go env -w GO111MODULE=on
 
+# 七牛(优先推荐)
+go env -w GOPROXY=https://goproxy.cn,direct
+
 # 阿里
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
-
-# 七牛
-go env -w GOPROXY=https://goproxy.cn,direct
 ```
