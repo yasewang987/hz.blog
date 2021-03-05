@@ -109,3 +109,12 @@
 ## redisClient
 
 https://gitee.com/qishibo/AnotherRedisDesktopManager/releases
+
+## 配置快速启动
+
+```bash
+vim .zshrc
+
+# 添加如下内容
+alias code='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code'
+```
