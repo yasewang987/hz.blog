@@ -38,7 +38,7 @@ docker run -d -p 8083:8081 -p 8082:8082 -v $PWD/data:/nexus-data --restart=alway
 
 ```json
 {
-   "insecure-registries": ["aa.bb.cc:8083"]
+   "insecure-registries": ["aa.bb.cc:8082"]
 }
 ```
 
