@@ -63,6 +63,27 @@ docker pull gitlab/gitlab-runner
     > 映射`/var/run/docker.sock`这个文件是为了让容器可以通过`/var/run/docker.sock`与`Docker守护进程`通信，管理其他`Docker容器`
     > `-v /srv/gitlab-runner/config:/etc/gitlab-runner`是将runner的配置文件映射到宿主机`/srv/gitlab-runner/config`方便调整和查看配置
 
+    打开配置文件sudo cat /home/yasewang/runner/runnertest/builder/config.toml确认配置是否正确
+
+    ```
+    [[runners]]
+    name = "dataservice"
+    url = "http://1.2.3.4:10001/"
+    token = "指定项目的授权码"
+    executor = "docker"
+    [runners.docker]
+        tls_verify = false
+        image = "docker:stable"
+        privileged = false
+        disable_entrypoint_overwrite = false
+        oom_kill_disable = false
+        disable_cache = false
+        volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+        shm_size = 0
+    ```
+
+    * 一定要确保 *[volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]* 存在，不然无法使用docker命令
+
 按照上面的顺序操作下来，如果顺利的话就会在gitlab项目的ci里面看到这个runner已经上线
 
 ![3](http://cdn.go99.top/docs/devops/gitlabrunner/base2.png)
@@ -185,12 +206,12 @@ deploy-dev-job:
   script:
     - ls out/
     - sh ./check-dev.sh
-    - docker build -t runnertest-dev .
+    - docker build -t runnertest-dev:$CI_PIPELINE_ID .
     # 这里可以添加将生成好的image上传到dockerhub或者docker本地仓库
     
     ### 如果生成的镜像需要统一上传到仓库管理，则后面的逻辑可以分离到另外一个runner去执行
     # 这里可以添加从dockerhub或本地仓库拉取指定镜像
-    - docker run -d --name runnertest-dev -p 10001:80 runnertest-dev
+    - docker run -d --name runnertest-dev -p 10001:80 runnertest-dev:$CI_PIPELINE_ID
   tags:
     - 109-runnertest-deploy
 
@@ -204,16 +225,19 @@ deploy-master-job:
   script:
     - ls out/
     - sh ./check-master.sh
-    - docker build -t runnertest-master .
+    - docker build -t runnertest-master:$CI_PIPELINE_ID .
     # 这里可以添加将生成好的image上传到dockerhub或者docker本地仓库
     
     ### 如果生成的镜像需要统一上传到仓库管理，则后面的逻辑可以分离到另外一个runner去执行
     # 这里可以添加从dockerhub或本地仓库拉取指定镜像
-    - docker run -d --name runnertest-master -p 10000:80 runnertest-master
+    - docker run -d --name runnertest-master -p 10000:80 runnertest-master:$CI_PIPELINE_ID
   when: manual
   tags:
     - 109-runnertest-deploy
 ```
+
+* 可以在 Settings-》CI/CD-》Variables 设置机密配置，通过 `$KEY` 方式使用
+* gitlab流水线预设的变量：https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
 
 ## 其他
 

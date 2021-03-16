@@ -299,7 +299,8 @@ module.exports = {
                 'win-cmd',
                 'win-tools',
                 'vscode',
-                'resource'
+                'resource',
+                'zentao'
             ],
             '/other/cloud/': [
                 'proxmox',
