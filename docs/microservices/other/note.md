@@ -16,6 +16,9 @@
 1. 后台任务
 1. 实时通讯
 
+## Microservices技术图
+
+![1](http://cdn.go99.top/docs/microservices/other/microservers.png)
 
 ## 参考
 

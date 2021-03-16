@@ -54,6 +54,14 @@ locale
 1. 查看发行版本：`cat /etc/os-release`
 1. 查看内核版本：`uname -r`
 
+## 查看系统进程并关闭
+
+```bash
+ps -ef | grep nginx
+
+sudo kill -9 <PID>
+```
+
 ## 端口使用情况
 
 ```bash

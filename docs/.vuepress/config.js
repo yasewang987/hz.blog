@@ -76,15 +76,17 @@ module.exports = {
                     { text: 'K8s-从0开始系列', link: '/devops/k8s/k8s-learning/' },
                     { text: 'Docker', link: '/devops/docker/' },
                     { text: 'Jenkins', link: '/devops/jenkins/' },
-                    { text: 'GitLab-Runner', link: '/devops/gitlabrunner/' },
-                    { text: '脚本', link: '/devops/shell/' }
+                    { text: 'GitLab', link: '/devops/gitlab/' },
+                    { text: '脚本', link: '/devops/shell/' },
+                    { text: '其他', link: '/devops/other/' }
                 ]
             },
             {
                 text: 'SQL',
                 items: [
                     { text: 'MSSQL', link: '/sql/mssql/' },
-                    { text: 'MYSQL', link: '/sql/mysql/' }
+                    { text: 'MYSQL', link: '/sql/mysql/' },
+                    { text: 'MongoDB', link: '/sql/mongo/'}
                 ]
             },
             {
@@ -131,7 +133,8 @@ module.exports = {
             ],
             '/code/java/basics/': [
                 'volatile',
-                'clone'
+                'clone',
+                'concurrence'
             ],
             '/code/java/spring/': [],
             '/code/java/tools/' : [
@@ -142,7 +145,8 @@ module.exports = {
             ],
             '/code/web/npm/': [
                 'base',
-                'ci'
+                'ci',
+		'install'
             ],
             '/code/web/ts/': [
                 'base',
@@ -188,7 +192,8 @@ module.exports = {
                 'note',
                 'cap-base',
                 'idgenerater',
-                'ddd'
+                'ddd',
+                'dapr'
             ],
             '/test/jmeter/': [
                 'install-docker',
@@ -198,9 +203,10 @@ module.exports = {
                 'compose-netcore',
                 'install',
                 'dockerfiles',
-                'podman'
+                'dockerfilebest'
             ],
-            '/devops/gitlabrunner/': [
+            '/devops/gitlab/': [
+                'gitlab-install',
                 'base',
                 'netcore',
                 'yml'
@@ -235,8 +241,15 @@ module.exports = {
                 'k8s-helm'
             ],
             '/devops/shell/': [
-                'sh-common.md',
-                'sh-gitbranch.md'
+                'sh-common',
+                'sh-gitbranch'
+            ],
+            '/devops/other/': [
+                'nginx',
+                'nginx-docker',
+                'nginxhotreload',
+                'podman',
+                'nexus'
             ],
             '/sql/mssql/': [
                 'usesul'
@@ -246,6 +259,9 @@ module.exports = {
                 'gh-ost',
                 'announcements',
                 'explain'
+            ],
+            '/sql/mongo/': [
+                'install'
             ],
             '/other/designpattern/': [
                 'factory',
@@ -283,7 +299,8 @@ module.exports = {
                 'win-cmd',
                 'win-tools',
                 'vscode',
-                'resource'
+                'resource',
+                'zentao'
             ],
             '/other/cloud/': [
                 'proxmox',
@@ -291,7 +308,8 @@ module.exports = {
                 'cloudbeaver'
             ],
             '/book/classicals/': [
-                'classical1'
+                'classical1',
+                'regular'
             ]
         },
         sidebarDepth: 2

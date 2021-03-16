@@ -5,8 +5,8 @@ sdkman官网地址：https://sdkman.io
 
 ## JDK安装
 
-* OracleJDK下载地址：https://www.oracle.com/technetwork/java/javase/downloads/index.html
-* OpenJDK下载地址：https://adoptopenjdk.net/
+* AdoptOpenJDK下载地址：https://adoptopenjdk.net/
+* ZuluOpenJDK: https://www.azul.com/downloads/zulu-community/?package=jdk
 * linux系统一般都有自带的`openjdk`可以先删除自带的jdk
   > 查看安装的jdk包：`sudo dpkg --list | grep -i jdk`
   > 删除相关包：`sudo apt purge openjdk-*`

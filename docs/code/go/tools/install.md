@@ -32,3 +32,15 @@
     source $HOME/.profile
     ```
 1. 输入`go version`检查是否安装成功
+
+1. 修改阿里源
+
+```bash
+go env -w GO111MODULE=on
+
+# 七牛(优先推荐)
+go env -w GOPROXY=https://goproxy.cn,direct
+
+# 阿里
+go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
+```
