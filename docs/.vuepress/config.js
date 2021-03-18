@@ -145,7 +145,8 @@ module.exports = {
                 'gin'
             ],
             '/code/go/tools/': [
-                'install'
+                'install',
+                'docker'
             ],
             '/code/web/npm/': [
                 'base',
