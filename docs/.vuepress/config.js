@@ -37,6 +37,7 @@ module.exports = {
                     {
                         text: 'Go',
                         items: [
+                            { text: 'Gin', link: '/code/go/gin/' },
                             { text: '其他', link: '/code/go/tools/' }
                         ]
                     },
@@ -139,6 +140,9 @@ module.exports = {
             '/code/java/spring/': [],
             '/code/java/tools/' : [
                 'install'
+            ],
+            '/code/go/gin/': [
+                'gin'
             ],
             '/code/go/tools/': [
                 'install'
