@@ -38,6 +38,7 @@ module.exports = {
                         text: 'Go',
                         items: [
                             { text: 'Gin', link: '/code/go/gin/' },
+                            { text: 'Go常用功能', link: '/code/go/common/' },
                             { text: '其他', link: '/code/go/tools/' }
                         ]
                     },
@@ -143,6 +144,10 @@ module.exports = {
             ],
             '/code/go/gin/': [
                 'gin'
+            ],
+            '/code/go/common/': [
+                'http',
+                'mongodb'
             ],
             '/code/go/tools/': [
                 'install',

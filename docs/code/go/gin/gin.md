@@ -16,7 +16,18 @@ import "net/http"
 ## 简单使用Gin
 
 ```go
-r := gin.Default()
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+
+func main() {
+	r := gin.Default()
 	r.POST("/git/pipeline/wechat", func(context *gin.Context) {
 		var request GitlabRequest
 
@@ -35,7 +46,7 @@ r := gin.Default()
 	"text": {
 		"content": "` + text + `"
 	}
-}`)
+	}`)
 		client := &http.Client{}
 		req,err := http.NewRequest(method,url, playload)
 
@@ -59,7 +70,38 @@ r := gin.Default()
 		//data,_ := json.Marshal(request)
 		context.JSON(http.StatusOK, string(body))
 	})
-
+	r.GET("/tasks/", handleGetTasks)
+	r.PUT("/tasks/", handleCreateTask)
 	r.Run()
+}
+
+func handleGetTasks(c *gin.Context)  {
+	var tasks []Task
+	var task Task
+	task.Title = "Title1"
+	task.Body = `- Body1
+	- Body1 - 1
+	- Body1 - 2`
+	tasks = append(tasks, task)
+	c.JSON(http.StatusOK, gin.H {"tasks": tasks})
+}
+
+func handleCreateTask(c *gin.Context)  {
+	var task Task
+
+	if err := c.ShouldBindJSON(&task); err != nil {
+		log.Print(err)
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err})
+		return
+	}
+
+	id, err := Create(&task)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"id":id})
+}
 ```
 
