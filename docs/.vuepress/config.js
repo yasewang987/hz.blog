@@ -298,7 +298,8 @@ module.exports = {
                 'screen',
                 'ubuntu',
                 'manjaro',
-                'ddns'
+                'ddns',
+                'crontab'
             ],
             '/other/mac/': [
                 'install',
