@@ -1,4 +1,4 @@
-# GO开发环境安装
+# Go开发环境安装
 
 [中文部署参考网站](http://docscn.studygolang.com/doc/install#%E5%AE%89%E8%A3%85%E5%8C%85)
 
@@ -44,3 +44,7 @@ go env -w GOPROXY=https://goproxy.cn,direct
 # 阿里
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 ```
+
+## GOPATH
+
+个人看来gopath的作用是定义go项目依赖包存放的位置，统一管理，以后创建go项目指定了gopath之后就可以复用本地的包了

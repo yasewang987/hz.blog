@@ -37,6 +37,8 @@ module.exports = {
                     {
                         text: 'Go',
                         items: [
+                            { text: 'Gin', link: '/code/go/gin/' },
+                            { text: 'Go常用功能', link: '/code/go/common/' },
                             { text: '其他', link: '/code/go/tools/' }
                         ]
                     },
@@ -140,8 +142,16 @@ module.exports = {
             '/code/java/tools/' : [
                 'install'
             ],
+            '/code/go/gin/': [
+                'gin'
+            ],
+            '/code/go/common/': [
+                'http',
+                'mongodb'
+            ],
             '/code/go/tools/': [
-                'install'
+                'install',
+                'docker'
             ],
             '/code/web/npm/': [
                 'base',
@@ -288,7 +298,8 @@ module.exports = {
                 'screen',
                 'ubuntu',
                 'manjaro',
-                'ddns'
+                'ddns',
+                'crontab'
             ],
             '/other/mac/': [
                 'install',
