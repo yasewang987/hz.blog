@@ -260,7 +260,8 @@ module.exports = {
                 'nginx-docker',
                 'nginxhotreload',
                 'podman',
-                'nexus'
+                'nexus',
+                'prometheus'
             ],
             '/sql/mssql/': [
                 'usesul'

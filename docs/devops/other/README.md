@@ -5,3 +5,4 @@
 * [Nginx配置文件热更新](./nginxhotreload.md)
 * [Podman](./podman.md)
 * [Nexus](./nexus.md)
+* [Prometheus安装](./prometheus.md)
