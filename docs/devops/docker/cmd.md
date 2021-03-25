@@ -21,11 +21,18 @@ docker rmi $(docker images | grep none | awk '{print $3}')
 docker search
 # 查看容器元数据
 docker inspect xxx
+# 查看日志文件数据
+$ docker inspect --format='{{.LogPath}}' <容器ID>
+/var/lib/docker/containers/545e06a75cc0ac8f8c1e6f7217455660187124a3eed031b5eb2f6f0edeb426cb/545e06a75cc0ac8f8c1e6f7217455660187124a3eed031b5eb2f6f0edeb426cb-json.log
+
 # 查看日志
 docker logs xxx
+
+# 查看最新10条日志
+docker logs --tail=100 <容器ID>
+
 # 进入容器bash
 docker exec -it xxx /bin/bash
-
 ```
 
 ## docker常用功能
@@ -57,7 +64,60 @@ docker run -d -e LANG="C.UTF-8" --name hello helloworld
 
 ### docker替换国内镜像源
 
+`apt update`升级较慢时需要用到
+
 ```bash
 # 在dockerfile中加入如下内容，stretch这个需要注意看一下构建镜像的时候提示的默认版本是什么
 RUN echo "deb http://mirrors.aliyun.com/debian/ stretch main" >/etc/apt/sources.list && echo "deb http://mirrors.aliyun.com/debian-security stretch/updates main" >>/etc/apt/sources.list && echo "deb http://mirrors.aliyun.com/debian/ stretch-updates main" >>/etc/apt/sources.list
+```
+
+## docker容器日志清理
+
+创建shell脚本
+
+```bash
+vim /home/docker-sh/clean_docker_log.sh
+```
+
+脚本内容如下：
+
+```shell
+#!/bin/sh 
+echo "======== start clean docker containers logs ========"  
+logs=$(find /var/lib/docker/containers/ -name *-json.log)  
+for log in $logs  
+        do  
+                echo "clean logs : $log"  
+                cat /dev/null > $log  
+        done  
+echo "======== end clean docker containers logs ========"  
+```
+
+添加定时服务自动执行
+
+```bash
+crontab -e
+
+0 0 2 * * ? /home/docker-sh/clean_docker_log.sh
+```
+
+## docker限定日志大小
+
+修改docker配置文件`daemon.json`:
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": {"max-size": "10m", "max-file": "3"}
+}
+```
+
+重启生效：
+
+```bash
+systemctl daemon-reload
+systemctl restart docker
+
+# 或者直接执行
+systemctl reload docker
 ```
