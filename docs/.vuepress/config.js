@@ -211,6 +211,7 @@ module.exports = {
             ],
             '/devops/docker/': [
                 'cmd',
+                'problem',
                 'compose-netcore',
                 'install',
                 'dockerfiles',

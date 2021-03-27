@@ -35,34 +35,13 @@ docker logs --tail=100 <容器ID>
 docker exec -it xxx /bin/bash
 ```
 
-## docker常用功能
-
-### docker容器中使用docker命令
+## docker容器中使用docker命令
 
 ```bash
 docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --name hello helloworld
 ```
 
-### docker时区问题
-
-```bash
-docker run -d -v /etc/localtime:/etc/localtime --name hello helloworld
-```
-
-### docker中文乱码问题
-
-```bash
-# 查看所有编码
-locale -a
-
-# 查看当前所使用的编码
-locale
-
-# 这里设置哪种编码需要根据容器环境确定
-docker run -d -e LANG="C.UTF-8" --name hello helloworld
-```
-
-### docker替换国内镜像源
+## docker替换国内镜像源
 
 `apt update`升级较慢时需要用到
 
@@ -121,3 +100,37 @@ systemctl restart docker
 # 或者直接执行
 systemctl reload docker
 ```
+
+## 优雅重启dockerd
+
+编辑文件 `/etc/docker/daemon.json`，添加如下配置
+
+```bash
+{
+    "live-restore": true
+}
+```
+
+dockerd reload 配置(不会重启 dockerd，修改配置真好用)
+
+```bash
+# 给 dockerd 发送 SIGHUP 信号，dockerd 收到信号后会 reload 配置
+kill -SIGHUP $(pidof dockerd)
+```
+
+检查是否配置成功
+
+```bash
+docker info | grep -i live
+# 可以看到 Live Restore Enabled: true
+```
+
+重启 docker，此时重启 docker 不会重启容器
+
+```bash
+systemctl restart docker
+```
+
+* 如果有容器挂载了 docker.sock 文件，重启后工作可能会不正常，需要重启该容器。
+
+## 
