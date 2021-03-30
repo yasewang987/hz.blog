@@ -215,7 +215,8 @@ module.exports = {
                 'compose-netcore',
                 'install',
                 'dockerfiles',
-                'dockerfilebest'
+                'dockerfilebest',
+                'buildx'
             ],
             '/devops/gitlab/': [
                 'gitlab-install',
