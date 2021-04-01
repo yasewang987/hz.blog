@@ -62,6 +62,7 @@ module.exports = {
                     { text: 'Identity', link: '/microservices/identity/' },
                     { text: 'Skywalking', link: '/microservices/skywalking/' },
                     { text: 'MQ', link: '/microservices/mq/' },
+                    { text: 'Dapr', link: '/microservices/dapr/' },
                     { text: '随笔', link: '/microservices/other/' }
                 ]
             },
@@ -190,6 +191,9 @@ module.exports = {
             ],
             '/microservices/mq/': [
                 'rabbitmq-install'
+            ],
+            '/microservices/dapr/': [
+                'install'
             ],
             '/microservices/ocelot/': [
                 'middleware',
