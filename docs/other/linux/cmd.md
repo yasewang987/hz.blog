@@ -292,3 +292,13 @@ ls -l /etc/alternatives/java
 
 # 到这里就已经是java命令的最终目录了
 ```
+
+## linux复制文件
+
+```bash
+# 从本地拷贝到远程
+scp -P 2022 localfile/localdir guoyujun@aa.bb.cc:remotedir
+
+# 从远程拷贝到本地
+scp -P 2022 guoyujun@aa.bb.cc:remotedir localfile/localdir
+```

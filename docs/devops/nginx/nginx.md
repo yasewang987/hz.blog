@@ -102,3 +102,38 @@ sudo nginx -s stop
 ps -ef | grep Nginx
 sudo kill -9 <PID>
 ```
+
+## Nginx不记录某些日志的配置
+
+```nginx
+server {
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css)$ {
+        access_log off;
+    }
+}
+```
+
+## Nginx日志切割备份
+
+```bash
+# 创建并编辑shell脚本
+vim nginx_logback.sh
+# 内容如下
+
+#!/bin/bash
+YESTERDAY=$(date -d "yesterday" +"%Y-%m-%d")
+LOGPATH=/usr/local/openresty/nginx/logs/
+PID=${LOGPATH}nginx.pid
+mv ${LOGPATH}access.log ${LOGPATH}access-${YESTERDAY}.log
+mv ${LOGPATH}error.log ${LOGPATH}error-${YESTERDAY}.log
+
+kill -USR1 `cat ${PID}`
+
+# 添加执行权限
+chmod +x nginx_logback.sh
+
+# 添加定时任务
+crontab -e
+
+0 0 * * * /bin/bash /root/nginx_logback.sh
+```
