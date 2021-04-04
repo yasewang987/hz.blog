@@ -195,7 +195,10 @@ module.exports = {
                 'rabbitmq-install'
             ],
             '/microservices/dapr/': [
-                'install'
+                'install',
+                'component',
+                'state',
+                'pubsub'
             ],
             '/microservices/ocelot/': [
                 'middleware',
@@ -209,8 +212,7 @@ module.exports = {
                 'note',
                 'cap-base',
                 'idgenerater',
-                'ddd',
-                'dapr'
+                'ddd'
             ],
             '/test/jmeter/': [
                 'install-docker',
