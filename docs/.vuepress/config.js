@@ -241,6 +241,7 @@ module.exports = {
                 'prometheus',
                 'node-exporter',
                 'gpu-exporter',
+                'custom-exporter',
                 'wechat-alert'
             ],
             '/devops/jenkins/': [
