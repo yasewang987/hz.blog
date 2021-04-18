@@ -24,7 +24,8 @@
 
     # 添加一下内容
     export GOROOT=/usr/local/go
-    export PATH=$PATH:$GOROOT/bin
+    export GOPATH=/var/gopath  #自己定义的gopath
+    export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
     # 生效全局配置
     source /etc/profile
@@ -45,6 +46,29 @@ go env -w GOPROXY=https://goproxy.cn,direct
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 ```
 
-## GOPATH
+## GO Debug
 
-个人看来gopath的作用是定义go项目依赖包存放的位置，统一管理，以后创建go项目指定了gopath之后就可以复用本地的包了
+需要安装 `go-delve`
+
+Mac安装`go-delve`: `brew install go-delve/delve/delve --verbose`
+
+VSCode调试需要添加文件 `launch.json`, 内容如下：
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Part1",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "remotePath": "",
+            "port": 12345,
+            "host": "127.0.0.1",
+            "program": "${workspaceFolder}/part1/main.go",
+            "showLog": true
+        }
+    ]
+}
+```
