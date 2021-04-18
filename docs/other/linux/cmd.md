@@ -51,8 +51,8 @@ locale
 
 ## 查看系统版本
 
-1. 查看发行版本：`cat /etc/os-release`
-1. 查看内核版本：`uname -r`
+1. 查看发行版本：`cat /etc/os-release` , `cat /etc/issue`
+1. 查看内核版本：`uname -a`，`uname -m`, `uname -s`
 
 ## 查看系统进程并关闭
 
