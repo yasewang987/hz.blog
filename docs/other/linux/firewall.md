@@ -26,6 +26,8 @@ chkconfig iptables on
  vim /etc/sysconfig/iptables
 # 加入如下代码
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+# 重启
+service iptables restart
 ```
 
 ## firewall防火墙
