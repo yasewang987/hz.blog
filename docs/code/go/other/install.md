@@ -46,11 +46,41 @@ go env -w GOPROXY=https://goproxy.cn,direct
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 ```
 
-## GO Debug
+## Go Debug
 
-需要安装 `go-delve`
+需要安装 `go-delve`,github地址： https://github.com/go-delve/delve
 
-Mac安装`go-delve`: `brew install go-delve/delve/delve --verbose`
+Mac安装`go-delve`: https://github.com/go-delve/delve/blob/master/Documentation/installation/README.md
+
+```bash
+xcode-select --install
+
+go install github.com/go-delve/delve/cmd/dlv@latest
+
+sudo /usr/sbin/DevToolsSecurity -enable
+sudo dscl . append /Groups/_developer GroupMembership $(whoami)
+```
+
+如果是 arm64 架构的mac，需要编写脚本 `dlv.sh`：
+
+```sh
+#!/bin/sh
+exec /usr/bin/arch -arch arm64 /Users/hzgod/Documents/gopath/bin/dlv "$@"
+```
+
+一定要注意，需要将该文件权限改为`可执行`
+
+```bash
+chmod 777 dlv.sh
+```
+
+并且需要在vscode的配置文件`settings.json`中增加如下配置：
+
+```json
+"go.alternateTools": {
+    "dlv": "/Users/hzgod/Documents/dlv.sh"
+},
+```
 
 VSCode调试需要添加文件 `launch.json`, 内容如下：
 
@@ -63,7 +93,6 @@ VSCode调试需要添加文件 `launch.json`, 内容如下：
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "remotePath": "",
             "port": 12345,
             "host": "127.0.0.1",
             "program": "${workspaceFolder}/part1/main.go",
@@ -71,4 +100,14 @@ VSCode调试需要添加文件 `launch.json`, 内容如下：
         }
     ]
 }
+```
+
+如果调试中出现 `could not launch process: stub exited while waiting for connection: exit status 0` 错误，可以通过如下命令确认是否是 arm64 的 mac 使用了 `x86_64` 的 `debugserver`:
+
+```bash
+# 在go项目的主目录执行如下命令
+CGO_ENABLED=0 dlv debug --log --headless .
+
+# 出现如下提示
+debugserver-@ PROGRAM:LLDB  PROJECT:lldb-1200.0.44 for x86_64.
 ```
