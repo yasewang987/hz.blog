@@ -1,6 +1,6 @@
 # Docker问题处理
 
-## docker拉取私有镜像报错
+## docker登陆、拉取私有镜像报错
 
 问题：Error response from daemon: Get https://ip:port/v2/: http: server gave HTTP response to HTTPS client
 

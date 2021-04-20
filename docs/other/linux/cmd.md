@@ -20,19 +20,6 @@ service ssh restart
 
 ## 权限相关
 
-```bash
-chmod 777 filename
-adduser username #添加用户
-passwd username #添加密码
-
-chmod u+x filename # 给用户添加执行权限
-```
-
----
-
-## chmod相关
-
-常见格式：`sudo chmod 777 /home/xxx`  
 777对应的用户：文件所有者、群组用户、其他用户  
 
 权限|权限数字|含义
@@ -40,6 +27,14 @@ chmod u+x filename # 给用户添加执行权限
 r|4|读取read
 w|2|写入write
 x|1|执行execute
+
+```bash
+chmod 777 filename
+adduser username #添加用户
+passwd username #添加密码
+
+chmod u+x filename # 给用户添加执行权限
+```
 
 ---
 
@@ -301,4 +296,25 @@ scp -P 2022 localfile/localdir guoyujun@aa.bb.cc:remotedir
 
 # 从远程拷贝到本地
 scp -P 2022 guoyujun@aa.bb.cc:remotedir localfile/localdir
+```
+
+## 将用户加入某个用户组
+
+```bash
+# 加入
+sudo usermod -aG docker gitlab-runner
+
+# 验证
+sudo -u gitlab-runner -H docker info
+```
+
+## 命令行跳转快捷键
+
+* 行首：ctrl + a
+* 行尾：ctrl + e
+
+## 后台执行命令
+
+```
+nohup 命令 &
 ```
