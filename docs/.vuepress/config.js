@@ -228,7 +228,7 @@ module.exports = {
             ],
             '/devops/gitlab/': [
                 'gitlab-install',
-                'base',
+                'runner',
                 'netcore',
                 'yml'
             ],

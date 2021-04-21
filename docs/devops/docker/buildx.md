@@ -59,13 +59,29 @@
     ```
 
 1. 新建 Docker builder 实例支持多平台构建：
+
+    如果是私有仓库管理docker镜像，而且使用的是http协议，则会出现错误提示： `Error response from daemon: Get https://ip:port/v2/: http: server gave HTTP response to HTTPS client`
+
+    需要在 `/home/gitlab-runner/.docker/buildx` 文件夹下新建 `config.toml` 文件，内容如下：
+
+    ```
+    [registry."docker.io"]
+        mirrors = ["reg-mirror.qiniu.com"]
+        
+    [registry."192.168.1.118:5000"]
+        http = true
+        insecure = true
+    ```
+    * mirrors: 镜像加速器地址
+    * http和insecure: 允许非安全的http仓库地址
+    * 完整配置参考：https://github.com/moby/buildkit/blob/master/docs/buildkitd.toml.md
     
     ```bash
     # 新建同时切换 builder 
-    docker buildx create --use --name mybuilder
+    docker buildx create --use --name mybuilder --config=/home/${USER}/.docker/buildx/config.toml
 
     # 只新建，然后再切换 builder
-    docker buildx create --name mybuilder
+    docker buildx create --name mybuilder --config=/home/${USER}/.docker/buildx/config.toml
     docker buildx use mybuilder
 
     # 启动构建器

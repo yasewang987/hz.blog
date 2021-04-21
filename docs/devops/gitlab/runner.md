@@ -10,6 +10,32 @@
 
 ![3](http://cdn.go99.top/docs/devops/gitlabrunner/base1.png)
 
+### 安装包安装runner
+
+安装： https://docs.gitlab.com/runner/install/linux-manually.html
+
+```bash
+# Replace ${arch} with any of the supported architectures, e.g. amd64, arm, arm64
+# A full list of architectures can be found here https://gitlab-runner-downloads.s3.amazonaws.com/latest/index.html
+curl -LJO "https://gitlab-runner-downloads.s3.amazonaws.com/latest/deb/gitlab-runner_${arch}.deb"
+
+dpkg -i gitlab-runner_<arch>.deb
+```
+
+注册： https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-the-shell-executor
+
+```bash
+sudo gitlab-runner register 
+# 根据提示填写信息即可
+
+# 将gitlab-runner加入到docker用户组
+sudo usermod -aG docker gitlab-runner
+```
+
+* 如果在 Runner 在执行过程中提示 `Job failed (system failure): preparing environment:`,则需要把 `/home/gitlab-runner/.bash_logout` 删除，[官网处理意见参考](https://docs.gitlab.com/runner/faq/README.html#job-failed-system-failure-preparing-environment)。
+
+### docker安装runner
+
 gitlab-runner提供windows和linux版本的安装客户端，我这边使用`docker`的方式安装举例
 
 ```bash
@@ -235,7 +261,7 @@ deploy-master-job:
 * 可以在 Settings-》CI/CD-》Variables 设置机密配置，通过 `$KEY` 方式使用
 * gitlab流水线预设的变量：https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
 
-## 其他
+## 四、其他
 
 做完上面的工作之后，将代码提交到gitlab的develop或者master分支就会自动触发构建任务了（第一次运行会比较慢，因为要拉取`netcore`和`docker`镜像，所以在没开始学习这个教程之前可以将几个镜像都准备好）。
 
@@ -258,3 +284,55 @@ deploy-master-job:
 
 
 
+
+
+## 五、Runner中使用docker buildx
+
+确保使用的 Linux 发行版内核 **>=4.8.0**（推荐使用 Ubuntu 18.04 以上的 TLS 发行版），且 **Docker >= 19.03**；
+
+如果是私有仓库管理docker镜像，而且使用的是http协议，则会出现错误提示： `Error response from daemon: Get https://ip:port/v2/: http: server gave HTTP response to HTTPS client`
+
+需要在 `/home/gitlab-runner/.docker/buildx` 文件夹下新建 `config.toml` 文件，内容如下：
+
+```
+[registry."docker.io"]
+    mirrors = ["reg-mirror.qiniu.com"]
+    
+[registry."192.168.1.118:5000"]
+    http = true
+    insecure = true
+```
+* mirrors: 镜像加速器地址
+* http和insecure: 允许非安全的http仓库地址
+
+需要在 `.gitlab-ci.yml` 脚本中添加如下命令：
+
+```yml
+stages:
+  - build-image
+
+build-image:
+  stage: build-image
+  only:
+    - master
+  cache:
+    untracked: true
+  script:
+    - export DOCKER_CLI_EXPERIMENTAL=enabled
+    ########################################
+    - docker buildx version
+    - docker run --rm --privileged docker/binfmt:66f9012c56a8316f9244ffd7622d7c21c1f6f28d
+    - ls -al /proc/sys/fs/binfmt_misc
+    - docker buildx create --use --name mybuilder2 --config=/home/${USER}/.docker/buildx/config.toml
+    - docker buildx inspect mybuilder2 --bootstrap
+    - docker buildx ls
+    # 上面的只需要第一次执行即可，后面就不需要执行了。
+    - docker login -u dockeruser -p $DOCKER_PWD inner.test.ifuncun.cn:8082
+    - docker buildx build -t inner.test.ifuncun.cn:8082/pytest:$CI_PIPELINE_ID --platform=linux/arm64,linux/amd64 . --push
+  artifacts:
+    expire_in: 10 days
+    paths:
+      - out/
+  tags:
+    - imagebuilder3
+```
