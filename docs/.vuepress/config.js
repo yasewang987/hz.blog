@@ -66,12 +66,6 @@ module.exports = {
                     { text: '随笔', link: '/microservices/other/' }
                 ]
             },
-            { 
-                text: '测试',
-                items: [
-                    { text: 'Jmeter', link: '/test/jmeter/' }
-                ]
-            },
             {
                 text: 'DevOps',
                 items: [
@@ -87,11 +81,23 @@ module.exports = {
                 ]
             },
             {
+                text: 'AI',
+                items: [
+                    { text: 'AI部署资料', link: '/ai/deploy/' }
+                ]
+            },
+            {
                 text: 'SQL',
                 items: [
                     { text: 'MSSQL', link: '/sql/mssql/' },
                     { text: 'MYSQL', link: '/sql/mysql/' },
                     { text: 'MongoDB', link: '/sql/mongo/'}
+                ]
+            },
+            { 
+                text: '测试',
+                items: [
+                    { text: 'Jmeter', link: '/test/jmeter/' }
                 ]
             },
             {
@@ -102,13 +108,8 @@ module.exports = {
                     { text: 'Linux', link: '/other/linux/' },
                     { text: '实用工具', link: '/other/tools/' },
                     { text: 'Mac', link: '/other/mac/' },
-                    { text: 'Cloud', link: '/other/cloud/'}
-                ]
-            },
-            {
-                text: '读书',
-                items: [
-                    { text: '经典文章摘录', link: '/book/classicals/' }
+                    { text: 'Cloud', link: '/other/cloud/'},
+                    { text: '读书', link: '/other/book/'}
                 ]
             }
         ],
@@ -339,9 +340,13 @@ module.exports = {
                 'theia',
                 'cloudbeaver'
             ],
-            '/book/classicals/': [
+            '/other/book/': [
                 'classical1',
                 'regular'
+            ],
+            '/ai/deploy/': [
+                'torchserve',
+                'tfx'
             ]
         },
         sidebarDepth: 2
