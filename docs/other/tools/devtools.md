@@ -12,3 +12,7 @@ Termux官网：https://termux.com/
 
 国内镜像源地址：https://mirrors.tuna.tsinghua.edu.cn/help/termux/
 
+## Dbeaver
+
+https://github.com/dbeaver/dbeaver/releases
+

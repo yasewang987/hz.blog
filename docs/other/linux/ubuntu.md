@@ -2,8 +2,9 @@
 
 ## 下载源修改
 
-```bash
+参考：https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
 
+```bash
 # 查看系统版本
 lsb_release -a
 
@@ -21,6 +22,12 @@ sudo apt-get upgrade
 ```
 
 ## 修改IP，DNS
+
+```bash
+sudo vim /etc/systemd/resolved.conf
+
+DNS=114.114.114.114 233.5.5.5 8.8.8.8
+```
 
 ```bash
 vim /etc/netplan/xx-netcfg.yaml
@@ -68,4 +75,40 @@ vim /etc/fstab
 mount -a
 # 取消挂载
 umount   /data/fileshare   
+```
+
+## 禁用休眠
+
+查看是否休眠
+
+```bash
+systemctl status sleep.target
+
+# 内容如下
+● sleep.target - Sleep
+    Loaded: loaded (/lib/systemd/system/sleep.target; static; vendor preset: enabled)
+    Active: inactive (dead)
+      Docs: man:systemd.special(7)
+ Feb 24 13:18:08 xps systemd[1]: Reached target Sleep.
+ Feb 26 13:29:31 xps systemd[1]: Stopped target Sleep.
+ Feb 26 13:29:57 xps systemd[1]: Reached target Sleep.
+ Feb 26 13:30:19 xps systemd[1]: Stopped target Sleep.
+```
+
+禁止休眠设置：
+
+```bash
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+# 输出
+Created symlink /etc/systemd/system/sleep.target → /dev/null.
+Created symlink /etc/systemd/system/suspend.target → /dev/null.
+Created symlink /etc/systemd/system/hibernate.target → /dev/null.
+Created symlink /etc/systemd/system/hybrid-sleep.target → /dev/null.
+
+# 检查是否成功
+systemctl status sleep.target
+# 输出
+● sleep.target
+   Loaded: masked (Reason: Unit sleep.target is masked.)
+   Active: inactive (dead)
 ```

@@ -27,7 +27,7 @@
     mkdir model-store && mkdir examples
 
     # 启动容器
-    docker run --rm -d --gpus all -p 8080-8082:8080-8082 -p 7070-7071:7070-7071 -v $(pwd)/model-store:/home/model-server/model-store -v $(pwd)/examples:/home/model-server/examples pytorch/torchserve:0.2.0-cuda10.1-cudnn7-runtime
+    docker run --rm -d --gpus all --privileged -p 8080-8082:8080-8082 -p 7070-7071:7070-7071 -v $(pwd)/model-store:/home/model-server/model-store -v $(pwd)/examples:/home/model-server/examples pytorch/torchserve:0.2.0-cuda10.1-cudnn7-runtime
     ```
 
     * 8080提供服务接口，8081提供管理接口，8082提供监控接口

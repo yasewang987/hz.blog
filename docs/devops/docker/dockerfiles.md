@@ -49,3 +49,35 @@ COPY . .
 
 CMD ["python", "./init.py"]
 ```
+
+## dockerfile-tensorflow
+
+基础镜像版本根据自己的需求选择
+
+```dockerfile
+FROM tensorflow/tensorflow:1.13.2-gpu-py3
+WORKDIR /app
+COPY ./requirements.txt .
+RUN pip install --ignore-installed -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r requirements.txt
+```
+## dockerfile-pytorch
+
+基础镜像版本根据自己的需求选择
+
+```dockerfile
+FROM pytorch/pytorch:1.3-cuda10.1-cudnn7-runtime
+WORKDIR /app
+COPY ./requirements.txt .
+RUN pip install --ignore-installed -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r requirements.txt
+```
+
+## dockerfile-pyltp
+
+`pyltp` 目前只支持 `python3.6` 版本的 `pip` 安装，所以需要确认官方镜像的python版本,可以通过基础镜像的官方github仓库查看对应分支的`Dockerfile`确认
+
+```dockerfile
+FROM pytorch/pytorch:1.3-cuda10.1-cudnn7-runtime
+WORKDIR /app
+COPY ./requirements.txt .
+RUN pip install --ignore-installed -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r requirements.txt
+```
