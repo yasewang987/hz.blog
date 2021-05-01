@@ -68,6 +68,17 @@
 
 * 安装 [nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
 
+    dockeer19.03版本之后只需要安装 `nvidia-container-runtime` 即可
+    
+    ```bash
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+        && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+        && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+
+    sudo apt-get update \
+        && sudo apt-get install -y nvidia-container-runtime
+    ```
+
 * 查看内核显卡版本：`cat /proc/driver/nvidia/version`
 * 查看安装的显卡驱动信息： `dpkg --list | grep nvidia`
 
@@ -76,6 +87,16 @@
 ```bash
 nvidia-smi
 ```
+
+## nvidia运行docker容器选择
+
+如果是`Tensorflow`的，到帮助目录先确认要下载的镜像版本号：https://docs.nvidia.com/deeplearning/frameworks/tensorflow-release-notes/running.html#running
+
+如果是`Pytorch`的，到这个地址确认：https://docs.nvidia.com/deeplearning/frameworks/pytorch-release-notes/index.html
+
+如果上面没有找到符合要求的镜像，也可以到 dockerhub 里面找
+
+再到Nvidia官方的容器镜像仓库下载：https://ngc.nvidia.com/catalog/containers
 
 ## 常见错误处理
 

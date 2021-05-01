@@ -28,7 +28,7 @@ locale -a
 locale
 
 # 这里设置哪种编码需要根据容器环境确定
-docker run -d -e LANG="C.UTF-8" --name hello helloworld
+docker run -d -e LANG="C.UTF-8" --env LC_ALL=zh_CN.UTF-8 --name hello helloworld
 ```
 
 ## 二进制安装docker，systemd无法管理docker服务问题

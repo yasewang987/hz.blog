@@ -345,6 +345,7 @@ module.exports = {
                 'regular'
             ],
             '/ai/deploy/': [
+                'problem',
                 'nvidia',
                 'torchserve',
                 'tfx'
