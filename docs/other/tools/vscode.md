@@ -16,29 +16,38 @@
 1. 点击服务器，输入密码即可登陆（要输入2次）
 1. 每次都要输入密码很麻烦，可以通过 [【SSH免密登陆】](../linux/cmd.md) 解决
 
-## C# Extensions
+## 连接远程服务器Docker容器开发
+
+1. 准备好远程容器: `docker run -it -p 50003:22 ubuntu:14.04`
+    * 设置容器密码：`passwd`（密码自己设置）
+    * 安装ssh服务：`apt-get update && apt-get install openssh-server`（`ps -e |grep ssh`检查是否启动）
+    * 修改配置文件`/etc/ssh/sshd_config`,允许root用户远程登陆：将 `# PermitRootLogin without-password` 替换成 `PermitRootLogin yes`
+    * 重启ssh：`service ssh start`
+1. 远程连接容器：`ssh root@youhostip -p 50003`
+
+* 注意，有可能ssh连接到容器中的时候`环境变量`与执行 `docker exec`的不一致，导致有些命令无法执行。这个时候需要将`docker exec`状态下的环境变量`$PATH`的值加到 ssh 下的 `.basrc` 最后面，例如：`export PATH=$PATH:/opt/conda/bin:/opt/cmake-3.14.6-Linux-x86_64/bin/`
+
+## C# 开发
+### C# Extensions
 这个插件最有用的功能是可以右键新建C#类和C#接口，同时支持各种code snippets，例如 ctor 、prop等，具体功能特性，可以查看插件的说明
 ![2](http://cdn.go99.top/docs/other/tools/vscode2.png)
 
-## Auto-Using for C#
+### Auto-Using for C#
 这个插件自动添加using引用
 ![3](http://cdn.go99.top/docs/other/tools/vscode3.png)
 
-## vscode-solution-explorer
+### vscode-solution-explorer
 这个插件给VS Code增加了解决方案tab, 支持新建解决方案、新建工程、添加引用、Nuget包，这个插件非常有用
 ![4](http://cdn.go99.top/docs/other/tools/vscode4.png)
 
-## Code Runner
+## 其他
+### Code Runner
 即选中一段代码，直接run
 ![5](http://cdn.go99.top/docs/other/tools/vscode5.png)
 
-## Visual Studio IntelliCode
+### Visual Studio IntelliCode
 VS代码智能提示，根据上下文语境，自动推荐你下一步用到的代码，后台基于AI的
 ![6](http://cdn.go99.top/docs/other/tools/vscode6.png)
-
-
-
-
 
 ## VSCode错误处理
 

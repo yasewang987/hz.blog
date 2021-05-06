@@ -151,7 +151,9 @@ module.exports = {
             ],
             '/code/go/common/': [
                 'http',
-                'mongodb'
+                'mongodb',
+                'lock',
+                'package'
             ],
             '/code/go/other/': [
                 'install',
