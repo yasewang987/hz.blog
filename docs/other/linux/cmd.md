@@ -41,13 +41,50 @@ chmod u+x filename # 给用户添加执行权限
 ## 查看linux系统编码
 
 ```bash
+# 查看所有系统编码
+locale -a
+
+# 查看当前系统编码
 locale
+```
+
+## 获取当前日期时间
+
+```sh
+version=`date +%y%m%d%H%M%s`
 ```
 
 ## 查看系统版本
 
 1. 查看发行版本：`cat /etc/os-release` , `cat /etc/issue`
-1. 查看内核版本：`uname -a`，`uname -m`, `uname -s`
+1. 查看内核版本：`uname -a`，`uname -m`, `uname -s`，`uname -p`
+
+## 查看linux cpu，磁盘、内存
+
+```bash
+# cpu
+lscpu
+
+# 磁盘
+lsblk
+
+# 内存
+free -h
+```
+
+## 查看内存、cpu使用情况
+
+```bash
+top
+
+# us: 用户空间cpu使用占比
+# sy: 内核空间cpu使用占比
+# ni：用户进程空间内改变过优先级的进程占用cpu百分比
+# id：空闲cpu百分比
+# wa：等待输入输出的cpu时间百分比
+# hi：cpu服务于硬件中断所消耗的时间总额
+# si：cpu服务软中断所消耗的时间总额
+```
 
 ## 查看系统进程并关闭
 
@@ -55,12 +92,6 @@ locale
 ps -ef | grep nginx
 
 sudo kill -9 <PID>
-```
-
-## 端口使用情况
-
-```bash
-nc -vz 12.12.12.12 28301
 ```
 
 ## 端口使用情况
@@ -317,4 +348,14 @@ sudo -u gitlab-runner -H docker info
 
 ```
 nohup 命令 &
+```
+
+## 执行远程服务器脚本
+
+```sh
+ssh -tt root@192.168.20.71 << closessh
+chmod u+x /home/erpaggregateservice/Build.sh
+source /home/erpaggregateservice/Build.sh
+exit
+closessh
 ```

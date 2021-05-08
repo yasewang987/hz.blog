@@ -76,7 +76,6 @@ module.exports = {
                     { text: 'Jenkins', link: '/devops/jenkins/' },
                     { text: 'GitLab', link: '/devops/gitlab/' },
                     { text: 'Prometheus', link: '/devops/prometheus/' },
-                    { text: '脚本', link: '/devops/shell/' },
                     { text: '其他', link: '/devops/other/' }
                 ]
             },
@@ -153,7 +152,8 @@ module.exports = {
                 'http',
                 'mongodb',
                 'lock',
-                'package'
+                'package',
+                'godoc'
             ],
             '/code/go/other/': [
                 'install',
@@ -275,10 +275,6 @@ module.exports = {
                 'k8s-network',
                 'k8s-ingress',
                 'k8s-helm'
-            ],
-            '/devops/shell/': [
-                'sh-common',
-                'sh-gitbranch'
             ],
             '/devops/other/': [
                 'podman',
