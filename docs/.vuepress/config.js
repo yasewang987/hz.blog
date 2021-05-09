@@ -76,6 +76,7 @@ module.exports = {
                     { text: 'Jenkins', link: '/devops/jenkins/' },
                     { text: 'GitLab', link: '/devops/gitlab/' },
                     { text: 'Prometheus', link: '/devops/prometheus/' },
+                    { text: 'Ansible', link: '/devops/ansible/' },
                     { text: '其他', link: '/devops/other/' }
                 ]
             },
@@ -250,6 +251,11 @@ module.exports = {
             '/devops/jenkins/': [
                 'dotnet',
                 'install'
+            ],
+            '/devops/ansible/': [
+                'info',
+                'install',
+                'module'
             ],
             '/devops/k8s/k8s-normal/': [
                 'k8s-yamls',
