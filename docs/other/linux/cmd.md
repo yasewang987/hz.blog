@@ -362,3 +362,22 @@ source /home/erpaggregateservice/Build.sh
 exit
 closessh
 ```
+
+## /dev/null
+
+`/dev/null`: 表示的是一个黑洞，通常用于丢弃不需要的数据输出，或者用于输入流的空文件。
+
+将无用的输出流写入到黑洞丢弃：`00 01 * * * /bin/sh/server/scripts/mysqlbak.sh >/dev/null 2>&1`
+
+* `>`: 代表重定向到哪里
+* `/dev/null` 代表空设备文件
+* `2>` 表示`stderr`标准错误
+* `&` 表示 `等同于` 的意思，`2>&1`，表示`2`的输出重定向 `等同于 1`
+* `1` 表示`stdout`标准输出，系统默认值是`1`，所以`>/dev/null`等同于 `1>/dev/null`
+
+所以 `>/dev/null 2>&1` == `1> /dev/null 2> &1`
+
+`1>/dev/null` ：首先表示标准输出重定向到空设备文件，也就是不输出任何信息到终端，说白了就是不显示任何信息。
+`2>&1` ：接着，标准错误输出重定向 到标准输出，因为之前标准输出已经重定向到了空设备文件，所以标准错误输出也重定向到空设备文件（较多的时候我们会用`command > file 2>&1` 这样的写法）
+
+清空文件： `cat /dev/null > /home/omc/h.txt`
