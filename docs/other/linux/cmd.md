@@ -181,6 +181,9 @@ tar xvf xxx.tar
 使用dpkg命令  
 `sudo dpkg --list | grep -i jdk`
 
+使用ps命令
+`ps -aux  | grep pkgname
+
 ---
 
 ## 开机启动服务

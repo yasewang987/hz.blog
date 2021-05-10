@@ -154,7 +154,8 @@ module.exports = {
                 'mongodb',
                 'lock',
                 'package',
-                'godoc'
+                'godoc',
+                'rw'
             ],
             '/code/go/other/': [
                 'install',
@@ -239,7 +240,8 @@ module.exports = {
             '/devops/nginx/': [
                 'nginx-docker',
                 'nginx',
-                'nginxhotreload'
+                'nginxhotreload',
+                'problem'
             ],
             '/devops/prometheus/': [
                 'prometheus',
