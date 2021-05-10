@@ -326,7 +326,10 @@ module.exports = {
                 'ubuntu',
                 'manjaro',
                 'ddns',
-                'crontab'
+                'crontab',
+                'curl',
+                'awk',
+                'sed'
             ],
             '/other/mac/': [
                 'install',
