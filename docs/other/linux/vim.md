@@ -1,4 +1,16 @@
 # Vim操作技巧
+## vim批量替换
+
+```bash
+# 在命令模式下
+
+# 将文档中所有abc替换为tttt
+:%s/abc/tttt/g
+
+# 如果有转义字符，需要在字符前使用 \
+# 将 /path/to/myfile 替换为 /otherpath/to/otherfile
+:%s/\/path\/to\/myfile/\/otherpath\/to\/otherfile/g
+```
 
 ## 注意事项
 
@@ -114,5 +126,3 @@ $|移动光标到行尾
 `<ctrl-v>{code}`|code包含3位数字插入字符例如插入A:`<ctrl-v>065`
 `<ctrl-v>u{code}`|u表示使用16进制的unicode编码
 `<ctrl-k>{char1}{char2}`|插入以二合字母{char1}{char2}表示的字符1/2：`<ctrl-k>12`
-
-* 可视模式

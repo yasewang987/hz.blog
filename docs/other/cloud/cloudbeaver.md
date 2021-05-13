@@ -2,7 +2,7 @@
 
 cloudbeaver是一款云数据库管理软件
 
-官方地址：https://cloudbeaver.io/
+官方地址：https://cloudbeaver.io/docs/CloudBeaver-overview/
 
 ## Cloudbeaver部署
 
@@ -12,16 +12,17 @@ cloudbeaver是一款云数据库管理软件
   # 拉镜像
   sudo docker pull dbeaver/cloudbeaver:latest
 
-  mikdir -p /var/cloudbeaver/workspace
-
+  mikdir -p /opt/cloudbeaver/workspace
+  cd /opt/cloudbeaver
+  
   # 运行测试
-  sudo docker run --name cloudbeaver --rm -ti -p 4444:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
+  sudo docker run --name cloudbeaver --rm -ti -p 4444:8978 -v $PWD/workspace:/opt/cloudbeaver/workspace  cloudbeaver:latest
 
   # 守护模式（docker启动运行）
-  sudo docker run --name cloudbeaver --rm -d --restart unless-stopped -p 4444:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
+  sudo docker run --name cloudbeaver -d --restart unless-stopped -p 4444:8978 -v $PWD/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
 
   # 允许访问本机数据库服务
-  sudo docker run --name cloudbeaver --rm -d --restart unless-stopped --network host -p 4444:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
+  sudo docker run --name cloudbeaver -d --restart unless-stopped --network host -p 4444:8978 -v $PWD/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
 
   # 其他设置参考官网
   ```
@@ -31,7 +32,7 @@ cloudbeaver是一款云数据库管理软件
   ```bash
   mikdir -p /var/cloudbeaver/workspace
 
-  podman run --name cloudbeaver -d -p 4444:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
+  podman run --name cloudbeaver -d -p 4444:8978 -v $PWD/workspace:/opt/cloudbeaver/workspace dbeaver/cloudbeaver:latest
   ```
 
 ## Cloudbeaver访问

@@ -1,5 +1,7 @@
 # Node-Exporter部署
 
+## Docker安装NodeExporter
+
 1. 在需要监控的机器上运行node-exporter
 
     ```bash
@@ -12,6 +14,25 @@
     --name node-exporter \
     prom/node-exporter
     ```
+
+## 源文件安装NodeExporter
+
+选择对应版本的`node-exporter`： https://prometheus.io/download/#node_exporter
+
+```bash
+# 下载
+wget https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz
+
+# 解压：
+tar zxvf node_exporter-1.1.2.linux-amd64.tar.gz
+
+cd node_exporter-1.1.2.linux-amd64
+
+# 后台运行
+nohup ./node_exporter &
+```
+
+## NodeExporter加入Prometheus
 
 1. 修改prometheus.yml配置文件，加入node监控信息
 

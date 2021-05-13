@@ -72,7 +72,25 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
 
     我们要做的是，当客户端通过 Nginx 访问 8888 端口时，将这个请求传到 5000 端口，并将响应返回给客户端！
 
-  ```
+  ```conf
+  upstream tomcat_pools {
+    server 172.16.1.91:8080 weight=1 max_fails=3 fail_timeout=3s;
+    server 172.16.1.91:8081 weight=1 max_fails=3 fail_timeout=3s;
+    check interval=2000 rise=3 fall=2 timeout=1000 type=http;
+  }
+
+  server {
+      listen 8082;
+      access_log    logs/tomcat-access.log main;
+      error_log     logs/tomcat-error.log warn;
+      location / {
+        proxy_pass http://tomcat_pools;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+  }
+
   server {
       listen 8888;
 
@@ -92,8 +110,12 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
 # 首次启动 Nginx Web 服务器
 sudo nginx
 
+# 检查配置文件
+/usr/local/nginx/sbin/nginx -t -c /usr/local/nginx/conf/nginx.conf
+
 # 重新加载正在运行的 Nginx Web 服务器
 sudo nginx -s reload
+sudo /usr/local/nginx/sbin/nginx -s reload
 
 # 停止正在运行中的 Nginx Web 服务器
 sudo nginx -s stop
@@ -101,7 +123,89 @@ sudo nginx -s stop
 # 查看系统上运行的 Nginx 进程
 ps -ef | grep Nginx
 sudo kill -9 <PID>
+
+# 查看nginx安装了哪些模块
+sudo nginx -V
 ```
+
+## Nginx后端服务健康检查
+
+nginx_upstream_check_module
+
+```conf
+upstream tomcat_pools {
+    ip_hash;
+    server 172.16.1.91:8080 weight=1 max_fails=3 fail_timeout=3s;
+    server 172.16.1.91:8081 weight=1 max_fails=3 fail_timeout=3s;
+    check interval=2000 rise=3 fall=2 timeout=1000 type=http;
+    #对tomcat_pools这个负载均衡池中的所有节点，每个2秒检测一次，
+    #请求3次正常则标记realserver状态为up，如果检测2次都失败，则
+    #标记realserver的状态为down，后端健康请求的超时时间为1s，健
+    #康检查包的类型为http请求。
+    check_http_send "HEAD / HTTP/1.0\r\n\r\n";
+    #通过http HEAD消息头检测realserver的健康
+    check_http_expect_alive http_2xx http_3xx;
+    #该指令指定HTTP回复的成功状态，默认为2XX和3XX的状态是健康的
+}
+
+server {
+    listen        0.0.0.0:80;
+    server_name   localhost;
+    access_log    logs/tomcat-access.log main;
+    error_log     logs/tomcat-error.log warn;
+
+    location / {
+        proxy_pass http://tomcat_pools;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /nstatus {
+    #状态页配置
+        check_status;
+        access_log off;
+        allow      172.16.1.254;
+        #允许可以连接的远端ip地址
+        deny       all;
+        #限制所有远端ip的连接
+    }
+}
+```
+
+访问http://172.16.1.91/nstatus监控界面
+
+健康检查参数说明：
+
+interval：向后端发送的健康检查包的间隔。
+
+fall(fall_count)：如果连续失败次数达到fall_count，服务器就被认为是down。
+
+rise(rise_count)：如果连续成功次数达到rise_count，服务器就被认为是up。
+
+timeout：后端健康请求的超时时间。
+
+default_down：设定初始时服务器的状态，如果是true，就说明默认是down的，如果是false，就是up的。
+
+默认值是true，也就是一开始服务器认为是不可用，要等健康检查包达到一定成功次数以后才会被认为是健康的。
+
+type：健康检查包的类型，现在支持以下多种类型：
+
+tcp：简单的tcp连接，如果连接成功，就说明后端正常。
+
+ssl_hello：发送一个初始的SSL hello包并接受服务器的SSL hello包。
+
+http：发送HTTP请求，通过后端的回复包的状态来判断后端是否存活。
+
+mysql：向mysql服务器连接，通过接收服务器的greeting包来判断后端是否存活。
+
+ajp：向后端发送AJP协议的Cping包，通过接收Cpong包来判断后端是否存活。
+
+port：指定后端服务器的检查端口。你可以指定不同于真实服务的后端服务器的端口，比如后端提供的是443端
+
+口的应用，你可以去检查80端口的状态来判断后端健康状况。默认是0，表示跟后端server提供真实服务的端口一
+
+样。该选项出现于Tengine-1.4.0。
 
 ## Nginx不记录某些日志的配置
 

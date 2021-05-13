@@ -1,5 +1,14 @@
 # Docker常用方法
 
+## 判断Docker容器是否存在
+
+```sh
+if [ ! $(docker ps -a --format {{.Names}} | grep schoolpal.aggregate.api.builder) ]
+then
+    docker run -d -i -v /home:/dotnet --name schoolpal.aggregate.api.builder mcr.microsoft.com/dotnet/core/sdk:2.2
+fi
+```
+
 ## docker常用命令
 
 ```bash

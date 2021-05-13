@@ -2,6 +2,9 @@
 
 [中文部署参考网站](http://docscn.studygolang.com/doc/install#%E5%AE%89%E8%A3%85%E5%8C%85)
 
+* `GOROOT`: 中包含go语言的基础执行程序 `$GOROOT/bin`,以及go的基础库 `$GOROOT/src/mod`
+* `GOPATH`: 中包含除了基础库之外的其他项目依赖包执行程序 `$GOPATH/bin`,以及go基础库之外的依赖包源码 `$GOPATH/src/mod`
+
 1. 下载Go发行版 [官方二进制发行版](https://golang.org/dl/),选择对应版本（我这里使用centos系统所以选择linux）
 1. 下载`go1.13.linux-amd64`版本，版本可以自行选择：
     ```bash
@@ -24,7 +27,8 @@
 
     # 添加一下内容
     export GOROOT=/usr/local/go
-    export PATH=$PATH:$GOROOT/bin
+    export GOPATH=/var/gopath  #自己定义的gopath
+    export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
     # 生效全局配置
     source /etc/profile
@@ -45,6 +49,68 @@ go env -w GOPROXY=https://goproxy.cn,direct
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 ```
 
-## GOPATH
+## Go Debug
 
-个人看来gopath的作用是定义go项目依赖包存放的位置，统一管理，以后创建go项目指定了gopath之后就可以复用本地的包了
+需要安装 `go-delve`,github地址： https://github.com/go-delve/delve
+
+Mac安装`go-delve`: https://github.com/go-delve/delve/blob/master/Documentation/installation/README.md
+
+```bash
+xcode-select --install
+
+go install github.com/go-delve/delve/cmd/dlv@latest
+
+sudo /usr/sbin/DevToolsSecurity -enable
+sudo dscl . append /Groups/_developer GroupMembership $(whoami)
+```
+
+如果是 arm64 架构的mac，需要编写脚本 `dlv.sh`：
+
+```sh
+#!/bin/sh
+exec /usr/bin/arch -arch arm64 /Users/hzgod/Documents/gopath/bin/dlv "$@"
+```
+
+一定要注意，需要将该文件权限改为`可执行`
+
+```bash
+chmod 777 dlv.sh
+```
+
+并且需要在vscode的配置文件`settings.json`中增加如下配置：
+
+```json
+"go.alternateTools": {
+    "dlv": "/Users/hzgod/Documents/dlv.sh"
+},
+```
+
+VSCode调试需要添加文件 `launch.json`, 内容如下：
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Part1",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "port": 12345,
+            "host": "127.0.0.1",
+            "program": "${workspaceFolder}/part1/main.go",
+            "showLog": true
+        }
+    ]
+}
+```
+
+如果调试中出现 `could not launch process: stub exited while waiting for connection: exit status 0` 错误，可以通过如下命令确认是否是 arm64 的 mac 使用了 `x86_64` 的 `debugserver`:
+
+```bash
+# 在go项目的主目录执行如下命令
+CGO_ENABLED=0 dlv debug --log --headless .
+
+# 出现如下提示
+debugserver-@ PROGRAM:LLDB  PROJECT:lldb-1200.0.44 for x86_64.
+```

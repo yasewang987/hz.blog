@@ -66,12 +66,6 @@ module.exports = {
                     { text: '随笔', link: '/microservices/other/' }
                 ]
             },
-            { 
-                text: '测试',
-                items: [
-                    { text: 'Jmeter', link: '/test/jmeter/' }
-                ]
-            },
             {
                 text: 'DevOps',
                 items: [
@@ -82,8 +76,14 @@ module.exports = {
                     { text: 'Jenkins', link: '/devops/jenkins/' },
                     { text: 'GitLab', link: '/devops/gitlab/' },
                     { text: 'Prometheus', link: '/devops/prometheus/' },
-                    { text: '脚本', link: '/devops/shell/' },
+                    { text: 'Ansible', link: '/devops/ansible/' },
                     { text: '其他', link: '/devops/other/' }
+                ]
+            },
+            {
+                text: 'AI',
+                items: [
+                    { text: 'AI部署资料', link: '/ai/deploy/' }
                 ]
             },
             {
@@ -94,6 +94,12 @@ module.exports = {
                     { text: 'MongoDB', link: '/sql/mongo/'}
                 ]
             },
+            { 
+                text: '测试',
+                items: [
+                    { text: 'Jmeter', link: '/test/jmeter/' }
+                ]
+            },
             {
                 text: 'Other',
                 items: [
@@ -102,13 +108,8 @@ module.exports = {
                     { text: 'Linux', link: '/other/linux/' },
                     { text: '实用工具', link: '/other/tools/' },
                     { text: 'Mac', link: '/other/mac/' },
-                    { text: 'Cloud', link: '/other/cloud/'}
-                ]
-            },
-            {
-                text: '读书',
-                items: [
-                    { text: '经典文章摘录', link: '/book/classicals/' }
+                    { text: 'Cloud', link: '/other/cloud/'},
+                    { text: '读书', link: '/other/book/'}
                 ]
             }
         ],
@@ -150,7 +151,11 @@ module.exports = {
             ],
             '/code/go/common/': [
                 'http',
-                'mongodb'
+                'mongodb',
+                'lock',
+                'package',
+                'godoc',
+                'rw'
             ],
             '/code/go/other/': [
                 'install',
@@ -228,24 +233,31 @@ module.exports = {
             ],
             '/devops/gitlab/': [
                 'gitlab-install',
-                'base',
+                'runner',
                 'netcore',
                 'yml'
             ],
             '/devops/nginx/': [
                 'nginx-docker',
                 'nginx',
-                'nginxhotreload'
+                'nginxhotreload',
+                'problem'
             ],
             '/devops/prometheus/': [
                 'prometheus',
                 'node-exporter',
                 'gpu-exporter',
+                'custom-exporter',
                 'wechat-alert'
             ],
             '/devops/jenkins/': [
                 'dotnet',
                 'install'
+            ],
+            '/devops/ansible/': [
+                'info',
+                'install',
+                'module'
             ],
             '/devops/k8s/k8s-normal/': [
                 'k8s-yamls',
@@ -272,13 +284,13 @@ module.exports = {
                 'k8s-ingress',
                 'k8s-helm'
             ],
-            '/devops/shell/': [
-                'sh-common',
-                'sh-gitbranch'
-            ],
             '/devops/other/': [
                 'podman',
-                'nexus'
+                'nexus',
+                'elasticsearch',
+                'minio',
+                'mysql',
+                'redis'
             ],
             '/sql/mssql/': [
                 'usesul'
@@ -318,7 +330,10 @@ module.exports = {
                 'ubuntu',
                 'manjaro',
                 'ddns',
-                'crontab'
+                'crontab',
+                'curl',
+                'awk',
+                'sed'
             ],
             '/other/mac/': [
                 'install',
@@ -338,9 +353,15 @@ module.exports = {
                 'theia',
                 'cloudbeaver'
             ],
-            '/book/classicals/': [
+            '/other/book/': [
                 'classical1',
                 'regular'
+            ],
+            '/ai/deploy/': [
+                'problem',
+                'nvidia',
+                'torchserve',
+                'tfx'
             ]
         },
         sidebarDepth: 2

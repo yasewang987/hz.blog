@@ -20,6 +20,14 @@ service ssh restart
 
 ## 权限相关
 
+777对应的用户：文件所有者、群组用户、其他用户  
+
+权限|权限数字|含义
+---|---|---
+r|4|读取read
+w|2|写入write
+x|1|执行execute
+
 ```bash
 chmod 777 filename
 adduser username #添加用户
@@ -30,29 +38,53 @@ chmod u+x filename # 给用户添加执行权限
 
 ---
 
-## chmod相关
-
-常见格式：`sudo chmod 777 /home/xxx`  
-777对应的用户：文件所有者、群组用户、其他用户  
-
-权限|权限数字|含义
----|---|---
-r|4|读取read
-w|2|写入write
-x|1|执行execute
-
----
-
 ## 查看linux系统编码
 
 ```bash
+# 查看所有系统编码
+locale -a
+
+# 查看当前系统编码
 locale
+```
+
+## 获取当前日期时间
+
+```sh
+version=`date +%y%m%d%H%M%s`
 ```
 
 ## 查看系统版本
 
-1. 查看发行版本：`cat /etc/os-release`
-1. 查看内核版本：`uname -r`
+1. 查看发行版本：`cat /etc/os-release` , `cat /etc/issue`
+1. 查看内核版本：`uname -a`，`uname -m`, `uname -s`，`uname -p`
+
+## 查看linux cpu，磁盘、内存
+
+```bash
+# cpu
+lscpu
+
+# 磁盘
+lsblk
+
+# 内存
+free -h
+```
+
+## 查看内存、cpu使用情况
+
+```bash
+top
+
+# us: 用户空间cpu使用占比
+# sy: 内核空间cpu使用占比
+# ni：用户进程空间内改变过优先级的进程占用cpu百分比
+# id：空闲cpu百分比
+# wa：等待输入输出的cpu时间百分比
+# hi：cpu服务于硬件中断所消耗的时间总额
+# si：cpu服务软中断所消耗的时间总额
+```
 
 ## 查看系统进程并关闭
 
@@ -60,12 +92,6 @@ locale
 ps -ef | grep nginx
 
 sudo kill -9 <PID>
-```
-
-## 端口使用情况
-
-```bash
-nc -vz 12.12.12.12 28301
 ```
 
 ## 端口使用情况
@@ -154,6 +180,9 @@ tar xvf xxx.tar
 
 使用dpkg命令  
 `sudo dpkg --list | grep -i jdk`
+
+使用ps命令
+`ps -aux  | grep pkgname
 
 ---
 
@@ -302,3 +331,53 @@ scp -P 2022 localfile/localdir guoyujun@aa.bb.cc:remotedir
 # 从远程拷贝到本地
 scp -P 2022 guoyujun@aa.bb.cc:remotedir localfile/localdir
 ```
+
+## 将用户加入某个用户组
+
+```bash
+# 加入
+sudo usermod -aG docker gitlab-runner
+
+# 验证
+sudo -u gitlab-runner -H docker info
+```
+
+## 命令行跳转快捷键
+
+* 行首：ctrl + a
+* 行尾：ctrl + e
+
+## 后台执行命令
+
+```
+nohup 命令 &
+```
+
+## 执行远程服务器脚本
+
+```sh
+ssh -tt root@192.168.20.71 << closessh
+chmod u+x /home/erpaggregateservice/Build.sh
+source /home/erpaggregateservice/Build.sh
+exit
+closessh
+```
+
+## /dev/null
+
+`/dev/null`: 表示的是一个黑洞，通常用于丢弃不需要的数据输出，或者用于输入流的空文件。
+
+将无用的输出流写入到黑洞丢弃：`00 01 * * * /bin/sh/server/scripts/mysqlbak.sh >/dev/null 2>&1`
+
+* `>`: 代表重定向到哪里
+* `/dev/null` 代表空设备文件
+* `2>` 表示`stderr`标准错误
+* `&` 表示 `等同于` 的意思，`2>&1`，表示`2`的输出重定向 `等同于 1`
+* `1` 表示`stdout`标准输出，系统默认值是`1`，所以`>/dev/null`等同于 `1>/dev/null`
+
+所以 `>/dev/null 2>&1` == `1> /dev/null 2> &1`
+
+`1>/dev/null` ：首先表示标准输出重定向到空设备文件，也就是不输出任何信息到终端，说白了就是不显示任何信息。
+`2>&1` ：接着，标准错误输出重定向 到标准输出，因为之前标准输出已经重定向到了空设备文件，所以标准错误输出也重定向到空设备文件（较多的时候我们会用`command > file 2>&1` 这样的写法）
+
+清空文件： `cat /dev/null > /home/omc/h.txt`

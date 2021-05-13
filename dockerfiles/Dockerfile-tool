@@ -1,3 +1,0 @@
-FROM ubuntu
-LABEL Name=tool Version=0.0.1
-RUN apt-get -y update && apt-get install -y vim && apt-get install -y iputils-ping && apt-get install -y curl

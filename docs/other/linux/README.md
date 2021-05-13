@@ -11,3 +11,6 @@
 * [Manjaro](./manjaro.md)
 * [DDNS](./ddns.md)
 * [Crontab定时任务](./crontab.md)
+* [Curl指南](./curl.md)
+* [Awk指南](./awk.md)
+* [Sed指南](./sed.md)
