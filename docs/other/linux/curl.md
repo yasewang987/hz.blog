@@ -4,6 +4,26 @@ curl 是常用的命令行工具，用来请求 Web 服务器。
 
 `curl https://www.example.com`: 发出 GET 请求
 
+## 监控网页状态、响应时间
+
+```bash
+curl -o /dev/null -s -w 'time_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}\nhttp_code:%{http_code}\n' -X POST https://www.example.com
+```
+
+时间指标解释 ：
+
+* `time_namelookup` DNS解析时间,从请求开始到DNS解析完毕所用时间。
+* `time_appconnect` 连接建立完成时间，如SSL/SSH等建立连接或者完成三次握手时间。
+* `time_connect`    建立到服务器的 TCP 连接所用的时间
+* `time_starttransfer`    在发出请求之后，Web 服务器返回数据的第一个字节所用的时间
+* `time_total`   完成请求所用的时间
+* `http_code` 请求状态码
+* `size_download` 下载大小。
+* `size_upload` 上传大小
+* `size_request` 请求的大小
+* `speed_download` 下载速度，单位-字节每秒。
+* `speed_upload` 上传速度,单位-字节每秒
+
 ## -X
 
 `-X`参数指定 HTTP 请求的方法。

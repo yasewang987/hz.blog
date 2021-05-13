@@ -286,7 +286,11 @@ module.exports = {
             ],
             '/devops/other/': [
                 'podman',
-                'nexus'
+                'nexus',
+                'elasticsearch',
+                'minio',
+                'mysql',
+                'redis'
             ],
             '/sql/mssql/': [
                 'usesul'

@@ -2,3 +2,7 @@
 
 * [Podman](./podman.md)
 * [Nexus](./nexus.md)
+* [Elasticsearch](./elasticsearch.md)
+* [Mysql](./mysql.md)
+* [Redis](./redis.md)
+* [MinIO](./minio.md)
