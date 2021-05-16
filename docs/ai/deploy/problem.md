@@ -1,5 +1,36 @@
 # 深度学习部署问题记录
 
+
+## pyltp 在 arm64 等cpu架构的系统中安装报错
+
+直接使用 pip 去安装 pyltp 时如果报错，则需要使用源码安装。
+
+```bash
+git clone https://github.com/HIT-SCIR/pyltp && cd pyltp
+git submodule init
+git submodule update
+python setup.py install
+```
+
+源码安装如果碰到 `cmake` 命令找不到时只需要安装cmake即可
+
+```bash
+# Ubuntu/Debian
+apt-get install cmake
+```
+
+如果 `mem.cc` 报错 `mm_malloc.h` 文件找不到，则按照如下命令修改文件
+
+```bash
+sed -i 's/#include <mm_malloc.h>/\/\/#include <mm_malloc.h>/g' /home/pyltp/ltp/thirdparty/dynet/dynet/mem.cc
+
+sed -i 's/_mm_malloc/aligned_alloc/g' /home/pyltp/ltp/thirdparty/dynet/dynet/mem.cc
+
+sed -i 's/_mm_free(mem)/\/\/_mm_free(mem)/g' /home/pyltp/ltp/thirdparty/dynet/dynet/mem.cc
+```
+
+
+
 ## pyltp在高版本python中安装问题
 
 一般如果不是python3.6的环境安装pyltp都不会成功

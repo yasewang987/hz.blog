@@ -104,6 +104,28 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
   }
   ```
 
+## Nginx Stream配置
+
+例如：mysql 、 redis 这些需要使用stream配置
+
+特别注意：stream要与http在同级目录  
+
+```conf
+stream {
+    upstream mysql3306 {
+        hash $remote_addr consistent;
+        server 172.31.88.27:3306 weight=5 max_fails=3 fail_timeout=30s;
+    }
+	
+	 server {
+        listen 3307;
+        proxy_connect_timeout 10s;
+        proxy_timeout 200s;
+        proxy_pass mysql3306;
+    }
+}
+```
+
 ## Nginx常用命令
 
 ```bash

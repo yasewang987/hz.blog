@@ -155,7 +155,8 @@ module.exports = {
                 'lock',
                 'package',
                 'godoc',
-                'rw'
+                'rw',
+                'filecopy'
             ],
             '/code/go/other/': [
                 'install',
