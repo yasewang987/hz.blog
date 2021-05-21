@@ -334,7 +334,8 @@ module.exports = {
                 'crontab',
                 'curl',
                 'awk',
-                'sed'
+                'sed',
+                'rsync'
             ],
             '/other/mac/': [
                 'install',
@@ -362,7 +363,8 @@ module.exports = {
                 'problem',
                 'nvidia',
                 'torchserve',
-                'tfx'
+                'tfx',
+                'tf'
             ]
         },
         sidebarDepth: 2
