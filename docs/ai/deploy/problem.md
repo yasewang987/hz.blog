@@ -85,3 +85,13 @@ print（a）
 ```
 
 一般来讲，输出主要是报48号错误，也就是CUDA的问题，出现这个问题在于硬件的支持情况，对于算力3.0的显卡来说，如果安装了9.0的CUDA就会出现这个问题，解决的办法是退回CUDA8.0，或者更换更加高端的显卡，或者直接从源码编译，并在源码中做相应设置（修改setup.py文件里的`TORCH_CUDA_ARCH_LIST`，将这个值改成你当前使用的GPU对应算力！）
+
+## arm64提示Failed building wheel for tokenizers
+
+`error: can not find Rust Compiler` 
+
+可以通过安装 `rust` 解决这个问题
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```

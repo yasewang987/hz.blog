@@ -156,7 +156,8 @@ module.exports = {
                 'package',
                 'godoc',
                 'rw',
-                'filecopy'
+                'filecopy',
+                'readargs'
             ],
             '/code/go/other/': [
                 'install',
@@ -291,7 +292,9 @@ module.exports = {
                 'elasticsearch',
                 'minio',
                 'mysql',
-                'redis'
+                'redis',
+                'qemu',
+                'rpm'
             ],
             '/sql/mssql/': [
                 'usesul'

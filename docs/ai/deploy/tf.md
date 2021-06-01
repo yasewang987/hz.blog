@@ -1,5 +1,10 @@
 # tensorflow 安装
 
+## tensorflow常用镜像
+
+`arrch64/arm64` 镜像：
+1. https://github.com/richliu/tensorflow-aarch64/tree/master/files/tensorflow
+1. https://github.com/lhelontra/tensorflow-on-arm/releases
 ## tensorflow正常安装
 
 官网参考地址：https://www.tensorflow.org/install/pip?hl=zh-cn#system-install
@@ -25,8 +30,7 @@ docker pull tensorflow/tensorflow:devel
 `docker run` 命令会在 `/tensorflow_src` 目录（即源代码树的根目录）中启动 `shell`。它会在该容器的 `/mnt` 目录中装载主机的当前目录，并通过一个环境变量将主机用户的信息传递给该容器，该环境变量用来设置权限，Docker 会让此过程变得很复杂。
 
 ```bash
-docker run -it -w /tensorflow_src -v $PWD:/mnt -e HOST_PERMS="$(id -u):$(id -g)" \
-    tensorflow/tensorflow:devel bash
+docker run -it -w /tensorflow_src -v $PWD:/mnt -e HOST_PERMS="$(id -u):$(id -g)" tensorflow/tensorflow:devel bash
 
 git pull # 拉取最新代码
 
@@ -57,4 +61,17 @@ bazel build --config=v1 //tensorflow/tools/pip_package:build_pip_package
 
 # 调整文件在容器外部的所有权。
 chown $HOST_PERMS /mnt/tensorflow-version-tags.whl
+```
+
+### 安装过程报错
+
+无法下载 `io_bazel_rules_docker` : 在 `WORKSPACE` 文件前面加上下面内容
+
+```
+http_archive(
+    name = "io_bazel_rules_docker",
+    sha256 = "87fc6a2b128147a0a3039a2fd0b53cc1f2ed5adb8716f50756544a572999ae9a",
+    strip_prefix = "rules_docker-0.8.1",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.8.1.tar.gz"],
+)
 ```

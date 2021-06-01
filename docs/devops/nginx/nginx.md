@@ -2,6 +2,9 @@
 
 Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负载均衡器、邮件代理和 HTTP 缓存。
 
+* worker_processes： 进程数，一般配置和服务器核心数一致
+* worker_connections：尽量大一点，推荐 65535
+
 ## Nginx 基本配置 & 示例
 
 首先，在本地创建如下的目录结构:
@@ -85,7 +88,7 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
       error_log     logs/tomcat-error.log warn;
       location / {
         proxy_pass http://tomcat_pools;
-        proxy_set_header Host $host;
+        proxy_set_header Host $host:$server_port;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -178,7 +181,8 @@ server {
 
     location / {
         proxy_pass http://tomcat_pools;
-        proxy_set_header Host $host;
+        # 用户真实的ip地址转发给后端服务器
+        proxy_set_header Host $host:$server_port;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -290,3 +294,42 @@ crontab -e
 
 * `proxy_send_timeout` 60s： nginx发送数据至`upstream server`超时, 默认60s, 如果连续的60s内没有发送1个字节, 连接关闭
 
+
+## Nginx日志配置
+
+```conf
+http {
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"'
+                      '$request_time "$upstream_addr" $upstream_response_time';
+
+    access_log  /var/log/nginx/access.log  main;
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
+`$remote_addr`  #记录访问网站的客户端地址
+
+`$remote_user`  #远程客户端用户名
+
+`$time_local`  #记录访问时间与时区
+
+`$request`  #用户的http请求起始行信息
+
+`$status`  #http状态码，记录请求返回的状态码，例如：200、301、404等
+
+`$body_bytes_sent`  #服务器发送给客户端的响应body字节数
+
+`$http_referer`  #记录此次请求是从哪个连接访问过来的，可以根据该参数进行防盗链设置。
+
+`$http_user_agent`  #记录客户端访问信息，例如：浏览器、手机客户端等
+
+`$http_x_forwarded_for`  #当前端有代理服务器时，设置web节点记录客户端地址的配置，此参数生效的前提是代理服务器也要进行相关的x_forwarded_for设置
+
+`$request_time` 请求总的耗时
+
+`$upstream_addr` 后端服务的地址
+
+`$upstream_response_time` 后端服务的响应时间

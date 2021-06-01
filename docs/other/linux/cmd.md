@@ -86,12 +86,17 @@ top
 # si：cpu服务软中断所消耗的时间总额
 ```
 
-## 查看系统进程并关闭
+## 查看系统进程及占用资源情况
 
 ```bash
+# 查看进程
 ps -ef | grep nginx
-
+# 关闭进程
 sudo kill -9 <PID>
+# 查看进程占用cpu，内存资源
+ps -aux | grep nginx
+
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 ```
 
 ## 查看磁盘信息
