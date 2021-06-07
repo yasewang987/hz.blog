@@ -207,7 +207,8 @@ module.exports = {
                 'component',
                 'state',
                 'pubsub',
-                'middleware'
+                'middleware',
+                'observability'
             ],
             '/microservices/ocelot/': [
                 'middleware',

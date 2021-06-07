@@ -5,3 +5,4 @@
 * [Dapr-State](./state.md)
 * [Dapr-PubSub](./pubsub.md)
 * [Dapr-Middleware](./middleware.md)
+* [Dapr-可观测性](./observability.md)
