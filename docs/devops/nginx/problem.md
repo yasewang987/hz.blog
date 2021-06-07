@@ -8,3 +8,8 @@
 `upstream timed out (110: Connection timed out)`
 
 该错误是由于nginx 代理去获取上游服务器的 返回值超时了，可以将 `proxy_read_timeout 240s; ` 值设置大一点来解决
+
+## nginx请求头设置
+
+在设计添加请求头时统一使用 `-` ，不要使用 `_`，因为nginx默认配置会忽略带下划线的header，官方解释：因为破折号和下划线都会被映射为下划线，两者不好区分
+

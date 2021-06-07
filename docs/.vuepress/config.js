@@ -162,7 +162,8 @@ module.exports = {
             '/code/go/other/': [
                 'install',
                 'docker',
-                'problem'
+                'problem',
+                'cmd'
             ],
             '/code/web/npm/': [
                 'base',
@@ -205,7 +206,8 @@ module.exports = {
                 'install',
                 'component',
                 'state',
-                'pubsub'
+                'pubsub',
+                'middleware'
             ],
             '/microservices/ocelot/': [
                 'middleware',
@@ -367,7 +369,8 @@ module.exports = {
                 'nvidia',
                 'torchserve',
                 'tfx',
-                'tf'
+                'tf',
+                'python'
             ]
         },
         sidebarDepth: 2

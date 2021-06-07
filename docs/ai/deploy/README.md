@@ -6,3 +6,5 @@
 
 * [深度学习部署问题记录](./problem.md)
 * [tensorflow 安装](./tf.md)
+
+* [python相关资料](./python.md)

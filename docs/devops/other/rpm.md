@@ -99,3 +99,90 @@ rm -rf %{buildroot}		//清理临时存放软件包构建的目录
 ```bash
 sudo rpm -ivh xxxx.rpm
 ```
+
+## python包例子
+
+```text
+Name:           pyltp
+Version:        0.2.1
+Release:        1%{?dist}
+Source0:        pyltp-0.2.1.tar.gz
+Summary:        funcun  libs
+License: GPLv3+
+BuildArch: noarch
+
+AutoReqProv: no
+
+%define _binaries_in_noarch_packages_terminate_build   0
+
+%description
+funcun  libs
+
+
+%prep
+%setup -q
+
+%build
+%install
+rm -rf %{buildroot}/funcun/libs/%{name}
+mkdir  -p %{buildroot}/funcun/libs/%{name}
+cp -rf $RPM_BUILD_DIR/%{name}-%{version}/*  %{buildroot}/funcun/libs/%{name}
+
+%post
+cd /funcun/libs/%{name}
+python3 setup.py install
+
+%postun
+rm -rf /funcun/libs/%{name}
+
+%clean
+rm -rf %_builddir/%{name}-%{version}
+rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root,-)
+/funcun/libs/%{name}
+
+%changelog
+```
+
+## minio例子
+
+```text
+Name: minio
+Version: 1.0.0
+Summary: funcun minio
+Release: 1
+#Source0: minio
+Packager: funcun
+#BuildRequires: 
+#Requires:
+AutoReqProv:no 
+ 
+License: GPLv3+
+Group: System Enviroment/Base
+ 
+%description
+funcun minio
+ 
+%prep
+#%setup -q 
+%build
+%install
+rm -rf %{buildroot}/opt/%{name}
+mkdir -p %{buildroot}/opt/%{name}
+chmod +x %_topdir/BUILD/%{name}
+cp -rf %_topdir/BUILD/%{name} %{buildroot}/opt/%{name}
+
+%post
+nohup /opt/minio/minio server /opt/minio > /opt/minio/minio.log 2>&1 &
+ 
+%postun
+rm -rf /opt/%{name}
+ 
+%clean
+#rm -rf %_builddir/%{name}
+rm -rf %{buildroot}
+%files
+/opt/%{name}
+```
