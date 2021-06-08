@@ -203,12 +203,14 @@ module.exports = {
                 'rabbitmq-install'
             ],
             '/microservices/dapr/': [
+                'info',
                 'install',
                 'component',
                 'state',
                 'pubsub',
                 'middleware',
-                'observability'
+                'observability',
+                'security'
             ],
             '/microservices/ocelot/': [
                 'middleware',
