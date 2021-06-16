@@ -6,9 +6,9 @@
 直接使用 pip 去安装 pyltp 时如果报错，则需要使用源码安装。
 
 ```bash
-git clone https://github.com/HIT-SCIR/pyltp && cd pyltp
+git clone https://github.com.cnpmjs.org/HIT-SCIR/pyltp && cd pyltp
 git submodule init
-git submodule update
+git submodule update --recursive
 python setup.py install
 ```
 

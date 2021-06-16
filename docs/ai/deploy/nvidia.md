@@ -2,6 +2,8 @@
 
 * 安装 [nvidia显卡驱动](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html)
 
+    https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
+
     Ubuntu20.04显卡驱动安装：
 
     * 禁用 `nouveau` 驱动
@@ -77,6 +79,9 @@
 
     sudo apt-get update \
         && sudo apt-get install -y nvidia-container-runtime
+
+    # 验证
+    sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
     ```
 
 * 查看内核显卡版本：`cat /proc/driver/nvidia/version`

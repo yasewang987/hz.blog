@@ -6,6 +6,8 @@ Dapr基本概念介绍
 
 https://note.youdao.com/s/D7gEckR9
 
+![2](http://cdn.go99.top/docs/microservices/dapr/info2.png)
+
 ## 基本术语
 
 * 应用（App/Application）：运行中的服务/二进制应用，通常是由用户创建和运行的。

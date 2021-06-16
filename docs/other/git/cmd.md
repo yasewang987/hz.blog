@@ -1,5 +1,4 @@
 # Git常用操作
-
 ## Git删除分支
 
 * 删除本地分支  
@@ -109,3 +108,25 @@ exit 0
 
 撤销某个提交的修改：`git revert commitid`,重新生成一条记录
 回滚到某个提交：`git reset commitid`, 如果已经提交到远程仓库推送需要`-f`：`git push origin master -f`，删除之前的记录
+
+## Git添加子仓库
+
+```bash
+# 添加子模块
+git submodule add <submodule_url>
+
+# 获取子模块内容
+git submodule init
+git submodule update --init --recursive
+# 或者在拉代码时直接加上--recurse-submodules
+git clone xxxx --recurse-submodules
+
+# 更新子模块（或者可以直接进入子模块目录直接拉新代码）
+git submodule foreach 'git pull origin master'
+
+# 删除子模块
+# 删除.git/config相关模块内容
+git submodule deinit --force project-sub-1
+# 删除.gitmodules相关模块内容
+git rm project-sub-1
+```

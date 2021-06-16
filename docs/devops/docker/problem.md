@@ -102,3 +102,11 @@ systemctl enable docker
 
 reboot
 ```
+
+## arm64服务器服务时报错 “Illegal instruction(core dumped)”
+
+需要在环境变量中增加 `OPENBLAS_CORETYPE=ARMV8`
+
+* 方式一： `docker run -e OPENBLAS_CORETYPE=ARMV8 xxxx`
+* 方式二： 在 `dockerfile` 中增加 `ENV OPENBLAS_CORETYPE=ARMV8`
+* 方式三： 到容器中修改环境变量 `export OPENBLAS_CORETYPE=ARMV8`

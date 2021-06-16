@@ -8,7 +8,7 @@
 * 服务发现
 * 中间件：Dapr 允许将自定义 中间件 插入请求处理管道。 中间件组件与 `服务调用` 基础结构块一起使用。
 * Pub/Sub 代理
-* 绑定资源
+* 绑定资源 bangdings
 * Secret stores（密钥存储）
 
 ## Dapr自定义密钥组件(Secrets)
@@ -37,9 +37,9 @@ spec:
   type: secretstores.local.file
   version: v1
   metadata:
-  - name: secretsFile
+  - name: secretsFile # 文件位置
     value: /Users/hzgod/Documents/hz/daprtest/my-components/mysecrets.json
-  - name: nestedSeparator
+  - name: nestedSeparator # 分隔符
     value: ":"
 ```
 
