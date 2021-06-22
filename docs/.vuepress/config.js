@@ -206,6 +206,7 @@ module.exports = {
                 'info',
                 'install',
                 'component',
+                'invoke',
                 'state',
                 'pubsub',
                 'middleware',

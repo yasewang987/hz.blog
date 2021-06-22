@@ -37,6 +37,45 @@ rpmbuild -ba 软件名-版本.spec
 --target 指定生成 rpm 包的平台，默认会生成 i686 和 x86_64 的 rpm 包，但一般我只需要 x86_64 的 rpm 包
 ```
 
+## 宏
+
+比如我们要查看`%{_bindir}`的路径，就可以使用命令`rpm --eval "%{ _bindir}"`来查看
+
+所有的宏都可以在`/usr/lib/rpm/macros`里找到
+
+```
+%{_topdir}            %{getenv:HOME}/rpmbuild
+%{_builddir}          %{_topdir}/BUILD
+%{_rpmdir}            %{_topdir}/RPMS
+%{_sourcedir}         %{_topdir}/SOURCES
+%{_specdir}           %{_topdir}/SPECS
+%{_srcrpmdir}         %{_topdir}/SRPMS
+%{_buildrootdir}      %{_topdir}/BUILDROOT
+
+%{_sysconfdir}        /etc
+%{_prefix}            /usr
+%{_exec_prefix}       %{_prefix}
+%{_bindir}            %{_exec_prefix}/bin
+%{_lib}               lib (lib64 on 64bit systems)
+%{_libdir}            %{_exec_prefix}/%{_lib}
+%{_libexecdir}        %{_exec_prefix}/libexec
+%{_sbindir}           %{_exec_prefix}/sbin
+%{_sharedstatedir}    /var/lib
+%{_datadir}           %{_prefix}/share
+%{_includedir}        %{_prefix}/include
+%{_oldincludedir}     /usr/include
+%{_infodir}           /usr/share/info
+%{_mandir}            /usr/share/man
+%{_localstatedir}     /var
+%{_initddir}          %{_sysconfdir}/rc.d/init.d
+
+%{_var}               /var
+%{_tmppath}           %{_var}/tmp
+%{_usr}               /usr
+%{_usrsrc}            %{_usr}/src
+%{_docdir}            %{_datadir}/doc
+```
+
 ## spec文件详解
 
 下面以解压完可以直接进行运行的hadoop为例:
@@ -58,11 +97,16 @@ Group: System Enviroment/Base			//基于系统的基础运行环境
 %description			//对于软件的相关描述，同上summary一致
 The Apache© Hadoop project develops open-source software for reliable, scalable, distributed computing.
 
-%prep			//开始进行软件包构建
+//开始进行软件包构建,将 SOURCES 目录下的源代码解压到 BUILD 目录
+%prep
 %global debug_package %{nil}		//忽略debug的错误信息
 %setup -q			//对SOURCES里面的软件源进行静默方式解压至BUILD目录
-%build		//开始构建软件包
-%install		//进行构建中的相关操作
+
+//开始构建软件包，一般执行 ./configure和make命令
+%build
+
+//将需要打包到rpm包的文件从 BUILD 下拷贝到 BUILDROOT 目录下，这些文件会安装到用户系统对应的目录中
+%install
 rm -rf %{buildroot}/opt/%{name}			//构建前先删除原先存在的同名文件目录
 mkdir -p %{buildroot}/opt/%{name}		//创建BUILDROOT目录下的文件目录
 cp -rf %_topdir/BUILD/%{name}-%{version}/* %{buildroot}/opt/%{name}		//将BUILD目录解压文件复制进软件包制作临时目录
@@ -84,8 +128,11 @@ fi
 %clean
 rm -rf %_builddir/%{name}-%{version}	//构建完毕软件包后的清理，清理BUILD目录
 rm -rf %{buildroot}		//清理临时存放软件包构建的目录
-%files
-/opt/%{name}	//软件包制作完成后软件的安装位置,此实例hadoop软件安装在/opt/hadoop目录下
+
+%files // 主要用来说明会将%{buildroot}目录下的哪些文件和目录最终打包到rpm包里
+%defattr(文件权限,用户名,组名,目录权限)
+/opt/%{name}
+%exclude dic_name
 
 %changelog	//软件包构建信息以及联系方式。
 * Sat May 22 2021 Eason Xu<xumin@kylinos.cn> - 1.0.0
@@ -101,6 +148,8 @@ sudo rpm -ivh xxxx.rpm
 ```
 
 ## python包例子
+
+* 源码拷贝到主机上安装例子
 
 ```text
 Name:           pyltp
@@ -144,6 +193,49 @@ rm -rf %{buildroot}
 /funcun/libs/%{name}
 
 %changelog
+```
+
+* 编译在开发机，安装在专用机例子
+
+```
+%global buildpath /usr/local/lib/python3.7/dist-packages
+%global installpath /usr/lib/python3.7/site-packages
+Name:           scipy
+Version:        1.5.4
+Release:        1%{?dist}
+Source0:       scipy-1.5.4.tar.gz
+Summary:        funcun libs
+License: GPLv3+
+
+%description
+funcun libs
+
+
+%prep
+%setup -q
+
+%build
+python3.7 setup.py install --root %{_builddir}/%{name}-%{version}/out
+%install
+rm -rf %{buildroot}%{installpath}
+rm -rf %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{installpath}
+mkdir -p %{buildroot}%{_bindir}
+cp -rf %{_builddir}/%{name}-%{version}/out%{buildpath}/* %{buildroot}%{installpath}  
+cp -rf %{_builddir}/%{name}-%{version}/out/usr/local/bin/* %{buildroot}%{_bindir}
+
+%post
+
+%postun
+
+%clean
+#rm -rf %_builddir/%{name}-%{version}
+#rm -rf %{buildroot}
+
+%files
+#%defattr(-,root,root,-)
+%{installpath}
+%{_bindir}
 ```
 
 ## minio例子

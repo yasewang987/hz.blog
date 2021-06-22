@@ -29,8 +29,6 @@ sed -i 's/_mm_malloc/aligned_alloc/g' /home/pyltp/ltp/thirdparty/dynet/dynet/mem
 sed -i 's/_mm_free(mem)/\/\/_mm_free(mem)/g' /home/pyltp/ltp/thirdparty/dynet/dynet/mem.cc
 ```
 
-
-
 ## pyltp在高版本python中安装问题
 
 一般如果不是python3.6的环境安装pyltp都不会成功
@@ -66,25 +64,27 @@ python setup.py install
 #else
 ```
 
-## pytorch报错：Cuda runtime error (48) : no kernel image is available for execution
+## 源码安装 pytorch 报错
 
-命令检测CUDA是否安装正确并能被Pytorch检测到
+* `Cuda runtime error (48) : no kernel image is available for execution`
 
-```python
-import torch
-import torchvision
-print(torch.cuda.is_available())
-```
+    命令检测CUDA是否安装正确并能被Pytorch检测到
 
-看Pytorch能不能调用cuda加速
+    ```python
+    import torch
+    import torchvision
+    print(torch.cuda.is_available())
+    ```
 
-```python
-a = torch.Tensor(5,3)
-a=a.cuda()
-print（a）
-```
+    看Pytorch能不能调用cuda加速
 
-一般来讲，输出主要是报48号错误，也就是CUDA的问题，出现这个问题在于硬件的支持情况，对于算力3.0的显卡来说，如果安装了9.0的CUDA就会出现这个问题，解决的办法是退回CUDA8.0，或者更换更加高端的显卡，或者直接从源码编译，并在源码中做相应设置（修改setup.py文件里的`TORCH_CUDA_ARCH_LIST`，将这个值改成你当前使用的GPU对应算力！）
+    ```python
+    a = torch.Tensor(5,3)
+    a=a.cuda()
+    print（a）
+    ```
+
+    一般来讲，输出主要是报48号错误，也就是CUDA的问题，出现这个问题在于硬件的支持情况，对于算力3.0的显卡来说，如果安装了9.0的CUDA就会出现这个问题，解决的办法是退回CUDA8.0，或者更换更加高端的显卡，或者直接从源码编译，并在源码中做相应设置（修改setup.py文件里的`TORCH_CUDA_ARCH_LIST`，将这个值改成你当前使用的GPU对应算力！）
 
 ## arm64提示Failed building wheel for tokenizers
 
@@ -95,3 +95,11 @@ print（a）
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
+
+## 源码安装scipy报错
+
+* `library dfftpack has Fortran sources but no Fortran compiler found`
+
+    ```bash
+    apt install gfortran
+    ```
