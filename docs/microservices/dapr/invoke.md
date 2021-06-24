@@ -66,3 +66,45 @@ Dapr 使用 mDNS 协议提供轮询负载均衡的服务调用请求，例如用
 
 默认情况下，所有应用程序之间的调用都会被追踪，也会收集到度量（metrics），以便为应用程序提供洞察力（insights）和诊断。 这在生产场景中尤其重要。 这给您的服务之间的调用提供了调用链图和度量（metrics）。
 
+## 简单使用示例
+
+准备一个http服务
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+func main() {
+	http.HandleFunc("/get1", get1Handler)
+	log.Println("start http server on port 8080")
+	err := http.ListenAndServe("localhost:8080", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func get1Handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "hello get1")
+}
+```
+
+用dapr代理启动
+
+```bash
+dapr run --app-id cart --dapr-http-port 5000 --app-port 8080 go run main.go
+```
+
+调用测试
+
+```bash
+# curl
+curl http://localhost:5000/v1.0/invoke/cart/method/get1
+
+# dapr-cli
+dapr invoke --app-id cart --method get1
+```
