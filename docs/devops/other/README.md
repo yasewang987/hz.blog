@@ -7,4 +7,4 @@
 * [Redis](./redis.md)
 * [MinIO](./minio.md)
 * [QEMU](./qemu.md)
-* [rpm包制作](./rpm.md)
+* [Next-Terminal](./nextterminal.md)

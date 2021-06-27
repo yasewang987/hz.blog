@@ -15,3 +15,4 @@
 * [Awk指南](./awk.md)
 * [Sed指南](./sed.md)
 * [rsync指南](./rsync.md)
+* [rpm包制作](./rpm.md)

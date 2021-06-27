@@ -347,10 +347,12 @@ ls -l /etc/alternatives/java
 
 ```bash
 # 从本地拷贝到远程
-scp -P 2022 localfile/localdir guoyujun@aa.bb.cc:remotedir
+scp -P 2022 localdir/localfile guoyujun@aa.bb.cc:remotedir
+# 拷贝文件夹
+scp -r -P 2022 localfile/localdir guoyujun@aa.bb.cc:remotedir
 
 # 从远程拷贝到本地
-scp -P 2022 guoyujun@aa.bb.cc:remotedir localfile/localdir
+scp -P 2022 guoyujun@aa.bb.cc:remotedir/file localdir
 ```
 
 ## 将用户加入某个用户组

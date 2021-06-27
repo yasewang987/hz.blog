@@ -300,7 +300,7 @@ module.exports = {
                 'mysql',
                 'redis',
                 'qemu',
-                'rpm'
+                'nextterminal'
             ],
             '/sql/mssql/': [
                 'usesul'
@@ -328,6 +328,7 @@ module.exports = {
                 'cmd',
                 'git-hook',
                 'gl-hook',
+                'problem'
             ],
             '/other/linux/': [
                 'cmd',
@@ -344,7 +345,8 @@ module.exports = {
                 'curl',
                 'awk',
                 'sed',
-                'rsync'
+                'rsync',
+                'rpm'
             ],
             '/other/mac/': [
                 'install',
