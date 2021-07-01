@@ -48,3 +48,11 @@ stream {    # stream 模块配置和 http 模块在相同级别
     }
 }
 ```
+
+## 错误处理
+
+* `WARNING overcommit_memory is set to 0 ...` 
+
+    临时处理： `echo 1 > /proc/sys/vm/overcommit_memory` 然后重启redis或者redis容器
+
+    永久解决：在`/etc/sysctl.conf`最后一行加入`vm.overcommit_memory = 1`,然后重启服务器或者执行`sysctl vm.overcommit_memory=1`命令生效。

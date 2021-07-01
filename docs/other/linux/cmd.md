@@ -99,6 +99,22 @@ ps -aux | grep nginx
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 ```
 
+## 查看进程执行目录
+
+```
+ll /proc/<pid>
+
+cwd 符号链接的是进程运行目录；
+
+exe 符号连接就是执行程序的绝对路径；
+
+cmdline 就是程序运行时输入的命令行命令；
+
+environ 记录了进程运行时的环境变量；
+
+fd 目录下是进程打开或使用的文件的符号连接 
+```
+
 ## 查看磁盘信息
 
 ```bash
@@ -404,3 +420,17 @@ closessh
 `2>&1` ：接着，标准错误输出重定向 到标准输出，因为之前标准输出已经重定向到了空设备文件，所以标准错误输出也重定向到空设备文件（较多的时候我们会用`command > file 2>&1` 这样的写法）
 
 清空文件： `cat /dev/null > /home/omc/h.txt`
+
+## 查看服务使用端口号
+
+可以查看 `/etc/services` 文件来找到端口号和服务名称之间的联系
+
+## 查看进程下的线程
+
+```bash
+# “-T”选项可以开启线程查看
+ps -T -p <pid>
+
+# "-H"选项开启线程查看
+top -H -p <pid>
+```

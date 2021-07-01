@@ -4,3 +4,4 @@
 * [Dockerfile](./docker.md)
 * [常见错误处理](./problem.md)
 * [Go常用命令](./cmd.md)
+* [Go多版本管理](./version.md)

@@ -30,6 +30,27 @@ chkconfig iptables on
 service iptables restart
 ```
 
+## ufw防火墙
+
+规则存放目录：`/etc/ufw`
+
+```bash
+# 查看状态
+sudo ufw status
+
+# 允许 http 访问
+$ sudo ufw allow 80
+# 拒绝 smtp 访问
+$ sudo ufw deny 25
+
+# 直接使用服务名称开放防火墙
+sudo ufw allow http
+sudo ufw allow https
+
+# 阻止来自一个 IP 地址的连接
+sudo ufw deny from 208.176.0.50
+```
+
 ## firewall防火墙
 
 ```bash

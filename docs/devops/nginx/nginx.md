@@ -129,6 +129,17 @@ stream {
 }
 ```
 
+## Nginx WebSocket配置
+
+```conf
+location / {
+    proxy_pass http://127.0.0.1:8088/;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
+}
+```
+
 ## Nginx常用命令
 
 ```bash
@@ -333,3 +344,86 @@ http {
 `$upstream_addr` 后端服务的地址
 
 `$upstream_response_time` 后端服务的响应时间
+
+## 跨域CORS
+
+```conf
+server {
+    listen 5000;
+    server_name 1.1.1.1;
+    # 允许跨域请求的域
+    add_header 'Access-Control-Allow-Origin' *;
+    # 允许带上cookie请求
+    add_header 'Access-Control-Allow-Credentials' 'true';
+    # 允许请求的方法 如POST/GET/DELETE/PUT
+    add_header 'Access-Control-Allow-Methods' *;
+    # 允许携带的请求头
+    add_header 'Access-Control-Allow-Headers' *;
+
+    location / {
+        proxy_pass http://127.0.0.1:5001
+    }
+}
+```
+
+## 配置SSL
+
+检查nginx中是否包含http_ssl_module模块：`nginx -V`,如果没有需要下载源码编译。
+
+```conf
+server {
+    # https 监听的是443端口
+    listen       443 ssl;
+    # 指定准备好的域名
+    server_name  aaaa.com;
+    # 指定证书路径，这里需要把准备好的证书放到此目录
+    ssl_certificate      /usr/local/nginx/myssl/codezyq.cn.pem;
+    ssl_certificate_key  /usr/local/nginx/myssl/codezyq.cn.key;
+    ssl_session_cache    shared:SSL:1m;
+    # 超时时间
+    ssl_session_timeout 5m;
+    # 表示使用的加密套件的类型
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    # 表示使用的TLS协议的类型
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2; 
+    ssl_prefer_server_ciphers on;
+    location /www/ {
+        root   static;
+        index  index.html index.htm;
+    }
+}
+```
+
+## 防盗链配置
+
+```conf
+server {
+    listen       80;
+    server_name 47.113.204.41;
+    # 针对html访问的匹配规则
+    location /www/ {
+        root static;
+        index index.html index.htm;
+    }
+    # 针对图片访问的匹配规则
+    location /img/ {
+        root static;
+        #对源站点的验证，验证IP是否是47.113.204.41
+        #可以输入域名，多个空格隔开
+        valid_referers 47.113.204.41;
+        #非法引入会进入下方判断
+        if ($invalid_referer) {
+            #这里返回403，也可以rewrite到其他图片
+            return 403;
+        }
+    }
+    charset utf-8;
+}
+```
+
+## 隐藏版本信息
+
+http {
+    server_tokens off;
+}
+
