@@ -88,6 +88,7 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
       error_log     logs/tomcat-error.log warn;
       location / {
         proxy_pass http://tomcat_pools;
+        proxy_http_version 1.1;
         proxy_set_header Host $host:$server_port;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

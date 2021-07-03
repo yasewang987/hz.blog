@@ -301,7 +301,8 @@ module.exports = {
                 'mysql',
                 'redis',
                 'qemu',
-                'nextterminal'
+                'nextterminal',
+                'jumpserver'
             ],
             '/sql/mssql/': [
                 'usesul'
