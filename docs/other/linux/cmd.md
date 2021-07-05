@@ -18,6 +18,16 @@ sudo systemctl restart ssh
 service ssh restart
 ```
 
+## 查看所有用户/用户组
+
+```bash
+# 用户
+cat /etc/passwd
+
+# 用户组
+cat /etc/group
+```
+
 ## 权限相关
 
 777对应的用户：文件所有者、群组用户、其他用户  

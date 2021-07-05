@@ -348,7 +348,8 @@ module.exports = {
                 'awk',
                 'sed',
                 'rsync',
-                'rpm'
+                'rpm',
+                'shell'
             ],
             '/other/mac/': [
                 'install',
