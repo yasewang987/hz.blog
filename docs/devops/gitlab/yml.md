@@ -15,7 +15,7 @@ Gitlab CI 是与 Gitlab 配套使用，深度集成的强大的持续集成工�
 2. 完整的参数可用列表参考[这里](https://docs.gitlab.com/ee/ci/yaml/)
 1. CI高级技巧参考：https://www.jianshu.com/p/3c0cbb6c2936
 
-#### 常用参数列表
+## 常用参数列表
 
 1. **stages**：`pipeline`的阶段列表。定义整个`pipeline`的阶段
 2. **stage**：定义某个`job`的所在阶段。参考#1
@@ -27,7 +27,21 @@ Gitlab CI 是与 Gitlab 配套使用，深度集成的强大的持续集成工�
 8. **artifacts**：保留文档。在每次 job 之前`runner`会清除未被 git 跟踪的文件。为了让编译或其他操作后的产物可以留存到后续使用，添加该参数并设置保留的目录，保留时间等。被保留的文件将被上传到`gitlab`以备后续使用。[参考](https://docs.gitlab.com/ee/ci/yaml/#artifacts)
 9. **dependencies**：任务依赖。指定`job`的前置`job`。添加该参数后，可以获取到前置`job`的`artifacts`。注意如果前置 job 执行失败，导致没能生成`artifacts`，则 job 也会直接失败。
 
-#### 一个例子（萝卜白菜后端项目）
+## 变量定义
+
+```yaml
+# 全局变量
+variables:
+    SEVER_NAME: "law"
+
+# 单job变量
+job1:
+  stag: build
+  variables:
+    SEVER_NAME: "law"
+```
+
+## 一个例子（萝卜白菜后端项目）
 
 ```yaml
 stages: # 定义3个阶段。build，产品部署，测试部署
