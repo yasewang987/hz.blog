@@ -122,3 +122,19 @@ docker network disconnect --force bridge 容器名
 ## No Route to Host
 
 一半都是防火墙问题，需要修改防火墙规则
+
+## systemctl无法停止docker
+
+`Warning: Stopping docker.service, but it can still be activated by: docker.socket`
+
+```bash
+sudo systemctl stop docker.socket
+```
+
+## iptables failed: iptables --wait -t nat
+
+直接重启docker服务：
+
+```bash
+systmctl restart docker
+```

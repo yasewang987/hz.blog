@@ -177,6 +177,8 @@ tcp        0      0 0.0.0.0:8000                0.0.0.0:*                   LIST
 
 ##### 一、TAR
 
+查看tar压缩包中的内容：`tar -tf xxx.tar` 或者 `tar -tvf xxx.tar.gz`
+
 * tar在Linux上是常用的打包、压缩、加压缩工具，他的参数很多，折里仅仅列举常用的压缩与解压缩参数
 
 1. 参数：
@@ -191,6 +193,9 @@ tcp        0      0 0.0.0.0:8000                0.0.0.0:*                   LIST
 ```bash
 tar -cvf /home/www/images.tar /home/www/images ← 仅打包，不压缩
 tar -zcvf /home/www/images.tar.gz /home/www/images ← 打包后，以gzip压缩
+
+# 排除某些文件夹
+tar -zcvf /home/www/images.tar.gz --exclude=/home/www/images/aaa --exclude=/home/www/images/bbb /home/www/images
 ```
 
 * 在参数f后面的压缩文件名是自己取的，习惯上用tar来做，如果加z参数，则以tar.gz 或tgz来代表gzip压缩过的tar file文件
@@ -198,7 +203,7 @@ tar -zcvf /home/www/images.tar.gz /home/www/images ← 打包后，以gzip压缩
 1. 将tgz文件解压到指定目录  
 `tar zxvf test.tgz -C 指定目录`  
 比如将/source/kernel.tgz解压到 /source/linux-2.6.29 目录  
-`tar zxvf /source/kernel.tgz -C /source/ linux-2.6.29`
+`tar zxvf /source/kernel.tgz -C /source/linux-2.6.29`
 1. 将指定目录压缩到指定文件  
 比如将linux-2.6.29 目录压缩到 kernel.tgz  
 `tar czvf kernel.tgz linux-2.6.29`

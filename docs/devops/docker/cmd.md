@@ -164,4 +164,11 @@ systemctl restart docker
 
 * 如果有容器挂载了 docker.sock 文件，重启后工作可能会不正常，需要重启该容器。
 
-## 
+## 修改启动容器的环境变量
+
+1. 停止容器: `docker stop xxx`
+1. 修改容器配置文件内容：
+
+    `/var/lib/docker/containers/[container-id]/config.json`
+    `/var/lib/docker/containers/[container-id]/config.v2.json`
+1. 重启docker：`sudo systemctl restart docker`
