@@ -1,5 +1,9 @@
 # redis安装
 
+## docker安装教程
+
+### 主服务器
+
 在redis目录下创建文件夹 data，conf
 
 下载redis.conf文件：http://download.redis.io/redis-stable/redis.conf 放到 conf 文件夹下
@@ -27,6 +31,15 @@ sudo docker run -d --restart=always -p 6379:6379 \
 -v $PWD/conf:/usr/local/etc/redis \
 -v $PWD/data:/data \
 --name redis redis redis-server /usr/local/etc/redis/redis.conf
+```
+
+### 从服务器
+
+从服务器只需要修改如下配置文件，其他与主服务器一样即可：
+
+```conf
+replicaof 主redis-ip 主reids端口
+masterauth 主redis密码
 ```
 
 ## nginx反向代理

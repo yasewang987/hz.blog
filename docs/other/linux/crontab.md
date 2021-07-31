@@ -17,6 +17,9 @@ Linux crontab是用来定期执行程序的命令。
 # 每分钟执行一次
 * * * * * /bin/ls
 
+# 每天23.30执行一次
+30 23 * * * ls
+
 # 在 12 月内, 每天的早上 6 点到 12 点，每隔 3 个小时 0 分钟执行一次 /usr/bin/backup
 0 6-12/3 * 12 * /usr/bin/backup
 
@@ -46,6 +49,10 @@ crontab -e
 
 # 列出所有定时任务
 crontab -l
+# 查看某个用户定时任务
+crontab -l -u username
+# 查看所有用户定时任务
+cat /etc/passwd | cut -f 1 -d : |xargs -I {} crontab -l -u {}
 
 # 编辑/删除指定任务
 crontab -e

@@ -145,6 +145,10 @@ rm -rf %{buildroot}		//清理临时存放软件包构建的目录
 
 ```bash
 sudo rpm -ivh xxxx.rpm
+
+# 或者
+
+yum localinstall xxxx.rpm
 ```
 
 ## python包例子
@@ -277,4 +281,44 @@ rm -rf /opt/%{name}
 rm -rf %{buildroot}
 %files
 /opt/%{name}
+```
+
+## 自定义命令示例
+
+```text
+Name:           hello
+Version:        1.0.0
+Release:        1%{?dist}
+Summary:        hello test
+
+Group:          hz
+License:        GPLV3+
+
+%description
+hello test
+
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/%{name}
+mkdir -p %{buildroot}/opt/%{name}
+cp -f %{_builddir}/hz/hello.sh %{buildroot}/opt/%{name}
+rm -rf %{buildroot}/usr/local/bin/hellohz
+mkdir -p %{buildroot}/usr/local/bin
+cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
+
+%files
+# 修改文件和目录权限
+%defattr (0777,root,root,0777)
+/opt/%{name}
+/usr/local/bin/hellohz
+
+
+
+%changelog
+
+%clean
 ```

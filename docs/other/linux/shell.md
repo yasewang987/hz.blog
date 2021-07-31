@@ -19,6 +19,8 @@
 例子：
 
 ```shell
+#!/bin/bash
+
 # shell判断文件,目录是否存在或者具有权限
 folder="/var/www/"
 file="/var/www/log"

@@ -43,12 +43,31 @@ $ sudo ufw allow 80
 # 拒绝 smtp 访问
 $ sudo ufw deny 25
 
+# 范围端口开放(所有协议)
+ufw allow 7100:7200/tcp
+
 # 直接使用服务名称开放防火墙
 sudo ufw allow http
 sudo ufw allow https
 
 # 阻止来自一个 IP 地址的连接
 sudo ufw deny from 208.176.0.50
+
+# 允许 IP 地址(192.168.1.1 到 192.168.1.254)，通过 3360(MySQL)
+sudo ufw allow from 192.168.1.0/24 to any port 3306
+
+# 禁止从23.24.25.0/24对80和443端口的访问
+sudo ufw deny proto tcp from 23.24.25.0/24 to any port 80,443
+
+# 删除老配置
+sudo ufw delete allow 8069
+
+# 禁用ufw
+sudo ufw disable
+# 启用ufw
+sudo ufw enable
+# 重置 UFW 将会禁用 UFW，删除所有激活的规则。
+sudo ufw reset
 ```
 
 ## firewall防火墙

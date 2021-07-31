@@ -138,3 +138,22 @@ sudo systemctl stop docker.socket
 ```bash
 systmctl restart docker
 ```
+
+## IPv4 forwarding is disabled
+
+`WARNING: IPv4 forwarding is disabled. Networking will not work.`
+
+问题原因：是没有开启转发,docker网桥配置完后，需要开启转发，不然容器启动后，就会没有网络，配置`/etc/sysctl.conf`,添加`net.ipv4.ip_forward=1`.
+
+```bash
+# vim /etc/sysctl.conf 或者 /usr/lib/sysctl.d/00-system.conf
+
+#添加此行配置
+net.ipv4.ip_forward=1
+
+# 重启网络并重启docker服务
+systemctl restart network && systemctl restart docker
+
+# 查看是否修改成功
+sysctl net.ipv4.ip_forward
+```

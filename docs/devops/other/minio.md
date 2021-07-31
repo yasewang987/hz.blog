@@ -11,6 +11,9 @@
 ```bash
 sudo docker run -d --restart=always -p 9000:9000 \
 -v $PWD/data:/data \
+-v $PWD/config::/root/.minio \
+-e MINIO_ACCESS_KEY=minio \
+-e MINIO_SECRET_KEY=minio@123 \
 --name minio \
 minio/minio server /data
 ```

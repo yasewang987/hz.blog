@@ -449,3 +449,17 @@ ps -T -p <pid>
 # "-H"选项开启线程查看
 top -H -p <pid>
 ```
+
+## 查看网卡带宽使用情况
+
+```bash
+# 安装nload
+apt install nload
+
+# 查看网卡信息
+ifconfig
+ip addr
+
+# 查看某块网卡带宽使用情况
+nload em1
+```
