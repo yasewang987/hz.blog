@@ -68,4 +68,10 @@ stream {    # stream 模块配置和 http 模块在相同级别
 
     临时处理： `echo 1 > /proc/sys/vm/overcommit_memory` 然后重启redis或者redis容器
 
-    永久解决：在`/etc/sysctl.conf`最后一行加入`vm.overcommit_memory = 1`,然后重启服务器或者执行`sysctl vm.overcommit_memory=1`命令生效。
+    永久解决：在`/etc/sysctl.conf`最后一行加入`vm.overcommit_memory = 1`,然后重启服务器或者执行`sysctl vm.overcommit_memory=1`命令生效。（或者执行 `sysctl -p` 可以立即生效）
+
+* `The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128`
+
+    将 `net.core.somaxconn = 1024` 添加到`/etc/sysctl.conf`中，然后执行 `sysctl -p` 生效配置。
+
+* redis容器间隔1分钟左右就自动重启：有很大可能是redis的rdb文件比较大，服务器内存不够了，需要释放内存之后再启动。

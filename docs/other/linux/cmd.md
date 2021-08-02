@@ -84,6 +84,8 @@ free -h
 
 ## 查看内存、cpu使用情况
 
+使用`shift+m`会按照内存使用从大到小排序。
+
 ```bash
 top
 
@@ -206,7 +208,7 @@ tar -zcvf /home/www/images.tar.gz --exclude=/home/www/images/aaa --exclude=/home
 `tar zxvf /source/kernel.tgz -C /source/linux-2.6.29`
 1. 将指定目录压缩到指定文件  
 比如将linux-2.6.29 目录压缩到 kernel.tgz  
-`tar czvf kernel.tgz linux-2.6.29`
+`tar zcvf kernel.tgz linux-2.6.29`
 
 ##### 二、ZIP
 
