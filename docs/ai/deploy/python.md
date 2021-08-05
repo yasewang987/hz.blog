@@ -15,7 +15,7 @@ python3.7 -m pip install xxxx
 
 ```bash
 # 豆瓣的源比清华的块很多
-pip install -I -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com xxx
+pip install -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com xxx
 
 # 升级pip
 python -m pip install --upgrade pip
@@ -28,3 +28,36 @@ pipdeptree -p xxx
 # 只能显示依赖的包
 pip show xxx
 ```
+
+## pyinstaller打包应用
+
+使用 pip 安装`pyinstaller`
+
+```bash
+pip install pyinstaller
+```
+
+打包python应用
+
+```bash
+pyinstaller -F app.py
+```
+
+如果上面的命令执行时出现提示：`PyInstaller does not include a pre-compiled bootloader for your platform`,那么代表你需要去安装`bootloader`, 安装参考地址：https://pyinstaller.readthedocs.io/en/stable/bootloader-building.html
+
+简要安装流程
+
+```bash
+# 前置安装(debian,ubuntu)
+apt-get install build-essential zlib1g-dev
+# 前置安装(Fedora, RedHat)
+sudo yum groupinstall "Development Tools"
+sudo yum install zlib-devel
+
+# 到 pypi 上下载 pyinstaller 源码，并解压，进入到解压的目录。
+cd bootloader
+python ./waf all
+# 执行完上面的命令之后会在PyInstaller的安装目录中出现对应系统架构的bootloader，里面包含run，run_d
+```
+
+* 安装完上面的bootloader之后，如果打包的时候还是报错，主要一下打包时的提示信息中`Bootloader`的加载位置，目前在`mips64`平台上打包时回去`/usr/local/lib/python3.7/dist-packages/PyInstaller/bootloader/Linux-64bit-unknown/run` 找，但是上面安装的会生成 `Linux-64bit-mips`版本的bootloader，这个时候只需要将`Linux-64bit-mips`复制一份改成`Linux-64bit-unknown`即可

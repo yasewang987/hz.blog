@@ -204,7 +204,8 @@ rm -rf %{buildroot}
 ```
 %global buildpath /usr/local/lib/python3.7/dist-packages
 %global installpath /usr/lib/python3.7/site-packages
-Name:           scipy
+%global pyname scipy
+Name:           py-scipy
 Version:        1.5.4
 Release:        1%{?dist}
 Source0:       scipy-1.5.4.tar.gz
@@ -216,24 +217,24 @@ funcun libs
 
 
 %prep
-%setup -q
+%setup -q -n %{pyname}-%{version}
 
 %build
-python3.7 setup.py install --root %{_builddir}/%{name}-%{version}/out
+python3.7 setup.py install --root %{_builddir}/%{pyname}-%{version}/out
 %install
 rm -rf %{buildroot}%{installpath}
 rm -rf %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{installpath}
 mkdir -p %{buildroot}%{_bindir}
-cp -rf %{_builddir}/%{name}-%{version}/out%{buildpath}/* %{buildroot}%{installpath}  
-cp -rf %{_builddir}/%{name}-%{version}/out/usr/local/bin/* %{buildroot}%{_bindir}
+cp -rf %{_builddir}/%{pyname}-%{version}/out%{buildpath}/* %{buildroot}%{installpath}  
+cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bindir}
 
 %post
 
 %postun
 
 %clean
-#rm -rf %_builddir/%{name}-%{version}
+#rm -rf %_builddir/%{pyname}-%{version}
 #rm -rf %{buildroot}
 
 %files

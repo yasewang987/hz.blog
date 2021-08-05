@@ -157,7 +157,8 @@ module.exports = {
                 'godoc',
                 'rw',
                 'filecopy',
-                'readargs'
+                'readargs',
+                'rpc'
             ],
             '/code/go/other/': [
                 'install',
