@@ -23,6 +23,7 @@ assert_is_supported_arch() {
 ### go交叉编译
 
 ```go
+CGO_ENABLED=0 GOOS=linux GOARCH=mips64le go build
 ```
 ## rpm包制作
 
@@ -53,7 +54,6 @@ make install PREFIX=output/
 %install
 rm -rf %{buildroot}/opt/%{name}
 mkdir -p %{buildroot}/opt/%{name}
-chmod +x %{_builddir}/minio-master/output/minio
 cp -rf %{_builddir}/minio-master/output/* %{buildroot}/opt/%{name}
 
 %post

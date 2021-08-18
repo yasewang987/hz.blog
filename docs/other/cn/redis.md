@@ -4,7 +4,7 @@
 
 源码地址：https://github.com/redis/redis
 
-注意事项：`一定要查看pagesize`
+注意事项：一定要查看`pagesize`, 命令 `getconf PAGESIZE`,尽量在pagesize大的环境里面打包，因为pagesize小的环境打出来的包在大的环境中无法使用。
 
 ## rpm包制作
 
@@ -28,11 +28,11 @@ funcun redis
 %prep
 %setup -q -n redis-%{version}
 %build
-make %{?_smp_mflags}
+make install PREFIX=output
 %install
 rm -rf %{buildroot}/opt/%{name}
 mkdir -p %{buildroot}/opt/%{name}
-make install PREFIX=%{buildroot}/opt/%{name}
+cp -rf %{_builddir}/redis-%{version}/output/* %{buildroot}/opt/%{name}
 
 %post
 
