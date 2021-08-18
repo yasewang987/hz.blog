@@ -69,3 +69,19 @@
 * 国内镜像仓库
   > 镜像仓库可以自己搭建私人仓库，也可以使用国内阿里云等提供的镜像仓库。
   1. 阿里云容器服务-镜像仓库（根据教程操作即可）
+
+## Docker-Compose安装
+
+参考资料：https://docs.docker.com/compose/install/
+
+1. 下载compose
+
+     ```bash
+     curl -L "https://github.com/docker/compose/releases/download/1.28.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+     ```
+
+1. 修改执行权限
+
+     ```bash
+     chmod +x /usr/local/bin/docker-compose
+     ```

@@ -109,7 +109,8 @@ module.exports = {
                     { text: '实用工具', link: '/other/tools/' },
                     { text: 'Mac', link: '/other/mac/' },
                     { text: 'Cloud', link: '/other/cloud/'},
-                    { text: '读书', link: '/other/book/'}
+                    { text: '读书', link: '/other/book/'},
+                    { text: '国产适配', link: '/other/cn/' }
                 ]
             }
         ],
@@ -373,6 +374,15 @@ module.exports = {
             '/other/book/': [
                 'classical1',
                 'regular'
+            ],
+            '/other/cn/': [
+                'es',
+                'jdk',
+                'mariadb',
+                'minio',
+                'nginx',
+                'python',
+                'redis'
             ],
             '/ai/deploy/': [
                 'problem',

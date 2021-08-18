@@ -50,3 +50,25 @@ docker run -d --name fc-jms --restart=always \
     jumpserver/jms_all:latest
 ```
 
+## nginx反向代理配置
+
+```conf
+upstream jms {
+    server  192.168.1.3:19000;
+}
+
+server {
+    listen      15010;
+    client_max_body_size 20G; //这里特别注意一下，如果配置比较小上传文件大小会受限制
+
+    location / {
+        proxy_pass  http://jms;
+        proxy_set_header Host $host:$server_port;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $http_connection;
+    }
+}
+```
+

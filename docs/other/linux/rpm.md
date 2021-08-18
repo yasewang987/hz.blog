@@ -324,6 +324,45 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 %clean
 ```
 
+## redis源码打包示例
+
+```
+Name: funcun-redis
+Version: 6.2.5
+Summary: funcun redis
+Release: 1
+Source0: redis-%{version}.tar.gz
+Packager: funcun
+#BuildRequires:
+#Requires:
+AutoReqProv:no
+
+License: GPLv3+
+Group: System Enviroment/Base
+
+%description
+funcun redis
+
+%prep
+%setup -q -n redis-%{version}
+%build
+make %{?_smp_mflags}
+%install
+rm -rf %{buildroot}/opt/%{name}
+mkdir -p %{buildroot}/opt/%{name}
+make install PREFIX=%{buildroot}/opt/%{name}
+
+%post
+
+%postun
+
+%clean
+#rm -rf %_builddir/%{name}
+%files
+%defattr(-,root,root,0755)
+/opt/%{name}
+```
+
 ## rpm包命令
 
 1）用RPM安装软件包，最简单的命令如下：

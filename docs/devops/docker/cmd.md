@@ -39,8 +39,10 @@ $ docker inspect --format='{{.LogPath}}' <容器ID>
 # 查看日志
 docker logs xxx
 
-# 查看最新10条日志
+# 查看最后10条日志
 docker logs --tail=100 <容器ID>
+# 动态监控最后200条日志
+docker logs -f --tail 200 <containerid>
 
 # 进入容器bash
 docker exec -it xxx /bin/bash

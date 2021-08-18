@@ -465,3 +465,16 @@ ip addr
 # 查看某块网卡带宽使用情况
 nload em1
 ```
+
+## 查找文件
+
+```bash
+# 查找文件
+find / -name myfile
+
+# 查找当前目录md格式文件
+find ./ ./**/*.md
+
+# 查找软链接
+find /app -type l
+```
