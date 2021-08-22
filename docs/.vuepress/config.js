@@ -376,6 +376,7 @@ module.exports = {
                 'regular'
             ],
             '/other/cn/': [
+                'qemu',
                 'es',
                 'jdk',
                 'mariadb',

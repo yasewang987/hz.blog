@@ -1,5 +1,6 @@
 # 国产环境适配
 
+* [qemu虚拟机](./qemu.md)
 * [es](./es.md)
 * [jdk](./jdk.md)
 * [mariadb](./mariab.md)

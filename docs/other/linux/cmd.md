@@ -472,8 +472,8 @@ nload em1
 # 查找文件
 find / -name myfile
 
-# 查找当前目录md格式文件
-find ./ ./**/*.md
+# 查找当前目录及子目录下的md格式文件
+find ./ -name " *.md"
 
 # 查找软链接
 find /app -type l
