@@ -18,6 +18,16 @@ sudo systemctl restart ssh
 service ssh restart
 ```
 
+## 查看所有用户/用户组
+
+```bash
+# 用户
+cat /etc/passwd
+
+# 用户组
+cat /etc/group
+```
+
 ## 权限相关
 
 777对应的用户：文件所有者、群组用户、其他用户  
@@ -74,6 +84,8 @@ free -h
 
 ## 查看内存、cpu使用情况
 
+使用`shift+m`会按照内存使用从大到小排序。
+
 ```bash
 top
 
@@ -86,12 +98,49 @@ top
 # si：cpu服务软中断所消耗的时间总额
 ```
 
-## 查看系统进程并关闭
+## 查看系统进程及占用资源情况
 
 ```bash
+# 查看进程
 ps -ef | grep nginx
-
+# 关闭进程
 sudo kill -9 <PID>
+# 查看进程占用cpu，内存资源
+ps -aux | grep nginx
+
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+```
+
+## 查看进程执行目录
+
+```
+ll /proc/<pid>
+
+cwd 符号链接的是进程运行目录；
+
+exe 符号连接就是执行程序的绝对路径；
+
+cmdline 就是程序运行时输入的命令行命令；
+
+environ 记录了进程运行时的环境变量；
+
+fd 目录下是进程打开或使用的文件的符号连接 
+```
+
+## 查看磁盘信息
+
+```bash
+# 查看所有物理磁盘
+fdisk -l
+
+# 查看系统剩余空间
+df -h
+
+# 查看当前目录下各个文件及目录占用空间大小
+du -sh *
+
+# 查看/home 下的所有的一级目录文件大小
+du -h --max-depth=1 /home
 ```
 
 ## 端口使用情况
@@ -130,6 +179,8 @@ tcp        0      0 0.0.0.0:8000                0.0.0.0:*                   LIST
 
 ##### 一、TAR
 
+查看tar压缩包中的内容：`tar -tf xxx.tar` 或者 `tar -tvf xxx.tar.gz`
+
 * tar在Linux上是常用的打包、压缩、加压缩工具，他的参数很多，折里仅仅列举常用的压缩与解压缩参数
 
 1. 参数：
@@ -144,6 +195,9 @@ tcp        0      0 0.0.0.0:8000                0.0.0.0:*                   LIST
 ```bash
 tar -cvf /home/www/images.tar /home/www/images ← 仅打包，不压缩
 tar -zcvf /home/www/images.tar.gz /home/www/images ← 打包后，以gzip压缩
+
+# 排除某些文件夹
+tar -zcvf /home/www/images.tar.gz --exclude=/home/www/images/aaa --exclude=/home/www/images/bbb /home/www/images
 ```
 
 * 在参数f后面的压缩文件名是自己取的，习惯上用tar来做，如果加z参数，则以tar.gz 或tgz来代表gzip压缩过的tar file文件
@@ -151,10 +205,10 @@ tar -zcvf /home/www/images.tar.gz /home/www/images ← 打包后，以gzip压缩
 1. 将tgz文件解压到指定目录  
 `tar zxvf test.tgz -C 指定目录`  
 比如将/source/kernel.tgz解压到 /source/linux-2.6.29 目录  
-`tar zxvf /source/kernel.tgz -C /source/ linux-2.6.29`
+`tar zxvf /source/kernel.tgz -C /source/linux-2.6.29`
 1. 将指定目录压缩到指定文件  
 比如将linux-2.6.29 目录压缩到 kernel.tgz  
-`tar czvf kernel.tgz linux-2.6.29`
+`tar zcvf kernel.tgz linux-2.6.29`
 
 ##### 二、ZIP
 
@@ -326,10 +380,12 @@ ls -l /etc/alternatives/java
 
 ```bash
 # 从本地拷贝到远程
-scp -P 2022 localfile/localdir guoyujun@aa.bb.cc:remotedir
+scp -P 2022 localdir/localfile guoyujun@aa.bb.cc:remotedir
+# 拷贝文件夹
+scp -r -P 2022 localfile/localdir guoyujun@aa.bb.cc:remotedir
 
 # 从远程拷贝到本地
-scp -P 2022 guoyujun@aa.bb.cc:remotedir localfile/localdir
+scp -P 2022 guoyujun@aa.bb.cc:remotedir/file localdir
 ```
 
 ## 将用户加入某个用户组
@@ -381,3 +437,44 @@ closessh
 `2>&1` ：接着，标准错误输出重定向 到标准输出，因为之前标准输出已经重定向到了空设备文件，所以标准错误输出也重定向到空设备文件（较多的时候我们会用`command > file 2>&1` 这样的写法）
 
 清空文件： `cat /dev/null > /home/omc/h.txt`
+
+## 查看服务使用端口号
+
+可以查看 `/etc/services` 文件来找到端口号和服务名称之间的联系
+
+## 查看进程下的线程
+
+```bash
+# “-T”选项可以开启线程查看
+ps -T -p <pid>
+
+# "-H"选项开启线程查看
+top -H -p <pid>
+```
+
+## 查看网卡带宽使用情况
+
+```bash
+# 安装nload
+apt install nload
+
+# 查看网卡信息
+ifconfig
+ip addr
+
+# 查看某块网卡带宽使用情况
+nload em1
+```
+
+## 查找文件
+
+```bash
+# 查找文件
+find / -name myfile
+
+# 查找当前目录及子目录下的md格式文件
+find ./ -name " *.md"
+
+# 查找软链接
+find /app -type l
+```

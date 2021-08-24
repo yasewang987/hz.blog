@@ -10,6 +10,7 @@
     ```bash
     wget https://dl.google.com/go/go1.13.linux-amd64.tar.gz
     
+    # mac版本的最好到这边下载对应的版本安装会快很多
     # 由于某些原因无法下载使用下面地址
     wget https://studygolang.com/dl/golang/go1.15.6.linux-amd64.tar.gz
     ```
@@ -35,9 +36,9 @@
     # 生效用户环境变量
     source $HOME/.profile
     ```
-1. 输入`go version`检查是否安装成功
+1. 输入`go version`检查是否安装成功(如果是m1芯片的mac必须确认安装的go是`arm64`版本的)
 
-1. 修改阿里源
+1. 修改go源
 
 ```bash
 go env -w GO111MODULE=on
@@ -50,6 +51,8 @@ go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 ```
 
 ## Go Debug
+
+如果是用的是 vscode 安装go插件之后，随便创建一个 `main.go` 文件会提示安装调试需要的依赖项，直接全部确认安装即可。
 
 需要安装 `go-delve`,github地址： https://github.com/go-delve/delve
 
@@ -64,28 +67,7 @@ sudo /usr/sbin/DevToolsSecurity -enable
 sudo dscl . append /Groups/_developer GroupMembership $(whoami)
 ```
 
-如果是 arm64 架构的mac，需要编写脚本 `dlv.sh`：
-
-```sh
-#!/bin/sh
-exec /usr/bin/arch -arch arm64 /Users/hzgod/Documents/gopath/bin/dlv "$@"
-```
-
-一定要注意，需要将该文件权限改为`可执行`
-
-```bash
-chmod 777 dlv.sh
-```
-
-并且需要在vscode的配置文件`settings.json`中增加如下配置：
-
-```json
-"go.alternateTools": {
-    "dlv": "/Users/hzgod/Documents/dlv.sh"
-},
-```
-
-VSCode调试需要添加文件 `launch.json`, 内容如下：
+(最新版本可以不用加)VSCode调试需要添加文件 `launch.json`, 内容如下：
 
 ```json
 {

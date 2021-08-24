@@ -14,3 +14,6 @@
 * [Curl指南](./curl.md)
 * [Awk指南](./awk.md)
 * [Sed指南](./sed.md)
+* [rsync指南](./rsync.md)
+* [rpm包制作](./rpm.md)
+* [shell脚本](./shell.md)

@@ -2,6 +2,9 @@
 
 Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负载均衡器、邮件代理和 HTTP 缓存。
 
+* worker_processes： 进程数，一般配置和服务器核心数一致
+* worker_connections：尽量大一点，推荐 65535
+
 ## Nginx 基本配置 & 示例
 
 首先，在本地创建如下的目录结构:
@@ -85,7 +88,8 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
       error_log     logs/tomcat-error.log warn;
       location / {
         proxy_pass http://tomcat_pools;
-        proxy_set_header Host $host;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host:$server_port;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -103,6 +107,39 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
       }
   }
   ```
+
+## Nginx Stream配置
+
+例如：mysql 、 redis 这些需要使用stream配置
+
+特别注意：stream要与http在同级目录  
+
+```conf
+stream {
+    upstream mysql3306 {
+        hash $remote_addr consistent;
+        server 172.31.88.27:3306 weight=5 max_fails=3 fail_timeout=30s;
+    }
+	
+	 server {
+        listen 3307;
+        proxy_connect_timeout 10s;
+        proxy_timeout 200s;
+        proxy_pass mysql3306;
+    }
+}
+```
+
+## Nginx WebSocket配置
+
+```conf
+location / {
+    proxy_pass http://127.0.0.1:8088/;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
+}
+```
 
 ## Nginx常用命令
 
@@ -156,7 +193,8 @@ server {
 
     location / {
         proxy_pass http://tomcat_pools;
-        proxy_set_header Host $host;
+        # 用户真实的ip地址转发给后端服务器
+        proxy_set_header Host $host:$server_port;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -241,3 +279,197 @@ crontab -e
 
 0 0 * * * /bin/bash /root/nginx_logback.sh
 ```
+
+## Nginx 超时时间
+
+* `client_header_timeout` 60s： 客户端向服务端发送一个完整的 `request header` 的超时时间。如果客户端在指定时间内没有发送一个完整的 request header，Nginx 返回 HTTP 408（Request Timed Out）。
+
+* `client_body_timeout` 60s： 指定客户端与服务端建立连接后发送 `request body` 的超时时间。如果客户端在指定时间内没有发送任何内容，Nginx 返回 HTTP 408（Request Timed Out）。
+
+* `send_timeout` 60s: 服务端向客户端传输数据的超时时间。
+
+* `keepalive_timeout` 75s：客户端与代理的超时时间,默认75s，通常keepalive_timeout应该比client_body_timeout大
+
+    HTTP 是一种无状态协议，客户端向服务器发送一个 TCP 请求，服务端响应完毕后断开连接。
+
+    如果客户端向服务器发送多个请求，每个请求都要建立各自独立的连接以传输数据。
+
+    HTTP 有一个 KeepAlive 模式，它告诉 webserver 在处理完一个请求后保持这个 TCP 连接的打开状态。若接收到来自客户端的其它请求，服务端会利用这个未被关闭的连接，而不需要再建立一个连接。
+
+    KeepAlive 在一段时间内保持打开状态，它们会在这段时间内占用资源。占用过多就会影响性能。
+
+    Nginx 使用 keepalive_timeout 来指定 KeepAlive 的超时时间（timeout）。指定每个 TCP 连接最多可以保持多长时间。Nginx 的默认值是 75 秒，有些浏览器最多只保持 60 秒，所以可以设定为 60 秒。若将它设置为 0，就禁止了 keepalive 连接
+
+* `proxy_connect_timeout` 60s：nginx与`upstream server`的连接超时时间
+
+* `proxy_read_timeout` 60s： nginx接收`upstream server`数据超时, 默认60s, 如果连续的60s内没有收到1个字节, 连接关闭
+
+* `proxy_send_timeout` 60s： nginx发送数据至`upstream server`超时, 默认60s, 如果连续的60s内没有发送1个字节, 连接关闭
+
+
+## Nginx日志配置
+
+```conf
+http {
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"'
+                      '$request_time "$upstream_addr" $upstream_response_time';
+
+    access_log  /var/log/nginx/access.log  main;
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
+`$remote_addr`  #记录访问网站的客户端地址
+
+`$remote_user`  #远程客户端用户名
+
+`$time_local`  #记录访问时间与时区
+
+`$request`  #用户的http请求起始行信息
+
+`$status`  #http状态码，记录请求返回的状态码，例如：200、301、404等
+
+`$body_bytes_sent`  #服务器发送给客户端的响应body字节数
+
+`$http_referer`  #记录此次请求是从哪个连接访问过来的，可以根据该参数进行防盗链设置。
+
+`$http_user_agent`  #记录客户端访问信息，例如：浏览器、手机客户端等
+
+`$http_x_forwarded_for`  #当前端有代理服务器时，设置web节点记录客户端地址的配置，此参数生效的前提是代理服务器也要进行相关的x_forwarded_for设置
+
+`$request_time` 请求总的耗时
+
+`$upstream_addr` 后端服务的地址
+
+`$upstream_response_time` 后端服务的响应时间
+
+## 跨域CORS
+
+```conf
+server {
+    listen 5000;
+    server_name 1.1.1.1;
+    # 允许跨域请求的域
+    add_header 'Access-Control-Allow-Origin' *;
+    # 允许带上cookie请求
+    add_header 'Access-Control-Allow-Credentials' 'true';
+    # 允许请求的方法 如POST/GET/DELETE/PUT
+    add_header 'Access-Control-Allow-Methods' *;
+    # 允许携带的请求头
+    add_header 'Access-Control-Allow-Headers' *;
+
+    location / {
+        proxy_pass http://127.0.0.1:5001
+    }
+}
+```
+
+## 配置SSL
+
+检查nginx中是否包含http_ssl_module模块：`nginx -V`,如果没有需要下载源码编译。
+
+```conf
+server {
+    # https 监听的是443端口
+    listen       443 ssl;
+    # 指定准备好的域名
+    server_name  aaaa.com;
+    # 指定证书路径，这里需要把准备好的证书放到此目录
+    ssl_certificate      /usr/local/nginx/myssl/codezyq.cn.pem;
+    ssl_certificate_key  /usr/local/nginx/myssl/codezyq.cn.key;
+    ssl_session_cache    shared:SSL:1m;
+    # 超时时间
+    ssl_session_timeout 5m;
+    # 表示使用的加密套件的类型
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    # 表示使用的TLS协议的类型
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2; 
+    ssl_prefer_server_ciphers on;
+    location /www/ {
+        root   static;
+        index  index.html index.htm;
+    }
+}
+```
+## Nginx根据请求头转发到不同服务
+
+转发规则配置，使用`$http_XXX`，来获取header指定的值，`$http_`为固定格式,`XXX`为自定义header字段名。
+
+```conf
+http {
+    map_hash_bucket_size 64;
+    map $http_apiversion $apiupstream {
+        default apiversion1;
+        v2 apiversion2;
+    }
+
+    upstream apiversion1 {
+        server 10.168.173.29:8080 max_fails=0 fail_timeout=0;
+    }
+
+    upstream apiversion2 {
+        server 10.168.177.171:8080 max_fails=0 fail_timeout=0;
+    }
+
+    server {
+        listen 8998;
+        server_name aa.bb.cc;
+        location / {
+            proxy_pass http://$apiupstream
+        }
+    }
+}
+```
+
+## 防盗链配置
+
+```conf
+server {
+    listen       80;
+    server_name 47.113.204.41;
+    # 针对html访问的匹配规则
+    location /www/ {
+        root static;
+        index index.html index.htm;
+    }
+    # 针对图片访问的匹配规则
+    location /img/ {
+        root static;
+        #对源站点的验证，验证IP是否是47.113.204.41
+        #可以输入域名，多个空格隔开
+        valid_referers 47.113.204.41;
+        #非法引入会进入下方判断
+        if ($invalid_referer) {
+            #这里返回403，也可以rewrite到其他图片
+            return 403;
+        }
+    }
+    charset utf-8;
+}
+```
+
+## 隐藏版本信息
+
+http {
+    server_tokens off;
+}
+
+## Nginx一个server配置多个location
+
+```conf
+location / {
+        root   /data/html/;
+        index  index.html index.html;
+}
+location /train {
+     alias  /data/trainning/;
+     index  index.html index.html;
+}
+```
+
+如果配置两个 `root`，http://xxxx/train 会提示404。
+
+`root`的处理结果是：root路径＋location路径 `alias`的处理结果是：使用alias路径替换location路径 `alias`是一个目录别名的定义，root则是最上层目录的定义。 还有一个重要的区别是alias后面必须要用 `/` 结束，否则会找不到文件的。。。而root则可有可无~~

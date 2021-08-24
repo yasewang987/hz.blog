@@ -6,3 +6,6 @@
 * [Mysql](./mysql.md)
 * [Redis](./redis.md)
 * [MinIO](./minio.md)
+* [QEMU](./qemu.md)
+* [Next-Terminal](./nextterminal.md)
+* [Jumpserver](./jumpserver.md)

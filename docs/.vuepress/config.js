@@ -109,7 +109,8 @@ module.exports = {
                     { text: '实用工具', link: '/other/tools/' },
                     { text: 'Mac', link: '/other/mac/' },
                     { text: 'Cloud', link: '/other/cloud/'},
-                    { text: '读书', link: '/other/book/'}
+                    { text: '读书', link: '/other/book/'},
+                    { text: '国产适配', link: '/other/cn/' }
                 ]
             }
         ],
@@ -155,12 +156,17 @@ module.exports = {
                 'lock',
                 'package',
                 'godoc',
-                'rw'
+                'rw',
+                'filecopy',
+                'readargs',
+                'rpc'
             ],
             '/code/go/other/': [
                 'install',
                 'docker',
-                'problem'
+                'problem',
+                'cmd',
+                'version'
             ],
             '/code/web/npm/': [
                 'base',
@@ -200,10 +206,15 @@ module.exports = {
                 'rabbitmq-install'
             ],
             '/microservices/dapr/': [
+                'info',
                 'install',
                 'component',
+                'invoke',
                 'state',
-                'pubsub'
+                'pubsub',
+                'middleware',
+                'observability',
+                'security'
             ],
             '/microservices/ocelot/': [
                 'middleware',
@@ -290,7 +301,10 @@ module.exports = {
                 'elasticsearch',
                 'minio',
                 'mysql',
-                'redis'
+                'redis',
+                'qemu',
+                'nextterminal',
+                'jumpserver'
             ],
             '/sql/mssql/': [
                 'usesul'
@@ -318,6 +332,7 @@ module.exports = {
                 'cmd',
                 'git-hook',
                 'gl-hook',
+                'problem'
             ],
             '/other/linux/': [
                 'cmd',
@@ -333,7 +348,10 @@ module.exports = {
                 'crontab',
                 'curl',
                 'awk',
-                'sed'
+                'sed',
+                'rsync',
+                'rpm',
+                'shell'
             ],
             '/other/mac/': [
                 'install',
@@ -357,11 +375,23 @@ module.exports = {
                 'classical1',
                 'regular'
             ],
+            '/other/cn/': [
+                'qemu',
+                'es',
+                'jdk',
+                'mariadb',
+                'minio',
+                'nginx',
+                'python',
+                'redis'
+            ],
             '/ai/deploy/': [
                 'problem',
                 'nvidia',
                 'torchserve',
-                'tfx'
+                'tfx',
+                'tf',
+                'python'
             ]
         },
         sidebarDepth: 2

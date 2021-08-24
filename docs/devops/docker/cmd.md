@@ -12,6 +12,8 @@ fi
 ## docker常用命令
 
 ```bash
+# 指定默认工作目录 /data
+docker run -d -w /data aaa
 # 删除所有容器
 docker rm $(docker ps -qa)
 # 强制删除所有容器（包含运行的）
@@ -37,11 +39,33 @@ $ docker inspect --format='{{.LogPath}}' <容器ID>
 # 查看日志
 docker logs xxx
 
-# 查看最新10条日志
+# 查看最后10条日志
 docker logs --tail=100 <容器ID>
+# 动态监控最后200条日志
+docker logs -f --tail 200 <containerid>
 
 # 进入容器bash
 docker exec -it xxx /bin/bash
+
+# 使用容器生成镜像
+docker commit 容器id 镜像名称
+
+# 拷贝宿主机文件到容器中
+docker cp 宿主机文件夹/文件 容器id:/path
+# 拷贝容器文件到宿主机
+docker cp 容器id:/path 宿主机文件夹/文件
+
+# 查看指定镜像的创建历史
+docker history [OPTIONS] IMAGE
+
+# 将指定镜像保存成 tar 归档文件
+# -o :输出到的文件
+docker save [OPTIONS] IMAGE [IMAGE...]
+
+# 导入使用 docker save 命令导出的镜像
+# --input , -i : 指定导入的文件
+docker load [OPTIONS]
+
 ```
 
 ## docker容器中使用docker命令
@@ -142,4 +166,11 @@ systemctl restart docker
 
 * 如果有容器挂载了 docker.sock 文件，重启后工作可能会不正常，需要重启该容器。
 
-## 
+## 修改启动容器的环境变量
+
+1. 停止容器: `docker stop xxx`
+1. 修改容器配置文件内容：
+
+    `/var/lib/docker/containers/[container-id]/config.json`
+    `/var/lib/docker/containers/[container-id]/config.v2.json`
+1. 重启docker：`sudo systemctl restart docker`

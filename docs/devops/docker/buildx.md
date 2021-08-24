@@ -27,8 +27,17 @@
 
     如果你使用的是 Linux，需要手动启用 binfmt_misc。大多数 Linux 发行版都很容易启用，不过还有一个更容易的办法，直接运行一个特权容器，容器里面写好了设置脚本：
 
+    **注意**：如果服务器重启需要重新执行
+
     ```bash
-    docker run --rm --privileged docker/binfmt:66f9012c56a8316f9244ffd7622d7c21c1f6f28d
+    # 建议(包含了mips64el等)
+    docker run --privileged --rm tonistiigi/binfmt:buildkit:latest --install all
+    # 卸载
+    docker run --privileged --rm tonistiigi/binfmt:buildkit:latest --uninstall qemu-*
+    # 备用
+    docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+    # 这个只是在机器上安装所有的qemu支持，但是 docker buildx 并不能使用
+    docker run --rm --privileged multiarch/qemu-user-static:register --reset
     ```
 
     如果报错 `Cannot write to /proc/sys/fs/binfmt_misc/register: write /proc/sys/fs/binfmt_misc/register: invalid argument`,这是由于内核不支持 （F）标志造成的。出现这种情况，建议您升级系统内核或者换使用较高版本内核的 Linux 发行版。
@@ -77,15 +86,21 @@
     * 完整配置参考：https://github.com/moby/buildkit/blob/master/docs/buildkitd.toml.md
     
     ```bash
+    # 适用于国内环境(设置了 --driver-opt 后，可以使用 mips64el)
+    $ docker buildx create --use --name=mybuilder-cn --driver docker-container --driver-opt image=dockerpracticesig/buildkit:master
+
+    # 适用于腾讯云环境(腾讯云主机、coding.net 持续集成)
+    $ docker buildx create --use --name=mybuilder-cn --driver docker-container --driver-opt image=dockerpracticesig/buildkit:master-tencent
+
     # 新建同时切换 builder 
-    docker buildx create --use --name mybuilder --config=/home/${USER}/.docker/buildx/config.toml
+    docker buildx create --use --name mybuilder # --config=/home/${USER}/.docker/buildx/config.toml
 
     # 只新建，然后再切换 builder
-    docker buildx create --name mybuilder --config=/home/${USER}/.docker/buildx/config.toml
+    docker buildx create --name mybuilder # --config=/home/${USER}/.docker/buildx/config.toml
     docker buildx use mybuilder
 
     # 启动构建器
-    docker buildx inspect mybuilder --bootstrap
+    docker buildx inspect mybuilder-cn --bootstrap
     ```
 
 1. 查看当前使用的构建器及构建器支持的 CPU 架构
@@ -194,3 +209,10 @@
     # 输出
     Hell,amd64
     ```
+
+**拉取多平台镜像**
+
+```bash
+docker pull --platform arm64  镜像
+# --platform：该参数是用于拉取指定平台的镜像，也是实验性功能，在上面步骤中开启后就会出现。通过该参数可以手动指定需要的CPU平台镜像，而不用自动去识别。
+```

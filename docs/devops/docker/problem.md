@@ -27,8 +27,10 @@ locale -a
 # 查看当前所使用的编码
 locale
 
-# 这里设置哪种编码需要根据容器环境确定
-docker run -d -e LANG="C.UTF-8" --env LC_ALL=zh_CN.UTF-8 --name hello helloworld
+# 这里设置哪种编码需要根据容器环境确定 -e LANG="C.UTF-8" -e LC_ALL="C.UTF-8" 选一个
+docker run -d -e LANG="C.UTF-8" --name hello helloworld
+
+ENV LANG=C.UTF-8
 ```
 
 ## 二进制安装docker，systemd无法管理docker服务问题
@@ -99,4 +101,59 @@ WantedBy=multi-user.target
 systemctl enable docker
 
 reboot
+```
+
+## arm64服务器服务时报错 “Illegal instruction(core dumped)”
+
+需要在环境变量中增加 `OPENBLAS_CORETYPE=ARMV8`
+
+* 方式一： `docker run -e OPENBLAS_CORETYPE=ARMV8 xxxx`
+* 方式二： 在 `dockerfile` 中增加 `ENV OPENBLAS_CORETYPE=ARMV8`
+* 方式三： 到容器中修改环境变量 `export OPENBLAS_CORETYPE=ARMV8`
+
+## docker endpoint with name zookeeper already exists in network bridge
+
+```bash
+sudo docker  rm -f 容器名
+# 清理此容器的网络占用
+docker network disconnect --force bridge 容器名
+```
+
+## No Route to Host
+
+一半都是防火墙问题，需要修改防火墙规则
+
+## systemctl无法停止docker
+
+`Warning: Stopping docker.service, but it can still be activated by: docker.socket`
+
+```bash
+sudo systemctl stop docker.socket
+```
+
+## iptables failed: iptables --wait -t nat
+
+直接重启docker服务：
+
+```bash
+systmctl restart docker
+```
+
+## IPv4 forwarding is disabled
+
+`WARNING: IPv4 forwarding is disabled. Networking will not work.`
+
+问题原因：是没有开启转发,docker网桥配置完后，需要开启转发，不然容器启动后，就会没有网络，配置`/etc/sysctl.conf`,添加`net.ipv4.ip_forward=1`.
+
+```bash
+# vim /etc/sysctl.conf 或者 /usr/lib/sysctl.d/00-system.conf
+
+#添加此行配置
+net.ipv4.ip_forward=1
+
+# 重启网络并重启docker服务
+systemctl restart network && systemctl restart docker
+
+# 查看是否修改成功
+sysctl net.ipv4.ip_forward
 ```

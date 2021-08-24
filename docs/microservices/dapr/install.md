@@ -40,6 +40,7 @@ Dapr 与您的应用程序一起作为sidecar运行，在自托管模式下，�
 * 安装最新的 Dapr 运行时二进制程序:
 
 ```bash
+# 执行之后会生成3个容器
 sudo dapr init
 ```
 
@@ -74,6 +75,23 @@ ls ~/.dapr
 
 # 内容如下
 bin  components  config.yaml
+```
+
+## Configuration配置
+
+文件位置：`~/.dapr/config.yaml`
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: daprConfig
+  namespace: default
+spec:
+  tracing:
+    samplingRate: "1"
+    zipkin:
+      endpointAddress: "http://localhost:9411/api/v2/spans"
 ```
 
 
