@@ -16,7 +16,6 @@ qemu官方文档：https://qemu-project.gitlab.io/qemu/system/index.html  ，可
 |-drive|添加一个驱动器，参数可重复|
 |-net|添加网络设备|
 
-
 ## Windows
 
 ### 安装步骤
@@ -62,6 +61,31 @@ qemu官方文档：https://qemu-project.gitlab.io/qemu/system/index.html  ，可
 
 # 启动系统
 .\qemu-system-aarch64.exe -m 10240 -cpu cortex-a72 -smp 8,cores=8,threads=1,sockets=1 -M virt -bios .\bios\QEMU_EFI.fd -net nic -net tap,ifname=tap0 -device nec-usb-xhci -device usb-kbd -device usb-mouse -device VGA -device virtio-scsi-device -drive if=none,file=D:\qemu\vms\kylin\hdd01.img,id=hd0 -device virtio-blk-device,drive=hd0
+```
+
+`yum`源设置：
+
+```text
+[root@172-17-190-26 ~]# cat /etc/yum.repos.d/kylin_aarch64.repo 
+###Kylin Linux Advanced Server 10 - os repo###
+
+[ks10-adv-os]
+name = Kylin Linux Advanced Server 10 - Os 
+baseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1/os/adv/lic/base/$basearch/
+gpgcheck = 0
+enabled = 1
+
+[ks10-adv-updates]
+name = Kylin Linux Advanced Server 10 - Updates
+baseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1/os/adv/lic/updates/$basearch/
+gpgcheck = 0
+enabled = 0
+
+[ks10-adv-addons]
+name = Kylin Linux Advanced Server 10 - Addons
+baseurl = http://update.cs2c.com.cn:8080/NS/V10/V10SP1/os/adv/lic/addons/$basearch/
+gpgcheck = 0
+enabled = 0
 ```
 
 ## Ubuntu

@@ -103,3 +103,15 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     ```bash
     apt install gfortran
     ```
+
+## pip安装时报【fatal error: Python.h: No such file or directory compilation terminated】错误
+
+```bash
+# ubuntu,debian
+sudo apt-get install python-dev   # for python2.x installs
+sudo apt-get install python3-dev  # for python3.x installs
+
+# centos
+sudo yum install python-devel   # for python2.x installs
+sudo yum install python3-devel   # for python3.4 installs
+```
