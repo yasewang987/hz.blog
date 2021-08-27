@@ -16,3 +16,12 @@ sudo docker run --name elasticsearch -p 9200:9200 -p 9300:9300 \
 -v $PWD/plugins:/usr/share/elasticsearch/plugins \
 -d --restart=always elasticsearch:7.1.0
 ```
+
+## 查看信息
+
+```bash
+# 查看到es对应的版本和基本信息
+curl http://localhost:9200
+# 查看索引信息
+curl http://localhost:9200/_cat/indices?v 
+```

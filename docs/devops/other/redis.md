@@ -42,6 +42,12 @@ replicaof 主redis-ip 主reids端口
 masterauth 主redis密码
 ```
 
+## redis-cli客户端连接
+
+```bash
+redis-cli -p 1234 -a mypassword
+```
+
 ## nginx反向代理
 
 监听具备公网ip服务器的3307端口，实现跳转到172.31.88.27的3306端口。

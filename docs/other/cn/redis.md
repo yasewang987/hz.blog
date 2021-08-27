@@ -6,6 +6,20 @@
 
 注意事项：一定要查看`pagesize`, 命令 `getconf PAGESIZE`,尽量在pagesize大的环境里面打包，因为pagesize小的环境打出来的包在大的环境中无法使用。
 
+命令
+
+```bash
+# 启动redis
+./redis-server ../redis.conf
+
+# reids-cli链接
+./redis-cli
+redis> set foo bar
+OK
+redis> get foo
+"bar"
+```
+
 ## rpm包制作
 
 ```

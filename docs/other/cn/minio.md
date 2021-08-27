@@ -1,7 +1,16 @@
 # minio国产环境适配
 
 ## 源码编译
-官方git地址：https://github.com/minio/minio
+官方源码git地址：https://github.com/minio/minio
+
+官方包（二进制，rpm，deb）下载地址：https://min.io/download#/linux
+
+启动命令：
+
+```bash
+MINIO_ROOT_USER=admin MINIO_ROOT_PASSWORD=password ./minio server /mnt/data --console-address ":9001"
+```
+
 ### make命令编译
 
 需要提前安装go环境
