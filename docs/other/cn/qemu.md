@@ -88,6 +88,12 @@ gpgcheck = 0
 enabled = 0
 ```
 
+设置之后执行如下命令
+
+```bash
+yum makecache
+```
+
 ## Ubuntu
 
 

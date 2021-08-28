@@ -15,6 +15,8 @@ Summary:        funcun  libs
 License: GPLv3+
 BuildArch: noarch
 
+BuildRequires:  python3-setuptools, python3-devel
+
 AutoReqProv: no
 
 %define _binaries_in_noarch_packages_terminate_build   0
@@ -62,6 +64,8 @@ Release:        1%{?dist}
 Source0:       scipy-1.5.4.tar.gz
 Summary:        funcun libs
 License: GPLv3+
+
+BuildRequires:  python3-setuptools, python3-devel
 
 %description
 funcun libs
