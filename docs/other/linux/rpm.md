@@ -210,3 +210,12 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 3）升级软件包
 
 升级软件类似于安装软件：`rpm -Uvh example.rpm`
+
+## 报错处理
+
+`SyntaxError: invalid syntax`: 在spec文件中添加如下内容
+
+```text
+%global _python_bytecompile_errors_terminate_build 0
+%global __python %{__python3}
+```
