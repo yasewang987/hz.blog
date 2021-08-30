@@ -212,9 +212,11 @@ module.exports = {
                 'invoke',
                 'state',
                 'pubsub',
-                'middleware',
+                'bindings',
+                'actor',
                 'observability',
-                'security'
+                'security',
+                'middleware'
             ],
             '/microservices/ocelot/': [
                 'middleware',
