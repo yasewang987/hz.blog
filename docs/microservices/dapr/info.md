@@ -19,3 +19,23 @@ https://note.youdao.com/s/D7gEckR9
 * 自托管：您可以在 Windows/macOS/Linux机器 用Dapr运行您的应用程序。 Dapr 提供以"自托管"模式在机器上运行的功能。
 * Service (服务)：正在运行的应用程序或二进制文件。 可用于指您的应用程序，或Dapr应用程序。
 * Sidecar：将应用程序作为单独的流程或容器与您的应用程序一起运行的程序。
+
+## dapr常用镜像
+
+Docker Hub上，每个 Dapr 组件都有已发布的 Docker 镜像。
+
+* [daprio/dapr](https://hub.docker.com/r/daprio/dapr) (包含所有Dapr binaries)
+* [daprio/daprd](https://hub.docker.com/r/daprio/daprd)
+* [daprio/placement](https://hub.docker.com/r/daprio/placement)
+* [daprio/sentry](https://hub.docker.com/r/daprio/sentry)
+* [daprio/dapr-dev](https://hub.docker.com/r/daprio/dapr-dev)
+### Linux/amd64
+* `latest`：最新版本，仅 用于开发目的。
+* `edge`: 最新的edge构建(master)。
+* `major.minor.patch`: 发布版本。
+* `major.patch-rc.iteration`: 候选发布。
+### Linux/arm/v7
+* `latest-arm`：最新的ARM版本， 只 用于开发目的。
+* `edge-arm`: ARM的最新的edge构建(master)。
+* `major.minor.patch-arm`: ARM的发布版本。
+* `major.patch-rc.iteration`: ARM的候选发布。

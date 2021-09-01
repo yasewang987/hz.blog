@@ -242,7 +242,9 @@ module.exports = {
                 'install',
                 'dockerfiles',
                 'dockerfilebest',
-                'buildx'
+                'buildx',
+                'network',
+                'update'
             ],
             '/devops/gitlab/': [
                 'gitlab-install',

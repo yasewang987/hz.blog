@@ -10,7 +10,7 @@ Dapr 可以配置发送跟踪数据，并且由于 Dapr 使用广泛采用的协
 
 ![1](http://cdn.go99.top/docs/microservices/daprobservability1.png)
 
-![1.1]()
+![1.1](http://cdn.go99.top/docs/microservices/dapr/tracing1.1.png)
 
 ### OpenTelemetry 采集器
 
@@ -67,6 +67,35 @@ Dapr 生成 日志，以提供 sidecar 操作的可见性，并帮助用户识�
 ### 度量
 
 指标（Metrics）是在一段时间内收集和存储的一系列度量值和计数。 Dapr 指标 提供监控功能，以了解 Dapr sidecar 和系统服务的行为。 例如，Dapr sidecar 和用户应用之间的服务指标可以展示调用延迟、流量故障、请求的错误率等。 Dapr 的系统服务度量 则可以显示 sidecar 注入失败，系统服务的运行状况 ( 包括 CPU 使用率，actor 位置数量等) 。
+
+接入prometheus,修改 `prometheus.yml` 文件。
+
+```yaml
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: 'dapr'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: 'dapr'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+      - targets: ['localhost:9090'] # Replace with Dapr metrics port if not default
+```
+
+引入 grafana 模版：https://github.com/dapr/dapr/tree/master/grafana
 
 ### 健康状态
 

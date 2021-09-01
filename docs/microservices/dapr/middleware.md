@@ -22,3 +22,70 @@ spec:
     - name: uppercase
       type: middleware.http.uppercase
 ```
+
+Dapr中的中间件使用Component文件描述，其schema如下:
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: <COMPONENT NAME>
+  namespace: <NAMESPACE>
+spec:
+  type: middleware.http.<MIDDLEWARE TYPE>
+  version: v1
+  metadata:
+  - name: <KEY>
+    value: <VALUE>
+  - name: <KEY>
+    value: <VALUE>
+...
+```
+
+例如限流组件
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: ratelimit
+spec:
+  type: middleware.http.ratelimit
+  version: v1
+  metadata:
+  - name: maxRequestsPerSecond
+    value: 10
+```
+## 编写自定义中间件
+
+Dapr 使用 [FastHTTP](https://github.com/valyala/fasthttp) 来实现其的 HTTP 服务器。 因此，您的 HTTP 中间件也需要编写为 `FastHTTP handler`。 您的中间件需要实现 Middleware 接口，该接口定义 `GetHandler` 方法，该方法返回 `fasthttp.RequestHandler`:
+
+```go
+type Middleware interface {
+  GetHandler(metadata Metadata) (func(h fasthttp.RequestHandler) fasthttp.RequestHandler, error)
+}
+
+func GetHandler(metadata Metadata) fasthttp.RequestHandler {
+  return func(h fasthttp.RequestHandler) fasthttp.RequestHandler {
+    return func(ctx *fasthttp.RequestCtx) {
+      // inboud logic
+      h(ctx)  // call the downstream handler
+      // outbound logic
+    }
+  }
+}
+```
+
+## 添加新的中间件组件
+
+您的中间件组件可以贡献到 [components-contrib](https://github.com/dapr/components-contrib/tree/master/middleware) 仓库。
+
+在接受了 `components-contrib` 变更后，针对 Dapr 运行时仓库 提交另一个 pull 请求，以注册新的中间件类型。 您需要修改`runtime.WithHTTPMiddleware`方法中的**`cmd/daprd/main.go`方法，将您的中间件注册到Dapr的运行时。
+
+## 常用中间件
+
+* [Rate limit](https://docs.dapr.io/developing-applications/middleware/supported-middleware/middleware-rate-limit/)：限制每秒允许的 HTTP 请求的最大数量
+* [OAuth2](https://docs.dapr.io/developing-applications/middleware/supported-middleware/middleware-oauth2/)：在Web API上启用OAuth2授权授权流程
+* [OAuth2 client credentials](https://docs.dapr.io/developing-applications/middleware/supported-middleware/middleware-oauth2clientcredentials/)：在Web API上启用OAuth2客户端凭证授予流程
+* [Bearer](https://docs.dapr.io/developing-applications/middleware/supported-middleware/middleware-bearer/)：使用 OpenID Connect在 Web API 上验证 Bearer Token
+* [Open Policy Agent](https://docs.dapr.io/developing-applications/middleware/supported-middleware/middleware-opa/)：将Rego/OPA策略应用到传入的Dapr HTTP请求中
