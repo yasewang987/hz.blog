@@ -63,3 +63,9 @@ if [ $(docker ps -a --format {{.Names}} | grep runnertest-master) ]; then
     echo "runnertest-master already run"
 fi
 ```
+
+## 获取服务器ip地址
+
+```bash
+ip addr | grep global | head -1 | awk '{print $2}' | cut -d / -f 1
+```

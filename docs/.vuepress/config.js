@@ -159,7 +159,8 @@ module.exports = {
                 'rw',
                 'filecopy',
                 'readargs',
-                'rpc'
+                'rpc',
+                'mysql'
             ],
             '/code/go/other/': [
                 'install',

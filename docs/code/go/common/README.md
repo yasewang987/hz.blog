@@ -9,3 +9,4 @@
 * [Go文件拷贝](./filecopy.md)
 * [读取命令行参数](./readargs.md)
 * [RPC介绍](./rpc.md)
+* [MySQL操作](./mysql.md)

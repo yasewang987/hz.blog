@@ -478,3 +478,40 @@ find ./ -name " *.md"
 # 查找软链接
 find /app -type l
 ```
+
+## cut字符截取
+
+`cut`:
+
+* `-b` ：以字节为单位进行分割。这些字节位置将忽略多字节字符边界，除非也指定了`-n`标志。
+* `-c` ：以字符为单位进行分割。
+* `-d`：自定义分隔符，默认为制表符(tab)。
+* `-f`：与`-d`一起使用，指定显示哪个区域。
+* `-n`：取消分割多字节字符。仅和`-b`标志一起使用。如果字符的最后一个字节落在由`-b`标志的List参数指示的范围之内，该字符将被写出；否则，该字符将被排除。
+
+```bash
+# 剪切字符串中的第2和第5个字节:2b
+echo "123abc" | cut -b 2,5
+# 11-14位置的字符: bcde
+ echo "123456789abcdefghjklmnopq" | cut -b 11-14
+# 输出/etc/passwd文件每一行的前4个字符
+cut -c 1-4 /etc/passwd
+# 以 % 分割 ： CPU:  busy 14
+echo "CPU:  busy 14%  (system=10% user=3% nice=0% idle=85%)" | cut -d \% -f 1
+# (system=10
+echo "CPU:  busy 14%  (system=10% user=3% nice=0% idle=85%)" | cut -d \% -f 2
+```
+
+## head取前N行
+
+```bash
+# 取 /etc/password 文件 第一行
+cat /etc/password | head -1
+```
+
+## tail取后N行
+
+```bash
+# 取 /etc/password 文件最后两行
+cat /etc/password | tail -2
+```

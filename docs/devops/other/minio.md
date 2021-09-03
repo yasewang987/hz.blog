@@ -49,6 +49,7 @@ http://IP:9000
 ## nginx 反向代理配置
 
 ```conf
+server{
  listen 80;
  server_name example.com;
 

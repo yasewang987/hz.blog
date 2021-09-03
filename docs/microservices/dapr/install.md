@@ -172,3 +172,9 @@ dapr init
 # 查看版本
 $ dapr --version
 ```
+
+## 不使用docker运行
+
+1. 下载dapr cli
+1. `dapr init --slim` 使用slim模式启动，在此模式下安装了两个不同的二进制文件 daprd 和 placement。不会为状态管理或发布/订阅安装任何默认组件（如 Redis）。
+1. 到`/$HOME/. dapr/bin`目录下启动对应功能（placement等）
