@@ -182,6 +182,8 @@ module.exports = {
                 'vscode'
             ],
             '/code/web/css/': [
+                'resources',
+                'animation'
             ],
             '/microservices/consul/': [
                 'base',
