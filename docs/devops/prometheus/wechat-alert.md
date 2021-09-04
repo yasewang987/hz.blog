@@ -103,14 +103,14 @@ groups:
 - name: 实例存活告警规则
   rules:
   - alert: 实例存活告警
-    expr: up{job="prometheus"} == 0 or up{job="Linux-host"} == 0
+    expr: up{job="prometheus"} == 0 or up{job="mysql"} == 0
     for: 1m
     labels:
       user: prometheus
       severity: Disaster
     annotations:
-      summary: "Instance {{ $labels.instance }} is down"
-      description: "Instance {{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minutes."
+      summary: "实例 {{ $labels.instance }} 下线"
+      description: "实例 {{ $labels.instance }} 的 {{ $labels.job }} 已经下线超过1分钟."
       value: "{{ $value }}"
 
 - name: 内存告警规则

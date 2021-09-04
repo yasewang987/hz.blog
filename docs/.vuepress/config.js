@@ -265,6 +265,7 @@ module.exports = {
                 'prometheus',
                 'node-exporter',
                 'gpu-exporter',
+                'mysqld-exporter',
                 'custom-exporter',
                 'wechat-alert'
             ],
