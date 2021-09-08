@@ -23,7 +23,7 @@ chkconfig iptables on
 ### 2. 开启指定端口
 
 ```bash
- vim /etc/sysconfig/iptables
+vim /etc/sysconfig/iptables
 # 加入如下代码
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
 # 重启

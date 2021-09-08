@@ -51,3 +51,7 @@ groups:
       description: "实例 {{ $labels.instance }} 中的 {{ $labels.job }} 服务已经下线超过1分钟，请及时处理."
       value: "{{ $value }}"
 ```
+
+## 问题处理
+
+`Only queries that return single series/table is supported` 错误：如果配置多个mysql实例的时候，mysql overivew模版出现这个问题，需要点击对应的 panel 之后，将 `Instant`激活。

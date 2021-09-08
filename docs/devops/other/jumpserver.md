@@ -40,12 +40,12 @@ docker run -d --name fc-jms --restart=always \
     -e SECRET_KEY=GmmIghD61fQqPUlsoUBooLoe1DXuyYvytTQ6049IuHAbyUQBGn \
     -e BOOTSTRAP_TOKEN=RztM39jzhJVnrdb5 \
     -e DB_HOST=192.168.1.6 \
-    -e DB_PORT=3306 \
+    -e DB_PORT=28003 \
     -e DB_USER='jumpserver' \
     -e DB_PASSWORD="weakPassword" \
     -e DB_NAME=jumpserver \
     -e REDIS_HOST=192.168.1.6 \
-    -e REDIS_PORT=6379 \
+    -e REDIS_PORT=7379 \
     -e REDIS_PASSWORD=ifuncun888 \
     jumpserver/jms_all:latest
 ```
