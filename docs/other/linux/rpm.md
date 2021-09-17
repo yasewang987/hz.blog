@@ -16,6 +16,12 @@ rpm 从 `4.5.x` 版本开始，将 `rpmbuid` 的默认工作路径移动到用�
 ```bash
 # centos
 yum install rpm-build  -y 
+yum install -y rpmdevtools
+# 生成文件夹（会在用户目录下生成rpmbuild以及配置文件.rpmmacros）
+rpmdev-setuptree
+
+# ubuntu
+apt-get install rpm
 
 # 创建文件夹
 mkdir -pv  ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS,BUILDROOT}
@@ -34,7 +40,14 @@ rpmbuild -ba 软件名-版本.spec
 -bb 只生成二进制 rpm 包
 -bs 只生成源码 rpm 包
 -ba 生成二进制 rpm 包和源码 rpm 包
---target 指定生成 rpm 包的平台，默认会生成 i686 和 x86_64 的 rpm 包，但一般我只需要 x86_64 的 rpm 包
+--target 指定生成 rpm 包的平台
+–-buildroot 一般在centos5等低版本的系统中需要制定这个位置
+```
+
+例如要构建龙芯平台的 `rpm` 包，则 `–-target=mipsel`，但是这样在打包的过程中将无法获得 `%_arch` 的值，所以 `rpmbuild` 无法定位 `BUILDROOT` 下的目标目录。这个时候，可以用 `--define` 参数来手动定义 `%_arch` 宏。
+
+```bash
+rpmbuild -bb –-target=mipsel –-define="%_arch mipsel" SPECS/codeblocks.spec
 ```
 
 ## 宏
@@ -85,11 +98,12 @@ Name: hadoop		//软件包名称
 Version: 2.7.0		//软件版本号
 Summary: The Apache© Hadoop project develops open-source software for reliable, scalable, distributed computing.		//软件描述
 Release: 1		//编译版本
-Source0:hadoop-2.7.0.tar.gz		//软件包所存放的位置,一般在SOURCES目录
+Source0: hadoop-2.7.0.tar.gz		//软件包所存放的位置,一般在SOURCES目录
 Packager: Eason Xu			//软件包制作者
 #BuildRequires:				//包构建所需依赖，空值表示默认
 #Requires:					//包安装所需依赖，空值表示默认
 AutoReqProv:no  //不需要检查软件依赖信息
+Prefix:     /usr/local/hadoop-2.7.0
 
 License: GPLv3+		//遵循开源软件公有认证第三版以上
 Group: System Enviroment/Base			//基于系统的基础运行环境
@@ -97,16 +111,20 @@ Group: System Enviroment/Base			//基于系统的基础运行环境
 %description			//对于软件的相关描述，同上summary一致
 The Apache© Hadoop project develops open-source software for reliable, scalable, distributed computing.
 
-//开始进行软件包构建,将 SOURCES 目录下的源代码解压到 BUILD 目录
+// 读取位于 %_sourcedir 目录的源代码和 patch 。之后，解压源代码至 %_builddir 的子目录并应用所有 patch。
 %prep
 %global debug_package %{nil}		//忽略debug的错误信息
 %setup -q			//对SOURCES里面的软件源进行静默方式解压至BUILD目录
 
-//开始构建软件包，一般执行 ./configure和make命令
+// 编译位于 %_builddir 构建目录下的文件。通过执行类似 ./configure && make 的命令实现。
 %build
+CFLAGS="-pipe -O2 -g -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror" ./configure --prefix=%{prefix}
+# make后面的意思是：如果是多处理器，则并行编译
+make %{?_smp_mflags}
 
-//将需要打包到rpm包的文件从 BUILD 下拷贝到 BUILDROOT 目录下，这些文件会安装到用户系统对应的目录中
+// 读取位于 %_builddir 构建目录下的文件并将其安装至 %_buildrootdir 目录。这些文件就是用户安装 RPM 后，最终得到的文件。注意一个奇怪的地方: 最终安装目录 不是 构建目录。通过执行类似 make install 的命令实现。
 %install
+make install DESTDIR=%{buildroot}
 rm -rf %{buildroot}/opt/%{name}			//构建前先删除原先存在的同名文件目录
 mkdir -p %{buildroot}/opt/%{name}		//创建BUILDROOT目录下的文件目录
 cp -rf %_topdir/BUILD/%{name}-%{version}/* %{buildroot}/opt/%{name}		//将BUILD目录解压文件复制进软件包制作临时目录

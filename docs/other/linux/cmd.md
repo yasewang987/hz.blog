@@ -515,3 +515,15 @@ cat /etc/password | head -1
 # 取 /etc/password 文件最后两行
 cat /etc/password | tail -2
 ```
+
+## 创建软链接
+
+```bash
+ln -s [源文件] [软链接文件]
+
+# 删除软链接（正确）
+rm -rf ./xxx
+
+# 删除（错误），会把xxx文件夹下的内容删除
+rm -rf ./xxx/
+```

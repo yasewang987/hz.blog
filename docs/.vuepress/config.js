@@ -160,7 +160,9 @@ module.exports = {
                 'filecopy',
                 'readargs',
                 'rpc',
-                'mysql'
+                'mysql',
+                'scanf',
+                'orm'
             ],
             '/code/go/other/': [
                 'install',
@@ -179,7 +181,8 @@ module.exports = {
                 'install'
             ],
             '/code/web/vue/': [
-                'vscode'
+                'vscode',
+                'qiankun'
             ],
             '/code/web/css/': [
                 'resources',

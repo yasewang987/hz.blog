@@ -10,3 +10,5 @@
 * [读取命令行参数](./readargs.md)
 * [RPC介绍](./rpc.md)
 * [MySQL操作](./mysql.md)
+* [格式化字符串](./scanf.md)
+* [go-orm资料记录](./orm.md)
