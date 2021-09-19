@@ -39,41 +39,35 @@ CGO_ENABLED=0 GOOS=linux GOARCH=mips64le go build
 ### make命令编译
 
 ```text
-Name: mytest-minio
-Version: 4.0.10
-Summary: mytest minio
+%global mname minio
+%global mpath base/%{mname}
+Name: mytest-%{mname}
+Version: 1.0.0
+Summary: funcun %{mname}
 Release: 1
-#Source0: minio
-Packager: mytest
-#BuildRequires:
-#Requires:
-AutoReqProv:no
-
 License: GPLv3+
 Group: System Enviroment/Base
+AutoReqProv:no
 
 %description
-mytest minio
+funcun %{mname}
 
 %prep
-#%setup -q
+
 %build
-cd %{_builddir}/minio-master
-make install PREFIX=output/
+
 %install
-rm -rf %{buildroot}/opt/%{name}
-mkdir -p %{buildroot}/opt/%{name}
-cp -rf %{_builddir}/minio-master/output/* %{buildroot}/opt/%{name}
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/opt/mytest/%{mpath}
+cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %post
 
-%postun
-
 %clean
-#rm -rf %_builddir/%{name}
+
 %files
-%defattr(-,root,root,0755)
-/opt/%{name}
+%defattr(-,root,root,0775)
+/opt/mytest/%{mpath}
 ```
 
 ### 交叉编译后直接打包

@@ -22,41 +22,36 @@ redis> get foo
 
 ## rpm包制作
 
-```
-Name: funcun-redis
-Version: 6.2.5
-Summary: funcun redis
+```text
+%global mname redis
+%global mpath base/%{mname}
+Name: mytest-%{mname}
+Version: 1.0.0
+Summary: funcun %{mname}
 Release: 1
-Source0: redis-%{version}.tar.gz
-Packager: funcun
-#BuildRequires:
-#Requires:
-AutoReqProv:no
-
 License: GPLv3+
 Group: System Enviroment/Base
+AutoReqProv:no
 
 %description
-funcun redis
+funcun %{mname}
 
 %prep
-%setup -q -n redis-%{version}
+
 %build
-make install PREFIX=output
+
 %install
-rm -rf %{buildroot}/opt/%{name}
-mkdir -p %{buildroot}/opt/%{name}
-cp -rf %{_builddir}/redis-%{version}/output/* %{buildroot}/opt/%{name}
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/opt/mytest/%{mpath}
+cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %post
 
-%postun
-
 %clean
-#rm -rf %_builddir/%{name}
+
 %files
-%defattr(-,root,root,0755)
-/opt/%{name}
+%defattr(-,root,root,0775)
+/opt/mytest/%{mpath}
 ```
 
 ## deb包制作

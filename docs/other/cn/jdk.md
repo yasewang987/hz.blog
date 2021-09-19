@@ -13,4 +13,36 @@ x86源码地址： https://github.com/AdoptOpenJDK/openjdk-jdk8u
 
 ## rpm包制作
 
+```text
+%global mname jdk
+%global mpath base/%{mname}
+Name: mytest-%{mname}
+Version: 1.0.0
+Summary: funcun %{mname}
+Release: 1
+License: GPLv3+
+Group: System Enviroment/Base
+AutoReqProv:no
+
+%description
+funcun %{mname}
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/opt/mytest/%{mpath}
+cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
+
+%post
+
+%clean
+
+%files
+%defattr(-,root,root,0775)
+/opt/mytest/%{mpath}
+```
+
 ## deb包制作
