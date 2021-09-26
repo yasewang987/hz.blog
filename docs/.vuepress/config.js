@@ -178,10 +178,12 @@ module.exports = {
             ],
             '/code/web/ts/': [
                 'base',
-                'install'
+                'install',
+                'promise'
             ],
             '/code/web/vue/': [
                 'vscode',
+                'vue3',
                 'qiankun'
             ],
             '/code/web/css/': [
