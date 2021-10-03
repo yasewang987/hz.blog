@@ -2190,6 +2190,25 @@ router.beforeEach((to, from, next) => {
 ```
 ## 状态管理v-strore
 
+* 对于大型应用，我们会希望把 Vuex 相关代码分割到模块中。下面是项目结构示例
+
+```bash
+├── index.html
+├── main.js
+├── api
+│   └── ... # 抽取出API请求
+├── components
+│   ├── App.vue
+│   └── ...
+└── store
+    ├── index.js          # 我们组装模块并导出 store 的地方
+    ├── actions.js        # 根级别的 action
+    ├── mutations.js      # 根级别的 mutation
+    └── modules
+        ├── cart.js       # 购物车模块
+        └── products.js   # 产品模块
+```
+
 ### 安装
 
 ```bash
@@ -2202,21 +2221,181 @@ https://unpkg.com/vuex@4.0.0/dist/vuex.global.js
 ```
 
 ### 实例
-
+```js
+// mutation-types.js
+// 常量替代 mutation 事件类型
+export const SOME_MUTATION = 'SOME_MUTATION'
+```
 ```js
 import { createApp } from 'vue'
 import { createStore } from 'vuex'
+import { SOME_MUTATION } from './mutation-types'
 
 // 创建一个新的 store 实例
 const store = createStore({
   state () {
     return {
-      count: 0
+      count: 0,
+      todos: [
+        { id: 1, text: '...', done: true },
+        { id: 2, text: '...', done: false }
+      ]
     }
   },
+  // 可以认为是 store 的计算属性
+  getters: {
+    doneTodos: (state) => {
+      return state.todos.filter(todo => todo.done)
+    }
+    doneTodosCount (state, getters) {
+      return getters.doneTodos.length
+    }
+    // 让 getter 返回一个函数，来实现给 getter 传参。在你对 store 里的数组进行查询时非常有用。
+    getTodoById: (state) => (id) => {
+      return state.todos.find(todo => todo.id === id)
+    }
+  }
+  // 状态的唯一方法是提交 mutation
+  // mutation 必须是同步函数（因为异步的方法会使状态不可被追踪）
   mutations: {
     increment (state) {
       state.count++
+    }
+    // 提交载荷（Payload）
+    increment2 (state, n) {
+      state.count += n
+    }
+    // payload是一个对象
+    increment3 (state, payload) {
+      state.count += payload.amount
+    }
+    // 使用常量
+    [SOME_MUTATION] (state) {
+      // 修改 state
+    }
+  }
+  // Action 提交的是 mutation，而不是直接变更状态
+  // Action 可以包含任意异步操作
+  actions: {
+    increment (context) {
+      context.commit('increment')
+    }
+    increment ({ commit }) {
+      commit('increment')
+    }
+    incrementAsync ({ commit }) {
+      setTimeout(() => {
+        commit('increment')
+      }, 1000)
+    }
+    // 购物车实例
+    checkout ({ commit, state }, products) {
+      // 把当前购物车的物品备份起来
+      const savedCartItems = [...state.cart.added]
+      // 发出结账请求，然后乐观地清空购物车
+      commit(types.CHECKOUT_REQUEST)
+      // 购物 API 接受一个成功回调和一个失败回调
+      shop.buyProducts(
+        products,
+        // 成功操作
+        () => commit(types.CHECKOUT_SUCCESS),
+        // 失败操作
+        () => commit(types.CHECKOUT_FAILURE, savedCartItems)
+      )
+    }
+    // store.dispatch 可以处理被触发的 action 的处理函数返回的 Promise，并且 store.dispatch 仍旧返回 Promise
+    actionA ({ commit }) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          commit('someMutation')
+          resolve()
+        }, 1000)
+      })
+    }
+    // 上面的例子也可以这么些，因为dispatch返回Promise
+    actionB ({ dispatch, commit }) {
+      return dispatch('actionA').then(() => {
+        commit('someOtherMutation')
+      })
+    }
+    // 通过async/await组合action
+    // 假设 getData() 和 getOtherData() 返回的是 Promise
+    async actionA ({ commit }) {
+      commit('gotData', await getData())
+    },
+    async actionB ({ dispatch, commit }) {
+      await dispatch('actionA') // 等待 actionA 完成
+      commit('gotOtherData', await getOtherData())
+    }
+  }
+  modules: {
+    account: {
+      namespaced: true,
+      // 模块内容（module assets）
+      state: () => ({ ... }), // 模块内的状态已经是嵌套的了，使用 `namespaced` 属性不会对其产生影响
+      getters: {
+        isAdmin () { ... } // -> getters['account/isAdmin']
+      },
+      actions: {
+        login () { ... } // -> dispatch('account/login')
+      },
+      mutations: {
+        login () { ... } // -> commit('account/login')
+      },
+
+      // 嵌套模块
+      modules: {
+        // 继承父模块的命名空间
+        myPage: {
+          state: () => ({ ... }),
+          getters: {
+            profile () { ... } // -> getters['account/profile']
+          }
+        },
+
+        // 进一步嵌套命名空间
+        posts: {
+          namespaced: true,
+
+          state: () => ({ ... }),
+          getters: {
+            popular () { ... } // -> getters['account/posts/popular']
+          }
+        }
+      }
+    },
+    foo: {
+      namespaced: true,
+
+      getters: {
+        // 在这个模块的 getter 中，`getters` 被局部化了
+        // 你可以使用 getter 的第四个参数来调用 `rootGetters`
+        someGetter (state, getters, rootState, rootGetters) {
+          getters.someOtherGetter // -> 'foo/someOtherGetter'
+          rootGetters.someOtherGetter // -> 'someOtherGetter'
+        },
+        someOtherGetter: state => { ... }
+      },
+
+      actions: {
+        // 在这个模块中， dispatch 和 commit 也被局部化了
+        // 他们可以接受 `root` 属性以访问根 dispatch 或 commit
+        someAction ({ dispatch, commit, getters, rootGetters }) {
+          getters.someGetter // -> 'foo/someGetter'
+          rootGetters.someGetter // -> 'someGetter'
+
+          dispatch('someOtherAction') // -> 'foo/someOtherAction'
+          dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+
+          commit('someMutation') // -> 'foo/someMutation'
+          commit('someMutation', null, { root: true }) // -> 'someMutation'
+        },
+        someOtherAction (ctx, payload) { ... },
+        someAction: {
+          root: true,
+          handler (namespacedContext, payload) { ... } // -> 'someAction'
+        }
+      }
     }
   }
 })
@@ -2229,20 +2408,62 @@ app.use(store)
 ///// 使用
 methods: {
   increment() {
+    //// 访问mutations,修改state
     this.$store.commit('increment')
+    this.$store.commit('increment2', 10)
+    this.$store.commit('increment3', { amount: 10 })
+    // 或者使用对象风格的提交方式 
+    this.$store.commit({ type: 'increment3', amount: 10 })
+    //// 访问state
     console.log(this.$store.state.count)
+    //// 访问getter
+    this.$store.getters.doneTodos // -> [{ id: 1, text: '...', done: true }]
+    this.$store.getters.getTodoById(2) // -> { id: 2, text: '...', done: false }
+    //// 访问action
+    this.$store.dispatch('increment')
+    // 以载荷形式分发
+    this.$store.dispatch('incrementAsync', {
+      amount: 10
+    })
+    // 以对象形式分发
+    this.$store.dispatch({
+      type: 'incrementAsync',
+      amount: 10
+    })
+    // 异步组合处理
+    this.$store.dispatch('actionA').then(() => {
+      // ...
+    })
   }
 }
-computed: mapState({
-  // 映射 this.count 为 store.state.count
-  'count'
-  // 箭头函数可使代码更简练
-  count: state => state.count,
-  // 传字符串参数 'count' 等同于 `state => state.count`
-  countAlias: 'count',
-  // 为了能够使用 `this` 获取局部状态，必须使用常规函数
-  countPlusLocalState (state) {
-    return state.count + this.localCount
+computed: {
+  doneTodosCount () {
+    return this.$store.getters.doneTodosCount
   }
-})
+}
+// 也可以通过mapStae，mapGetter，mapMutations,mapActions使用，具体参考vuex官方资料
+```
+
+### 组合式api
+
+```js
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+
+export default {
+  setup () {
+    const store = useStore()
+
+    return {
+      // 在 computed 函数中访问 state
+      count: computed(() => store.state.count),
+      // 在 computed 函数中访问 getter
+      double: computed(() => store.getters.double),
+      // 使用 mutation
+      increment: () => store.commit('increment'),
+      // 使用 action
+      asyncIncrement: () => store.dispatch('asyncIncrement')
+    }
+  }
+}
 ```
