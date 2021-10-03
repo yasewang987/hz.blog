@@ -25,9 +25,13 @@ bin/python3
 
 ## rpm包制作
 
+`%define __os_install_post %{nil}` 这个对于python和java不需要编译的项目特别重要，不需要解压、压缩、自动编译python和jar包这些操作。
+
 * 虚拟环境安装之后打包
 
 ```text
+%define __os_install_post %{nil}
+%define debug_package %{nil}
 %global mname mytest-env
 %global mpath %{mname}
 Name: %{mname}

@@ -94,6 +94,8 @@ rpmbuild -bb –-target=mipsel –-define="%_arch mipsel" SPECS/codeblocks.spec
 下面以解压完可以直接进行运行的hadoop为例:
 
 ```txt
+%define __os_install_post %{nil} //这个对于python和java不需要编译的项目特别重要，不需要解压、压缩、自动编译python和jar包这些操作。
+%define debug_package %{nil}		//忽略debug的错误信息
 Name: hadoop		//软件包名称
 Version: 2.7.0		//软件版本号
 Summary: The Apache© Hadoop project develops open-source software for reliable, scalable, distributed computing.		//软件描述
@@ -113,7 +115,6 @@ The Apache© Hadoop project develops open-source software for reliable, scalable
 
 // 读取位于 %_sourcedir 目录的源代码和 patch 。之后，解压源代码至 %_builddir 的子目录并应用所有 patch。
 %prep
-%global debug_package %{nil}		//忽略debug的错误信息
 %setup -q			//对SOURCES里面的软件源进行静默方式解压至BUILD目录
 
 // 编译位于 %_builddir 构建目录下的文件。通过执行类似 ./configure && make 的命令实现。
@@ -231,9 +232,13 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 
 ## 报错处理
 
-`SyntaxError: invalid syntax`: 在spec文件中添加如下内容
+* `SyntaxError: invalid syntax`: 在spec文件中添加如下内容
 
 ```text
 %global _python_bytecompile_errors_terminate_build 0
 %global __python %{__python3}
 ```
+
+* `ELF load command address not properly aligned`
+
+1. `torch`: 使用 `1.8.1` 版本
