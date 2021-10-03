@@ -555,3 +555,151 @@ function getMessage(type: MessageType, count?: number): Message[];
 ```
 像上面示例中正确做法这样，如果说入参个数只有一个，那可以直接跳过第一个函数签名，无须做入参类型的判断
 
+## 接口interface
+
+```ts
+interface LabeledValue {
+  label: string;
+}
+function printLabel(labeledObj: LabeledValue) {
+  console.log(labeledObj.label);
+}
+let myObj = { size: 10, label: "Size 10 Object" };
+printLabel(myObj); // OK
+
+// 简写
+function printLabel(labeledObj: { label: string }) {
+  console.log(labeledObj.label);
+}
+let myObj = { size: 10, label: "Size 10 Object" };
+printLabel(myObj); // OK
+
+// 可选属性
+interface Props { 
+  name: string; 
+  age: number; 
+  money?: number;
+}
+
+// 只读属性
+interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+
+let p: Point = { x: 10, y: 20 };
+p.x = 5; // Error
+
+// ReadonlyArray
+let a: number[] = [1, 2, 3, 4];
+let ro: ReadonlyArray<number> = a;
+ro[0] = 12; // Error
+ro.push(5); // Error
+ro.length = 100; // Error
+a = ro; // Error
+// 可以看到就算把整个ReadonlyArray赋值到一个普通数组也是不可以的，此时可以使用类型断言：
+a = ro as number[];
+
+/////// 接口继承接口
+interface Shape {
+  color: string;
+}
+interface PenStroke {
+  penWidth: number;
+}
+interface Square extends Shape, PenStroke {
+  sideLength: number;
+}
+
+let square: Square = { sideLength: 1 } // Error
+let square1: Square = { sideLength: 1, color: 'red' } // Error
+let square2: Square = { sideLength: 1, color: 'red', penWidth: 2 } // OK
+
+/////// new 代表 类class
+interface ClockConstructor {
+  new (hour: number, minute: number): any;
+}
+
+let C:ClockConstructor = class { // OK
+    constructor() {}
+}
+
+let C1:ClockConstructor = class { // OK
+    constructor(h: number) {}
+}
+ 
+let C2:ClockConstructor = class { // OK
+    constructor(h: number, m: number) {}
+}
+
+let C3:ClockConstructor = class { // Error
+    constructor(h: string, m: number) {}
+}
+
+let C4:ClockConstructor = class { // Error
+    constructor(h: number, m: number, b: number) {}
+}
+```
+
+## 泛型
+
+```ts
+////// 单个
+function identity<T>(arg: T): T {
+    return arg;
+}
+
+////// 多个
+function swap<T, U>(tuple: [T, U]): [U, T] {
+    return [tuple[1], tuple[0]];
+}
+
+swap([7, 'seven']); // ['seven', 7]
+
+////// 数组
+// 1
+function loggingIdentity<T>(arg: T[]): T[] {
+    console.log(arg.length);  // OK
+    return arg;
+}
+
+// 2
+function loggingIdentity<T>(arg: Array<T>): Array<T> {
+    console.log(arg.length);  // OK
+    return arg;
+}
+
+/////// 类型约束
+interface Lengthwise {
+    length: number;
+}
+function loggingIdentity<T extends Lengthwise>(arg: T): T {
+    console.log(arg.length);  // OK
+    return arg;
+}
+
+loggingIdentity({length: 10, value: 3}); // OK
+loggingIdentity([1,2]); // OK
+
+//////// 泛型接口
+interface GenericIdentityFn {
+    <T>(arg: T): T;
+}
+function identity<T>(arg: T): T {
+    return arg;
+}
+let myIdentity: GenericIdentityFn = identity;
+
+interface Person<T> {
+    name: T;
+    getAge(arg: T): T;
+}
+
+let myIdentity: Person<string> = {
+    name: "兔兔",
+    getAge(name) {
+        return name
+    }
+};
+
+```

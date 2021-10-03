@@ -1,53 +1,66 @@
 # python国产环境适配
 
+## 不同服务器迁移
+
+一定要注意一下，如果虚拟环境文件夹的路径变了，需要修改 `bin/activate` 的如下内容：
+```bash
+VIRTUAL_ENV="/home/venv"
+export VIRTUAL_ENV
+```
+
+## 激活环境
+
+使用 `virtualenv` 建立虚拟环境，直接放到涉密服务器即可。
+
+```bash
+# 激活虚拟环境
+source bin/activate
+
+# 进入python3环境验证包能不能正常用
+# 这个特别重要，一定要用虚拟环境的bin目录下的python3，不然找不到包
+bin/python3
+```
+
 ## 源码编译
 
 ## rpm包制作
 
-* 源码拷贝到主机上安装例子
+`%define __os_install_post %{nil}` 这个对于python和java不需要编译的项目特别重要，不需要解压、压缩、自动编译python和jar包这些操作。
+
+* 虚拟环境安装之后打包
 
 ```text
-Name:           pyltp
-Version:        0.2.1
-Release:        1%{?dist}
-Source0:        pyltp-0.2.1.tar.gz
-Summary:        funcun  libs
+%define __os_install_post %{nil}
+%define debug_package %{nil}
+%global mname mytest-env
+%global mpath %{mname}
+Name: %{mname}
+Version: 1.0.0
+Summary: %{mname}
+Release: 1
 License: GPLv3+
-BuildArch: noarch
-
-AutoReqProv: no
-
-%define _binaries_in_noarch_packages_terminate_build   0
+Group: System Enviroment/Base
+AutoReqProv:no
 
 %description
-funcun  libs
-
+funcun %{mname}
 
 %prep
-%setup -q
 
 %build
+
 %install
-rm -rf %{buildroot}/funcun/libs/%{name}
-mkdir  -p %{buildroot}/funcun/libs/%{name}
-cp -rf $RPM_BUILD_DIR/%{name}-%{version}/*  %{buildroot}/funcun/libs/%{name}
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/opt/mytest/%{mpath}
+cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %post
-cd /funcun/libs/%{name}
-python3 setup.py install
-
-%postun
-rm -rf /funcun/libs/%{name}
 
 %clean
-rm -rf %_builddir/%{name}-%{version}
-rm -rf %{buildroot}
 
 %files
-%defattr(-,root,root,-)
-/funcun/libs/%{name}
-
-%changelog
+%defattr(-,root,root,0775)
+/opt/mytest/%{mpath}
 ```
 
 * 编译在开发机，安装在专用机例子
@@ -62,6 +75,8 @@ Release:        1%{?dist}
 Source0:       scipy-1.5.4.tar.gz
 Summary:        funcun libs
 License: GPLv3+
+
+BuildRequires:  python3-setuptools, python3-devel
 
 %description
 funcun libs

@@ -159,7 +159,10 @@ module.exports = {
                 'rw',
                 'filecopy',
                 'readargs',
-                'rpc'
+                'rpc',
+                'mysql',
+                'scanf',
+                'orm'
             ],
             '/code/go/other/': [
                 'install',
@@ -175,12 +178,17 @@ module.exports = {
             ],
             '/code/web/ts/': [
                 'base',
-                'install'
+                'install',
+                'promise'
             ],
             '/code/web/vue/': [
-                'vscode'
+                'vscode',
+                'vue3',
+                'qiankun'
             ],
             '/code/web/css/': [
+                'resources',
+                'animation'
             ],
             '/microservices/consul/': [
                 'base',
@@ -212,9 +220,11 @@ module.exports = {
                 'invoke',
                 'state',
                 'pubsub',
-                'middleware',
+                'bindings',
+                'actor',
                 'observability',
-                'security'
+                'security',
+                'middleware'
             ],
             '/microservices/ocelot/': [
                 'middleware',
@@ -240,7 +250,9 @@ module.exports = {
                 'install',
                 'dockerfiles',
                 'dockerfilebest',
-                'buildx'
+                'buildx',
+                'network',
+                'update'
             ],
             '/devops/gitlab/': [
                 'gitlab-install',
@@ -258,6 +270,7 @@ module.exports = {
                 'prometheus',
                 'node-exporter',
                 'gpu-exporter',
+                'mysqld-exporter',
                 'custom-exporter',
                 'wechat-alert'
             ],

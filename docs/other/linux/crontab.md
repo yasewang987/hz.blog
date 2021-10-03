@@ -74,3 +74,14 @@ crontab -u xxx -r
 # 指定日志文件保存位置
 27 10 * * * /usr/bin/sh /opt/lyy/checkES.sh >>/opt/lyy/checkES.log 2>&1
 ```
+
+## shell脚本中添加crontab
+
+在shell脚本中添加如下内容：
+
+```shell
+#!/bin/bash
+crontab -l > crontab_tmp
+echo "* * * * * echo hello" > crontab_tmp
+crontab crontab_tmp
+```

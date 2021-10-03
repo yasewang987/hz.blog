@@ -8,6 +8,8 @@ Dapr是一个可移植的、无服务器的、事件驱动的运行时，它使�
 
 quickstarts: https://github.com/dapr/quickstarts
 
+如果是自托管需要在每台服务器上都安装dapr。
+
 ## 安装Dapr Cli
 
 官方github仓库的Release页面下载对应系统的压缩包
@@ -94,4 +96,85 @@ spec:
       endpointAddress: "http://localhost:9411/api/v2/spans"
 ```
 
+## 使用 Docker-Compose 运行
 
+如果您希望在没有Kubernetes的情况下，在本地使用Dapr sidecars运行多个应用程序，那么建议使用Docker Compose定义（docker-compose.yml）。
+
+为了使用Dapr和Docker Compose运行您的应用程序，您需要在您的`docker-compose.yml`中定义sidecar模式。 例如:
+
+
+```yaml
+version: '3'
+services:
+  nodeapp:
+    build: ./node
+    ports:
+      - "50001:50001" # Dapr instances communicate over gRPC so we need to expose the gRPC port
+    depends_on:
+      - redis
+      - placement
+    networks:
+      - hello-dapr
+  nodeapp-dapr:
+    image: "daprio/daprd:edge"
+    command: [
+      "./daprd",
+     "-app-id", "nodeapp",
+     "-app-port", "3000",
+     "-placement-host-address", "placement:50006" # Dapr's placement service can be reach via the docker DNS entry
+     ]
+    volumes:
+        - "./components/:/components" # Mount our components folder for the runtime to use
+    depends_on:
+      - nodeapp
+    network_mode: "service:nodeapp" # Attach the nodeapp-dapr service to the nodeapp network namespace
+
+  ... # Deploy other daprized services and components (i.e. Redis)
+
+  placement:
+    image: "daprio/dapr"
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+    networks:
+      - hello-dapr Redis)
+
+  placement:
+    image: "daprio/dapr"
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+    networks:
+      - hello-dapr
+```
+
+## 卸装dapr
+
+```bash
+# 下面的 CLI 命令移除Dapr sidecar 二进制文件和placement 容器：
+dapr uninstall
+
+# 上述命令不会删除在dapr init期间默认安装的Redis或Zipkin容器，以防你将它们用于其他目的。 要删除 Redis, Zipkin, Actor Placement 容器，以及位于 $HOME/.dapr 或 %USERPROFILE%\.dapr\, 运行：
+dapr uninstall --all
+```
+
+## 升级dapr
+
+```bash
+# 卸载
+dapr uninstall --all
+
+# 下载最新版本
+
+# 初始化
+dapr init
+
+# 查看版本
+$ dapr --version
+```
+
+## 不使用docker运行
+
+1. 下载dapr cli
+1. `dapr init --slim` 使用slim模式启动，在此模式下安装了两个不同的二进制文件 daprd 和 placement。不会为状态管理或发布/订阅安装任何默认组件（如 Redis）。
+1. 到`/$HOME/. dapr/bin`目录下启动对应功能（placement等）

@@ -473,3 +473,48 @@ location /train {
 如果配置两个 `root`，http://xxxx/train 会提示404。
 
 `root`的处理结果是：root路径＋location路径 `alias`的处理结果是：使用alias路径替换location路径 `alias`是一个目录别名的定义，root则是最上层目录的定义。 还有一个重要的区别是alias后面必须要用 `/` 结束，否则会找不到文件的。。。而root则可有可无~~
+
+## Nginx静态文件服务器
+
+注意需要将对应的文件夹`/home/data/download`权限改成 `777`.
+
+```conf
+server {
+    # 监听8001端口
+    listen       8001;
+    server_name  192.168.0.2;
+    # 指定使用utf8的编码
+    charset utf-8;
+    # 内容根目录
+    root /home/data/download;
+
+    location / {
+        # 自动创建目录文件列表为首页
+        autoindex on;
+        # 自动首页的格式为html
+        autoindex_format html;
+        # 关闭文件大小转换
+        autoindex_exact_size off;
+        # 按照服务器时间显示文件时间
+        autoindex_localtime on;
+
+        default_type application/octet-stream;
+        # 开启零复制。默认配置中，文件会先到nginx缓冲区，开启零复制后，文件跳过缓冲区，可以加快文件传输速度。
+        sendfile on;
+        # 限制零复制过程中每个连接的最大传输量
+        sendfile_max_chunk 1m;
+        # tcp_nopush与零复制配合使用，当数据包大于最大报文长度时才执行网络发送操作，从而提升网络利用率。
+        tcp_nopush on;
+        # 启用异步IO，需要配合direcio使用
+        aio on;
+        # 大于10MB的文件会采用直接IO的当时进行缓冲读取
+        directio 10m;
+        # 对齐文件系统块大小4096
+	directio_alignment 4096;
+	# 启用分块传输标识
+	chunked_transfer_encoding on;
+	# 文件输出的缓冲区大小为128KB
+	output_buffers 4 32k;
+    }
+}
+```

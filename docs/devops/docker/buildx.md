@@ -31,9 +31,9 @@
 
     ```bash
     # 建议(包含了mips64el等)
-    docker run --privileged --rm tonistiigi/binfmt:buildkit:latest --install all
+    docker run --privileged --rm tonistiigi/binfmt:latest --install all
     # 卸载
-    docker run --privileged --rm tonistiigi/binfmt:buildkit:latest --uninstall qemu-*
+    docker run --privileged --rm tonistiigi/binfmt:latest --uninstall qemu-*
     # 备用
     docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
     # 这个只是在机器上安装所有的qemu支持，但是 docker buildx 并不能使用

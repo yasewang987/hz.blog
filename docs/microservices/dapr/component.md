@@ -58,5 +58,26 @@ curl http://localhost:3500/v1.0/secrets/my-secret-store/my-secret
 # 内容如下
 {"my-secret":"yasewang"}
 ```
+go代码获取密钥示例
+
+```go
+import (
+  "fmt"
+  "net/http"
+)
+
+func main() {
+  url := "http://localhost:3500/v1.0/secrets/my-secrets-store/my-secret"
+
+  res, err := http.Get(url)
+  if err != nil {
+    panic(err)
+  }
+  defer res.Body.Close()
+
+  body, _ := ioutil.ReadAll(res.Body)
+  fmt.Println(string(body))
+}
+```
 
 

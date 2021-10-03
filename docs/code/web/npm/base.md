@@ -1,9 +1,37 @@
 # 使用NPM库管理前端通用库
 
-## 常用
+使用`nvm`管理node和npm
+## 常用命令
 
-* 使用`nvm`管理node和npm
-* 查看全局安装模块：`npm list --depth=0 -global`
+```bash
+# 查看全局安装模块
+npm list --depth=0 -global
+
+# 把webpack包安装到node_modules目录
+# 在package.json的dependencies属性下（项目正常运行时需要）
+# 运行 npm install 初始化项目时会下载模块
+npm install --save xxx
+npm install -S xxx
+yarn add xxx
+
+# 把webpack包安装到node_modules目录
+# 在package.json的devDependencies属性下(项目开发时需要)
+# 运行 npm install 初始化项目时会下载模块
+npm install --save-dev xxx
+npm install -D xxx
+yarn add -D xxx
+
+# 安装模块到项目node_modules目录下
+# 不会将模块依赖写入devDependencies或dependencies 节点
+# 运行 npm install 初始化项目时不会下载模块
+npm install xxx
+
+# 安装模块到全局，不会在项目node_modules目录中保存模块包
+# 不会将模块依赖写入devDependencies或dependencies 节点
+# 运行 npm install 初始化项目时不会下载模块
+npm install -g xxx
+yarn add -g xxx
+```
 
 ## 建立自己的npm库
 
@@ -123,7 +151,7 @@
         1. 运行测试脚本：`npm run test`
 
 1. 将项目上传到`GitHub`托管：
-    1. 忽略没有必要上传的文件
+    1. 忽略没有必要上传的文件 `.gitignore`
         ```bash
         # .gitignore
         node_modules/
@@ -131,7 +159,7 @@
         /dist/
         ```
     1. 推送到远程仓库
-        ```git
+        ```bash
         git init
         git add .
         git commit -m 'init'
@@ -139,7 +167,7 @@
         git push -u origin master
         ```
 1. 发布到`npm`：
-    1. 忽略没有必要上传的文件：
+    1. 忽略没有必要上传的文件：`.npmignore`
         ``` bash
         # .npmignore
         lib/
@@ -209,7 +237,7 @@
     ```bash
     # 新建一个 testNPM.js文件
     # 安装类库
-    npm install --dev hzgodutils
+    npm install -S hzgodutils
 
     # 在testNPM.js添加如下内容,也可以使用import
     var hzutils = require('hzgodutils')

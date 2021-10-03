@@ -24,9 +24,13 @@ sudo apt-get upgrade
 ## 修改IP，DNS
 
 ```bash
+# ubuntu
 sudo vim /etc/systemd/resolved.conf
 
 DNS=114.114.114.114 233.5.5.5 8.8.8.8
+
+# 重启生效
+systemctl restart systemd-resolved
 ```
 
 ```bash

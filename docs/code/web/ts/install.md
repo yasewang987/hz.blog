@@ -9,7 +9,7 @@
 1. 修改package.json文件配置（需要先执行`npm init`）：
     ```json
     {
-        "main": "./dist/index.js", // 配合tcconfig.json中的outDir字段
+        "main": "./dist/index.js", // 配合tsconfig.json中的outDir字段
         "scripts": {
             // "test": "./node_modules/.bin/mocha --reporter spec",
             "init": "./node_modules/.bin/tsc --init",

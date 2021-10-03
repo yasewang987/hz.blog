@@ -153,5 +153,9 @@ sed -i 's/\.$/\!/g' regular_express.txt
 
 # 直接在 regular_express.txt 最后一行加入 # This is a test:
 sed -i '$a # This is a test' regular_express.txt
+
+# 使用变量替换
+teststr="IBM"
+sed -n '/' "$teststr" '/=' testfile.txt
 ```
 
