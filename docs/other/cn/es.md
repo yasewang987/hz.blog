@@ -28,8 +28,8 @@ elif [ ! -z "$JAVA_HOME" ]; then
   JAVA="$JAVA_HOME/bin/java"
   JAVA_TYPE="JAVA_HOME"
 
-# 启动
-/opt/mytest/elasticsearch/bin/elasticsearch
+# 启动 -d 后台运行
+/opt/mytest/elasticsearch/bin/elasticsearch -d
 
 # 查看到es对应的版本和基本信息
 curl http://localhost:9200

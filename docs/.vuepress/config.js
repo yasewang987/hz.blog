@@ -246,13 +246,14 @@ module.exports = {
             '/devops/docker/': [
                 'cmd',
                 'problem',
-                'compose-netcore',
                 'install',
                 'dockerfiles',
                 'dockerfilebest',
                 'buildx',
                 'network',
-                'update'
+                'update',
+                'composefile',
+                'compose-netcore'
             ],
             '/devops/gitlab/': [
                 'gitlab-install',

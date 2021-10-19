@@ -2467,3 +2467,10 @@ export default {
   }
 }
 ```
+
+## TS项目问题记录
+
+* `store does not exist on type` : 在 `src` 目录添加 `vue.d.ts` 文件，内容如下：
+
+```ts
+```

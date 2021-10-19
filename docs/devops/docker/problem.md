@@ -157,3 +157,24 @@ systemctl restart network && systemctl restart docker
 # 查看是否修改成功
 sysctl net.ipv4.ip_forward
 ```
+
+## OCI runtime create failed container init caused “write /proc/self/attr/keycreate: permission denied““: unknown
+
+需要关闭 `SELINUX`,修改文件 `/etc/selinux/config`
+
+* 强制模式`SELINUX=enforcing`：表示所有违反安全策略的行为都将被禁止。
+* 宽容模式`SELINUX=permissive`：表示所有违反安全策略的行为不被禁止，但是会在日志中作记录。
+* 关闭 `SELINUX=disabled`: 表示关闭
+
+```text
+SELINUX=disabled
+```
+
+然后重启服务器,即可。
+
+```bash
+# 获取selinux状态
+getenforce
+# 临时关闭selinux
+setenforce 0
+```
