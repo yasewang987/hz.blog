@@ -82,6 +82,33 @@ docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/u
 # 在dockerfile中加入如下内容，stretch这个需要注意看一下构建镜像的时候提示的默认版本是什么
 RUN echo "deb http://mirrors.aliyun.com/debian/ stretch main" >/etc/apt/sources.list && echo "deb http://mirrors.aliyun.com/debian-security stretch/updates main" >>/etc/apt/sources.list && echo "deb http://mirrors.aliyun.com/debian/ stretch-updates main" >>/etc/apt/sources.list
 ```
+## docker限定日志大小
+
+单容器限制：
+
+```bash
+docker run -it --log-opt max-size=10m --log-opt max-file=3 redis
+```
+
+全局设置：修改docker配置文件`daemon.json`:
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": {"max-size": "10m", "max-file": "3"}
+}
+```
+
+重启生效：
+
+```bash
+systemctl daemon-reload
+systemctl restart docker
+
+# 或者直接执行
+systemctl reload docker
+```
+
 
 ## docker容器日志清理
 
@@ -111,27 +138,6 @@ echo "======== end clean docker containers logs ========"
 crontab -e
 
 0 0 2 * * ? /home/docker-sh/clean_docker_log.sh
-```
-
-## docker限定日志大小
-
-修改docker配置文件`daemon.json`:
-
-```json
-{
-  "log-driver": "json-file",
-  "log-opts": {"max-size": "10m", "max-file": "3"}
-}
-```
-
-重启生效：
-
-```bash
-systemctl daemon-reload
-systemctl restart docker
-
-# 或者直接执行
-systemctl reload docker
 ```
 
 ## 优雅重启dockerd

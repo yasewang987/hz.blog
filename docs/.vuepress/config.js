@@ -169,7 +169,8 @@ module.exports = {
                 'docker',
                 'problem',
                 'cmd',
-                'version'
+                'version',
+                'notice'
             ],
             '/code/web/npm/': [
                 'base',
