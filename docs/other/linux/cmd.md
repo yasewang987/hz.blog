@@ -354,6 +354,7 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
     PermitEmptyPasswords no #不允许空密码登录
     # 修改完毕之后需要重启sshd服务`systemctl restart sshd`
     ```
+如果调整之后还是不能免密码远程登录，需要注意下 `~/.ssh/authorized_keys` 文件的权限。确实是 `700`或者`600`, 调整完权限之后需要重启`sshd`服务。
 ---
 
 ## 查看命令安装位置
