@@ -135,6 +135,26 @@ module.exports = {
 };
 ```
 
+* 主项目添加多项目启动 `yarn add npm-run-all`,并修改`package.json`：
+```json
+{
+    "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "install:main": "npm install",
+    "install:login": "cd ../../box.login && npm install",
+    "install-all": "npm-run-all install:*",
+    "start:main": "npm run serve",
+    "start:login": "cd ../../box.login && npm run serve",
+    "start-all": "npm-run-all --parallel start:*",
+    "build:main": "npm run build",
+    "build:login": "cd ../../box.login && npm run build",
+    "build-all": "npm-run-all --parallel build:*"
+    },
+}
+```
+
 ### 创建微应用
 
 * 创建应用：`vue create search`，选择`vue3,ts,vue-router,vue-store等`

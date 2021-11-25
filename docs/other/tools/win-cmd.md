@@ -1,4 +1,4 @@
-# Windows服务器常用操作记录
+# Windows常用操作记录
 
 
 ## Windows服务
@@ -52,7 +52,6 @@ call xcopy ./out E:\test /e /y
     "commandline": "C:\\Program Files\\Git\\bin\\bash.exe", // git-bash的命令行所在位置
     "cursorColor": "#FFFFFF", // 光标颜色
     "cursorShape": "bar", // 光标形状
-    "fontFace": "YaHei Consolas Hybrid", // 字体配置，选择你电脑上已安装的字体
     "fontSize": 14, // 终端字体大小
     "guid": "{1c4de342-38b7-51cf-b940-2309a097f589}", // 唯一的标识，改成和其他的已有终端不一样
     "historySize": 9001, // 终端窗口记忆大小

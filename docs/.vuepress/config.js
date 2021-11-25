@@ -48,7 +48,8 @@ module.exports = {
                             { text: 'Npm', link: '/code/web/npm/' },
                             { text: 'TypeScript', link: '/code/web/ts/' },
                             { text: 'Vue', link: '/code/web/vue/' },
-                            { text: 'CSS', link: '/code/web/css/' }
+                            { text: 'CSS', link: '/code/web/css/' },
+                            { text: 'Other', link: '/code/web/other/' }
                         ]
                     }
                 ]
@@ -184,12 +185,16 @@ module.exports = {
             ],
             '/code/web/vue/': [
                 'vscode',
-                'vue3',
-                'qiankun'
+                'vue3'
             ],
             '/code/web/css/': [
                 'resources',
                 'animation'
+            ],
+            '/code/web/other/': [
+                'qiankun',
+                'microapp',
+                'electron'
             ],
             '/microservices/consul/': [
                 'base',

@@ -42,12 +42,17 @@ replicaof 主redis-ip 主reids端口
 masterauth 主redis密码
 ```
 
-## redis-cli客户端连接
+## redis常用命令
 
 ```bash
+# 客户端链接
 redis-cli -p 1234 -a mypassword
-```
 
+# 获取修改(连上redis之后执行)
+config get client-output-buffer-limit
+# 修改配置
+config set client-output-buffer-limit "normal 0 0 0 slave 0 0 0 pubsub 33554432 8388608 60"
+```
 ## nginx反向代理
 
 监听具备公网ip服务器的3307端口，实现跳转到172.31.88.27的3306端口。
@@ -81,3 +86,5 @@ stream {    # stream 模块配置和 http 模块在相同级别
     将 `net.core.somaxconn = 1024` 添加到`/etc/sysctl.conf`中，然后执行 `sysctl -p` 生效配置。
 
 * redis容器间隔1分钟左右就自动重启：有很大可能是redis的rdb文件比较大，服务器内存不够了，需要释放内存之后再启动。
+
+* redis从库过多导致数据同步失败：修改主库的配置文件中的 `client-output-buffer-limit`,命令如下：`config set client-output-buffer-limit "normal 0 0 0 slave 0 0 0 pubsub 33554432 8388608 60"`
