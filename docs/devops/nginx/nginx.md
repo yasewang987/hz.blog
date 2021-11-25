@@ -86,6 +86,7 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
       listen 8082;
       access_log    logs/tomcat-access.log main;
       error_log     logs/tomcat-error.log warn;
+      client_max_body_size 20G; //这里特别注意一下，如果配置比较小上传文件大小会受限制
       location / {
         proxy_pass http://tomcat_pools;
         proxy_http_version 1.1;
@@ -102,7 +103,7 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
           proxy_pass http://localhost:5000/;
       }
 
-      location /new {
+      location /new/ {
           proxy_pass http://localhost:5000/outsider/;
       }
   }

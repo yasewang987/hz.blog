@@ -37,6 +37,9 @@ Linux crontab是用来定期执行程序的命令。
 
 # 每月的1、11、21、31日是的6：30执行一次ls命令
 30 6 */10 * * ls
+
+# 开机之后执行命令
+@reboot echo "hello"
 ```
 
 ## Crontab常用命令

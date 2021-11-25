@@ -27,6 +27,24 @@
 
 * 注意，有可能ssh连接到容器中的时候`环境变量`与执行 `docker exec`的不一致，导致有些命令无法执行。这个时候需要将`docker exec`状态下的环境变量`$PATH`的值加到 ssh 下的 `.basrc` 最后面，例如：`export PATH=$PATH:/opt/conda/bin:/opt/cmake-3.14.6-Linux-x86_64/bin/`
 
+## Windows设置gitbash为默认terminal
+打开 `settings.json` ,添加如下内容
+
+```json
+{
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      ...
+    },
+    "GitBash": {
+      "path": "D:\\Git\\bin\\bash.exe"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "GitBash",
+  "terminal.integrated.automationShell.windows": "D:\\Git\\bin\\bash.exe",
+  "terminal.external.windowsExec": "D:\\Git\\bin\\bash.exe"
+}
+```
 ## C# 开发
 ### C# Extensions
 这个插件最有用的功能是可以右键新建C#类和C#接口，同时支持各种code snippets，例如 ctor 、prop等，具体功能特性，可以查看插件的说明
