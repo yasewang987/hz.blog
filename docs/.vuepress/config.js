@@ -163,7 +163,8 @@ module.exports = {
                 'rpc',
                 'mysql',
                 'scanf',
-                'orm'
+                'orm',
+                'time'
             ],
             '/code/go/other/': [
                 'install',
