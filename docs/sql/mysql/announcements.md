@@ -8,40 +8,55 @@
   > mysql在使用文件排序（using filesort）会出现这个问题，如果使用排序字段有索引默认就不会使用文件索引，就没有这个问题
 
 * 解决方案
-  > 如果想在Limit存在或不存在的情况下，都保证排序结果相同，可以额外加一个排序条件。例如id字段是唯一的，可以考虑在排序字段中额外加个id排序去确保顺序稳定。
+  > 如果想在Limit存在或不存在的情况下，都保证排序结果相同，可以额外加一个排序条件。例如`id`字段是唯一的，可以考虑在排序字段中额外加个id排序去确保顺序稳定。
 
 
 ## 常用sql语句
 
-`insert ignore into` : 如果记录存在了就忽略本次ignore本次插入。如果记录不存在就写入(`唯一键` 不能重复)。
+```sql
+-----------表结构操作-------------
+-- 添加普通索引
+alter table t add index idx1(colname)
+-- 多列索引
+alter table t add index idx1(colname1,colname2)
+-- 添加唯一索引
+alter table t add unique index idx1(colname)
+-- 添加全文索引
+alter table t add fulltext idx1(colname) 
 
-`replace into` : 如果数据已经存在了就更新（全量替换）。如果数据不存在就更写入(`唯一键` 不能重复)。
 
-`on duplicate key update`: 如果记录存在就更新，如果记录不存在就插入。如果你每次使用on duplicate key update进行更新时（注意是更新而不是插入），MySQL也会让last_insert_id变大。这就会出现id不连续增长的现象。
+-----------数据操作------------
+-- 如果记录存在了就忽略本次ignore本次插入。如果记录不存在就写入(`唯一键` 不能重复)。
+insert ignore into 
 
-## mysql锁表查询
+-- 如果数据已经存在了就更新（全量替换）。如果数据不存在就更写入(`唯一键` 不能重复)。
+replace into
 
-```bash
-# 查询是否锁表
+-- 如果记录存在就更新，如果记录不存在就插入。如果你每次使用on duplicate key update进行更新时（注意是更新而不是插入），MySQL也会让last_insert_id变大。这就会出现id不连续增长的现象。
+on duplicate key update
+
+
+-----------锁表查询------------
+-- 查询是否锁表
 show OPEN TABLES where In_use > 0;
-# 查看所有进程
-# MySQL:
+-- 查看所有进程
+-- MySQL:
 show processlist;
-# mariabd:
+-- mariadb:
 show full processlist;
-# 查询到相对应的进程===然后 kill id
-#杀掉指定mysql连接的进程号
+-- 查询到相对应的进程===然后 kill id
+-- 杀掉指定mysql连接的进程号
 kill $pid
-# 查看正在锁的事务
+-- 查看正在锁的事务
 SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS; 
-# 查看等待锁的事务
+-- 查看等待锁的事务
 SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS; 
-# 查看innodb引擎的运行时信息
+-- 查看innodb引擎的运行时信息
 show engine innodb status\G;
-# 查看造成死锁的sql语句，分析索引情况，然后优化sql语句；
+-- 查看造成死锁的sql语句，分析索引情况，然后优化sql语句；
  
-# 查看服务器状态
+-- 查看服务器状态
 show status like '%lock%';
-# 查看超时时间：
+-- 查看超时时间：
 show variables like '%timeout%';
 ```

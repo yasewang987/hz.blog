@@ -44,6 +44,7 @@ func main() {
     req.Header.Add("name","zhaofan")
     req.Header.Add("age","3")
     resp,_ := client.Do(req)
+    defer resp.Body.Close()
     body, _ := ioutil.ReadAll(resp.Body)
     fmt.Printf(string(body))
 }
@@ -53,23 +54,13 @@ func main() {
 
 ```go
 func main() {
-    urlValues := url.Values{}
-    urlValues.Add("name","zhaofan")
-    urlValues.Add("age","22")
-    resp, _ := http.PostForm("http://httpbin.org/post",urlValues)
-    body, _ := ioutil.ReadAll(resp.Body)
-    defer resp.Body.Close()
-    fmt.Println(string(body))
-}
-
-// 另外一种方式
-func main() {
     urlValues := url.Values{
         "name":{"zhaofan"},
         "age":{"23"},
     }
     reqBody:= urlValues.Encode()
     resp, _ := http.Post("http://httpbin.org/post", "text/html",strings.NewReader(reqBody))
+    defer resp.Body.Close()
     body,_:= ioutil.ReadAll(resp.Body)
     fmt.Println(string(body))
 }
@@ -85,16 +76,6 @@ func main() {
     resp, _ := client.Do(req)
     body, _ := ioutil.ReadAll(resp.Body)
     defer resp.Body.Close()
-    fmt.Println(string(body))
-}
-// 不用client的post请求
-func main() {
-    data := make(map[string]interface{})
-    data["name"] = "zhaofan"
-    data["age"] = "23"
-    bytesData, _ := json.Marshal(data)
-    resp, _ := http.Post("http://httpbin.org/post","application/json", bytes.NewReader(bytesData))
-    body, _ := ioutil.ReadAll(resp.Body)
     fmt.Println(string(body))
 }
 ```

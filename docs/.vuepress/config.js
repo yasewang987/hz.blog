@@ -320,7 +320,6 @@ module.exports = {
                 'nexus',
                 'elasticsearch',
                 'minio',
-                'mysql',
                 'redis',
                 'qemu',
                 'nextterminal',
