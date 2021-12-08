@@ -16,6 +16,11 @@
 
 ```bash
 docker run -d -v /etc/localtime:/etc/localtime --name hello helloworld
+
+RUN apk add tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/localtimezone \
+    && apk del tzdata
 ```
 
 ## docker中文乱码问题

@@ -59,4 +59,13 @@ show engine innodb status\G;
 show status like '%lock%';
 -- 查看超时时间：
 show variables like '%timeout%';
+
+--------慢sql查询-------------
+show variables like '%query';
+-- slow_query_log : 是否开启慢查询日志,需要临时开启，执行如下命令
+set global slow_query_log=on
+set global slow_query_log=off
+-- slow_query_log_file : 慢查询日志存储位置
+-- long_query_time : 超多多长时间的查询被定义为慢查询，默认10s，可以通过如下命令设置
+set long_query_time=5
 ```

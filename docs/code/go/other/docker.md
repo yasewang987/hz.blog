@@ -12,8 +12,11 @@ RUN go build -o alertsystem ./src
 
 FROM alpine
 WORKDIR /app
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-COPY --from=builder /app/alertsystem .
+RUN apk add tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/localtimezone \
+    && apk del tzdata
+COPY --from=builder /app/alertsystem /app/config.yaml ./
 ENV GIN_MODE=release \
     PORT=80
 EXPOSE 80
