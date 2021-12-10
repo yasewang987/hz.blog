@@ -1,6 +1,7 @@
 # Go Http请求
 
-## GET请求
+## 客户端
+### GET请求
 
 ```go
 func main(){
@@ -49,8 +50,7 @@ func main() {
     fmt.Printf(string(body))
 }
 ```
-
-## POST使用
+### POST使用
 
 ```go
 func main() {
@@ -80,51 +80,53 @@ func main() {
 }
 ```
 
-## 企业微信机器人实例
+## Http服务端
 
 ```go
-r.POST("/git/pipeline/wechat", func(context *gin.Context) {
-    var request GitlabRequest
+func main() {
+	// 加载配置
+	conf.GlobalConfig = &conf.Config{}
+	conf.GlobalConfig.InitConfig("./config.yaml")
 
-    // 反序列化为结构
-    context.ShouldBindJSON(&request)
-
-    text := fmt.Sprint("流水线执行结果\n流水线id：", request.ObjectAttributes.Id,
-        "\n执行状态：", request.ObjectAttributes.Status,
-        "\n项目名：", request.Project.Name,
-        "\n发布主题：", request.Commit.Title,
-        "\n提交内容链接：", request.Commit.Url)
-
-    // send message
-    url := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=11"
-    method := "POST"
-    playload := strings.NewReader(`{
-"msgtype": "text",
-"text": {
-    "content": "` + text + `"
+	// 启动http-listen
+    // get
+	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Write([]byte("hello"))
+	})
+    // post
+	http.HandleFunc("/validateToken", ValidateToken)
+	http.ListenAndServe(":9999", nil)
 }
-}`)
-    // http请求
-    client := &http.Client{}
-    req,err := http.NewRequest(method,url, playload)
 
-    if err != nil {
-        context.JSON(http.StatusInternalServerError, err)
-    }
-    req.Header.Add("Content-Type","application/json")
-    res,err := client.Do(req)
-    if err != nil {
-        context.JSON(http.StatusInternalServerError, err)
-    }
+type tokenRes struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
 
-    defer res.Body.Close()
+// 验证token
+func ValidateToken(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+	token := string(b)
 
-    body,err := ioutil.ReadAll(res.Body)
+	// 验证token
+	resToken := auth.VilidateToken(token, "123456")
 
-    if err != nil {
-        context.JSON(http.StatusInternalServerError, err)
-    }
-    //data,_ := json.Marshal(request)
-    context.JSON(http.StatusOK, string(body))
-})
+	res := tokenRes{
+		Code:    0,
+		Message: "认证通过",
+	}
+	if !resToken {
+		res.Code = 1
+		res.Message = "token错误，请重新输入!"
+	}
+
+	// 返回
+	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 ```

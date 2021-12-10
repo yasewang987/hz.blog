@@ -1,5 +1,6 @@
 # Go常用导航
 
+* [Go语言基础](./base.md)
 * [Http请求](./http.md)
 * [MongoDb操作](./mongodb.md)
 * [Go锁](./lock.md)

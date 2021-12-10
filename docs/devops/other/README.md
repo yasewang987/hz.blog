@@ -5,6 +5,6 @@
 * [Elasticsearch](./elasticsearch.md)
 * [Redis](./redis.md)
 * [MinIO](./minio.md)
-* [QEMU](./qemu.md)
 * [Next-Terminal](./nextterminal.md)
 * [Jumpserver](./jumpserver.md)
+* [蝉道部署](./zentao.md)

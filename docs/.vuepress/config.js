@@ -152,6 +152,7 @@ module.exports = {
                 'gin'
             ],
             '/code/go/common/': [
+                'base',
                 'http',
                 'mongodb',
                 'lock',
@@ -322,9 +323,9 @@ module.exports = {
                 'elasticsearch',
                 'minio',
                 'redis',
-                'qemu',
                 'nextterminal',
-                'jumpserver'
+                'jumpserver',
+                'zentao'
             ],
             '/sql/mssql/': [
                 'usesul'
@@ -384,7 +385,6 @@ module.exports = {
                 'win-tools',
                 'vscode',
                 'resource',
-                'zentao',
                 'devtools'
             ],
             '/other/cloud/': [
