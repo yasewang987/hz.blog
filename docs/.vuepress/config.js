@@ -385,7 +385,8 @@ module.exports = {
                 'win-tools',
                 'vscode',
                 'resource',
-                'devtools'
+                'devtools',
+                'plantuml'
             ],
             '/other/cloud/': [
                 'proxmox',
