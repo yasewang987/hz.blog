@@ -187,7 +187,8 @@ module.exports = {
             ],
             '/code/web/vue/': [
                 'vscode',
-                'vue3'
+                'vue3',
+                'vitevue'
             ],
             '/code/web/css/': [
                 'resources',
