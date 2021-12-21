@@ -156,7 +156,6 @@ module.exports = {
                 'http',
                 'mongodb',
                 'lock',
-                'package',
                 'godoc',
                 'rw',
                 'filecopy',
@@ -165,7 +164,8 @@ module.exports = {
                 'mysql',
                 'scanf',
                 'orm',
-                'time'
+                'time',
+                'server'
             ],
             '/code/go/other/': [
                 'install',
@@ -173,7 +173,8 @@ module.exports = {
                 'problem',
                 'cmd',
                 'version',
-                'notice'
+                'notice',
+                'package'
             ],
             '/code/web/npm/': [
                 'base',

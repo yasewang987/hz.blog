@@ -7,3 +7,4 @@
 * [Go多版本管理](./version.md)
 
 * [Go使用注意事项](./notice.md)
+* [Go多版本管理](./package.md)

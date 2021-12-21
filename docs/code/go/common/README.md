@@ -4,7 +4,6 @@
 * [Http请求](./http.md)
 * [MongoDb操作](./mongodb.md)
 * [Go锁](./lock.md)
-* [Go Module包导入](./package.md)
 * [Godoc使用](./godoc.md)
 * [Go读写操作](./rw.md)
 * [Go文件拷贝](./filecopy.md)
@@ -14,3 +13,4 @@
 * [格式化字符串](./scanf.md)
 * [go-orm资料记录](./orm.md)
 * [time介绍](./time.md)
+* [服务器信息获取](./server.md)

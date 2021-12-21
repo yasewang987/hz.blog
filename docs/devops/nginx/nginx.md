@@ -395,7 +395,7 @@ server {
     }
 }
 ```
-## Nginx根据请求头转发到不同服务
+## Nginx根据请求头转发到不同版本服务
 
 转发规则配置，使用`$http_XXX`，来获取header指定的值，`$http_`为固定格式,`XXX`为自定义header字段名。
 

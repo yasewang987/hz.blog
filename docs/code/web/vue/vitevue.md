@@ -579,6 +579,16 @@ export default defineConfig({
 })
 ```
 
+* 添加vue文件在`vscode`中智能提示`element-plus`, 在 `tsconfig.json` 中添加如下配置
+
+```json
+{
+  "compilerOptions": {
+    "types": ["./node_modules/element-plus/global"]
+  }
+}
+```
+
 * 在 `vue` 文件中就不需要再引入对应的组件了。 如果使用 `vscode` 时没有智能提示，需要关闭`vscode`重开。
 
 > 注意事项：按需加载 `ElMessageBox, ElLoading` 等组件时，需要 `import` 对应的 `scss` 样式文件，不然会没有样式。
