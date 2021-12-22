@@ -142,6 +142,42 @@ location / {
 }
 ```
 
+## proxy_pass 相对/绝对 路径
+
+### 绝对路径
+
+```conf
+# 注意在proxy_pass地址后面带上 /
+location /proxy {
+    proxy_pass http://192.168.137.181:8080/;
+}
+
+location /proxy {
+    proxy_pass http://10.0.0.1:8080/static01/;
+}
+```
+
+第一个： 当访问 `http://127.0.0.1/proxy/test/test.txt` 时，nginx匹配到 `/proxy` 路径，把请求转发给 `192.168.137.181:8080` 服务，实际请求路径为`http://10.0.0.1:8080/test/test.txt`，nginx会去掉匹配的`/proxy`。
+
+第二个： 当访问 `http://127.0.0.1/proxy/test/test.txt` 时，nginx匹配到`/proxy`路径，把请求转发给`192.168.137.181:8080`服务，实际请求代理服务器的路径为`http://10.0.0.1:8080/static01/test/test.txt`。
+
+作者：猫尾草
+链接：https://www.jianshu.com/p/ec14f55fd209
+来源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+### 相对路径
+
+```conf
+# 注意在proxy_pass地址后面没有 /
+location /proxy {
+    proxy_pass http://10.0.0.1:8080;
+}
+```
+
+当访问 `http://127.0.0.1/proxy/test/test.txt` 时，nginx匹配到`/proxy`路径，把请求转发给 `192.168.137.181:8080` 服务，实际请求代理服务器的路径为`http://192.168.137.181:8080/proxy/test/test.txt`， 此时nginx会把匹配的`/proxy`也代理给代理服务器。
+
+
 ## Nginx常用命令
 
 ```bash
