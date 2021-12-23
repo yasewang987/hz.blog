@@ -16,6 +16,11 @@
 
 ```bash
 docker run -d -v /etc/localtime:/etc/localtime --name hello helloworld
+
+RUN apk add tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/localtimezone \
+    && apk del tzdata
 ```
 
 ## docker中文乱码问题
@@ -177,4 +182,16 @@ SELINUX=disabled
 getenforce
 # 临时关闭selinux
 setenforce 0
+```
+
+## Docker运行shell脚本之后直接就退出
+
+这个是因为docker运行的时候pid是1的进程是调用shell脚本的，在脚本执行完毕之后终端会自动退出。
+
+所以只需要想办法让脚本在执行完之后不要退出就可以了。
+
+```sh
+echo "123"
+# 使用tail让shell脚本无法结束
+tail -f /dev/null
 ```

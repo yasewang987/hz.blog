@@ -152,10 +152,10 @@ module.exports = {
                 'gin'
             ],
             '/code/go/common/': [
+                'base',
                 'http',
                 'mongodb',
                 'lock',
-                'package',
                 'godoc',
                 'rw',
                 'filecopy',
@@ -163,7 +163,9 @@ module.exports = {
                 'rpc',
                 'mysql',
                 'scanf',
-                'orm'
+                'orm',
+                'time',
+                'server'
             ],
             '/code/go/other/': [
                 'install',
@@ -171,7 +173,8 @@ module.exports = {
                 'problem',
                 'cmd',
                 'version',
-                'notice'
+                'notice',
+                'package'
             ],
             '/code/web/npm/': [
                 'base',
@@ -185,7 +188,9 @@ module.exports = {
             ],
             '/code/web/vue/': [
                 'vscode',
-                'vue3'
+                'vue3',
+                'vitevue',
+                'setupscript'
             ],
             '/code/web/css/': [
                 'resources',
@@ -320,11 +325,10 @@ module.exports = {
                 'nexus',
                 'elasticsearch',
                 'minio',
-                'mysql',
                 'redis',
-                'qemu',
                 'nextterminal',
-                'jumpserver'
+                'jumpserver',
+                'zentao'
             ],
             '/sql/mssql/': [
                 'usesul'
@@ -333,7 +337,8 @@ module.exports = {
                 'install',
                 'gh-ost',
                 'announcements',
-                'explain'
+                'explain',
+                'pxb'
             ],
             '/sql/mongo/': [
                 'install'
@@ -383,8 +388,8 @@ module.exports = {
                 'win-tools',
                 'vscode',
                 'resource',
-                'zentao',
-                'devtools'
+                'devtools',
+                'plantuml'
             ],
             '/other/cloud/': [
                 'proxmox',

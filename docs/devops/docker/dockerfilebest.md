@@ -91,6 +91,39 @@ RUN curl -fsSL https://github.com/krallin/tini/releases/download/${TINI_VERSION}
 https://docs.docker.com/engine/reference/builder/#dockerignore-file
 https://codefresh.io/docker-tutorial/not-ignore-dockerignore/
 
+## 提取动态链接的 .so 文件
+
+1. 用 `ldd` 查出所需的 `.so` 文件
+1. 将所有依赖压缩成 `rootfs.tar` 或 `rootfs.tar.gz`，之后打进 `scratch` 基础镜像
+
+```bash
+# 列出依赖项
+ldd  redis-3.0.0/src/redis-server
+    linux-vdso.so.1 =>  (0x00007fffde365000)
+    libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f307d5aa000)
+    libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f307d38c000)
+    libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f307cfc6000)
+    /lib64/ld-linux-x86-64.so.2 (0x00007f307d8b9000)
+
+# 打包
+tar ztvf rootfs.tar.gz
+4485167  2015-04-21 22:54  usr/local/bin/redis-server
+1071552  2015-02-25 16:56  lib/x86_64-linux-gnu/libm.so.6
+ 141574  2015-02-25 16:56  lib/x86_64-linux-gnu/libpthread.so.0
+1840928  2015-02-25 16:56  lib/x86_64-linux-gnu/libc.so.6
+ 149120  2015-02-25 16:56  lib64/ld-linux-x86-64.so.2
+```
+
+* 制作最简镜像
+
+```dockerfile
+FROM scratch
+ADD  rootfs.tar.gz  /
+COPY redis.conf     /etc/redis/redis.conf
+EXPOSE 6379
+CMD ["redis-server"]
+```
+
 ## 多阶段构建
 
 Docker提供了多阶段构建（multistag-builds）的功能，但是一般在做多阶段构建时不需要这么复杂，只需要分成以下2步：

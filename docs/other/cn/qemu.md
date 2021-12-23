@@ -1,5 +1,7 @@
 # QEMU虚拟机
 
+qemu-user-static下载地址: https://github.com/multiarch/qemu-user-static/releases
+
 qemu官方文档：https://qemu-project.gitlab.io/qemu/system/index.html  ，可以到上面查看对应的资料，比如查看龙芯的虚拟cpu配置，直接在搜索框中输入cpu对应的架构mips64即可找到对应的资料。
 
 参数说明：

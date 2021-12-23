@@ -85,7 +85,7 @@ docker pull gitlab/gitlab-runner
     > 映射`/var/run/docker.sock`这个文件是为了让容器可以通过`/var/run/docker.sock`与`Docker守护进程`通信，管理其他`Docker容器`
     > `-v /srv/gitlab-runner/config:/etc/gitlab-runner`是将runner的配置文件映射到宿主机`/srv/gitlab-runner/config`方便调整和查看配置
 
-    打开配置文件sudo cat /home/yasewang/runner/runnertest/builder/config.toml确认配置是否正确
+    打开配置文件`sudo cat /home/yasewang/runner/runnertest/builder/config.toml`确认配置是否正确
 
     ```
     [[runners]]
