@@ -47,6 +47,7 @@ gitlab_rails['gitlab_default_can_create_group'] = false
 
 ```bash
 gitlab-ctl reconfigure
+gitlab-ctl restart
 ```
 
 登陆gitlab之后做一些其他配置
@@ -70,6 +71,30 @@ gitlab-ctl reconfigure
     Admin Area -> Settings -> CI/CD -> Continuous Integration and Deployment -> Default to Auto DevOps pipeline for all projects
 
     取消打勾并保存。
+
+## Gitlab内存占用过多问题
+
+修改配置文件 `/etc/gitlab/gitlab.rb`
+
+```conf
+unicorn['worker_processes'] = 5
+# 下面2个看情况
+unicorn['worker_memory_limit_min'] = "200 * 1 << 20"
+unicorn['worker_memory_limit_max'] = "300 * 1 << 20"
+
+puma['worker_processes'] = 5
+
+postgresql['shared_buffers'] = "128MB"
+postgresql['max_worker_processes'] = 5
+sidekiq['max-concurrency'] =5
+```
+
+改完之后重新加载配置
+
+```bash
+docker exec -it gitlab gitlab-ctl reconfigure
+docker exec -it gitlab gitlab-ctl restart
+```
 
 ## 问题总结
 

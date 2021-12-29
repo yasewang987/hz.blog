@@ -165,7 +165,8 @@ module.exports = {
                 'scanf',
                 'orm',
                 'time',
-                'server'
+                'server',
+                'io'
             ],
             '/code/go/other/': [
                 'install',

@@ -2,6 +2,8 @@
 
 ## 官方多版本管理
 
+### 方式一：
+
 `go`版本参考地址：https://github.com/golang/dl
 
 ```bash
@@ -22,6 +24,13 @@ sudo ln -s $GOPATH/bin/go<version> /usr/local/go/bin/go
 
 * 有一个特殊的版本标记：gotip，用来安装最新的开发版本；
 * 因为 golang.org 访问不了，你应该配置 GOPROXY（所以，启用 Module 是必须的）；
+
+### 方式二：
+
+```bash
+export GOROOT=$(go<version> env GOROOT)
+export PATH=${GOROOT}/bin:$PATH
+```
 
 ## 第三方
 
