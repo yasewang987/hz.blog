@@ -91,4 +91,23 @@ func main() {
 
   // hello world ,  welcome to golang !
 }
+
+// 检查服务状态
+func (s *ServiceInfo) checkServiceStatus(port string) error {
+	cmdStr := "curl http://localhost:" + port + "/check"
+	cmd := exec.Command("sh", "-c", cmdStr)
+	var outInfo bytes.Buffer
+	cmd.Stdout = &outInfo
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	ns := make(map[string]interface{})
+	if err = json.Unmarshal(outInfo.Bytes(), &ns); err != nil {
+		return err
+	}
+	s.ServiceVersion = ns["serviceVersion"].(string)
+	s.ServiceHealth = ns["serviceStatus"].(float64) <= 0
+	return nil
+}
 ```

@@ -101,14 +101,14 @@ top
 ## 服务器内存释放
 
 ```bash
+# 建议先执行清理文件系统缓存
+sync
 # 释放页缓存
 echo 1 > /proc/sys/vm/drop_caches
 # 释放dentries和inodes
 echo 2 > /proc/sys/vm/drop_caches
 # 释放所有缓存
 echo 3 > /proc/sys/vm/drop_caches
-# 清理文件系统缓存
-sync
 ```
 
 ## 查看系统进程及占用资源情况
