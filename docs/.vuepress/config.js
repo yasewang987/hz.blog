@@ -156,16 +156,16 @@ module.exports = {
                 'http',
                 'mongodb',
                 'lock',
-                'godoc',
                 'rw',
-                'filecopy',
-                'readargs',
+                'file',
                 'rpc',
                 'mysql',
                 'scanf',
                 'orm',
                 'time',
-                'server'
+                'server',
+                'io',
+                'strings'
             ],
             '/code/go/other/': [
                 'install',

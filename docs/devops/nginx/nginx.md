@@ -410,20 +410,27 @@ server {
 
 ```conf
 server {
+    listen 80;
+    server_name aa.bb.cn;
+    rewrite ^(.*) https://$server_name$1 permanent;
+}
+server {
     # https 监听的是443端口
     listen       443 ssl;
     # 指定准备好的域名
-    server_name  aaaa.com;
+    server_name  aa.bb.cn;
+    ssl on;
     # 指定证书路径，这里需要把准备好的证书放到此目录
-    ssl_certificate      /usr/local/nginx/myssl/codezyq.cn.pem;
-    ssl_certificate_key  /usr/local/nginx/myssl/codezyq.cn.key;
-    ssl_session_cache    shared:SSL:1m;
+    ssl_certificate      /usr/local/nginx/myssl/aa.bb.cn.pem;
+    ssl_certificate_key  /usr/local/nginx/myssl/aa.bb.cn.key;
+    ssl_session_cache    shared:SSL:10m;
     # 超时时间
-    ssl_session_timeout 5m;
+    ssl_session_timeout 30m;
+    # 表示使用的TLS协议的类型
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     # 表示使用的加密套件的类型
     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
-    # 表示使用的TLS协议的类型
-    ssl_protocols TLSv1 TLSv1.1 TLSv1.2; 
+    # 设置协商加密算法时，优先使用我们服务端的加密套件，而不是客户端浏览器的加密套件。 
     ssl_prefer_server_ciphers on;
     location /www/ {
         root   static;

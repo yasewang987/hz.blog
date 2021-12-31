@@ -98,6 +98,19 @@ top
 # si：cpu服务软中断所消耗的时间总额
 ```
 
+## 服务器内存释放
+
+```bash
+# 建议先执行清理文件系统缓存
+sync
+# 释放页缓存
+echo 1 > /proc/sys/vm/drop_caches
+# 释放dentries和inodes
+echo 2 > /proc/sys/vm/drop_caches
+# 释放所有缓存
+echo 3 > /proc/sys/vm/drop_caches
+```
+
 ## 查看系统进程及占用资源情况
 
 ```bash
@@ -527,4 +540,23 @@ rm -rf ./xxx
 
 # 删除（错误），会把xxx文件夹下的内容删除
 rm -rf ./xxx/
+```
+
+## 服务器重启(宕机)问题定位
+
+查看 `/var/log/messages` 里面记录了系统启动后的信息和错误日志
+
+```bash
+# 安全相关日志
+/var/log/secure
+# 定时任务日志
+/var/log/cron
+# 守护进程相关日志
+/var/log/boot.log
+# 永久记录每个用户登录、注销和系统启动、停机事件
+/var/log/wtmp
+# 记录当前正在登录系统的用户
+/var/log/utmp
+# 记录登录失败的信息
+/var/log/btmp
 ```

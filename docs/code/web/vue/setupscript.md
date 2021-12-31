@@ -6,11 +6,24 @@
 ```ts
 <template>
   <MyComponent :num="num" @click="addNum" />
+  <h1 v-for="(n, i) in state.nodes" :key="i">{{ n.nodeName }} + {{ n.nodeIp }} + {{ n.health }}</h1>
+  <h2 v-for="(n, i) in nodes" :key="i">{{ n.nodeName }} + {{ n.nodeIp }} + {{ n.health }}</h2>
 </template>
 
 <script setup>
-  import { ref } from 'vue';
-  import MyComponent from './MyComponent .vue';
+  import { ref, reactive, toRefs, onMounted } from 'vue'
+  import MyComponent from './MyComponent .vue'
+  import nodeApis, { NodeModel, NodeStatusModel } from '@/https/node'
+
+  // 数组
+  const state = reactive({
+    nodes: [] as NodeModel[],
+  })
+  onMounted(() => {
+    init()
+  })
+  // 在template中直接可以用nodes
+  const { nodes } = toRefs(state)
 
   // 像在平常的setup中一样的写,但是不需要返回任何变量
   const num= ref(0)       //在此处定义的 num 可以直接使用
