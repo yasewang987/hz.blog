@@ -361,6 +361,7 @@ module.exports = {
             ],
             '/other/linux/': [
                 'cmd',
+                'problem',
                 'firewall',
                 'info',
                 'install',
@@ -394,6 +395,7 @@ module.exports = {
             '/other/cloud/': [
                 'proxmox',
                 'theia',
+                'codeserver',
                 'cloudbeaver'
             ],
             '/other/book/': [

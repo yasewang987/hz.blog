@@ -21,8 +21,8 @@ service ssh restart
 ## 查看所有用户/用户组
 
 ```bash
-# 用户
-cat /etc/passwd
+# 正常登录用户
+cat /etc/passwd | grep /bin/bash
 
 # 用户组
 cat /etc/group
@@ -542,21 +542,18 @@ rm -rf ./xxx
 rm -rf ./xxx/
 ```
 
-## 服务器重启(宕机)问题定位
-
-查看 `/var/log/messages` 里面记录了系统启动后的信息和错误日志
+## 查看进程对应的容器
 
 ```bash
-# 安全相关日志
-/var/log/secure
-# 定时任务日志
-/var/log/cron
-# 守护进程相关日志
-/var/log/boot.log
-# 永久记录每个用户登录、注销和系统启动、停机事件
-/var/log/wtmp
-# 记录当前正在登录系统的用户
-/var/log/utmp
-# 记录登录失败的信息
-/var/log/btmp
+docker inspect $(docker ps -q) --format '{{.State.Pid}}, {{.Name}}' | grep 56249
+```
+
+## yum命令只下载rpm包不安装
+
+```bash
+# 未安装相应的软件
+yum install --downloadonly --downloaddir=/tmp/ podman
+
+# 已安装相应的软件
+yum reinstall --downloadonly --downloaddir=/tmp/ podman
 ```
