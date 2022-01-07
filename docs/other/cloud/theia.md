@@ -1,4 +1,4 @@
-# 云开发 - Theia
+# 云开发 - curl -fsSL https://code-server.dev/install.sh | sh
 
 ## http部署
 

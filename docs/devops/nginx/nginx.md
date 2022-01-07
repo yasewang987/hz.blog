@@ -161,11 +161,6 @@ location /proxy {
 
 第二个： 当访问 `http://127.0.0.1/proxy/test/test.txt` 时，nginx匹配到`/proxy`路径，把请求转发给`192.168.137.181:8080`服务，实际请求代理服务器的路径为`http://10.0.0.1:8080/static01/test/test.txt`。
 
-作者：猫尾草
-链接：https://www.jianshu.com/p/ec14f55fd209
-来源：简书
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-
 ### 相对路径
 
 ```conf
@@ -398,6 +393,11 @@ server {
     # 允许携带的请求头
     add_header 'Access-Control-Allow-Headers' *;
 
+    # 如果服务端里面没有处理 options 请求，需要加如下配置
+    if ( $request_method = 'OPTIONS' ) {
+        return 200;
+    }
+
     location / {
         proxy_pass http://127.0.0.1:5001
     }
@@ -412,7 +412,8 @@ server {
 server {
     listen 80;
     server_name aa.bb.cn;
-    rewrite ^(.*) https://$server_name$1 permanent;
+    # rewrite ^(.*) https://$server_name$1 permanent;
+    return 301 https://$server_name$request_uri;
 }
 server {
     # https 监听的是443端口

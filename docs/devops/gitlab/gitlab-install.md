@@ -98,7 +98,7 @@ docker exec -it gitlab gitlab-ctl restart
 
 ## 问题总结
 
-* `Gitlab Docker`容器中SSH端口失效问题：
+* `Gitlab Docker`容器中 `SSH` 端口失效问题：
 
     在 Gitlab 配置文档`/home/gitlab/config/gitlab.rb` 中，将 `SSH` 协议的端口设置为 `2222` 了，但是在一些情况下会出现用 `SSH` 协议的 `Url` 执行网络同步操作时提示"访问被拒，可能是权限问题" .
 
