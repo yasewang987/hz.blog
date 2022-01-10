@@ -5,110 +5,110 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
 * worker_processes： 进程数，一般配置和服务器核心数一致
 * worker_connections：尽量大一点，推荐 65535
 
-## Nginx 基本配置 & 示例
+## Nginx基本信息及模块信息查看
 
-首先，在本地创建如下的目录结构:
+```bash
+# yum安装的模块如下都安装好了，模块是固定的，如果想自定义增加模块使用编译安装才可以
+nginx -V
+##############
+nginx version: nginx/1.20.2
+built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) 
+built with OpenSSL 1.0.2k-fips  26 Jan 2017
+TLS SNI support enabled
 
+configure arguments: 
+--prefix=/etc/nginx  # 指定安装路径
+--sbin-path=/usr/sbin/nginx  # 程序文件位置
+--modules-path=/usr/lib64/nginx/modules  # 模块路径的位置
+--conf-path=/etc/nginx/nginx.conf  # 主配置文件的位置
+--error-log-path=/var/log/nginx/error.log # 错误日志位置
+--http-log-path=/var/log/nginx/access.log   # 访问日志位置
+--pid-path=/var/run/nginx.pid  # 程序PID
+--lock-path=/var/run/nginx.lock  # 锁路径，防止重复启动nginx
+--http-client-body-temp-path=/var/cache/nginx/client_temp   # 缓存 
+--http-proxy-temp-path=/var/cache/nginx/proxy_temp  # 代理缓存
+--http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp   # php缓存
+--http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp  # python缓存位置
+--http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx  # 用户
+--group=nginx  # 组
+--with-compat # 启动动态模块兼容
+--with-file-aio  # 提高性能
+--with-threads   # 多线程模块
+--with-http_addition_module  #  响应之前或者之后追加文本内容
+--with-http_auth_request_module  # 认证模块，比如登录密码
+--with-http_dav_module #  增加上传PUT,DELETE,MKCOL:创建集合,COPY和MOVE方法)默认情况下为关闭
+--with-http_flv_module # NGINX添加MP4、FLV视频支持模块
+
+--with-http_gunzip_module  # 压缩模块
+--with-http_gzip_static_module  # 压缩模块
+--with-http_mp4_module  # 支持多媒体
+--with-http_random_index_module  # 随机主页
+--with-http_realip_module  # nginx获取真实ip模块
+--with-http_secure_link_module  # nginx安全下载模块
+--with-http_slice_module  # nginx中文文档
+--with-http_ssl_module  # 网站加密
+--with-http_stub_status_module  # 访问状态
+--with-http_sub_module  # nginx替换响应内容
+--with-http_v2_module  # web2.0技术
+
+# 邮件
+--with-mail
+--with-mail_ssl_module 
+
+# 负载均衡反向代理模块
+--with-stream 
+--with-stream_realip_module 
+--with-stream_ssl_module 
+--with-stream_ssl_preread_module 
+
+# CPU优化参数等
+--with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -pie'
 ```
-.
-├── nginx-demo
-│  ├── content
-│  │  ├── first.txt
-│  │  ├── index.html
-│  │  └── index.md
-│  └── main
-│    └── index.html
-└── temp-nginx
-  └── outsider
-    └── index.html
+
+## Nginx全局配置
+
+全局配置一般在 `/etc/nginx/nginx.conf` 文件中，内容如下：
+
+```conf
+1、全局/核心块。配置影响nginx全局的指令。一般有运行nginx服务器的用户组，nginx进程pid存放路径，日志存放路径，配置文件引入，元许生成workerprocess数等。
+
+user  nginx;  # 指定Nginx的启动用户
+worker_processes  auto;  # 开启nginx的数量，可以自定义，建议和CPu一样多，2核就写2个···
+
+error_log  /var/log/nginx/error.log notice; # 错误日志
+pid        /var/run/nginx.pid;    # 进程号存放路径
+
+
+2、events块，配置影响nginx服务器或与用户的网络连接。有每个进程的最大连接数，选取哪种事件驱动模型处理连接请求，是否允许同时接受多个网路连接，开启多个网络连接序列化等。
+
+events {   
+    worker_connections  1024;  # 进程最大连接数
+}
+
+
+3、http模块：可以嵌套多个server，配置代理，缓存，日志定义等绝大多数功能和第三方模块的配置。如文件引入，mime-type定义，日志自定义，是否使用sendfile传输文件,连接超时时间,单连接请求数等。
+
+http {
+    include       /etc/nginx/mime.types;  # 加载外部的配置项，降低了文件的复杂度
+    default_type  application/octet-stream;  # 字节流处理方式
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';    # 日志格式，可以修改为json
+
+    access_log  /var/log/nginx/access.log  main; # 访问日志
+
+    sendfile        on;  # 加速访问、高效读取文件
+    #tcp_nopush     on;  # 优化
+
+    keepalive_timeout  65;  # 长连接，timeout不能太低，不然和短链接一样 
+
+    #gzip  on;  # 压缩
+    include /etc/nginx/conf.d/*.conf;  # 配置文件
+}
+4、server块：配置虚拟主机的相关参数，一个http中可以有多个server 
+5、location块：配置请求的路由，以及各种页面的处理情况
 ```
-
-这里，我们有两个单独的文件夹 nginx-demo 和 temp-nginx，每个文件夹都包含静态 HTML 文件。我们将着力在一个公共端口上运行这两个文件夹，并设置我们想要的规则。
-
-1. 添加配置的基本设置。一定要添加 events {}，因为在 Nginx 架构中，它通常用来表示 worker 的数量。在这里我们用 http 告诉 Nginx 我们将在 OSI 模型 的第 7 层作业。
-
-    这里，我们告诉 Nginx 监听 5000 端口，并指向 main 文件夹中的静态文件。
-    
-    ```
-    http {
-
-    server {
-      listen 5000;
-      root /path/to/nginx-demo/main/; 
-      }
-
-    }
-
-    events {}
-    ```
-1. 接下来我们将为 /content 和 /outsider URL 添加其他的规则，其中 outsider 将指向第一步中提到的根目录之外的目录。
-
-    这里的 location /content  表示无论我在叶（leaf）目录中定义了什么根（root），content 子 URL 都会被添加到定义的根 URL 的末尾。因此，当我指定 root 为 root /path/to/nginx-demo/时，这仅仅意味着我告诉 Nginx 在 http://localhost:5000/path/to/nginx-demo/content/ 文件夹中显示静态文件的内容。
-
-    ```
-    http {
-
-      server {
-          listen 5000;
-          root /path/to/nginx-demo/main/; 
-
-          location /content {
-              root /path/to/nginx-demo/;
-          }   
-
-          location /outsider {
-              root /path/temp-nginx/;
-          }
-      }
-    }
-
-    events {}
-    ```
-1. 接下来，我们在主服务器上编写一个规则来防止任意 .md 文件被访问。我们可以在 Nginx 中使用正则表达式，因此我们将这样定义规则：
-
-    ```
-    location ~ .md {
-          return 403;
-    }
-    ```
-1. 最后，让我们学习下 proxy_pass 命令来结束这个章节。我们已经了解了什么是代理和反向代理，在这里我们从定义另一个运行在 8888 端口上的后端服务器开始。现在，我们在 5000 和 8888 端口上运行了 2 个后端服务器。
-
-    我们要做的是，当客户端通过 Nginx 访问 8888 端口时，将这个请求传到 5000 端口，并将响应返回给客户端！
-
-  ```conf
-  upstream tomcat_pools {
-    server 172.16.1.91:8080 weight=1 max_fails=3 fail_timeout=3s;
-    server 172.16.1.91:8081 weight=1 max_fails=3 fail_timeout=3s;
-    check interval=2000 rise=3 fall=2 timeout=1000 type=http;
-  }
-
-  server {
-      listen 8082;
-      access_log    logs/tomcat-access.log main;
-      error_log     logs/tomcat-error.log warn;
-      client_max_body_size 20G; //这里特别注意一下，如果配置比较小上传文件大小会受限制
-      location / {
-        proxy_pass http://tomcat_pools;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host:$server_port;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-  }
-
-  server {
-      listen 8888;
-
-      location / {
-          proxy_pass http://localhost:5000/;
-      }
-
-      location /new/ {
-          proxy_pass http://localhost:5000/outsider/;
-      }
-  }
-  ```
-
 ## Nginx Stream配置
 
 例如：mysql 、 redis 这些需要使用stream配置
@@ -136,6 +136,7 @@ stream {
 ```conf
 location / {
     proxy_pass http://127.0.0.1:8088/;
+    proxy_http_version 1.1;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $http_connection;
@@ -226,7 +227,7 @@ server {
     location / {
         proxy_pass http://tomcat_pools;
         # 用户真实的ip地址转发给后端服务器
-        proxy_set_header Host $host:$server_port;
+        proxy_set_header Host $host;  #$host:$server_port;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -341,6 +342,8 @@ crontab -e
 
 ## Nginx日志配置
 
+日志可以放到 `http server location` 模块中。
+
 ```conf
 http {
 
@@ -360,7 +363,7 @@ http {
 
 `$time_local`  #记录访问时间与时区
 
-`$request`  #用户的http请求起始行信息
+`$request`  #请求方式、类型(post,get···)
 
 `$status`  #http状态码，记录请求返回的状态码，例如：200、301、404等
 
@@ -441,7 +444,7 @@ server {
 ```
 ## Nginx根据请求头转发到不同版本服务
 
-转发规则配置，使用`$http_XXX`，来获取header指定的值，`$http_`为固定格式,`XXX`为自定义header字段名。
+转发规则配置，使用`$http_xxx`，来获取header指定的值，`$http_`为固定格式,`xxx`为自定义header字段名。
 
 ```conf
 http {
@@ -470,6 +473,8 @@ http {
 ```
 
 ## 防盗链配置
+
+`ngx_http_referer_module` 模块
 
 ```conf
 server {
@@ -505,6 +510,7 @@ http {
 ## Nginx一个server配置多个location
 
 ```conf
+# 前端示例
 location / {
         root   /data/html/;
         index  index.html index.html;
@@ -561,5 +567,260 @@ server {
 	# 文件输出的缓冲区大小为128KB
 	output_buffers 4 32k;
     }
+}
+```
+
+## Nginx Cookie设置
+
+遇到这个情况的是代理 `tomcat` 的服务时出现的。
+
+server {
+    listen       80;
+    server_name www.aa.cn;
+
+    location / {
+        proxy_pass http://IP:8080/projectName/;
+        # 这条是关键
+        proxy_cookie_path /projectName /;
+        proxy_set_header   Host    $host;
+        proxy_set_header   X-Real-IP   $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    location /projectName {
+        proxy_pass http://IP:8080/projectName/;
+        proxy_cookie_path /projectName /;
+        proxy_set_header   Host    $host;
+        proxy_set_header   X-Real-IP   $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+## Location配置优先级
+
+使用`Nginx Location`可以控制访问网站的路径, 但一个`server`可以有多个`location`配置
+
+优先级从高到低：
+
+1. `=`: 精确匹配
+1. `^~`: 以某个字符串开头
+1. `~`: 区分大小写的正则匹配
+1. `~*`: 不区分大小写的正则匹配
+1. `/`: 通用匹配，任何请求都会匹配到
+
+```conf
+server {
+    listen 80;
+    server_name _;
+    # 不区分大小写正则
+    location ~* /python {
+        default_type text/html;
+        return 200 "Location ~*";
+    }
+    # 区分大小写正则
+    location ~ /Python {
+        default_type text/html;
+        return 200 "Location ~";
+    }
+    # 以xx开头
+    location ^~ /python {
+        default_type text/html;
+        return 200 "Location ^~";
+    }
+    # 精准匹配
+    location = /python {
+        default_type text/html;
+        return 200 "Location =";
+    }
+}
+```
+## 个性化404页面
+
+```conf
+server{
+    listen 80;
+    server_name www.aa.com;
+    location / {
+        root /opt/aa;
+        index index.html aa.html;
+    }
+    error_page 404 /404.html;
+    location = /404.html {
+        root /opt/aa;
+    }
+}
+```
+
+## PV、UV、IP统计
+
+```bash
+# 1. 统计一天内访问最多的10个ip
+# 日期：日/月/年:时:分:秒 -> 01/Sep/2022
+grep '日期' [日志路径] | awk '{arry[$1]++}END{for(i in ips ){print i , arry[i]}}'|sort -k2 -rn
+
+# 2、 统计每个URL访问内容总大小($body_bytes_sent)
+grep '日期' [日志路径]| awk '{urls[$7]++;size[$7]+=$10}END{for(i in urls){print "次数" urls[i],"体积" size[i], "内容" i}}'| sort -kl -rn | head -10
+
+# 3、统计IP访问状态码为404和出现的次数($status)
+grep '日期' [日志路径] | awk '{if($9="404"){ip_code[$1"   "$9]++}}END{for(i in ip_code){print i,ip_code[i]l}}'
+
+# 4、统计前一分钟的PV量
+date=$(date -d '-1 minute'+%Y:9%H:%M); awk -v awkdate=$date '$0 ~ date{it+}END{print i}' /var/log/nginx/access.log
+```
+
+## Nginx连接状态统计模块
+
+模块名：`ngx_http_stub_status_module`, `--with-http_stub_status_module`
+
+生效范围：`server,location`
+
+使用时需要确认模块是否安装：
+
+```bash
+nginx -V | grep http_stub_status_module
+```
+
+使用示例：
+
+```conf
+server{
+    listen 80;
+    server_name www.aa.com;
+    location / {
+        root /opt/aa;
+        index index.html;
+    }
+    location /status {
+        # 主要是这里
+        stub_status;
+        allow all;
+    }
+}
+```
+
+* `Active connections` ：当前活动的连接数（用户数）
+* `server accepts handled requests`：服务器接受处理的请求
+    1. 第一个：总连接数
+    1. 第二个：成功连接数
+    1. 第三个：总共处理的请求数
+* `Reading：0` ：读取客户端`Header`的信息数，请求头
+* `Writing：1`：返回给客户端的`Header`的信息署，响应头
+* `Waiting：1`：等待的请求数，开启了`keepalive`（长连接）
+
+## Nginx访问限制模块(限流)
+
+`ngx_http_limit_req_module` 模块：用于限制每个已定义键的请求处理速率，特别是来自单个 IP 地址的请求的处理速率，使用`leaky bucket`方法完成限制；
+
+```conf
+# 语法
+Syntax:	limit_req zone=name [burst=number] [nodelay | delay=number];
+Default:	—
+Context:	http， server，location
+```
+
+示例
+
+```conf
+#  Example Configuration
+http {
+    #limit_req_zone ：限制请求
+    # $binary_remote_addr ：二进制地址
+    # zone=one:10m ：限制策略的名称：占用10M空间
+    # rate=1r/s：允许每秒1次请求
+    limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+
+    ...
+
+    server {
+
+        ...
+
+        location /search/ {
+            # limit_req zone=one：引用限制策略的名称one
+            # burst=5 表示最大延迟请求数量不大于5。如果太过多的请求被限制延迟是不需要的，这时需要使用nodelay参数，服务器会立刻返回503状态码。
+            limit_req zone=one burst=5;
+        }
+    }
+}
+```
+
+`ngx_http_limit_conn_module` 模块: 用于限制链接（TCP），特别是来自单个IP地址的连接数。不是所有的连接都被计算在内。只有当服务器正在处理一个请求，并且整个请求头已经被读取时，连接才会被计数。
+
+```conf
+# 语法
+Syntax:	limit_conn zone number;
+Default:	—
+Context:	http, server, location
+```
+
+示例
+
+```conf
+# 官网示例
+http {
+    limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+    ...
+
+    server {
+
+        ...
+
+        location /download/ {
+            limit_conn addr 1;
+        }
+    }
+}
+```
+
+## Niginx访问控制模块（黑白名单）
+
+`ngx_http_access_module`: 基于ip操作
+
+```conf
+# 允许
+Syntax:	allow address | CIDR | unix: | all;
+Default:	—
+Context:	http, server, location, limit_except
+
+# 拒绝
+Syntax:	deny address | CIDR | unix: | all;
+Default:	—
+Context:	http, server, location, limit_except
+```
+
+示例
+
+```conf
+# 官网示例
+location / {
+    deny  192.168.1.1;  # 拒绝
+    allow 192.168.1.0/24;  # 允许
+    allow 10.1.1.0/16;  
+    allow 2001:0db8::/32;
+    deny  all;   # 拒绝所有
+}
+```
+
+`ngx_http_auth_basic_module`: 通过设置用户名密码来限制访问
+
+```conf
+# 启用语法
+Syntax:	auth_basic string | off;
+Default:	auth_basic off;
+Context:	http, server, location, limit_except
+
+# 指定密码文件
+Syntax:	auth_basic_user_file file;
+Default:	—
+Context:http,server,location,limit_except
+```
+
+示例
+
+```conf
+# 官网示例
+location / {
+    auth_basic           "closed site";
+    auth_basic_user_file conf/htpasswd;
 }
 ```
