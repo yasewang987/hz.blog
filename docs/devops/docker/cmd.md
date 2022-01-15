@@ -171,3 +171,17 @@ systemctl restart docker
 ```
 
 * 如果有容器挂载了 docker.sock 文件，重启后工作可能会不正常，需要重启该容器。
+
+## Docker普通用户使用
+
+```bash
+# 查看 docker.sock 所属用户组
+ls -l /var/run/docker.sock
+# 如果不是docker用户组所有需要修改
+chown root:docker /var/run/docker.sock
+## 最终效果
+srw-rw----. 1 root docker 0 May 25 14:12 /var/run/docker.sock
+
+# 将普通用户加入docker用户组
+usermod -G docker test
+```

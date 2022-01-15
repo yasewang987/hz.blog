@@ -1,11 +1,4 @@
 # Linux常用命令
-
-## 修改root密码
-
-```bash
-sudo passwd root
-```
-
 ## 允许root用户远程登陆
 
 ```bash
@@ -18,17 +11,31 @@ sudo systemctl restart ssh
 service ssh restart
 ```
 
-## 查看所有用户/用户组
+## 用户/用户组常用命令
 
 ```bash
-# 正常登录用户
+# 查看正常登录用户
 cat /etc/passwd | grep /bin/bash
-
-# 用户组
+# 查看用户组
 cat /etc/group
+# 增加用户
+useradd abc
+# 设置密码
+passwd abc
+# 删除用户
+userdel abc
+# 增加用户组
+groupadd gabc
+# 将用户加入用户组
+usermod -G gbac abc
+# 修改文件所属权限
+chown abc:gabc file
+### 用户赋予sudo权限
+vim /etc/sudoers
+# 添加如下内容
+username    ALL=(ALL)   ALL
 ```
-
-## 权限相关
+## 文件权限相关
 
 777对应的用户：文件所有者、群组用户、其他用户  
 
@@ -40,13 +47,9 @@ x|1|执行execute
 
 ```bash
 chmod 777 filename
-adduser username #添加用户
-passwd username #添加密码
-
-chmod u+x filename # 给用户添加执行权限
+# 给用户添加执行权限
+chmod u+x filename 
 ```
-
----
 
 ## 查看linux系统编码
 
@@ -98,19 +101,6 @@ top
 # si：cpu服务软中断所消耗的时间总额
 ```
 
-## 服务器内存释放
-
-```bash
-# 建议先执行清理文件系统缓存
-sync
-# 释放页缓存
-echo 1 > /proc/sys/vm/drop_caches
-# 释放dentries和inodes
-echo 2 > /proc/sys/vm/drop_caches
-# 释放所有缓存
-echo 3 > /proc/sys/vm/drop_caches
-```
-
 ## 查看系统进程及占用资源情况
 
 ```bash
@@ -123,7 +113,18 @@ ps -aux | grep nginx
 
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 ```
+## 服务器内存释放
 
+```bash
+# 建议先执行清理文件系统缓存
+sync
+# 释放页缓存
+echo 1 > /proc/sys/vm/drop_caches
+# 释放dentries和inodes
+echo 2 > /proc/sys/vm/drop_caches
+# 释放所有缓存
+echo 3 > /proc/sys/vm/drop_caches
+```
 ## 查看进程执行目录
 
 ```

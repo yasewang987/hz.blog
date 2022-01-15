@@ -390,7 +390,8 @@ module.exports = {
                 'vscode',
                 'resource',
                 'devtools',
-                'plantuml'
+                'plantuml',
+                'vnc'
             ],
             '/other/cloud/': [
                 'proxmox',
