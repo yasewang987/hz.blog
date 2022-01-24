@@ -329,13 +329,15 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
 
 ## SSH免密登录
 
-在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户（比如gitlab-runner运行的默认帐号是gitlab-runner，我们就需要切换到这个用户下面做免密登录配置）
+在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户
+
+* 比如`gitlab-runner`运行的默认帐号是`gitlab-runner`，我们就需要切换到这个用户下面做免密登录配置,全部配置完成之后需要手动登录一次
 
 如果是在`sh`等脚本里面执行`ssh`免密登录，需要在添加参数`-tt`(例如：`ssh root@192.168.20.10 -tt`)
 
 `server1`免密登录`server2`
 
-1. `server1`生成rsa或者dsa：`ssh-keygen -t rsa -C server1`
+1. `server1`生成rsa或者ed：`ssh-keygen -t rsa -C server1`
 1. 直接用`ssh-copy-id`:`ssh-copy-id -i id_rsa.pub root@192.168.20.10`,输入密码即可（或者使用下面方式）
 1. 将`server1`生成的公钥复制到`server2`
 

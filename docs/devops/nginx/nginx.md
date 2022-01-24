@@ -216,6 +216,39 @@ configure arguments:
                 #     redirect: 返回302临时重定向
                 #     permanent: 返回301永久重定向
                 rewrite /(.*) https://www.baidu.com permanent;
+                # 其主要作用就是在一个指定的本地目录来缓存较大的代理请求。一般都设置在临时目录中。
+                proxy_temp_path /tmp/proxy_temp;
+                # 设置临时文件的大小
+                proxy_max_temp_file_size 1G;
+                # 这个指令用于开启对被代理服务器的应答缓存
+                proxy_buffering on;
+                # 设置缓冲区大小,从被代理服务器取得的响应内容,会先读取放置到这里.设置的过小，小的响应header通常位于这部分响应内容里边.设置的过小，可能会产生502错误。
+                proxy_buffer_size  4k;
+                # 设置从被代理服务器读取应答内容的缓存区的数目和大小。数目可以任意定，但是一个缓存区的大小一般就是4k或者8k。
+                proxy_buffers 256 4k;
+                # 在系统繁忙的时候可以申请更大的proxy_buffers缓冲区。一般就设置成proxy_buffers的二倍。
+                proxy_busy_buffers_size  8k;
+                # 设置和被代理服务器链接的超时时间，是代理服务器发起握手等待响应的超时时间。不要设置的太小，否则会报504错误。
+                proxy_connect_timeout 1m;
+                # 设置从被代理服务器读取应答内容的超时时间。
+                proxy_read_timeout 60;
+                proxy_send_timeout 60;
+                # 用于允许代理其他HTTP方法。
+                proxy_method GET;
+                ###############
+                # remote: 客户端，proxy：被代理的ip，server: 代理
+
+                proxy_http_version 1.1;
+                # 日志中的 $http_host = 请求头中的 Host
+                # $host：转发服务器,$host:$proxy_port,$host:$server_port,$proxy_host
+                # 一般都使用 $host,不设置默认为$proxy_host;
+                proxy_set_header Host $host;
+                # 一般都是 $remote_addr
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Real-PORT $remote_port;
+                # 固定写法，如果通过2个nginx代理，会是"用户的真实ip，第一台nginx的ip"
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header Connection "upgrade";
             }
             location /test1 {
                 # 继续匹配location，
