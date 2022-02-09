@@ -276,7 +276,8 @@ module.exports = {
                 'nginx-docker',
                 'nginx',
                 'nginxhotreload',
-                'problem'
+                'problem',
+                'test'
             ],
             '/devops/prometheus/': [
                 'prometheus',

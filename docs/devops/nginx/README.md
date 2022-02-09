@@ -4,3 +4,4 @@
 * [Docker部署nginx](./nginx-docker.md)
 * [Nginx配置文件热更新](./nginxhotreload.md)
 * [Nginx常见问题处理](./problem.md)
+* [Nginx压力测试及优化](./test.md)
