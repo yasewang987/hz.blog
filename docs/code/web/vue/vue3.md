@@ -2652,7 +2652,11 @@ export default {
 
   defineProps({
     modelValue: String,
-    age: Number
+    age: Number,
+    list: {
+      type: Array,
+      default: () => [],
+    },
   })
 
   const emit = defineEmits(['update:modelValue', 'update:age'])

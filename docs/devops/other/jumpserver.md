@@ -34,7 +34,7 @@ docker pull jumpserver/jms_all
 
 ```bash
 docker run -d --name fc-jms --restart=always \
-    -v /data/jumpserver:/data/jumpserver/data/media \
+    -v /home/jms:/data/jumpserver/data/media \
     -p 19000:80 \
     -p 19001:2222 \
     -e SECRET_KEY=GmmIghD61fQqPUlsoUBooLoe1DXuyYvytTQ6049IuHAbyUQBGn \

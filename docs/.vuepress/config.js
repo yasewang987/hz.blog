@@ -199,7 +199,8 @@ module.exports = {
             '/code/web/other/': [
                 'qiankun',
                 'microapp',
-                'electron'
+                'electron',
+                'tauri'
             ],
             '/microservices/consul/': [
                 'base',
