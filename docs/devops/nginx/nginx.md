@@ -1150,3 +1150,40 @@ location / {
     auth_basic_user_file conf/htpasswd;
 }
 ```
+
+## Nginx压缩配置
+
+gzip 属性在 `http、server、location` 三个模块都可以设置。
+
+建议是设置在 `http` 模块，为所有服务提供压缩功能。
+
+```conf
+http {
+    include mime.types;
+    default_type text/html;
+    sendfile on;
+    keepalive_timeout 65;
+    charset utf-8;
+
+    # 开启压缩
+    gzip on;
+    # 用于对匹配到的 MIME 类型文件进行压缩,其中 text/html 类型无论是否设置肯定会被压缩
+    gzip_types text/plain text/css application/javascript application/json application/xml;
+    #设置压缩比率,值的范围为：1-9，1：压缩比最小，处理最快；9：压缩比最大，处理最慢
+    gzip_comp_level 5;
+}
+```
+
+## HTTP 跳转 HTTPS
+
+使用 `HTTP` 访问时会返回 `307` 响应，然后切换为 `HTTPS` 协议访问。
+
+`307`: 临时
+`308`: 永久
+
+```conf
+server {
+    listen 80;
+    return 307 https://$host$request_uri;
+}
+```

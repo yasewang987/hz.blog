@@ -202,3 +202,24 @@ srw-rw----. 1 root docker 0 May 25 14:12 /var/run/docker.sock
 # 将普通用户加入docker用户组
 usermod -G docker test
 ```
+
+## Docker开启tcp控制
+
+* 如果开启了防火墙记得开启防火墙
+
+```bash
+# 查找docker.service的位置
+systemctl status docker.service
+
+# 修改配置文件
+vim /usr/lib/systemd/system/docker.service
+# 将 ExecStart 改为如下内容
+ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock -H tcp://0.0.0.0:2375
+
+# 重启docker服务
+systemctl daemon-reload
+systemctl restart docker
+
+# 执行命令示例如下
+docker -H 192.168.100.7:2375 ps 
+```
