@@ -69,7 +69,7 @@ call xcopy ./out E:\test /e /y
 ```json
 {
     // Ubuntu 这个可以修改看你用的是哪个版本 wsl -l
-    "startingDirectory": "//wsl$/Ubuntu/home/hz"
+    "startingDirectory": "//wsl$/Ubuntu-20.04/home/hz"
 }
 ```
 
