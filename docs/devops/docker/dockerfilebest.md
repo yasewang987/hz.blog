@@ -226,3 +226,35 @@ jenkins:x:1000:1000:Linux User,,,:/var/jenkins_home:/bin/bash
     ENV JENKINS_VERSION ${JENKINS_VERSION:-2.121.1}
     ```
 
+## MAINTANIER（已经废弃） --->  LABEL
+
+`LABEL`用于为镜像添加元数据，元数以键值对的形式指定：
+
+```dockerfile
+LABEL <key>=<value> <key>=<value> <key>=<value> ...
+
+LABEL version="1.0" description="this is description" by="hz"
+```
+
+指定后可以通过`docker inspect`查看：
+
+```bash
+docker inspect janker/test
+
+"Labels": {
+    "version": "1.0",
+    "description": "this is description",
+    "by": "hz"
+},
+```
+
+## HEALTHCHECK
+
+用于指定某个程序或者指令来监控 docker 容器服务的运行状态。
+
+```dockerfile
+HEALTHCHECK [选项] CMD <命令>：设置检查容器健康状况的命令
+HEALTHCHECK NONE：如果基础镜像有健康检查指令，使用这行可以屏蔽掉其健康检查指令
+
+HEALTHCHECK [选项] CMD <命令> : 这边 CMD 后面跟随的命令使用，可以参考 CMD 的用法。
+```

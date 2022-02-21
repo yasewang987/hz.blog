@@ -195,3 +195,15 @@ echo "123"
 # 使用tail让shell脚本无法结束
 tail -f /dev/null
 ```
+
+## Failed to start Docker Application Container Engine
+
+使用 `systemctl` 启动 `docker` 服务时无法启动，报这个错误。
+
+定位这种问题需要直接使用 `dockerd` 命令确认具体问题之后再进行处理。
+
+```bash
+dockerd
+# 信息如下，则删除 /var/lib/docker 之后再启动即可
+mkdir /var/lib/docker: file exists
+```

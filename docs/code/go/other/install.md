@@ -2,8 +2,8 @@
 
 [中文部署参考网站](http://docscn.studygolang.com/doc/install#%E5%AE%89%E8%A3%85%E5%8C%85)
 
-* `GOROOT`: 中包含go语言的基础执行程序 `$GOROOT/bin`,以及go的基础库 `$GOROOT/src/mod`
-* `GOPATH`: 中包含除了基础库之外的其他项目依赖包执行程序 `$GOPATH/bin`,以及go基础库之外的依赖包源码 `$GOPATH/src/mod`
+* `GOROOT`: 中包含go语言的基础执行程序 `$GOROOT/bin`,以及go的基础库 `$GOROOT/src/mod`，存放一些内置的开发包和工具。
+* `GOPATH`: 中包含除了基础库之外的其他项目依赖包执行程序 `$GOPATH/bin`,以及go基础库之外的依赖包源码 `$GOPATH/pkg/mod`，用于保存go项目的代码和第三方依赖包。
 
 1. 下载Go发行版 [官方二进制发行版](https://golang.org/dl/),选择对应版本（我这里使用centos系统所以选择linux）
 1. 下载`go1.13.linux-amd64`版本，版本可以自行选择：

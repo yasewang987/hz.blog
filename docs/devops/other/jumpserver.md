@@ -34,7 +34,7 @@ docker pull jumpserver/jms_all
 
 ```bash
 docker run -d --name fc-jms --restart=always \
-    -v /data/jumpserver:/data/jumpserver/data/media \
+    -v /home/jms:/data/jumpserver/data/media \
     -p 19000:80 \
     -p 19001:2222 \
     -e SECRET_KEY=GmmIghD61fQqPUlsoUBooLoe1DXuyYvytTQ6049IuHAbyUQBGn \
@@ -71,4 +71,19 @@ server {
     }
 }
 ```
+
+## 系统用户配置
+
+菜单：`资产管理/系统用户`
+
+* 特权用户：是资产已存在的, 并且拥有 高级权限 的系统用户， 如 root 或 拥有 `NOPASSWD: ALL` sudo 权限的用户。 JumpServer 使用该用户来 `推送系统用户`、`获取资产硬件信息` 等，记住特权用户一般`不要开给用户使用`。
+* 普通用户：可以在资产上预先存在，也可以由 特权用户 来自动创建。这种类型的账号才是给用户使用的，一般创建好之后在资产上添加之后再推送到服务器。一般可以将 `开发、运维、测试` 等按照角色来区分。
+
+设置完上面的用户和资产之后，还需要设置`权限管理/资产授权`，在 `系统用户` 表单中选择刚才创建的 `普通用户`。
+
+
+
+
+
+
 

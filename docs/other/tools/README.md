@@ -7,3 +7,4 @@
 * [常用资料信息记录](./resource.md)
 * [开发辅助工具](./devtools.md)
 * [PlantUML](./plantuml.md)
+* [VNC](./vnc.md)

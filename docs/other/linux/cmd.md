@@ -1,11 +1,4 @@
 # Linux常用命令
-
-## 修改root密码
-
-```bash
-sudo passwd root
-```
-
 ## 允许root用户远程登陆
 
 ```bash
@@ -18,17 +11,31 @@ sudo systemctl restart ssh
 service ssh restart
 ```
 
-## 查看所有用户/用户组
+## 用户/用户组常用命令
 
 ```bash
-# 正常登录用户
+# 查看正常登录用户
 cat /etc/passwd | grep /bin/bash
-
-# 用户组
+# 查看用户组
 cat /etc/group
+# 增加用户
+useradd abc
+# 设置密码
+passwd abc
+# 删除用户
+userdel abc
+# 增加用户组
+groupadd gabc
+# 将用户加入用户组
+usermod -G gbac abc
+# 修改文件所属权限
+chown abc:gabc file
+### 用户赋予sudo权限
+vim /etc/sudoers
+# 添加如下内容
+username    ALL=(ALL)   ALL
 ```
-
-## 权限相关
+## 文件权限相关
 
 777对应的用户：文件所有者、群组用户、其他用户  
 
@@ -40,13 +47,9 @@ x|1|执行execute
 
 ```bash
 chmod 777 filename
-adduser username #添加用户
-passwd username #添加密码
-
-chmod u+x filename # 给用户添加执行权限
+# 给用户添加执行权限
+chmod u+x filename 
 ```
-
----
 
 ## 查看linux系统编码
 
@@ -98,19 +101,6 @@ top
 # si：cpu服务软中断所消耗的时间总额
 ```
 
-## 服务器内存释放
-
-```bash
-# 建议先执行清理文件系统缓存
-sync
-# 释放页缓存
-echo 1 > /proc/sys/vm/drop_caches
-# 释放dentries和inodes
-echo 2 > /proc/sys/vm/drop_caches
-# 释放所有缓存
-echo 3 > /proc/sys/vm/drop_caches
-```
-
 ## 查看系统进程及占用资源情况
 
 ```bash
@@ -123,7 +113,18 @@ ps -aux | grep nginx
 
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 ```
+## 服务器内存释放
 
+```bash
+# 建议先执行清理文件系统缓存
+sync
+# 释放页缓存
+echo 1 > /proc/sys/vm/drop_caches
+# 释放dentries和inodes
+echo 2 > /proc/sys/vm/drop_caches
+# 释放所有缓存
+echo 3 > /proc/sys/vm/drop_caches
+```
 ## 查看进程执行目录
 
 ```
@@ -328,13 +329,15 @@ dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
 
 ## SSH免密登录
 
-在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户（比如gitlab-runner运行的默认帐号是gitlab-runner，我们就需要切换到这个用户下面做免密登录配置）
+在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户
+
+* 比如`gitlab-runner`运行的默认帐号是`gitlab-runner`，我们就需要切换到这个用户下面做免密登录配置,全部配置完成之后需要手动登录一次
 
 如果是在`sh`等脚本里面执行`ssh`免密登录，需要在添加参数`-tt`(例如：`ssh root@192.168.20.10 -tt`)
 
 `server1`免密登录`server2`
 
-1. `server1`生成rsa或者dsa：`ssh-keygen -t rsa -C server1`
+1. `server1`生成rsa或者ed：`ssh-keygen -t rsa -C server1`
 1. 直接用`ssh-copy-id`:`ssh-copy-id -i id_rsa.pub root@192.168.20.10`,输入密码即可（或者使用下面方式）
 1. 将`server1`生成的公钥复制到`server2`
 

@@ -15,6 +15,10 @@ func timedemo1() {
 	<-time.After(2 * time.Second)
 	fmt.Println("又过了2s: ", time.Now())
 
+	// 延迟2s
+	time.Sleep(2 * time.Second)
+	fmt.Println("2s:", time.Now())
+
 	// 重置完时间后，1s执行
 	t2 := time.NewTimer(5 * time.Second)
 	t2.Reset(1 * time.Second)

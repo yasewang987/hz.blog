@@ -282,10 +282,6 @@ deploy-master-job:
 
 整个过程走下来会发现其实耗时的操作都是拉取镜像，这个情况只有第一次的时候才会出现，后续构建就不会有这个问题了。
 
-
-
-
-
 ## 五、Runner中使用docker buildx
 
 确保使用的 Linux 发行版内核 **>=4.8.0**（推荐使用 Ubuntu 18.04 以上的 TLS 发行版），且 **Docker >= 19.03**；
@@ -335,4 +331,98 @@ build-image:
       - out/
   tags:
     - imagebuilder3
+```
+
+## SSH示例
+
+```yaml
+variables:
+  SEVER_NAME: 'law'
+  SEVER_PORT: '18400:18111'
+  IMG_AMD: 'ifuncun/py-work-amd64:6'
+  IMG_ARM: 'ifuncun/py-work-arm64:6'
+  TARFILE_AMD: '/data/tars/code/$SEVER_NAME.tar.gz'
+  TARFILE_ARM: '/home/data/tars/code/$SEVER_NAME.tar.gz'
+  TEST_BASEPATH_AMD: '/data/deploy'
+  TEST_BASEPATH_ARM: '/home/data/deploy'
+  TEST_SSH_AMD: 'root@192.168.1.2'
+  TEST_SSH_ARM: 'root@192.168.1.128'
+  TEST_TMP_AMD: '$TEST_BASEPATH_AMD/tmp/$SEVER_NAME'
+  TEST_TMP_ARM: '$TEST_BASEPATH_ARM/tmp/$SEVER_NAME'
+  TEST_RUNPATH_AMD: '$TEST_BASEPATH_AMD/$SEVER_NAME'
+  TEST_RUNPATH_ARM: '$TEST_BASEPATH_ARM/$SEVER_NAME'
+stages:
+  - deploy
+  - tars
+deploy-amd:
+  stage: deploy
+  allow_failure: true
+  only:
+    - test
+  script:
+    - scp -prq $(pwd) $TEST_SSH_AMD:$TEST_TMP_AMD
+    - ssh -tt $TEST_SSH_AMD << closessh
+    - if [ -d "$TEST_RUNPATH_AMD" ]; then rm -rf $TEST_RUNPATH_AMD; fi
+    - mv $TEST_TMP_AMD $TEST_BASEPATH_AMD
+    - docker run --rm -v $TEST_RUNPATH_AMD:/$SEVER_NAME -w /$SEVER_NAME $IMG_AMD python setup.py
+    - docker rm -f fc-$SEVER_NAME
+    - docker run -d --restart=always -p $SEVER_PORT -v $TEST_RUNPATH_AMD:/$SEVER_NAME -w /$SEVER_NAME --name fc-$SEVER_NAME $IMG_AMD python ./$SEVER_NAME.py --config config.test
+    - echo "deploy amd successful!"
+    - exit
+    - closessh
+  tags:
+    - deploy
+
+deploy-arm:
+  stage: deploy
+  allow_failure: true
+  only:
+    - test
+  script:
+    - scp -prq $(pwd) $TEST_SSH_ARM:$TEST_TMP_ARM
+    - ssh -tt $TEST_SSH_ARM << closessh
+    - if [ -d "$TEST_RUNPATH_ARM" ]; then rm -rf $TEST_RUNPATH_ARM; fi
+    - mv $TEST_TMP_ARM $TEST_BASEPATH_ARM
+    - docker run --rm -v $TEST_RUNPATH_ARM:/$SEVER_NAME -w /$SEVER_NAME $IMG_ARM python setup.py
+    - sed -i 's/28000/28010/g' $TEST_RUNPATH_ARM/build/word/config.test
+    - sed -i 's/\"encrypt\"\:false/\"encrypt\"\:true/g' $TEST_RUNPATH_ARM/build/word/config.test
+    - docker rm -f fc-$SEVER_NAME
+    - docker run -d --restart=always -p $SEVER_PORT -v $TEST_RUNPATH_ARM/build/$SEVER_NAME:/$SEVER_NAME -w /$SEVER_NAME --name fc-$SEVER_NAME $IMG_ARM python ./$SEVER_NAME.py --config config.test
+    - echo "deploy arm successful!"
+    - exit
+    - closessh
+  tags:
+    - deploy 
+
+tars-amd:
+  stage: tars
+  allow_failure: true
+  only:
+    - master
+  script:
+    - ssh -tt $TEST_SSH_AMD << closessh
+    - if [ -f "$TARFILE_AMD" ]; then rm -f $TARFILE_AMD; fi
+    - cd $TEST_RUNPATH_AMD/build/
+    - tar -zcvf $TARFILE_AMD  --exclude=.git --exclude=.gitlab-ci.yml --exclude=config --exclude=config.product --exclude=config.dispatch --exclude=config.redis $SEVER_NAME
+    - echo "tar amd successful!"
+    - exit
+    - closessh
+  tags:
+    - deploy
+
+tars-arm:
+  stage: tars
+  allow_failure: true
+  only:
+    - master
+  script:
+    - ssh -tt $TEST_SSH_ARM << closessh
+    - if [ -f "$TARFILE_ARM" ]; then rm -f $TARFILE_ARM; fi
+    - cd $TEST_RUNPATH_ARM/build/
+    - tar -zcvf $TARFILE_ARM  --exclude=.git --exclude=.gitlab-ci.yml --exclude=config --exclude=config.product --exclude=config.dispatch --exclude=config.redis $SEVER_NAME
+    - echo "tar arm successful!"
+    - exit
+    - closessh
+  tags:
+    - deploy
 ```

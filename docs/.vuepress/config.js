@@ -179,7 +179,8 @@ module.exports = {
             '/code/web/npm/': [
                 'base',
                 'ci',
-		'install'
+		        'install',
+                'problem'
             ],
             '/code/web/ts/': [
                 'base',
@@ -199,7 +200,8 @@ module.exports = {
             '/code/web/other/': [
                 'qiankun',
                 'microapp',
-                'electron'
+                'electron',
+                'tauri'
             ],
             '/microservices/consul/': [
                 'base',
@@ -264,7 +266,8 @@ module.exports = {
                 'network',
                 'update',
                 'composefile',
-                'compose-netcore'
+                'compose-netcore',
+                'portainer'
             ],
             '/devops/gitlab/': [
                 'gitlab-install',
@@ -276,7 +279,8 @@ module.exports = {
                 'nginx-docker',
                 'nginx',
                 'nginxhotreload',
-                'problem'
+                'problem',
+                'test'
             ],
             '/devops/prometheus/': [
                 'prometheus',
@@ -390,7 +394,8 @@ module.exports = {
                 'vscode',
                 'resource',
                 'devtools',
-                'plantuml'
+                'plantuml',
+                'vnc'
             ],
             '/other/cloud/': [
                 'proxmox',

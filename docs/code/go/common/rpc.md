@@ -258,3 +258,173 @@ func main()  {
      }
   }
 ```
+
+## GRPC示例
+
+### 准备
+
+```bash
+# 创建目录
+mkdir -p gotest/mygrpc && cd gotest
+# 初始化
+go mod init github.com/yasewang987/gotest
+# grpc
+go get -u google.golang.org/grpc
+# 协议插件
+go get -u google.golang.org/golang/protobuf
+go get -u google.golang.org/golang/protobuf/protoc-gen-go
+# 下载protoc，如果是mac m1 下载 x86版本即可
+curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.19.3/protoc-3.19.3-osx-x86_64.zip
+# 解压之后，移动到 $GOPATH/bin 目录下
+unzip protoc-3.19.3-osx-x86_64.zip
+mv protoc-3.19.3-osx-x86_64/bin/protoc $GOPATH/bin
+```
+
+### 生成proto的go文件
+
+准备 `mygrpc/test.proto` 文件，内容如下
+
+```proto
+syntax = "proto3";
+
+// 包名
+package  test;
+
+// 指定输出 go 语言的源码到哪个目录以及文件名称
+// 最终在 test.proto 目录生成 test.pb.go
+// 也可以只填写 "./"
+option go_package = "./;test";
+
+// 如果要输出其它语言的话
+// option csharp_package="MyTest";
+
+service Tester{
+  rpc MyTest(Request) returns (Response){}
+}
+
+// 函数参数
+message  Request{
+  string  jsonStr = 1;
+}
+
+// 函数返回值
+message  Response{
+  string  backJson = 1;
+}
+```
+
+生成 `go` 文件, 会在 `mygrpc` 文件夹生成 `test.pb.go` 文件
+
+```bash
+protoc --go_out=plugins=grpc:mygrpc mygrpc/*.proto
+```
+
+主要关注生成的两个 `Tester` 接口
+
+```go
+// 服务端
+type TesterServer interface {
+	MyTest(context.Context, *Request) (*Response, error)
+}
+
+// 客户端
+type TesterClient interface {
+	MyTest(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+}
+```
+
+### 服务端实现
+
+需要先实现 `TesterServer` 接口
+
+在 `mygrpc` 文件夹中新增 `testServer.go`, 内容如下：
+
+```go
+package test
+
+import (
+	context "context"
+	"fmt"
+)
+
+// 用于实现 TesterServer 服务
+type MyGrpcServer struct{}
+
+func (s MyGrpcServer) MyTest(context context.Context, request *Request) (*Response, error) {
+	fmt.Println("收到一个 grpc 请求，请求参数：", request)
+	response := Response{BackJson: `{"Code":666}`}
+	return &response, nil
+}
+```
+
+创建 `gRPC` 服务, `main.go`
+
+```go
+package main
+
+import (
+	"net"
+
+	"github.com/yasewang987/gotest/cmd"
+	test "github.com/yasewang987/gotest/mygrpc"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+)
+
+func main() {
+   // 创建 Tcp 连接
+	listener, _ := net.Listen("tcp", ":8028")
+   // 创建gRPC服务
+	grpcServer := grpc.NewServer()
+   // Tester 注册服务实现者
+	// 此函数在 test.pb.go 中，自动生成
+	test.RegisterTesterServer(grpcServer, &test.MyGrpcServer{})
+   // 在 gRPC 服务上注册反射服务
+	// func Register(s *grpc.Server)
+	reflection.Register(grpcServer)
+
+	grpcServer.Serve(listener)
+}
+```
+
+启动服务端 `go run main.go`
+
+### 客户端实现
+
+创建 `main_cli.go` 文件，内容如下
+
+```go
+package main
+
+import (
+	"bufio"
+	"context"
+	"log"
+	"os"
+
+	test "github.com/yasewang987/gotest/mygrpc"
+	"google.golang.org/grpc"
+)
+
+func main() {
+	conn, _ := grpc.Dial("127.0.0.1:8028", grpc.WithInsecure())
+	defer conn.Close()
+   // 创建 gRPC 客户端
+	grpcClient := test.NewTesterClient(conn)
+	request := test.Request{
+		JsonStr: `{"Code":666}`,
+	}
+	reader := bufio.NewReader(os.Stdin)
+	for {
+      // 发送请求，调用 MyTest 接口
+		response, err := grpcClient.MyTest(context.Background(), &request)
+		if err != nil {
+			log.Fatal("发送请求失败，原因是:", err)
+		}
+		log.Println(response)
+		reader.ReadLine()
+	}
+}
+```
+
+启动客户端 `go run main_cli.go`，每次按回车都会在服务端和客户端出现一行请求记录。

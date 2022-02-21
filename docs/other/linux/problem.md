@@ -12,7 +12,7 @@ grep -i -r 'killed process' /var/log
 
 ## 服务器重启(宕机)问题定位
 
-查看 `/var/log/messages` 里面记录了系统启动后的信息和错误日志
+查看 `/var/log/message` 里面记录了系统启动后的信息和错误日志
 
 ```bash
 # 安全相关日志
@@ -27,4 +27,25 @@ grep -i -r 'killed process' /var/log
 /var/log/utmp
 # 记录登录失败的信息
 /var/log/btmp
+```
+
+## 服务器启动一段时间后自动关机（休眠）
+
+大概率应该安装了`gnome`等桌面相关的应用导致的休眠问题
+
+```bash
+# 查看是否休眠
+systemctl status sleep.target
+# 如果显示状态是下面状态，则需要关闭
+Loaded: loaded
+
+# 关闭自动休眠
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+# 查看自动休眠是否关闭
+systemctl status sleep.target
+# 关闭之后的状态是
+Loaded: masked
+
+# 重新启动休眠
+systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
 ```
