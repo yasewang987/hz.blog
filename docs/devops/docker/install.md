@@ -70,6 +70,60 @@
   > 镜像仓库可以自己搭建私人仓库，也可以使用国内阿里云等提供的镜像仓库。
   1. 阿里云容器服务-镜像仓库（根据教程操作即可）
 
+## docker离线安装
+
+* arm版本下载地址: https://download.docker.com/linux/static/stable/aarch64/
+* amd版本滴在地址：https://download.docker.com/linux/static/stable/x86_64/
+
+```bash
+# 解压压缩包
+tar -zxvf docker-20.10.9.tgz
+
+# 转移到执行目录
+cp -p docker/* /usr/bin
+
+# 创建docker.service
+cat >/usr/lib/systemd/system/docker.service <<EOF 
+[Unit] 
+Description=Docker Application Container Engine 
+Documentation=http://docs.docker.com 
+After=network.target docker.socket 
+[Service] 
+Type=notify 
+EnvironmentFile=-/run/flannel/docker 
+WorkingDirectory=/usr/local/bin 
+ExecStart=/usr/bin/dockerd  -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock --selinux-enabled=false --log-opt max-size=1g 
+ExecReload=/bin/kill -s HUP $MAINPID 
+# Having non-zero Limit*s causes performance problems due to accounting overhead 
+# in the kernel. We recommend using cgroups to do container-local accounting. 
+LimitNOFILE=infinity 
+LimitNPROC=infinity 
+LimitCORE=infinity 
+# Uncomment TasksMax if your systemd version supports it. 
+# Only systemd 226 and above support this version. 
+#TasksMax=infinity 
+TimeoutStartSec=0 
+# set delegate yes so that systemd does not reset the cgroups of docker containers 
+Delegate=yes 
+# kill only the docker process, not all processes in the cgroup 
+KillMode=process 
+Restart=on-failure 
+[Install] 
+WantedBy=multi-user.target 
+EOF
+
+# 启动服务
+systemctl start docker
+
+# 开机启动
+systemctl enable docker
+
+# 关闭selinux
+setenforce=0
+# 永久关闭，设置SELINUX=disabled
+vim /etc/selinux/config
+```
+
 ## Docker-Compose安装
 
 参考资料：https://docs.docker.com/compose/install/
