@@ -12,7 +12,7 @@ grep -i -r 'killed process' /var/log
 
 ## 服务器重启(宕机)问题定位
 
-查看 `/var/log/message` 里面记录了系统启动后的信息和错误日志
+查看 `/var/log/messages` 里面记录了系统启动后的信息和错误日志
 
 ```bash
 # 安全相关日志

@@ -560,3 +560,19 @@ yum install --downloadonly --downloaddir=/tmp/ podman
 # 已安装相应的软件
 yum reinstall --downloadonly --downloaddir=/tmp/ podman
 ```
+
+## 开机时间/重启历史记录
+
+```bash
+who -b
+# 显示信息（开机时间）
+system boot  2020-06-12 17:44
+
+last reboot
+# 显示信息（历史记录）
+reboot   system boot  3.10.0-957.12.2. Fri Jun 12 17:44 - 10:21 (20+16:37)  
+reboot   system boot  3.10.0-957.12.2. Fri Jun 12 09:28 - 10:21 (21+00:53)  
+reboot   system boot  3.10.0-957.12.2. Mon Jun  8 15:27 - 16:02  (00:35)    
+reboot   system boot  3.10.0-957.12.2. Wed May 27 11:41 - 20:49  (09:08)    
+reboot   system boot  3.10.0-957.12.2. Tue May 19 09:52 - 20:49 (8+10:57)
+```
