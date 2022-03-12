@@ -385,7 +385,8 @@ module.exports = {
                 'rsync',
                 'rpm',
                 'shell',
-                'attack'
+                'attack',
+                'centos'
             ],
             '/other/mac/': [
                 'install',
