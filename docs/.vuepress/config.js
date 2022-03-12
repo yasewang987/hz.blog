@@ -174,6 +174,7 @@ module.exports = {
                 'problem',
                 'cmd',
                 'version',
+                'common',
                 'notice',
                 'package'
             ],
@@ -192,7 +193,8 @@ module.exports = {
                 'vscode',
                 'vue3',
                 'vitevue',
-                'setupscript'
+                'setupscript',
+                'vueuse'
             ],
             '/code/web/css/': [
                 'resources',
@@ -382,7 +384,8 @@ module.exports = {
                 'sed',
                 'rsync',
                 'rpm',
-                'shell'
+                'shell',
+                'attack'
             ],
             '/other/mac/': [
                 'install',

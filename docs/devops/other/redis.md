@@ -95,3 +95,8 @@ stream {    # stream 模块配置和 http 模块在相同级别
 * redis容器间隔1分钟左右就自动重启：有很大可能是redis的rdb文件比较大，服务器内存不够了，需要释放内存之后再启动。
 
 * redis从库过多导致数据同步失败：修改主库的配置文件中的 `client-output-buffer-limit`,命令如下：`config set client-output-buffer-limit "normal 0 0 0 slave 0 0 0 pubsub 33554432 8388608 60"`
+
+## redis常用管理工具
+
+* `another redis desktop manager`
+* `RedisInsight`
