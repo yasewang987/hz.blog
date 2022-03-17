@@ -78,6 +78,7 @@ module.exports = {
                     { text: 'GitLab', link: '/devops/gitlab/' },
                     { text: 'Prometheus', link: '/devops/prometheus/' },
                     { text: 'Ansible', link: '/devops/ansible/' },
+                    { text: 'Redis', link: '/devops/redis/' },
                     { text: '其他', link: '/devops/other/' }
                 ]
             },
@@ -327,12 +328,17 @@ module.exports = {
                 'k8s-ingress',
                 'k8s-helm'
             ],
+            '/devops/redis/': [
+                'install',
+                'base',
+                'cmd',
+                'problem'
+            ],
             '/devops/other/': [
                 'podman',
                 'nexus',
                 'elasticsearch',
                 'minio',
-                'redis',
                 'nextterminal',
                 'jumpserver',
                 'zentao'

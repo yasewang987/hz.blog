@@ -3,7 +3,6 @@
 * [Podman](./podman.md)
 * [Nexus](./nexus.md)
 * [Elasticsearch](./elasticsearch.md)
-* [Redis](./redis.md)
 * [MinIO](./minio.md)
 * [Next-Terminal](./nextterminal.md)
 * [Jumpserver](./jumpserver.md)
