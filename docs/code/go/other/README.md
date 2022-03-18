@@ -9,3 +9,4 @@
 
 * [Go使用注意事项](./notice.md)
 * [Go多版本管理](./package.md)
+* [Go-GPM解析](./gpm.md)

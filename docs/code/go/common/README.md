@@ -14,3 +14,5 @@
 * [服务器信息获取](./server.md)
 * [IO库](./io.md)
 * [Go字符串操作](./strings.md)
+* [Go测试](./test.md)
+* [GoChannel管道](./channel.md)

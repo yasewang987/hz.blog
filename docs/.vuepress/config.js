@@ -167,7 +167,9 @@ module.exports = {
                 'time',
                 'server',
                 'io',
-                'strings'
+                'strings',
+                'test',
+                'channel'
             ],
             '/code/go/other/': [
                 'install',
@@ -177,7 +179,8 @@ module.exports = {
                 'version',
                 'common',
                 'notice',
-                'package'
+                'package',
+                'gpm'
             ],
             '/code/web/npm/': [
                 'base',
