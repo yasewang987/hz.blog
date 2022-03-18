@@ -2,6 +2,10 @@
 
 ## K8s基础概念
 
+`Kubernetes` 集群将所有节点上的资源都整合到一个大的虚拟资源池里，以代替一个个单独的服务器，而后开放诸如 `CPU、内存和 I/O` 这些基本资源用于运行其基本单元 —— `Pod` 资源对象。`Pod` 的容器中运行着隔离的`任务单元`，它们以 `Pod` 为`原子单位`，并根据其资源需求聪虚拟资源池中为其动态分配资源。若可以将整个集群类比为一台传统的服务器，那么 `Kubernetes（Master）`就好比是`操作系统内核`，其主要职责在于抽象资源并调度任务，而 `Pod` 资源对象就是那些运行于用户空间中的进程。于是，传统意义上的向单节点或集群直接部署、配置应用的模型日渐式微，取而代之的是向 `Kubernetes` 的 `API Server` 提交运行 `Pod` 对象。
+
+`API Server` 是负责接受并相应客户端提交任务的接口，用户可使用诸如 CLI 工具（如 `kubectl`）、UI 工具（如 `Dashboard`）或程序代码（客户端开发库）发起请求，其中，`kubectl` 是最为常用的交互式命令行工具。
+
 ### 1.Cluster 集群
 
 计算、存储和网络资源的集合，Kubernetes利用这些资源运行各种基于容器的应用。
@@ -34,6 +38,8 @@ Kubernetes的最小工作单元，每个Pod包含一个或多个容器。Pod中�
 
 ### 5.Controller
 
+Kubernetes 集群的设计中，Pod 是有生命周期的对象。用户通过手工创建或由 Controller（控制器）直接创建的 Pod 对象会被“调度器”（Scheduler）调度至集群中的某工作节点运行，待到容器应用进程运行结束之后正常终止，随后就会被删除。另外，节点资源耗尽或故障也会导致 Pod 对象被回收。
+
 K8S不会直接创建Pod，是通过Controller来管理Pod的。为了满足不同业务场景，K8S提供了多种Controller：
 
 　　（1）Deployment  
@@ -55,7 +61,11 @@ K8S不会直接创建Pod，是通过Controller来管理Pod的。为了满足不�
 
 K8S定义了外界访问一个或一组特定Pod的方式，就是Service。每个Service有自己的IP和端口，并且为Pod提供了负载均衡。
 
-　　如果说K8S运行Pod的任务是交给了Controller去做，那么访问Pod的任务则是交给了Service去做。
+如果说K8S运行Pod的任务是交给了Controller去做，那么访问Pod的任务则是交给了Service去做。
+
+Service IP 是一种虚拟 IP，也称为 Cluster IP，它专用于集群内通信，通常使用专用的地址段，如 “10.96.0.0/12” 网络，各 Service 对象的 IP 地址在此范围内由系统动态分配。
+
+Service 主要由三种常用类型：第一种是仅用与集群内部通信的 ClusterIP 类型：第二种是接入集群外部请求的 NodePort 类型，它工作于每个节点的主机 IP 之上；第三种是 LoadBalacer 类型，它可以把外部请求负载均衡至多个 Node 的主机IP的 NodePort 之上。
 
 ### 7. Namespace
 
@@ -74,15 +84,17 @@ K8S中会自动创建两个Namespace：
 
 ### 1. Master节点
 
+Kubernetes 集群的设计中，Pod 是有生命周期的对象。用户通过手工创建或由 Controller（控制器）直接创建的 Pod 对象会被“调度器”（Scheduler）调度至集群中的某工作节点运行，待到容器应用进程运行结束之后正常终止，随后就会被删除。另外，节点资源耗尽或故障也会导致 Pod 对象被回收。
+
 K8S集群的“大脑”，运行以下多个Daemon服务：
 
 * API Server（kube-apiserver）
   1. 提供Restful API => Kubernetes API，供其他组件调用以管理Cluster的各种资源
 * Scheduler（kube-scheduler）
-  1. 负责决定将Pod放在哪个Node上Run起来
+  1. 通过与api server交互，负责决定将Pod放在哪个Node上Run起来
   1. 调度时会根据指定算法选择Pod（eg.集群拓扑结构、各节点负载情况、HA等等）
 * Controller Manager（kube-controller-manager）
-  1. 负责管理集群中的各种资源，保证资源处于预期的状态
+  1. 负责管理集群中的各种资源，通过宇api server交互,保证资源处于预期的状态
   1. 由多种Controller组成
       * Replication Controller：管理Deployment、StatefuleSet、DaemonSet的生命周期
       * Endpoints Controller
@@ -99,8 +111,8 @@ K8S集群的“大脑”，运行以下多个Daemon服务：
 运行Pod的主战场，主要运行以下K8S组件：
 
 * kubelet
-  1. Node的Agent，负责创建运行容器与向Master报告运行状态
+  1. Node的Agent，负责创建运行容器与向Master报告运行状态（与master api server交互）
 * kube-proxy
-  1. 每个Node都会运行proxy，它负责请求转发到后端的容器
+  1. 每个Node都会运行proxy，它负责请求转发到后端的容器（与master api server交互）
 * Pod网络
   1. 保证Pod能够相互通信，Flannel、Calico是一个可选方案
