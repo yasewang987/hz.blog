@@ -5,3 +5,4 @@
 * [Redis常用命令](./cmd.md)
 * [Redis常见问题](./problem.md)
 * [Redis消息队列](./mq.md)
+* [RedisSearch](./redissearch.md)

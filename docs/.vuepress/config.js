@@ -336,7 +336,8 @@ module.exports = {
                 'base',
                 'cmd',
                 'problem',
-                'mq'
+                'mq',
+                'redissearch'
             ],
             '/devops/other/': [
                 'podman',

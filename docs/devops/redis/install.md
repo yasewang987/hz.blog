@@ -65,4 +65,25 @@ stream {    # stream 模块配置和 http 模块在相同级别
 ## Redis常用客户端工具
 
 * `another redis desktop manager`
-* `RedisInsight`
+* `RedisInsight`：https://redis.com/redis-enterprise/redis-insight/
+
+## RedisMod安装
+
+首先介绍下RedisMod这个东西，它是一系列Redis的增强模块。有了RedisMod的支持，Redis的功能将变得非常强大。目前RedisMod中包含了如下增强模块：
+
+* RediSearch：一个功能齐全的搜索引擎；
+* RedisJSON：对JSON类型的原生支持；
+* RedisTimeSeries：时序数据库支持；
+* RedisGraph：图数据库支持；
+* RedisBloom：概率性数据的原生支持；
+* RedisGears：可编程的数据处理；
+* RedisAI：机器学习的实时模型管理和部署。
+
+```bash
+# docker方式安装
+docker run -d -p 6666:6379 \
+-v /home/user/redis/data:/data \
+-v /home/user/redis/redis.conf:/usr/local/etc/redis/redis.conf \
+--name redismod redislabs/redismod \
+/usr/local/etc/redis/redis.conf
+```
