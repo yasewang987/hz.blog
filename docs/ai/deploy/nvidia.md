@@ -4,7 +4,7 @@
 
     https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
 
-    Ubuntu20.04显卡驱动安装：
+## Ubuntu20.04显卡驱动安装
 
     * 禁用 `nouveau` 驱动
 
@@ -68,6 +68,69 @@
         +-----------------------------------------------------------------------------+
         ```
 
+## centos7显卡驱动安装
+
+* 安装依赖环境
+
+```bash
+yum install kernel-devel gcc -y
+```
+
+* 检查内核版本和源码版本，保证一致
+
+```bash
+ls /boot | grep vmlinu
+
+rpm -aq | grep kernel-devel
+```
+
+* 屏蔽系统自带的nouveau
+
+```bash
+# 查看命令：
+lsmod | grep nouveau
+
+# 修改dist-blacklist.conf文件：
+vim /lib/modprobe.d/dist-blacklist.conf
+
+# 添加如下内容：
+blacklist nouveau
+options nouveau modeset=0
+
+# 验证是否已禁用，没有信息显示，说明nouveau已被禁用
+lsmod | grep nouveau
+```
+
+* 重建initramfs image步骤
+
+```bash
+mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak
+
+dracut /boot/initramfs-$(uname -r).img $(uname -r)
+```
+
+* 修改运行级别为文本模式
+
+```bash
+systemctl set-default multi-user.target
+```
+
+* 重启系统：`reboot`
+
+* 下载显卡驱动文件：https://www.nvidia.cn/Download/index.aspx?lang=cn ，选择对应版本的显卡
+
+* 安装显卡驱动：
+
+```bash
+chmod +x NVIDIA-Linux-x86_64-440.64.run
+
+./NVIDIA-Linux-x86_64-440.64.run
+```
+
+* 验证：`nvidia-smi`
+
+## docker容器使用显卡驱动
+
 * 安装 [nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
 
     dockeer19.03版本之后只需要安装 `nvidia-container-runtime` 即可
@@ -110,4 +173,10 @@ nvidia-smi
 ```bash
 # 注意 --gpus all --privileged 是否都有
 sudo docker run --rm --gpus all --privileged pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime nvidia-smi
+```
+
+* 报错 `unable to find the kernel source tree for the currently running kernel.........`，使用下面命令安装，`3.10.0-1062.18.1.el7.x86_64`需要改成自己的目录
+
+```bash
+./NVIDIA-Linux-x86_64-440.64.run --kernel-source-path=/usr/src/kernels/3.10.0-1062.18.1.el7.x86_64 -k $(uname -r)
 ```

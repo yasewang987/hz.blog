@@ -12,6 +12,21 @@ grep -i -r 'killed process' /var/log
 
 ## 服务器重启(宕机)问题定位
 
+```bash
+dmesg | grep -i error
+# 输出
+ERST: Error Record Serialization Table (ERST) support is initialized.
+ACPI Error: No handler for Region [IPMI] (ffff88081cd55420) [IPMI] (20090903/evregion-319)
+ACPI Error: Region IPMI(7) has no handler (20090903/exfldio-295)
+ACPI Error (psparse-0537): Method parse/execution failed [\_SB_.PMI0._GHL] (Node ffff88101c853a38), AE_NOT_EXIST
+ACPI Error (psparse-0537): Method parse/execution failed [\_SB_.PMI0._PMC] (Node ffff88101c853a88), AE_NOT_EXIST
+
+# 问题处理：升级内核
+yum install kernel
+# 升级完之后重启
+reboot
+```
+
 查看 `/var/log/messages` 里面记录了系统启动后的信息和错误日志
 
 ```bash
