@@ -180,3 +180,16 @@ sudo docker run --rm --gpus all --privileged pytorch/pytorch:1.6.0-cuda10.1-cudn
 ```bash
 ./NVIDIA-Linux-x86_64-440.64.run --kernel-source-path=/usr/src/kernels/3.10.0-1062.18.1.el7.x86_64 -k $(uname -r)
 ```
+
+* `nvidia-smi`显卡丢失以及`GPU Fan`显示`ERR!`
+
+```bash
+# 1. 重启服务器
+reboot
+
+# 设置显卡最大功率
+# 把GPU的persistent mode（常驻模式）打开，这样才能顺利设置power limit
+sudo nvidia-smi -pm 1
+# 把功率限制从默认的250W调整到150W，也可以设置其他值
+sudo nvidia-smi -pl 200
+```
