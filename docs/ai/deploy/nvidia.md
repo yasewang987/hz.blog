@@ -188,8 +188,9 @@ sudo docker run --rm --gpus all --privileged pytorch/pytorch:1.6.0-cuda10.1-cudn
 reboot
 
 # 设置显卡最大功率
+# （每次设置下面功率都要先执行）
 # 把GPU的persistent mode（常驻模式）打开，这样才能顺利设置power limit
-sudo nvidia-smi -pm 1
+sudo nvidia-smi -pm 1 -i 显卡号
 # 把功率限制从默认的250W调整到150W，也可以设置其他值
-sudo nvidia-smi -pl 200
+sudo nvidia-smi -pl 150 -i 显卡号
 ```
