@@ -199,30 +199,28 @@ tcp        0      0 0.0.0.0:8000                0.0.0.0:*                   LIST
 
 1. 参数：
 `-c` ：create 建立压缩档案的参数；  
-`-x` ： 解压缩压缩档案的参数；  
+`-x` ： 解压缩压缩档案的参数；
+`-t` ： 查看压缩文件列表；  
 `-z` ： 是否需要用gzip压缩；  
 `-v` ： 压缩的过程中显示档案；  
 `-f` ： 置顶文档名，在f后面立即接文件名，不能再加参数  
 
-1. 举例： 一，将整个/home/www/images 目录下的文件全部打包为 /home/www/images.tar
-
 ```bash
+#### 压缩
 tar -cvf /home/www/images.tar /home/www/images ← 仅打包，不压缩
 tar -zcvf /home/www/images.tar.gz /home/www/images ← 打包后，以gzip压缩
-
 # 排除某些文件夹
 tar -zcvf /home/www/images.tar.gz --exclude=/home/www/images/aaa --exclude=/home/www/images/bbb /home/www/images
+
+#### 解压
+#将/source/kernel.tgz解压到 /source/linux-2.6.29 目录  
+`tar zxvf /source/kernel.tgz -C /source/linux-2.6.29`
+
+#### 查看压缩包文件列表
+tar -ztvf xxxxx.tgz
 ```
 
 * 在参数f后面的压缩文件名是自己取的，习惯上用tar来做，如果加z参数，则以tar.gz 或tgz来代表gzip压缩过的tar file文件
-
-1. 将tgz文件解压到指定目录  
-`tar zxvf test.tgz -C 指定目录`  
-比如将/source/kernel.tgz解压到 /source/linux-2.6.29 目录  
-`tar zxvf /source/kernel.tgz -C /source/linux-2.6.29`
-1. 将指定目录压缩到指定文件  
-比如将linux-2.6.29 目录压缩到 kernel.tgz  
-`tar zcvf kernel.tgz linux-2.6.29`
 
 ##### 二、ZIP
 
