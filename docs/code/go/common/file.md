@@ -2,7 +2,7 @@
 
 ## 文件读写
 
-**带缓冲的读取**
+### 带缓冲的读取
 
 ```go
 func fileDemo1() {
@@ -18,6 +18,7 @@ func fileDemo1() {
 
 	for {
 		inputString, readerError := inputReader.ReadString('\n')
+		// inputString, readerError := inputReader.ReadLine()
 		fmt.Printf("The input string is : %s", inputString)
 		if readerError == io.EOF {
 			return
@@ -26,7 +27,7 @@ func fileDemo1() {
 }
 ```
 
-变量 inputFile 是 *os.File 类型的。该类型是一个结构，表示一个打开文件的描述符（文件句柄）。然后，使用 os 包里的 Open 函数来打开一个文件。该函数的参数是文件名，类型为 string。在上面的程序中，我们以只读模式打开 `test.sh` 文件。
+变量 inputFile 是 `*os.File` 类型的。该类型是一个结构，表示一个打开文件的描述符（文件句柄）。然后，使用 os 包里的 `Open` 函数来打开一个文件。该函数的参数是文件名，类型为 string。在上面的程序中，我们以只读模式打开 `test.sh` 文件。
 
 如果文件不存在或者程序没有足够的权限打开这个文件，Open函数会返回一个错误.
 
@@ -45,7 +46,7 @@ if (n == 0) { break}
 
 变量 n 的值表示读取到的字节数.
 
-**将整个文件的内容读到一个字符串里**
+### 将整个文件的内容读到一个字符串里
 
 可以使用 `io/ioutil` 包里的 `ioutil.ReadFile()` 方法，该方法第一个返回值的类型是 `[]byte`，里面存放读取到的内容，第二个返回值是错误，如果没有错误发生，第二个返回值为 `nil`。函数 `WriteFile()` 可以将 `[]byte` 的值写入文件。
 
@@ -68,7 +69,7 @@ func fileDemo2() {
 }
 ```
 
-**按列读取文件中的数据**
+### 按列读取文件中的数据
 
 如果数据是按列排列并用空格分隔的，你可以使用 `fmt` 包提供的以 `FScan` 开头的一系列函数来读取他们。请看以下程序，我们将 3 列的数据分别读入变量 `v1、v2 和 v3` 内，然后分别把他们添加到切片的尾部。
 
@@ -119,7 +120,7 @@ filename := filepath.Base(path)
 
 关于解析 CSV 文件，`encoding/csv` 包提供了相应的功能。
 
-**压缩包读写**
+### 压缩包读写
 
 `compress`包提供了读取压缩文件的功能，支持的压缩文件格式为：`bzip2、flate、gzip、lzw 和 zlib`。
 
@@ -162,8 +163,7 @@ func main() {
 	}
 }
 ```
-
-**写文件**
+### 写文件
 
 请看以下程序：
 

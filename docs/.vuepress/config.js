@@ -78,6 +78,7 @@ module.exports = {
                     { text: 'GitLab', link: '/devops/gitlab/' },
                     { text: 'Prometheus', link: '/devops/prometheus/' },
                     { text: 'Ansible', link: '/devops/ansible/' },
+                    { text: 'Redis', link: '/devops/redis/' },
                     { text: '其他', link: '/devops/other/' }
                 ]
             },
@@ -166,7 +167,9 @@ module.exports = {
                 'time',
                 'server',
                 'io',
-                'strings'
+                'strings',
+                'test',
+                'channel'
             ],
             '/code/go/other/': [
                 'install',
@@ -174,8 +177,10 @@ module.exports = {
                 'problem',
                 'cmd',
                 'version',
+                'common',
                 'notice',
-                'package'
+                'package',
+                'gpm'
             ],
             '/code/web/npm/': [
                 'base',
@@ -192,7 +197,8 @@ module.exports = {
                 'vscode',
                 'vue3',
                 'vitevue',
-                'setupscript'
+                'setupscript',
+                'vueuse'
             ],
             '/code/web/css/': [
                 'resources',
@@ -325,12 +331,19 @@ module.exports = {
                 'k8s-ingress',
                 'k8s-helm'
             ],
+            '/devops/redis/': [
+                'install',
+                'base',
+                'cmd',
+                'problem',
+                'mq',
+                'redissearch'
+            ],
             '/devops/other/': [
                 'podman',
                 'nexus',
                 'elasticsearch',
                 'minio',
-                'redis',
                 'nextterminal',
                 'jumpserver',
                 'zentao'
@@ -382,7 +395,9 @@ module.exports = {
                 'sed',
                 'rsync',
                 'rpm',
-                'shell'
+                'shell',
+                'attack',
+                'centos'
             ],
             '/other/mac/': [
                 'install',

@@ -18,3 +18,5 @@
 * [rsync指南](./rsync.md)
 * [rpm包制作](./rpm.md)
 * [shell脚本](./shell.md)
+* [Linux排查服务器是否被入侵](./attack.md)
+* [Centos](./centos.md)

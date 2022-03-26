@@ -5,6 +5,8 @@
 * [常见错误处理](./problem.md)
 * [Go常用命令](./cmd.md)
 * [Go多版本管理](./version.md)
+* [Go常用开源库](./common.md)
 
 * [Go使用注意事项](./notice.md)
 * [Go多版本管理](./package.md)
+* [Go-GPM解析](./gpm.md)

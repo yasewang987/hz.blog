@@ -20,14 +20,11 @@ source bin/activate
 # 这个特别重要，一定要用虚拟环境的bin目录下的python3，不然找不到包
 bin/python3
 ```
-
-## 源码编译
-
 ## rpm包制作
 
 `%define __os_install_post %{nil}` 这个对于python和java不需要编译的项目特别重要，不需要解压、压缩、自动编译python和jar包这些操作。
 
-* 虚拟环境安装之后打包
+* 虚拟环境`virtualenv`安装之后打包（`建议`）
 
 ```text
 %define __os_install_post %{nil}
@@ -63,7 +60,7 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 /opt/mytest/%{mpath}
 ```
 
-* 编译在开发机，安装在专用机例子
+* 编译在开发机，安装在专用机例子（`不建议`）
 
 ```
 %global buildpath /usr/local/lib/python3.7/dist-packages
@@ -110,3 +107,37 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 ```
 
 ## deb包制作
+
+
+## 源码编译
+
+
+## python业务代码打包
+
+```text
+Name: funcun-code
+Version: 4.1.22
+Release:        1
+Summary:        funcun code
+
+Group:          funcun
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+funcun code
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/funcun/code
+mkdir -p %{buildroot}/opt/funcun/code
+cp -rf %{_builddir}/funcun/code/* %{buildroot}/opt/funcun/code
+
+%files
+/opt/funcun/code
+
+%changelog
+```

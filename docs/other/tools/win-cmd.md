@@ -96,3 +96,12 @@ call xcopy ./out E:\test /e /y
     ```bash
     sudo usermod -a -G docker $USER
     ```
+
+## Windows打开关闭虚拟机
+
+```bash
+# 关闭
+bcdedit /set hypervisorlaunchtype off
+# 打开
+bcdedit /set hypervisorlaunchtype auto
+```
