@@ -1,5 +1,26 @@
 # Linux排查服务器是否被入侵
 
+## 简单服务器病毒清理
+
+```bash
+# 找出异常进程
+top
+nvidia-smi
+
+# 通过systemctl查看对应信息,可以查看到对应的用户名、登录ip，相关session信息
+systemctl status pid
+
+# 确认用户是否有登录记录
+cat /var/log/secure | grep -i "accepted password"
+
+# 1. 确认有用户登录之后记得修改服务器密码
+passwd root
+# 2. 查看是否有ssh免密登录，有就删掉
+vim ~/.ssh/authorized_keys
+# 3. 查看是否有异常的定时任务,有就删除
+crontab -l
+```
+
 ## 1. 入侵者可能会删除机器的日志信息
 
 可以查看日志信息是否还`存在`或者是否被`清空`，相关命令示例：
