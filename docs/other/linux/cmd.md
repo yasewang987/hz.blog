@@ -574,3 +574,19 @@ reboot   system boot  3.10.0-957.12.2. Mon Jun  8 15:27 - 16:02  (00:35)
 reboot   system boot  3.10.0-957.12.2. Wed May 27 11:41 - 20:49  (09:08)    
 reboot   system boot  3.10.0-957.12.2. Tue May 19 09:52 - 20:49 (8+10:57)
 ```
+
+## History命令
+
+历史命令保存在 `~/.bash_history` 文件中
+
+```bash
+# 查看历史记录(不包含缓存中的历史命令)
+history
+# 将缓存中的历史命令保存到.bash_history
+history -w
+# 清空历史命令
+history -c
+# 设置历史命令保存条数10000
+vim /etc/profile
+HISTSIZE 10000
+```
