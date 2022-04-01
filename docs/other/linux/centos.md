@@ -49,3 +49,26 @@ uname -sr
 * `off`：关闭中断重映射
 * `nosid`：重映射时不对SID(Source ID)做检查
 * `no_x2apic_optout`：无视BIOS的设置，强制禁用x2APIC特性，主要用于解决某些对x2APIC支持有缺陷的BIOS导致的故障
+
+## 修改IP
+
+```bash
+# 查看网卡id
+ip addr
+
+# centos7 / kylin-v10
+vi /etc/sysconfig/network-scripts/ifcfg-网卡id
+# 修改如下内容
+BOOTPROTO=static  # static/dhcp
+ONBOOT=yes
+# 加入如下内容
+IPADDR=192.168.1.160
+NETMASK=255.255.255.0
+# 下面的如果不需要可以不设置
+GATEWAY=192.168.1.1
+DNS1=119.29.29.29
+DNS2=8.8.8.8
+
+# 重启网络服务生效
+systemctl restart network
+```

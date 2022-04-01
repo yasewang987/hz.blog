@@ -6,9 +6,9 @@ sudo vim /etc/ssh/sshd_config
 #找到PermitRootLogin without-password 修改为PermitRootLogin yes
 
 # 重启ssh服务
-sudo systemctl restart ssh
+sudo systemctl restart sshd
 # 或者
-service ssh restart
+service sshd restart
 ```
 
 ## 用户/用户组常用命令
