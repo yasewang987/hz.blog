@@ -207,3 +207,11 @@ dockerd
 # 信息如下，则删除 /var/lib/docker 之后再启动即可
 mkdir /var/lib/docker: file exists
 ```
+
+## port is already allocated
+
+```bash
+docker network prune
+# 先直接执行重启docker服务试试，不行就先执行上面，再执行重启
+systemctl restart docker
+```
