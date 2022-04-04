@@ -169,7 +169,8 @@ module.exports = {
                 'io',
                 'strings',
                 'test',
-                'channel'
+                'channel',
+                'select'
             ],
             '/code/go/other/': [
                 'install',
