@@ -286,3 +286,26 @@ func Bar() {
    fmt.Println(foo)
 }
 ```
+
+## Goroutine内存泄漏
+
+### 情况一：http服务未设置超时时间
+
+* 上游服务作为客户端使用了 `http1.1` 并且将连接设置为 `keepalive`；
+* 本服务作为服务端未设置 `idletimeout` 与 `readtimeout`；
+
+当这两种情况同时发生时，如果上游持有对本服务的连接不进行释放，那么服务端会一直维持这个连接的存在，不进行回收，进而导致协程泄漏；
+
+解决方案：
+
+```go
+server := &http.Server {
+    Addr: addr,
+    Handler: mux,
+    IdleTimeout: 120 * time.Second,
+}
+
+if err := server.ListenAndServer; err != nil {
+    return err
+}
+```

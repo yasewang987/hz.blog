@@ -1,5 +1,8 @@
 # Go Dockerfile
 
+
+## 常规dockerfile
+
 ```dockerfile
 FROM golang:1.16 as builder
 ENV GO111MODULE=on \
@@ -12,6 +15,8 @@ RUN go build -o alertsystem ./src
 
 FROM alpine
 WORKDIR /app
+# RUN apk update --no-cache && apk add --no-cache tzdata
+# ENV TZ Asia/Shanghai
 RUN apk add tzdata \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "Asia/Shanghai" > /etc/localtimezone \
