@@ -223,3 +223,16 @@ systemctl restart docker
 # 执行命令示例如下
 docker -H 192.168.100.7:2375 ps 
 ```
+
+## 清理指定label镜像
+
+```dockerfile
+FROM image:1
+LABEL mylabel=label0
+```
+
+```bash
+docker images prune -a -f --filter="label=mylabel=label0"
+```
+
+
