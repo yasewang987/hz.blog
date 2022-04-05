@@ -181,7 +181,35 @@ func main() {
 }
 ```
 
-## 在初始化slice的时候尽量补全cap
+## 在初始化slice，map的时候尽量指定容量
+
+注意，与 slice 不同。map capacity 提示并不保证完全的抢占式分配，而是用于估计所需的 hashmap bucket 的数量。因此，在将元素添加到 map 时，甚至在指定 map 容量时，仍可能发生分配。
+
+* map
+
+```go
+make(map[T1]T2, hint)
+
+// Bad
+m := make(map[string]os.FileInfo)
+
+files, _ := ioutil.ReadDir("./files")
+for _, f := range files {
+    m[f.Name()] = f
+}
+// m 是在没有大小提示的情况下创建的； 在运行时可能会有更多分配。
+
+// Good
+files, _ := ioutil.ReadDir("./files")
+
+m := make(map[string]os.FileInfo, len(files))
+for _, f := range files {
+    m[f.Name()] = f
+}
+// m 是有大小提示创建的；在运行时可能会有更少的分配。
+```
+
+* slice
 
 方法2相较于方法1，就只有一个区别：在初始化`[]int slice`的时候在`make`中设置了`cap`的长度，就是`slice`的大小。
 
@@ -309,3 +337,177 @@ if err := server.ListenAndServer; err != nil {
     return err
 }
 ```
+## 反射虽好，切莫贪杯
+
+标准库 reflect 为 Go 语言提供了运行时动态获取对象的类型和值以及动态创建对象的能力。反射可以帮助抽象和简化代码，提高开发效率。
+
+Go 语言标准库以及很多开源软件中都使用了 Go 语言的反射能力，例如用于序列化和反序列化的 json、ORM 框架 gorm、xorm 等。
+
+### 优先使用 strconv 而不是 fmt
+
+基本数据类型与字符串之间的转换，优先使用 strconv 而不是 fmt，因为前者性能更佳。fmt使用了反射
+
+```go
+// Bad
+for i := 0; i < b.N; i++ {
+ s := fmt.Sprint(rand.Int())
+}
+
+BenchmarkFmtSprint-4    143 ns/op    2 allocs/op
+
+// Good
+for i := 0; i < b.N; i++ {
+ s := strconv.Itoa(rand.Int())
+}
+
+BenchmarkStrconv-4    64.2 ns/op    1 allocs/op
+```
+
+## 避免重复的字符串到字节切片的转换
+
+```go
+// Bad
+for i := 0; i < b.N; i++ {
+ w.Write([]byte("Hello world"))
+}
+
+BenchmarkBad-4   50000000   22.2 ns/op
+
+// Good
+data := []byte("Hello world")
+for i := 0; i < b.N; i++ {
+ w.Write(data)
+}
+
+BenchmarkGood-4  500000000   3.25 ns/op
+```
+
+## 字符串拼接方式的选择
+
+### 行内拼接字符串推荐使用运算符+
+
+行内拼接字符串为了书写方便快捷，最常用的两个方法是：
+
+* 运算符+
+* fmt.Sprintf()
+
+行内字符串的拼接，主要追求的是代码的简洁可读。fmt.Sprintf() 能够接收不同类型的入参，通过格式化输出完成字符串的拼接，使用非常方便。但因其底层实现使用了反射，性能上会有所损耗。
+
+运算符 + 只能简单地完成字符串之间的拼接，非字符串类型的变量需要单独做类型转换。行内拼接字符串不会产生内存分配，也不涉及类型地动态转换，所以性能上优于fmt.Sprintf()。
+
+从性能出发，兼顾易用可读，如果待拼接的变量不涉及类型转换且数量较少（<=5），行内拼接字符串推荐使用运算符 +，反之使用 fmt.Sprintf()。
+
+下面看下二者的性能对比。
+
+```go
+// Good
+func BenchmarkJoinStrWithOperator(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  _ = s1 + s2 + s3
+ }
+}
+
+// Bad
+func BenchmarkJoinStrWithSprintf(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  _ = fmt.Sprintf("%s%s%s", s1, s2, s3)
+ }
+}
+
+go test -bench=^BenchmarkJoinStr -benchmem .
+BenchmarkJoinStrWithOperator-8    70638928    17.53 ns/op     0 B/op    0 allocs/op
+BenchmarkJoinStrWithSprintf-8      7520017    157.2 ns/op    64 B/op    4 allocs/op
+```
+
+### 非行内拼接字符串推荐使用 strings.Builder
+
+字符串拼接还有其他的方式，比如strings.Join()、strings.Builder、bytes.Buffer和byte[]，这几种不适合行内使用。当待拼接字符串数量较多时可考虑使用。
+
+先看下其性能测试的对比。
+
+```go
+func BenchmarkJoinStrWithStringsJoin(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  _ = strings.Join([]string{s1, s2, s3}, "")
+ }
+}
+
+func BenchmarkJoinStrWithStringsBuilder(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  var builder strings.Builder
+  _, _ = builder.WriteString(s1)
+  _, _ = builder.WriteString(s2)
+  _, _ = builder.WriteString(s3)
+ }
+}
+
+func BenchmarkJoinStrWithBytesBuffer(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  var buffer bytes.Buffer
+  _, _ = buffer.WriteString(s1)
+  _, _ = buffer.WriteString(s2)
+  _, _ = buffer.WriteString(s3)
+ }
+}
+
+func BenchmarkJoinStrWithByteSlice(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  var bys []byte
+  bys= append(bys, s1...)
+  bys= append(bys, s2...)
+  _ = append(bys, s3...)
+ }
+}
+
+func BenchmarkJoinStrWithByteSlicePreAlloc(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  bys:= make([]byte, 0, 9)
+  bys= append(bys, s1...)
+  bys= append(bys, s2...)
+  _ = append(bys, s3...)
+ }
+}
+
+go test -bench=^BenchmarkJoinStr .
+goos: windows
+goarch: amd64
+pkg: main/perf
+cpu: Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz
+BenchmarkJoinStrWithStringsJoin-8               31543916                36.39 ns/op
+BenchmarkJoinStrWithStringsBuilder-8            30079785                40.60 ns/op
+BenchmarkJoinStrWithBytesBuffer-8               31663521                39.58 ns/op
+BenchmarkJoinStrWithByteSlice-8                 30748495                37.34 ns/op
+BenchmarkJoinStrWithByteSlicePreAlloc-8         665341896               1.813 ns/op
+```
+
+从结果可以看出，strings.Join()、strings.Builder、bytes.Buffer和byte[] 的性能相近。如果结果字符串的长度是可预知的，使用 byte[] 且预先分配容量的拼接方式性能最佳。
+
+所以如果对性能要求非常严格，或待拼接的字符串数量足够多时，建议使用  byte[] 预先分配容量这种方式。
+
+综合易用性和性能，一般推荐使用strings.Builder来拼接字符串。
+
+string.Builder也提供了预分配内存的方式 Grow：
+
+```go
+func BenchmarkJoinStrWithStringsBuilderPreAlloc(b *testing.B) {
+ s1, s2, s3 := "foo", "bar", "baz"
+ for i := 0; i < b.N; i++ {
+  var builder strings.Builder
+  builder.Grow(9)
+  _, _ = builder.WriteString(s1)
+  _, _ = builder.WriteString(s2)
+  _, _ = builder.WriteString(s3)
+ }
+}
+
+BenchmarkJoinStrWithStringsBuilderPreAlloc-8    60079003                20.95 ns/op
+```
+
+使用了 Grow 优化后的版本的性能测试结果如下。可以看出相较于不预先分配空间的方式，性能提升了很多。
