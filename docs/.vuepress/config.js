@@ -171,7 +171,8 @@ module.exports = {
                 'test',
                 'channel',
                 'select',
-                'context'
+                'context',
+                'di'
             ],
             '/code/go/other/': [
                 'install',

@@ -18,3 +18,4 @@
 * [GoChannel管道](./channel.md)
 * [Go-Select](./select.md)
 * [Go-Context](./context.md)
+* [Go依赖注入](./di.md)
