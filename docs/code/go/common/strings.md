@@ -1,5 +1,10 @@
 # Go字符串操作
 
+## strconv
+
+优先使用 strconv 而不是 fmt
+## 获取字字符串
+
 ```go
 ////// 获取子字符串
 func subStr() {

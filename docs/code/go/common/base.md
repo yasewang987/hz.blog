@@ -302,27 +302,3 @@ type Student struct { // 首字母大写可包外访问
 
 * `defer` 延迟执行的函数会在 `return` 返回前执行，所以一般用来进行资源释放等清理工作
 * 多个被 `defer` 的函数会按照先进后出的顺序被调用
-
-## select
-
-* 要求 `case` 语句后面必须为 `channel` 的收发操作
-* 当有多个 `case` 语句同时返回时，`select` 将会随机选择一个 `case` 进行处理
-* 如果 `select` 语句的最后包含 `default` 语句，该 `select` 语句将会变为非阻塞型，即当其他所有的 `case` 语句都被阻塞无法返回时，`select` 语句将直接执行 `default` 语句返回结果
-
-
-```go
-select {
-case val := <- ch1: // 从 ch1 读取数据
-	fmt.Printf("get value %d from ch1\n", val)
-case ch2 <- 2 : // 使用 ch2 发送消息
-	fmt.Println("send value by ch2")
-case <-time.After(2 * time.Second): // 超时设置
-	fmt.Println("Time out")
-	return
-}
-```
-
-## context
-
-* 当需要在多个 `goroutine` 中传递上下文信息时，可以使用 `Context` 实现
-* `Context` 除了用来传递上下文信息，还可以用于传递终结执行子任务的相关信号，中止多个执行子任务的 `goroutine`

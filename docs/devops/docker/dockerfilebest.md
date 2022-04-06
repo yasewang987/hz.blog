@@ -201,20 +201,20 @@ jenkins:x:1000:1000:Linux User,,,:/var/jenkins_home:/bin/bash
     ```
 1. CMD和ENTRYPOINT
 
-    CMD语法：CMD ["executable", "param1", "param2"…]
+    CMD语法：CMD ["executable", "param1", "param2"…],会被 `docker run` 指定的命令覆盖。
 
-    ENTRYPOINT语法：ENTRYPOINT ["executable", "param1", "param2"…]
+    ENTRYPOINT语法：`ENTRYPOINT ["executable", "param1", "param2"…]`，不会被 `docker run` 命令指定的参数所覆盖
 
     **Dockerfile中应该只包含一个CMD或一个ENTRYPOINT。**
 
-    包含多个CMD时，只有最后一个CMD才会生效，并会让Dockerfile难懂。
+    包含多个CMD、ENTRYPOINT 时，只有最后一个CMD、ENTRYPOINT 才会生效，并会让Dockerfile难懂。
 
     同时包含CMD和ENTRYPOINT时，CMD中的参数其实是ENTRYPOINT的参数，让Dockerfile难懂。
 1. ARG和ENV
 
     ARG是构建时参数，通过 `docker build --build-arg arg=value` 指定。
 
-    ENV是运行时参数，通过docker run -e var=value指定。
+    ENV是运行时参数,也叫环境变量，通过docker run -e var=value指定。
 
     在Dockerfile中也可以用ARG来给ENV赋值，例如：
 
@@ -228,7 +228,7 @@ jenkins:x:1000:1000:Linux User,,,:/var/jenkins_home:/bin/bash
 
 ## MAINTANIER（已经废弃） --->  LABEL
 
-`LABEL`用于为镜像添加元数据，元数以键值对的形式指定：
+`LABEL`用于为镜像添加元数据，元数以键值对的形式指定，可用于筛选镜像：
 
 ```dockerfile
 LABEL <key>=<value> <key>=<value> <key>=<value> ...
@@ -257,4 +257,33 @@ HEALTHCHECK [选项] CMD <命令>：设置检查容器健康状况的命令
 HEALTHCHECK NONE：如果基础镜像有健康检查指令，使用这行可以屏蔽掉其健康检查指令
 
 HEALTHCHECK [选项] CMD <命令> : 这边 CMD 后面跟随的命令使用，可以参考 CMD 的用法。
+```
+
+## EXPOSE
+
+语法：`EXPOSE <port> [<port>/<protocol>...]`
+
+暴露容器运行时的监听端口给外部，可以指定端口是监听 TCP 还是 UDP，如果未指定协议，则默认为 TCP。
+
+```bash
+EXPOSE 80 443 8080/tcp
+```
+
+## WORKDIR
+
+语法：`WORKDIR /path/to/workdir`
+
+为 RUN、CMD、ENTRYPOINT 以及 COPY 和 AND 设置工作目录。
+
+```bash
+WORKDIR /usr/local
+```
+
+## VOLUME
+
+指定容器挂载点到宿主机自动生成的目录或其他容器，一般的使用场景为需要持久化存储数据时。一般不会在 Dockerfile 中用到，更常见的还是在 docker run 的时候通过 -v 指定数据卷。
+
+```bash
+# 容器的 /var/lib/mysql 目录会在运行时自动挂载为匿名卷，匿名卷在宿主机的 /var/lib/docker/volumes 目录下
+VOLUME ["/var/lib/mysql"]
 ```

@@ -1,8 +1,39 @@
 # 文件操作
 
-## 文件读写
+## 文件读取
 
-### 带缓冲的读取
+不管是什么大小的文件，均不推荐整个文件加载的方式，因为它在小文件时的速度优势并没有那么大，相较于安全隐患，不值得选择它。
+
+块读取是优先选择，尤其对于一些没有换行符的文件，例如音视频等。通过设定合适的块读取大小，能让速度和内存得到很好的平衡。且在读取过程中，往往伴随着处理内容的逻辑。每块内容可以赋给一个工作 goroutine 来处理，能更好地并发。
+
+### 块读取
+
+块读取也称为分片读取，这也很好理解，我们可以将内容分成一块块的，每次读取指定大小的块内容。这里，我们将块大小设置为 4KB。
+
+```go
+func ReadChunk(filename string) {
+ f, err := os.Open(filename)
+ if err != nil {
+  panic(err)
+ }
+ defer f.Close()
+ buf := make([]byte, 4*1024)
+ r := bufio.NewReader(f)
+ for {
+  _, err = r.Read(buf)
+  if err != nil {
+   if err == io.EOF {
+    break
+   }
+   panic(err)
+  }
+ }
+}
+```
+
+### 逐行读取
+
+在很多情况下，例如日志分析，对文件的处理都是按行进行的。Go 中 `bufio.Reader` 对象提供了一个 `ReadLine()` 方法，但其实我们更多地是使用 `ReadBytes('\n')` 或者 `ReadString('\n')` 代替。
 
 ```go
 func fileDemo1() {
@@ -20,8 +51,11 @@ func fileDemo1() {
 		inputString, readerError := inputReader.ReadString('\n')
 		// inputString, readerError := inputReader.ReadLine()
 		fmt.Printf("The input string is : %s", inputString)
-		if readerError == io.EOF {
-			return
+		if readerError != nil {
+			if readerError == io.EOF {
+				break
+			}
+			panic(readerError)
 		}
 	}
 }
@@ -46,7 +80,9 @@ if (n == 0) { break}
 
 变量 n 的值表示读取到的字节数.
 
-### 将整个文件的内容读到一个字符串里
+### 整个文件加载
+
+一次性加载文件的优缺点非常明显，它能减少 IO 次数，但它会将文件内容都加载至内存中，对于大文件，存在内存撑爆的风险。
 
 可以使用 `io/ioutil` 包里的 `ioutil.ReadFile()` 方法，该方法第一个返回值的类型是 `[]byte`，里面存放读取到的内容，第二个返回值是错误，如果没有错误发生，第二个返回值为 `nil`。函数 `WriteFile()` 可以将 `[]byte` 的值写入文件。
 
@@ -54,7 +90,7 @@ if (n == 0) { break}
 func fileDemo2() {
 	inputFile := "test.sh"
 	outputFile := "test1.sh"
-
+	// os.ReadFile('file')
 	buf, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "File error: %v\n", err)
@@ -163,7 +199,7 @@ func main() {
 	}
 }
 ```
-### 写文件
+## 写文件
 
 请看以下程序：
 
@@ -211,6 +247,46 @@ func fileDemo5() {
 	defer outputFile.Close()
 	outputFile.WriteString("string 222222\n")
 	fmt.Fprintln(outputFile, "string fmt")
+}
+```
+### 创建不同大小的文件
+
+```go
+package main
+
+import (
+ "bufio"
+ "math/rand"
+ "os"
+ "time"
+)
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func StringWithCharset(length int) string {
+ b := make([]byte, length)
+ for i := range b {
+  b[i] = charset[seededRand.Intn(len(charset))]
+ }
+ return string(b)
+}
+
+func main() {
+ files := map[string]int{"4KB.txt": 4, "4MB.txt": 4096, "4GB.txt": 4194304, "16GB.txt": 16777216}
+ for name, number := range files {
+  file, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE, 0666)
+  if err != nil {
+   panic(err)
+  }
+  write := bufio.NewWriter(file)
+  for i := 0; i < number; i++ {
+   s := StringWithCharset(1023) + "\n"
+   write.WriteString(s)
+  }
+  file.Close()
+ }
 }
 ```
 
