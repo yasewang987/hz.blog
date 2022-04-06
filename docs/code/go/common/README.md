@@ -15,7 +15,7 @@
 * [IO库](./io.md)
 * [Go字符串操作](./strings.md)
 * [Go测试](./test.md)
-* [GoChannel管道](./channel.md)
+* [Go-Channel](./channel.md)
 * [Go-Select](./select.md)
 * [Go-Context](./context.md)
 * [Go依赖注入](./di.md)
