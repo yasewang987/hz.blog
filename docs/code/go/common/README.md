@@ -20,3 +20,4 @@
 * [Go-Context](./context.md)
 * [Go依赖注入](./di.md)
 * [Go-SSH & SCP](./ssh.md)
+* [Go泛型](./generic.md)

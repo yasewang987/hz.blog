@@ -173,7 +173,8 @@ module.exports = {
                 'select',
                 'context',
                 'di',
-                'ssh'
+                'ssh',
+                'generic'
             ],
             '/code/go/other/': [
                 'install',
