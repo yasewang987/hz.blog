@@ -24,7 +24,7 @@ bin/python3
 
 `%define __os_install_post %{nil}` 这个对于python和java不需要编译的项目特别重要，不需要解压、压缩、自动编译python和jar包这些操作。
 
-* 虚拟环境`virtualenv`安装之后打包（`建议`）
+* 虚拟环境`virtualenv`安装之后一起打包（`建议`）
 
 ```text
 %define __os_install_post %{nil}
@@ -58,6 +58,35 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 %files
 %defattr(-,root,root,0775)
 /opt/mytest/%{mpath}
+```
+* python业务代码打包
+
+```text
+Name: funcun-code
+Version: 4.1.22
+Release:        1
+Summary:        funcun code
+
+Group:          funcun
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+funcun code
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/funcun/code
+mkdir -p %{buildroot}/opt/funcun/code
+cp -rf %{_builddir}/funcun/code/* %{buildroot}/opt/funcun/code
+
+%files
+/opt/funcun/code
+
+%changelog
 ```
 
 * 编译在开发机，安装在专用机例子（`不建议`）
@@ -141,34 +170,4 @@ make install
 # 添加软链接
 ln -s /usr/local/python3/bin/python3.8 /usr/bin/python3
 ln -s /usr/local/python3/bin/pip3.8 /usr/bin/pip3
-```
-
-## python业务代码打包
-
-```text
-Name: funcun-code
-Version: 4.1.22
-Release:        1
-Summary:        funcun code
-
-Group:          funcun
-License:        GPLv3+
-BuildArch: noarch
-
-%description
-funcun code
-
-%prep
-
-%build
-
-%install
-rm -rf %{buildroot}/opt/funcun/code
-mkdir -p %{buildroot}/opt/funcun/code
-cp -rf %{_builddir}/funcun/code/* %{buildroot}/opt/funcun/code
-
-%files
-/opt/funcun/code
-
-%changelog
 ```
