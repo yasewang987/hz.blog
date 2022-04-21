@@ -111,6 +111,37 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 
 ## 源码编译
 
+* 安装依赖
+
+```bash
+# ubuntu/debian
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+
+# centos
+sudo yum install @development zlib-devel bzip2 bzip2-devel readline-devel sqlite \
+sqlite-devel openssl-devel xz xz-devel libffi-devel findutils
+```
+
+* 编译安装 Python，打开 `https://www.python.org/ftp/python` 自选版本
+
+```bash
+# 下载源码
+curl -O https://www.python.org/ftp/python/3.8.1/Python-3.7.4.tar.xz
+
+# 解压
+tar -Jxvf Python-3.8.1.tar.xz
+
+# 编译安装，--enable-optimizations 配置项用于提高 Python 安装后的性能，使用会导致编译速度稍慢
+./configure --prefix=/opt/yourpath --enable-optimizations
+make
+make install
+
+# 添加软链接
+ln -s /usr/local/python3/bin/python3.8 /usr/bin/python3
+ln -s /usr/local/python3/bin/pip3.8 /usr/bin/pip3
+```
 
 ## python业务代码打包
 
