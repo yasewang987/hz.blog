@@ -157,5 +157,8 @@ sed -i '$a # This is a test' regular_express.txt
 # 使用变量替换
 teststr="IBM"
 sed -n '/' "$teststr" '/=' testfile.txt
+
+# 如果需要替换的字符中有 / 则可以用 # 替换分隔符
+sed -i "s#abc#cde#g" file.txt
 ```
 

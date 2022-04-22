@@ -12,7 +12,8 @@ sudo apt install gcc
 sudo  apt-get install build-essential zlib1g-dev libpcre3 libpcre3-dev  libssl-dev libxslt1-dev libxml2-dev libgeoip-dev  libgoogle-perftools-dev libperl-dev libtool libpcrecpp0v5 openssl -y
 
 # 配置编译生成的目录
-./configure –prefix=/opt/mytest/nginx --with-http_ssl_module --with-stream --with-mail=dynamic
+# 如果提示 prefix 参数无效，则需要手动输入下面命令，不要复制
+./configure –-prefix=/opt/mytest/nginx --with-http_ssl_module --with-stream --with-mail=dynamic
 
 # 编译
 make && make install
