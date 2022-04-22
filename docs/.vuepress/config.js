@@ -444,7 +444,8 @@ module.exports = {
                 'torchserve',
                 'tfx',
                 'tf',
-                'python'
+                'python',
+                'paddle'
             ]
         },
         sidebarDepth: 2
