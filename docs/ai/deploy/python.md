@@ -113,3 +113,13 @@ pip freeze > requirements.txt
 # 到目标机器上还原依赖项
 pip install -r requirements.txt
 ```
+
+## python项目源码编译
+
+```bash
+# 直接编译安装
+python setup.py install
+
+# 编译生成whl包,在dist目录下
+python setup.py bdist_wheel
+```

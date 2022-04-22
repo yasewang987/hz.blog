@@ -121,3 +121,9 @@ sudo yum install python3-devel   # for python3.4 installs
 ```bash
 rm -rf ~/.cache
 ```
+
+## No module named yaml
+
+```bash
+pip install pyyaml
+```
