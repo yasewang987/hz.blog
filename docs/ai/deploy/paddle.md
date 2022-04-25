@@ -16,8 +16,13 @@ cd .. && mkdir temp_gcc82 && cd temp_gcc82 && \
 make -j8 && make install
 
 # 修改软链接
-ln -s /usr/local/gcc-8.2/x86_64-linux-gnu-gcc /usr/bin/gcc
-ln -s /usr/local/gcc-8.2/x86_64-linux-gnu-g++ /usr/bin/g++
+ln -s /usr/local/gcc-8.2/gcc /usr/bin/gcc
+ln -s /usr/local/gcc-8.2/g++ /usr/bin/g++
+ln -s /usr/local/gcc-8.2/cpp /usr/bin/cpp
+ln -s /usr/local/gcc-8.2/c++ /usr/bin/c++
+ln -s /usr/local/gcc-8.2/ar /usr/bin/ar
+ln -s /usr/local/gcc-8.2/nm /usr/bin/nm
+ln -s /usr/local/gcc-8.2/gcc-xxxxxxxx /usr/bin/gcc-xxxxxx
 ```
 
 ## 源码编译paddle
