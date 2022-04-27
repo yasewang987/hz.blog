@@ -27,4 +27,27 @@ ln -s /usr/local/gcc-8.2/gcc-xxxxxxxx /usr/bin/gcc-xxxxxx
 
 ## 源码编译paddle
 
+### arm
+
+```bash
+# 下载镜像
+docker pull registry.baidubce.com/qili93/paddle-base:ubuntu18-aarch64
+
+# 运行容器
+docker run -itd --name paddle-dev registry.baidubce.com/qili93/paddle-base:ubuntu18-aarch64 bash
+
+# 拉取代码
+git clone https://github.com/PaddlePaddle/Paddle.git
+# 进入目录
+cd Paddle
+# 切换分支，我编译时2.1版本所以我切换到了2.1版本的分支上
+git checkout release/2.1
+# 创建build文件目录
+mkdir build && cd build
+# 执行cmake
+cmake .. -DPY_VERSION=3.7 -DWITH_ARM=ON -DWITH_DISTRIBUTE=ON -DWITH_PSCORE=OFF -DWITH_TESTING=ON -DON_INFER=ON -DCMAKE_BUILD_TYPE=Release 
+# make 因为我服务器只有两核所以是2
+make TARGET=ARMV8 -j2
+```
+
 ## 问题
