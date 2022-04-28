@@ -1,6 +1,6 @@
 # Paddle
 
-## 源码编译gcc8.2
+## 编译gcc8.2
 
 编译完之后生成在 `/usr/local/gcc-8.2` 目录，需要修改一下软链接
 
@@ -12,8 +12,11 @@ sed -i 's#ftp://gcc.gnu.org/pub/gcc/infrastructure/#https://paddle-ci.gz.bcebos.
 unset LIBRARY_PATH CPATH C_INCLUDE_PATH PKG_CONFIG_PATH CPLUS_INCLUDE_PATH INCLUDE && \
 ./contrib/download_prerequisites && \
 cd .. && mkdir temp_gcc82 && cd temp_gcc82 && \
-../gcc-8.2.0/configure --prefix=/usr/local/gcc-8.2 --enable-threads=posix --disable-checking --disable-multilib && \
+../gcc-8.2.0/configure --prefix=/opt/gcc-8.2 --enable-threads=posix --disable-checking --disable-multilib && \
 make -j8 && make install
+
+# 添加到环境变量
+PATH=/opt/gcc-8.2/bin:$PATH
 
 # 修改软链接
 ln -s /usr/local/gcc-8.2/gcc /usr/bin/gcc
@@ -23,6 +26,35 @@ ln -s /usr/local/gcc-8.2/c++ /usr/bin/c++
 ln -s /usr/local/gcc-8.2/ar /usr/bin/ar
 ln -s /usr/local/gcc-8.2/nm /usr/bin/nm
 ln -s /usr/local/gcc-8.2/gcc-xxxxxxxx /usr/bin/gcc-xxxxxx
+```
+
+## 编译cmake3.16.8
+
+```bash
+# 下载
+wget https://github.com/Kitware/CMake/releases/download/v3.16.8/cmake-3.16.8.tar.gz
+
+# 安装
+tar -xzf cmake-3.16.8.tar.gz && cd cmake-3.16.8
+./bootstrap && make && sudo make install
+
+# 添加到环境变量
+PATH=/opt/cmake-3.16.8/bin:$PATH
+```
+
+## 编译patchelf
+
+```bash
+# 下载
+wget https://github.com/NixOS/patchelf/archive/refs/tags/0.14.5.tar.gz
+
+# 安装
+tar -zxf 0.14.5.tar.gz && cd 0.14.5
+./bootstrap.sh
+./configure
+make
+make check
+sudo make install
 ```
 
 ## 源码编译paddle
@@ -46,8 +78,8 @@ git checkout release/2.1
 mkdir build && cd build
 # 执行cmake
 cmake .. -DPY_VERSION=3.7 -DWITH_ARM=ON -DWITH_DISTRIBUTE=ON -DWITH_PSCORE=OFF -DWITH_TESTING=ON -DON_INFER=ON -DCMAKE_BUILD_TYPE=Release 
-# make 因为我服务器只有两核所以是2
-make TARGET=ARMV8 -j2
+# 根据服务器核数来设置
+make TARGET=ARMV8 -j10
 ```
 
 ## 问题
