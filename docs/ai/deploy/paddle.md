@@ -49,7 +49,7 @@ PATH=/opt/cmake-3.16.8/bin:$PATH
 wget https://github.com/NixOS/patchelf/archive/refs/tags/0.14.5.tar.gz
 
 # 安装
-tar -zxf 0.14.5.tar.gz && cd 0.14.5
+tar -zxf 0.14.5.tar.gz && cd patchelf-0.14.5
 ./bootstrap.sh
 ./configure
 make
@@ -83,3 +83,16 @@ make TARGET=ARMV8 -j10
 ```
 
 ## 问题
+
+* `core_noavx elf load command alignment not page-aligned`
+
+试用源码编译 `patchelf` 最新版本
+
+```bash
+# 修改对应文件的pagesize
+patchelf --page-size 65536 core_noavx.so
+
+# 或者CMakeLists中加上
+add_definitions(-Wl,-z,max-page-size=65536)
+add_definitions(-Wl,-z,common-page-size=65536)
+```
