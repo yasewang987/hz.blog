@@ -91,8 +91,4 @@ make TARGET=ARMV8 -j10
 ```bash
 # 修改对应文件的pagesize
 patchelf --page-size 65536 core_noavx.so
-
-# 或者CMakeLists中加上
-add_definitions(-Wl,-z,max-page-size=65536)
-add_definitions(-Wl,-z,common-page-size=65536)
 ```
