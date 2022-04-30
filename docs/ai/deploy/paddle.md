@@ -82,7 +82,14 @@ cmake .. -DPY_VERSION=3.7 -DWITH_ARM=ON -DWITH_DISTRIBUTE=ON -DWITH_PSCORE=OFF -
 make TARGET=ARMV8 -j10
 ```
 
-## Dockerfiles
+### amd
+
+todo
+
+## PaddleOCR
+
+* 编译注意事项
+    * 修改 `requirements.txt` 中的 `opencv-contrib-python` 版本限制去掉
 
 * hubserving-cpu版本(需要修改`deploy/hubserving/ocr_system`中的配置和代码)
 
@@ -118,13 +125,59 @@ EXPOSE 8866
 CMD ["/bin/bash","-c","hub install deploy/hubserving/ocr_system/ && hub serving start -m ocr_system"]
 ```
 
+## PaddleServing
+
+使用paddleserving统一部署模型服务
+
+* 源码编译
+
+```bash
+
+```
+
+todo
+
 ## 问题
 
-* `core_noavx elf load command alignment not page-aligned`
+### Paddle
+
+* 编译paddle报错：`core_noavx elf load command alignment not page-aligned`
 
 试用源码编译 `patchelf` 最新版本
 
 ```bash
 # 修改对应文件的pagesize
 patchelf --page-size 65536 core_noavx.so
+```
+
+### PaddleHub
+
+* arm服务器PaddleHub安装报错，onnx编译无法通过（是因为依赖的 paddle2onnx 中限制了onnx的版本 `<=1.9.0`）
+
+```bash
+# 下载paddle2onnx
+git clone https://github.com/PaddlePaddle/Paddle2ONNX.git
+
+# 将 `requirements.txt` 和 `setup.py` 中的onnx版本限制去掉
+onnx <= 1.9.0 改成 onnx
+
+# 安装
+python setup.py install
+```
+
+* `OSError: Could not find library geos_c or load any of its variants ['libgeos_c.so.1', 'libgeos_c.so']`
+
+```bash
+# debian/ubuntu
+apt install libgeos-dev
+
+# centos
+yum install geos-devel
+```
+
+* `libGL.so.1: cannot open shared object file: No such file or directory`
+
+```bash
+# debian/ubuntu
+apt install libgl1
 ```
