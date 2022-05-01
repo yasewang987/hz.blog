@@ -44,6 +44,8 @@ PATH=/opt/cmake-3.16.8/bin:$PATH
 
 ## 编译patchelf
 
+* 这个很重要一定要用源码编译的
+
 ```bash
 # 下载
 wget https://github.com/NixOS/patchelf/archive/refs/tags/0.14.5.tar.gz
@@ -70,6 +72,7 @@ docker run -itd --name paddle-dev registry.baidubce.com/qili93/paddle-base:ubunt
 
 # 拉取代码
 git clone https://github.com/PaddlePaddle/Paddle.git
+
 # 进入目录
 cd Paddle
 # 切换分支，我编译时2.1版本所以我切换到了2.1版本的分支上
@@ -78,15 +81,22 @@ git checkout release/2.1
 mkdir build && cd build
 # 执行cmake
 cmake .. -DPY_VERSION=3.7 -DWITH_ARM=ON -DWITH_DISTRIBUTE=ON -DWITH_PSCORE=OFF -DWITH_TESTING=ON -DON_INFER=ON -DCMAKE_BUILD_TYPE=Release 
+
+# 这里一定要重新用源码编译安装一下patchelf
+# 然后找到core_noavx.so文件
+find . -name 'core_noavx.so'
+# 修改pagesize
+patchelf --page-size 65536 core_noavx.so
+
 # 根据服务器核数来设置
 make TARGET=ARMV8 -j10
 ```
 
 ### amd
 
-todo
+直接pip安装即可，不需要编译
 
-## PaddleOCR
+## PaddleOCR-Hub
 
 * 编译注意事项
     * 修改 `requirements.txt` 中的 `opencv-contrib-python` 版本限制去掉
@@ -123,6 +133,55 @@ RUN tar xf /PaddleOCR/inference/{file}.tar -C /PaddleOCR/inference/
 EXPOSE 8866
 
 CMD ["/bin/bash","-c","hub install deploy/hubserving/ocr_system/ && hub serving start -m ocr_system"]
+```
+
+* 自己制作镜像
+
+```bash
+# 下载python3.7镜像
+docker pull python3.7
+
+# 启动镜像
+docker run -itd --name paddle-dev python3.7 bash
+
+# 进入容器安装相关依赖
+docker exec -it paddle-dev bash
+
+# 安装paddle，注意arm服务器需要用源码编译出whl本地安装
+pip install -i https://mirror.baidu.com/pypi/simple paddlepaddle
+
+# 安装paddlehub, 注意arm服务器需要源码编译出whl，其中依赖的paddle2onnx中的onnx版本依赖需要改一下
+pip install -i https://mirror.baidu.com/pypi/simple paddlehub
+
+# 下载paddleOCR代码
+git clone https://github.com/PaddlePaddle/PaddleOCR.git
+
+# 下载要部署的推理模型，参考paddleOCR官网，放到 PaddleOCR的inference目录
+mkdir -p PaddleOCR/inference
+
+# 修改 `requirements.txt` 中的 `opencv-contrib-python` 版本限制去掉
+# 安装依赖项
+pip install -i https://mirror.baidu.com/pypi/simple -r requirements.txt
+
+# 直接加载模型看看有报错跟着参考【问题】解决
+hub install deploy/hubserving/ocr_system/
+hub serving start -m ocr_system
+
+# 上述步骤确认没问题，退出容器，生成镜像
+docker commit paddle-dev mypaddleocr:1
+```
+
+* 运行容器及测试脚本如下
+
+```bash
+# 运行容器
+docker run -d -p 18888:8866 -w /PaddleOCR --name my-ocr mypaddleocr:1 sh -c "hub install deploy/hubserving/ocr_system/ && hub serving start -m ocr_system"
+
+# 将图片base64编码之后写入test.txt中,格式如下
+{"images": ["填入图片Base64编码(需要删除'data:image/jpg;base64,'）"]}
+
+# 调用ocr容器验证
+cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/predict/ocr_system
 ```
 
 ## PaddleServing
