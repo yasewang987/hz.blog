@@ -182,7 +182,13 @@ docker pull gitlab/gitlab-runner
 ### `gitlab-ci.yml`常用参数
 
 1. **stages**：`pipeline`的阶段列表。定义整个`pipeline`的阶段
+    * 所有 Stages 会按照顺序运行，即当一个 Stage 完成后，下一个 Stage 才会开始
+    * 只有当所有 Stages 完成后，该构建任务 (Pipeline) 才会成功
+    * 如果任何一个 Stage 失败，那么后面的 Stages 不会执行，该构建任务 (Pipeline) 失败
 2. **stage**：定义某个`job`的所在阶段。参考#1
+    * 相同 Stage 中的 Jobs 会并行执行
+    * 相同 Stage 中的 Jobs 都执行成功时，该 Stage 才会成功
+    * 如果任何一个 Job 失败，那么该 Stage 失败，即该构建任务 (Pipeline) 失败
 3. **script**：（唯一一个必须写的参数）`job`执行过程中的命令列表
 4. **only/except**：触发类型/限制`job`的创建条件。参考[可用的选项](https://docs.gitlab.com/ee/ci/yaml/#only-and-except-simplified)
 5. **tags**：指定`runner`的`tag`，只有拥有指定`tag`的`runner`才会接收到这个任务
@@ -190,6 +196,15 @@ docker pull gitlab/gitlab-runner
 7. **environment**：指定部署相关任务的环境，并非真实环境，是对要部署到某环境的任务的归类。方便在`gitlab`上聚合以便进行回滚和重新部署操作，[参考](https://docs.gitlab.com/ee/ci/yaml/#environment)
 8. **artifacts**：保留文档。在每次 job 之前`runner`会清除未被 git 跟踪的文件。为了让编译或其他操作后的产物可以留存到后续使用，添加该参数并设置保留的目录，保留时间等。被保留的文件将被上传到`gitlab`以备后续使用。[参考](https://docs.gitlab.com/ee/ci/yaml/#artifacts)
 9. **dependencies**：任务依赖。指定`job`的前置`job`。添加该参数后，可以获取到前置`job`的`artifacts`。注意如果前置 job 执行失败，导致没能生成`artifacts`，则 job 也会直接失败。
+10. `image`: 所使用的docker镜像，查阅使用docker镜像
+11. `services`: 所使用的docker服务，查阅使用docker镜像
+12. `variables`: 定义job级别的变量
+13. `allow_failure`: 允许job失败。失败的job不影响commit状态
+14. `when`: 定义何时开始job。可以是on_success，on_failure，always或者manual
+15. `before_script`: 重写一组在作业前执行的命令
+16. `after_script`: 重写一组在作业后执行的命令
+17. `coverage`: 定义给定作业的代码覆盖率设置
+
 
 ### yml阶段构建脚本(.gitlab-ci.yml)
 

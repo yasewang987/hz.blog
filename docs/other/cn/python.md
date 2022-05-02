@@ -24,7 +24,7 @@ bin/python3
 
 `%define __os_install_post %{nil}` 这个对于python和java不需要编译的项目特别重要，不需要解压、压缩、自动编译python和jar包这些操作。
 
-* 虚拟环境`virtualenv`安装之后打包（`建议`）
+* 虚拟环境`virtualenv`安装之后一起打包（`建议`）
 
 ```text
 %define __os_install_post %{nil}
@@ -58,6 +58,35 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 %files
 %defattr(-,root,root,0775)
 /opt/mytest/%{mpath}
+```
+* python业务代码打包
+
+```text
+Name: funcun-code
+Version: 4.1.22
+Release:        1
+Summary:        funcun code
+
+Group:          funcun
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+funcun code
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/funcun/code
+mkdir -p %{buildroot}/opt/funcun/code
+cp -rf %{_builddir}/funcun/code/* %{buildroot}/opt/funcun/code
+
+%files
+/opt/funcun/code
+
+%changelog
 ```
 
 * 编译在开发机，安装在专用机例子（`不建议`）
@@ -111,33 +140,34 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 
 ## 源码编译
 
+* 安装依赖
 
-## python业务代码打包
+```bash
+# ubuntu/debian
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 
-```text
-Name: funcun-code
-Version: 4.1.22
-Release:        1
-Summary:        funcun code
+# centos
+sudo yum install @development zlib-devel bzip2 bzip2-devel readline-devel sqlite \
+sqlite-devel openssl-devel xz xz-devel libffi-devel findutils
+```
 
-Group:          funcun
-License:        GPLv3+
-BuildArch: noarch
+* 编译安装 Python，打开 `https://www.python.org/ftp/python` 自选版本
 
-%description
-funcun code
+```bash
+# 下载源码
+curl -O https://www.python.org/ftp/python/3.8.1/Python-3.7.4.tar.xz
 
-%prep
+# 解压
+tar -Jxvf Python-3.8.1.tar.xz
 
-%build
+# 编译安装，--enable-optimizations 配置项用于提高 Python 安装后的性能，使用会导致编译速度稍慢
+./configure --prefix=/opt/yourpath --enable-optimizations
+make
+make install
 
-%install
-rm -rf %{buildroot}/opt/funcun/code
-mkdir -p %{buildroot}/opt/funcun/code
-cp -rf %{_builddir}/funcun/code/* %{buildroot}/opt/funcun/code
-
-%files
-/opt/funcun/code
-
-%changelog
+# 添加软链接
+ln -s /usr/local/python3/bin/python3.8 /usr/bin/python3
+ln -s /usr/local/python3/bin/pip3.8 /usr/bin/pip3
 ```

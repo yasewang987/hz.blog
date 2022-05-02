@@ -8,3 +8,4 @@
 * [tensorflow 安装](./tf.md)
 
 * [python相关资料](./python.md)
+* [飞浆Paddle](./paddle.md)

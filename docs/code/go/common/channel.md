@@ -1,4 +1,4 @@
-# Go Channel管道
+# Go-Channel
 
 * 它是一个数据管道，可以往里面写数据，从里面读数据。
 * `channel` 是 `goroutine` 之间数据通信桥梁，而且是线程安全的。

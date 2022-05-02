@@ -39,7 +39,8 @@ module.exports = {
                         items: [
                             { text: 'Gin', link: '/code/go/gin/' },
                             { text: 'Go常用功能', link: '/code/go/common/' },
-                            { text: '其他', link: '/code/go/other/' }
+                            { text: '其他', link: '/code/go/other/' },
+                            { text: 'Demos', link: '/code/go/demo/' }
                         ]
                     },
                     {
@@ -172,7 +173,9 @@ module.exports = {
                 'channel',
                 'select',
                 'context',
-                'di'
+                'di',
+                'ssh',
+                'generic'
             ],
             '/code/go/other/': [
                 'install',
@@ -184,6 +187,10 @@ module.exports = {
                 'notice',
                 'package',
                 'gpm'
+            ],
+            '/code/go/demo/': [
+                'loadbalance',
+                'myrpc'
             ],
             '/code/web/npm/': [
                 'base',
@@ -442,7 +449,8 @@ module.exports = {
                 'torchserve',
                 'tfx',
                 'tf',
-                'python'
+                'python',
+                'paddle'
             ]
         },
         sidebarDepth: 2

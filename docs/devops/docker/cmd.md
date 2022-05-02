@@ -159,19 +159,24 @@ crontab -e
 
 ## 优雅重启dockerd
 
-编辑文件 `/etc/docker/daemon.json`，添加如下配置
 
 ```bash
+# Keep containers alive during daemon downtime
+$ sudo vim /etc/docker/daemon.yaml
 {
-    "live-restore": true
+  "live-restore": true
 }
-```
 
-dockerd reload 配置(不会重启 dockerd，修改配置真好用)
+# 在守护进程停机期间保持容器存活
+$ sudo dockerd --live-restore
 
-```bash
-# 给 dockerd 发送 SIGHUP 信号，dockerd 收到信号后会 reload 配置
-kill -SIGHUP $(pidof dockerd)
+# 只能使用reload重载
+# 相当于发送SIGHUP信号量给dockerd守护进程
+$ sudo systemctl reload docker
+
+# 但是对应网络的设置需要restart才能生效
+# 重启 docker，此时重启 docker 不会重启容器
+$ sudo systemctl restart docker
 ```
 
 检查是否配置成功
@@ -179,12 +184,6 @@ kill -SIGHUP $(pidof dockerd)
 ```bash
 docker info | grep -i live
 # 可以看到 Live Restore Enabled: true
-```
-
-重启 docker，此时重启 docker 不会重启容器
-
-```bash
-systemctl restart docker
 ```
 
 * 如果有容器挂载了 docker.sock 文件，重启后工作可能会不正常，需要重启该容器。
@@ -235,4 +234,56 @@ LABEL mylabel=label0
 docker images prune -a -f --filter="label=mylabel=label0"
 ```
 
+## 转移docker存储目录
+
+默认目录 `/var/lib/docker` 
+
+方案一：添加软链接
+
+```bash
+# 1.停止docker服务
+$ sudo systemctl stop docker
+
+# 2.开始迁移目录
+$ sudo mv /var/lib/docker /data/
+# 迁移目录也可以使用cp命令一定要加-arv
+# sudo cp -arv /data/docker /data2/docker
+
+# 3.添加软链接
+$ sudo ln -s /data/docker /var/lib/docker
+
+# 4.启动docker服务
+$ sudo systemctl start docker
+```
+
+方案二：改动 docker 配置文件
+
+```bash
+# [方式一] 改动docker启动配置文件
+$ sudo vim /lib/systemd/system/docker.service
+ExecStart=/usr/bin/dockerd --graph=/data/docker/
+
+# [方式二] 改动docker启动配置文件
+$ sudo vim /etc/docker/daemon.json
+{
+    "live-restore": true,
+    "graph": [ "/data/docker/" ]
+} 
+```
+
+## Docker 添加私有仓库
+
+```bash
+# 添加配置
+$ sudo cat /etc/docker/daemon.json
+{
+    "insecure-registries": ["192.168.31.191:5000"]
+}
+
+# 重启docker
+$ sudo systemctl restart docker
+
+# 重新登录即可
+$ docker login 私库地址 -u 用户名 -p 密码
+```
 

@@ -4,6 +4,12 @@ curl 是常用的命令行工具，用来请求 Web 服务器。
 
 `curl https://www.example.com`: 发出 GET 请求
 
+## 断点续传
+
+```bash
+curl -C - -O http://aa.bb.com
+```
+
 ## 监控网页状态、响应时间
 
 ```bash

@@ -2,9 +2,14 @@
 
 ## 源码编译
 
-源码地址：https://github.com/redis/redis
+源码地址：https://github.com/redis/redis , 点击 `tags` 选择对应的版本下载源码即可。
 
 注意事项：一定要查看`pagesize`, 命令 `getconf PAGESIZE`,尽量在pagesize大的环境里面打包，因为pagesize小的环境打出来的包在大的环境中无法使用。
+
+```bash
+# 编译打 /mypath/redis 目录，会在该目录下生成bin文件夹，里面包含了所有可执行文件
+make PREFIX=/mypath/redis install
+```
 
 命令
 

@@ -81,3 +81,10 @@ docker run -d -i -u root -v /home/node:/node --name node-builder docker.io/node
 
 ![img](http://cdn.go99.top/docs/code/web/npm/ci7-1.png)
 ![img](http://cdn.go99.top/docs/code/web/npm/ci7-2.png)
+
+## Npm、Yarn install共享缓存
+
+```bash
+# 在编译容器中将node_modules映射进去或者copy进去
+docker run -v /data/node_modules:/yourproject/node_modules
+```

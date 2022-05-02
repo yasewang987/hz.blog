@@ -34,7 +34,12 @@ func TestSub(t *testing.T) {
 执行测试：
 
 ```bash
+# 代码覆盖率
 go test --cover cal_test.go cal.go -v
+# 生代码覆盖率文件
+go test -coverprofile=c.out
+# 查看文件内容
+go tool cover -html=c.out
 ```
 
 ## 性能测试
@@ -53,6 +58,12 @@ func BenchmarkAdd(b *testing.B) {
 
 ```bash
 go test -bench=. -cpu=4 -count=3
+# 通过命令生成性能测试文件
+go test -bench . -cpuprofile cpu.out
+# 能过web方式查看性能文件
+go tool pprof cpu.out
+# 最后输入 web 后会自动弹出网页
+web
 ```
 
 ## pprof

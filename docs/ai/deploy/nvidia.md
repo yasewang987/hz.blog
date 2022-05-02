@@ -194,3 +194,19 @@ sudo nvidia-smi -pm 1 -i 显卡号
 # 把功率限制从默认的250W调整到150W，也可以设置其他值
 sudo nvidia-smi -pl 150 -i 显卡号
 ```
+
+* `NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver`
+
+出现这个问题，大概率是系统内核和显卡驱动不匹配，建议关闭系统自动更新
+
+```bash
+# 查看显卡版本号
+ls /usr/src | grep nvidia
+
+# 重新安装
+sudo apt install dkms
+sudo dkms install -m nvidia -v 418.87.00
+
+# 上面的操作如果提示找不到 nvidia-driver-418.87.00 则需要重新安装nvidia驱动
+# 然后再执行 dkms install -m nvidia -v 418.87.00
+```
