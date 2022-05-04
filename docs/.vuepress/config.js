@@ -37,7 +37,6 @@ module.exports = {
                     {
                         text: 'Go',
                         items: [
-                            { text: 'Gin', link: '/code/go/gin/' },
                             { text: 'Go常用功能', link: '/code/go/common/' },
                             { text: '其他', link: '/code/go/other/' },
                             { text: 'Demos', link: '/code/go/demo/' }
@@ -152,9 +151,6 @@ module.exports = {
                 'install',
                 'other'
             ],
-            '/code/go/gin/': [
-                'gin'
-            ],
             '/code/go/common/': [
                 'base',
                 'http',
@@ -185,13 +181,14 @@ module.exports = {
                 'cmd',
                 'version',
                 'common',
-                'notice',
+                'best',
                 'package',
                 'gpm'
             ],
             '/code/go/demo/': [
                 'loadbalance',
-                'myrpc'
+                'myrpc',
+                'gin'
             ],
             '/code/web/npm/': [
                 'base',

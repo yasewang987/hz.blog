@@ -315,6 +315,50 @@ func Bar() {
 }
 ```
 
+## 巧用大括号控制变量作用域
+
+err变量的作用域就完全局限在括号中了，每次都可以直接使用 := 来创建一个新的 err并处理它，不需要额外思考这个err 变量是否前面已经创建过了。
+
+```go
+var name string
+var folder string
+var mod string
+...
+{
+   prompt := &survey.Input{
+      Message: "请输入目录名称：",
+   }
+   err := survey.AskOne(prompt, &name)
+   if err != nil {
+      return err
+   }
+
+   ...
+}
+{
+   prompt := &survey.Input{
+      Message: "请输入模块名称(go.mod中的module, 默认为文件夹名称)：",
+   }
+   err := survey.AskOne(prompt, &mod)
+   if err != nil {
+      return err
+   }
+   ...
+}
+{
+   // 获取hade的版本
+   client := github.NewClient(nil)
+   prompt := &survey.Input{
+      Message: "请输入版本名称(参考 https://github.com/gohade/hade/releases，默认为最新版本)：",
+   }
+   err := survey.AskOne(prompt, &version)
+   if err != nil {
+      return err
+   }
+   ...
+}
+```
+
 ## Goroutine内存泄漏
 
 ### 情况一：http服务未设置超时时间
@@ -337,6 +381,7 @@ if err := server.ListenAndServer; err != nil {
     return err
 }
 ```
+
 ## 反射虽好，切莫贪杯
 
 标准库 reflect 为 Go 语言提供了运行时动态获取对象的类型和值以及动态创建对象的能力。反射可以帮助抽象和简化代码，提高开发效率。
