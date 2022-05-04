@@ -86,7 +86,8 @@ module.exports = {
             {
                 text: 'AI',
                 items: [
-                    { text: 'AI部署资料', link: '/ai/deploy/' }
+                    { text: 'AI部署资料', link: '/ai/deploy/' },
+                    { text: 'Paddle系列', link: '/ai/paddle/' }
                 ]
             },
             {
@@ -449,8 +450,12 @@ module.exports = {
                 'torchserve',
                 'tfx',
                 'tf',
-                'python',
-                'paddle'
+                'python'
+            ],
+            '/ai/paddle/': [
+                'paddle',
+                'paddleocr',
+                'paddlespeech'
             ]
         },
         sidebarDepth: 2
