@@ -349,3 +349,18 @@ $ docker rmi -f c565xxxxc87f
 # 删除悬空镜像
 $ docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 ```
+
+## apt无法更新
+
+* `Temporary failure resolving 'xxx.aa.org'`
+
+    ```bash
+    vim /etc/docker/daemon.json
+    # 添加如下内容
+    {
+        "dns": ["114.114.114.114", "8.8.8.8"]
+    }
+
+    # 重启docker服务
+    systemctl restart docker
+    ```
