@@ -83,6 +83,12 @@ docker port mymysql
 
 ##### 查看容器中运行的进程信息，支持 ps 命令参数
 docker top [OPTIONS] CONTAINER [ps OPTIONS]
+
+##### docker使用显卡
+# 显卡1和显卡2
+docker run --rm --gpus '"device=1,2"' 84b086e2ba68 nvidia-smi
+# 所有显卡
+docker run --rm --gpus all xxxx
 ```
 
 ## docker容器中使用docker命令
