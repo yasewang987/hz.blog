@@ -107,13 +107,14 @@ cuDNN 7.6
 # 拉去基础镜像
 docker pull nvidia/cuda:10.2-cudnn7-dev
 
-# 源码编译python
+# 源码编译python，需要注意configure配置路径
+./configure --prefix=/usr/local --enable-optimizations
 
 # 安装paddle-gpu版本
-pip install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+pip3 install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
 
 # 安装paddlehub, 注意arm服务器需要源码编译出whl，其中依赖的paddle2onnx中的onnx版本依赖需要改一下
-pip install -i https://mirror.baidu.com/pypi/simple paddlehub
+pip3 install -i https://mirror.baidu.com/pypi/simple paddlehub
 
 # 下载paddleOCR代码
 git clone https://github.com/PaddlePaddle/PaddleOCR.git
@@ -122,7 +123,7 @@ git clone https://github.com/PaddlePaddle/PaddleOCR.git
 mkdir -p PaddleOCR/inference
 
 # 安装依赖项
-pip install -i https://mirror.baidu.com/pypi/simple -r requirements.txt
+pip3 install -i https://mirror.baidu.com/pypi/simple -r requirements.txt
 
 # 直接加载模型看看有报错跟着参考【问题】解决
 hub install deploy/hubserving/ocr_system/
@@ -135,7 +136,7 @@ docker commit paddle-dev mypaddleocr-gpu:1
 * 启动验证
 
 ```bash
-# 启动容器
+# 启动容器,如果hub命令在环境变量中，则直接用hub命令即可不用完整路径
 docker run --gpus all -e CUDA_VISIBLE_DEVICES=1 -d -p 18888:8868 -w /root/PaddleOCR --name fc-ocr mypaddleocr-gpu:1 sh -c "/opt/bin/hub install deploy/hubserving/ocr_system/ && /opt/bin/hub serving start -c deploy/hubserving/ocr_system/config.json"
 
 # 将图片base64编码之后写入test.txt中,格式如下
