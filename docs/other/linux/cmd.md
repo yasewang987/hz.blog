@@ -1,4 +1,5 @@
 # Linux常用命令
+
 ## 允许root用户远程登陆
 
 ```bash
@@ -9,6 +10,75 @@ sudo vim /etc/ssh/sshd_config
 sudo systemctl restart sshd
 # 或者
 service sshd restart
+```
+
+## SSH免密登录
+
+在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户
+
+* 比如`gitlab-runner`运行的默认帐号是`gitlab-runner`，我们就需要切换到这个用户下面做免密登录配置,全部配置完成之后需要手动登录一次
+
+如果是在`sh`等脚本里面执行`ssh`免密登录，需要在添加参数`-tt`(例如：`ssh root@192.168.20.10 -tt`)
+
+`server1`免密登录`server2`
+
+1. `server1`生成rsa或者ed：`ssh-keygen -t rsa -C server1`
+1. 直接用`ssh-copy-id`:`ssh-copy-id -i id_rsa.pub root@192.168.20.10`,输入密码即可（或者使用下面方式）
+1. 将`server1`生成的公钥复制到`server2`
+
+    ```bash
+    scp id_rsa.pub root@server2ip:/root/.ssh
+    ```
+1. 在`server2`上创建`authorized_keys`，如果有就不需要了，并将`server1`的`id_rsa.pub`内容附加到`authorized_keys`中
+    
+    ```bash
+    # 创建文件
+    touch authorized_keys
+    # 附加内容
+    cat id_rsa.pub >> authorized_keys
+    ```
+1. 修改目录及文件权限
+
+    ```bash
+    chmod 644 authorized_keys id_rsa.pub
+    chmod 600 id_rsa
+    ```
+
+* 配置完成之后如果使用root帐号登录提示没有权限，需要修改`/etc/ssh/sshd_config`:
+    
+    ```bash
+    PermitRootLogin yes #允许root登录
+    StrictModes yes
+    PubkeyAuthentication yes
+    AuthorizedKeysFile .ssh/authorized_keys
+    PasswordAuthentication yes # 设置是否使用口令验证。
+    PermitEmptyPasswords no #不允许空密码登录
+    # 修改完毕之后需要重启sshd服务`systemctl restart sshd`
+    ```
+如果调整之后还是不能免密码远程登录，需要注意下 `~/.ssh/authorized_keys` 文件的权限。确实是 `700`或者`600`, 调整完权限之后需要重启`sshd`服务。
+
+## SSH、Telnet黑白名单
+
+```bash
+# 白名单 /etc/hosts.allow
+sshd:192.168.92.135:allow
+sshd:192.168.92.0/24:allow
+# 或者
+sshd:192.168.92.110
+sshd:192.168.92.
+# telnet示例
+in.telnetd:192.168.220.1
+in.telnetd:192.168.221.
+
+# 黑名单 /etc/hosts.deny
+sshd:192.168.92.135:deny
+sshd:192.168.92.0/24:deny
+# 或者
+sshd:192.168.92.110
+sshd:192.168.92.
+
+# 设置之后重启生效
+systemctl restart sshd
 ```
 
 ## 用户/用户组常用命令
@@ -322,54 +392,6 @@ mkfs.fat /dev/sdc -I
 dd if=ubuntu-16.0.3-desktop-amd64.iso of=/dev/sdb
 
 ```
-
----
-
-## SSH免密登录
-
-在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户
-
-* 比如`gitlab-runner`运行的默认帐号是`gitlab-runner`，我们就需要切换到这个用户下面做免密登录配置,全部配置完成之后需要手动登录一次
-
-如果是在`sh`等脚本里面执行`ssh`免密登录，需要在添加参数`-tt`(例如：`ssh root@192.168.20.10 -tt`)
-
-`server1`免密登录`server2`
-
-1. `server1`生成rsa或者ed：`ssh-keygen -t rsa -C server1`
-1. 直接用`ssh-copy-id`:`ssh-copy-id -i id_rsa.pub root@192.168.20.10`,输入密码即可（或者使用下面方式）
-1. 将`server1`生成的公钥复制到`server2`
-
-    ```bash
-    scp id_rsa.pub root@server2ip:/root/.ssh
-    ```
-1. 在`server2`上创建`authorized_keys`，如果有就不需要了，并将`server1`的`id_rsa.pub`内容附加到`authorized_keys`中
-    
-    ```bash
-    # 创建文件
-    touch authorized_keys
-    # 附加内容
-    cat id_rsa.pub >> authorized_keys
-    ```
-1. 修改目录及文件权限
-
-    ```bash
-    chmod 644 authorized_keys id_rsa.pub
-    chmod 600 id_rsa
-    ```
-
-* 配置完成之后如果使用root帐号登录提示没有权限，需要修改`/etc/ssh/sshd_config`:
-    
-    ```bash
-    PermitRootLogin yes #允许root登录
-    StrictModes yes
-    PubkeyAuthentication yes
-    AuthorizedKeysFile .ssh/authorized_keys
-    PasswordAuthentication yes # 设置是否使用口令验证。
-    PermitEmptyPasswords no #不允许空密码登录
-    # 修改完毕之后需要重启sshd服务`systemctl restart sshd`
-    ```
-如果调整之后还是不能免密码远程登录，需要注意下 `~/.ssh/authorized_keys` 文件的权限。确实是 `700`或者`600`, 调整完权限之后需要重启`sshd`服务。
----
 
 ## 查看命令安装位置
 

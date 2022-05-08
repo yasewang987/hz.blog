@@ -10,8 +10,13 @@ nvidia-smi
 # 通过systemctl查看对应信息,可以查看到对应的用户名、登录ip，相关session信息
 systemctl status pid
 
-# 确认用户是否有登录记录
+### 确认用户是否有登录记录
+# centos
 cat /var/log/secure | grep -i "accepted password"
+# debian，ubuntu
+cat /var/log/auth.log | grep -i "accepted password"
+
+# 这里最好把登录的ip加入到ssh黑名单中
 
 # 1. 确认有用户登录之后记得修改服务器密码
 passwd root
@@ -89,7 +94,10 @@ ac -dp
 尝试发现入侵者的信息，相关命令示例：
 
 ```bash
+# centos
 cat /var/log/secure | grep -i "accepted password"
+# debian，ubuntu
+cat /var/log/auth.log | grep -i "accepted password"
 ```
 
 ## 10.查询异常进程所对应的执行脚本文件
