@@ -37,7 +37,7 @@ module.exports = {
                     {
                         text: 'Go',
                         items: [
-                            { text: 'Go常用功能', link: '/code/go/common/' },
+                            { text: 'Go基础库', link: '/code/go/common/' },
                             { text: '其他', link: '/code/go/other/' },
                             { text: 'Demos', link: '/code/go/demo/' }
                         ]
@@ -154,24 +154,18 @@ module.exports = {
             '/code/go/common/': [
                 'base',
                 'http',
-                'mongodb',
                 'lock',
                 'rw',
                 'file',
                 'rpc',
-                'mysql',
                 'scanf',
-                'orm',
                 'time',
-                'server',
                 'io',
                 'strings',
                 'test',
                 'channel',
                 'select',
                 'context',
-                'di',
-                'ssh',
                 'generic'
             ],
             '/code/go/other/': [
@@ -188,7 +182,13 @@ module.exports = {
             '/code/go/demo/': [
                 'loadbalance',
                 'myrpc',
-                'gin'
+                'gin',
+                'di',
+                'mongodb',
+                'mysql',
+                'orm',
+                'server',
+                'ssh'
             ],
             '/code/web/npm/': [
                 'base',
