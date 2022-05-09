@@ -39,7 +39,7 @@ configure arguments:
 --with-http_dav_module #  增加上传PUT,DELETE,MKCOL:创建集合,COPY和MOVE方法)默认情况下为关闭
 --with-http_flv_module # NGINX添加MP4、FLV视频支持模块
 
---with-http_gunzip_module  # 压缩模块
+--with-http_gzip_module  # 压缩模块
 --with-http_gzip_static_module  # 压缩模块
 --with-http_mp4_module  # 支持多媒体
 --with-http_random_index_module  # 随机主页
@@ -1153,6 +1153,8 @@ location / {
 
 ## Nginx压缩配置
 
+* `ngx_http_gzip_module`模块
+
 gzip 属性在 `http、server、location` 三个模块都可以设置。
 
 建议是设置在 `http` 模块，为所有服务提供压缩功能。
@@ -1165,13 +1167,22 @@ http {
     keepalive_timeout 65;
     charset utf-8;
 
-    # 开启压缩
-    gzip on;
-    # 用于对匹配到的 MIME 类型文件进行压缩,其中 text/html 类型无论是否设置肯定会被压缩
-    gzip_types text/plain text/css application/javascript application/json application/xml;
-    #设置压缩比率,值的范围为：1-9，1：压缩比最小，处理最快；9：压缩比最大，处理最慢
-    gzip_comp_level 5;
+    gzip                on;     # 开启gzip
+    gzip_comp_level     6;      # 压缩等级：1-9 1:压缩最快/CPU消耗最少/压缩率最低 以次类推
+    gzip_min_length     1000;   # 小于此大小的数据不压缩(单位字节/byte)；数据来源"Content-Length"头
+    gzip_buffers        32 4k;  # 压缩响应的缓冲区数量和大小(4K 内存页大小取决于平台 getconf PAGESIZE)
+    gzip_proxied        any;    # 对代理的请求是否开启压缩
+    # 写压缩率大的(css/js/xml/json/ttf)， image图片就不要写了，压缩空间太小，又耗CPU
+    gzip_types text/plain application/xml application/javascript application/x-javascript text/css application/json;    # 哪些类型的数据需要被压缩
+    gzip_disable     "MSIE [1-5]\.";    # User-Agent 被正则匹配到的不开启压缩
+    gzip_vary on;               # 当gzip对请求生效时会被添加一个响应头 "Vary: Accept-Encoding"
 }
+```
+
+* `ngx_http_gzip_static_module`模块
+
+```conf
+gzip_static on|off|always;  # always: 不管客户端是否支持压缩我他妈全部给你压缩之后给你
 ```
 
 ## HTTP 跳转 HTTPS
