@@ -1151,9 +1151,9 @@ location / {
 }
 ```
 
-## Nginx压缩配置
+## Nginx压缩配置gzip
 
-* `ngx_http_gzip_module`模块
+* `http_gunzip_module`模块
 
 gzip 属性在 `http、server、location` 三个模块都可以设置。
 
