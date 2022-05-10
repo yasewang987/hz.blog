@@ -612,3 +612,23 @@ history -c
 vim /etc/profile
 HISTSIZE 10000
 ```
+
+## 无vim写文件
+
+* 输入如下内容到文件`test.conf`
+
+```conf
+server {
+    listen 80;
+    server_name hello;
+}
+```
+* 可以通过如下方式维护
+
+```bash
+# 创建文件
+touch test.conf
+
+# echo方式
+echo "server {\n    listen 80;\n    server_name hello;\n}" > test.conf
+```
