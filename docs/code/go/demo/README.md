@@ -7,5 +7,5 @@
 * [Go依赖注入](./di.md)
 * [Go-SSH & SCP](./ssh.md)
 * [go-orm资料记录](./orm.md)
-* [MySQL操作](./mysql.md)
+* [Go-Sql](./mysql.md)
 * [服务器信息获取](./server.md)
