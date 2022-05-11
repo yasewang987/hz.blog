@@ -305,13 +305,133 @@ func transactionDemo() {
 ## postgres
 
 ```go
-// 初始化一个新的连接池
-db, err := sql.Open("postgres", "postgres://user:pass@localhost/db")
-if err != nil {
-    log.Fatal(err)
+import (
+    "database/sql"
+    "fmt"
+    _ "https://github.com/lib/pq"
+)
+
+func main() {
+    db, err := sql.Open("postgres", "user=astaxie password=astaxie dbname=test sslmode=disable")
+    checkErr(err)
+
+	// 设置当前最大开放连接数（包括空闲和正在使用的）为5。
+	// 如果设置为0代表连接数没有限制，默认是没有限制数量的。
+	db.SetMaxOpenConns(5)
+
+    //插入数据
+    stmt, err := db.Prepare("INSERT INTO userinfo(username,departname,created) VALUES($1,$2,$3) RETURNING uid")
+    checkErr(err)
+
+    res, err := stmt.Exec("astaxie", "研发部门", "2012-12-09")
+    checkErr(err)
+
+    //pg不支持这个函数，因为他没有类似MySQL的自增ID
+    id, err := res.LastInsertId()
+    checkErr(err)
+
+    fmt.Println(id)
+
+    //更新数据
+    stmt, err = db.Prepare("update userinfo set username=$1 where uid=$2")
+    checkErr(err)
+
+    res, err = stmt.Exec("astaxieupdate", 1)
+    checkErr(err)
+
+    affect, err := res.RowsAffected()
+    checkErr(err)
+
+    fmt.Println(affect)
+
+    //查询数据
+    rows, err := db.Query("SELECT * FROM userinfo")
+    checkErr(err)
+
+    for rows.Next() {
+        var uid int
+        var username string
+        var department string
+        var created string
+        err = rows.Scan(&uid, &username, &department, &created)
+        checkErr(err)
+        fmt.Println(uid)
+        fmt.Println(username)
+        fmt.Println(department)
+        fmt.Println(created)
+    }
+
+    //删除数据
+    stmt, err = db.Prepare("delete from userinfo where uid=$1")
+    checkErr(err)
+
+    res, err = stmt.Exec(1)
+    checkErr(err)
+
+    affect, err = res.RowsAffected()
+    checkErr(err)
+
+    fmt.Println(affect)
+
+    db.Close()
 }
 
-// 设置当前最大开放连接数（包括空闲和正在使用的）为5。
-// 如果设置为0代表连接数没有限制，默认是没有限制数量的。
-db.SetMaxOpenConns(5)
+func checkErr(err error) {
+    if err != nil {
+        panic(err)
+    }
+}
 ```
+
+## sqlite3
+
+`https://github.com/mattn/go-sqlite3` 支持database/sql接口，基于cgo(关于cgo的知识请参看官方文档或者本书后面的章节)写的
+
+```go
+package main
+
+import (
+	"database/sql"
+	"fmt"
+
+	_ "github.com/mattn/go-sqlite3"
+)
+
+func main() {
+	// 初始化
+	db, err := sql.Open("sqlite3", "./mytest.db")
+	if err != nil {
+		panic(err)
+	}
+	// 插入数据
+	stmt, err := db.Prepare("insert into userinfo(username, departname, created) values (?,?,?)")
+	if err != nil {
+		panic(err)
+	}
+	defer stmt.Close()
+	res, _ := stmt.Exec("astaxie", "研发部门", "2012-12-09")
+	id, _ := res.LastInsertId()
+	fmt.Println(id)
+	// 更新数据
+	res, _ = db.Exec("update userinfo set username=? where uid=?", "astaxieupdate", id)
+	affect, _ := res.RowsAffected()
+	fmt.Println(affect)
+	// 查询数据
+	rows, _ := db.Query("select * from userinfo")
+	for rows.Next() {
+		var uid int
+		var username string
+		var departname string
+		var created string
+		err = rows.Scan(&uid, &username, &departname, &created)
+		fmt.Printf("uid=%d,username=%s,departname=%s,created=%s\n", uid, username, departname, created)
+	}
+	// 删除数据
+	res, _ = db.Exec("delete from userinfo where uid=?", id)
+	affect, _ = res.RowsAffected()
+	fmt.Println(affect)
+}
+
+```
+
+

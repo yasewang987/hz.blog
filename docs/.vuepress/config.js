@@ -185,10 +185,11 @@ module.exports = {
                 'gin',
                 'di',
                 'mongodb',
-                'mysql',
+                'sql',
                 'orm',
                 'server',
-                'ssh'
+                'ssh',
+                'conf'
             ],
             '/code/web/npm/': [
                 'base',
