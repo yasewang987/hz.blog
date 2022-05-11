@@ -189,7 +189,8 @@ module.exports = {
                 'orm',
                 'server',
                 'ssh',
-                'conf'
+                'conf',
+                'redis'
             ],
             '/code/web/npm/': [
                 'base',

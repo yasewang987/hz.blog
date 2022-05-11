@@ -10,3 +10,4 @@
 * [Go-Sql](./sql.md)
 * [服务器信息获取](./server.md)
 * [Go读取配置文件](./conf.md)
+* [Go-Redis](./redis.md)
