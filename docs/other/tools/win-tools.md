@@ -10,3 +10,4 @@ USB启动盘刻录：https://rufus.ie/zh_CN.html  或者 UISO
 Windows子系统WSL: https://sspai.com/post/47719
 
 PowerToys : https://github.com/microsoft/PowerToys
+gcc: https://www.cnblogs.com/feipeng8848/p/15227688.html
