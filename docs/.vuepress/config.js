@@ -31,7 +31,7 @@ module.exports = {
                         items: [
                             { text: '基础知识', link: '/code/java/basics/' },
                             { text: 'Spring', link: '/code/java/spring/' },
-                            { text: '其他', link: '/code/java/tools/' }
+                            { text: '其他', link: '/code/java/tools/' },
                         ]
                     },
                     {
@@ -51,7 +51,8 @@ module.exports = {
                             { text: 'CSS', link: '/code/web/css/' },
                             { text: 'Other', link: '/code/web/other/' }
                         ]
-                    }
+                    },
+                    { text: 'Python', link: '/code/python/' }
                 ]
             },
             {
@@ -219,6 +220,9 @@ module.exports = {
                 'microapp',
                 'electron',
                 'tauri'
+            ],
+            '/code/python/': [
+                'devops'
             ],
             '/microservices/consul/': [
                 'base',
