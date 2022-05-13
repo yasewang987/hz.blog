@@ -455,6 +455,62 @@ server {
     }
 }
 ```
+## mirror流量复制
+
+`ngx_http_mirror_module` 模块，mirror 指令提供的核心功能就是流量复制
+
+* Nginx会丢弃`mirror`响应，但是如果`mirror`过去的请求一直无响应或响应慢的时候，这时会影响主请求的响应速度的。
+* 需要注意，一般不会把`POST/PUT`等会影响数据状态的请求做镜像的， 除非你明确清楚的知道这样产生的影响并且可以接受.
+
+```conf
+location / {
+    # 开启流量复制
+    mirror /mirror;
+    proxy_pass http://backend;
+}
+
+# 复制的流量转发到这里
+location = /mirror {
+    # internal 标志该location只为内部的重定向服务， 外面来的返回404
+    internal;
+    # $request_uri 需要显示指明，因为流量复制过来之后会丢掉request_uri
+    proxy_pass http://test_backend$request_uri;
+}
+```
+
+ 基于cookie分流遇到的一个问题是：对于第三方的回调请求支持不友好， 因为第三方不可能携带我们自定义的cookie来回调我们。为了解决第三方回调的问题，我们开启了Nginx的mirror， 把回调接口的请求复制到测试所有环境内，总有一个是目标环境(从业务上说即使回调到其他环境也无所谓，所以直接镜像到所有环境)。
+
+ ```conf
+ location /notify/v1.0/ {
+    mirror  /test-01;
+    mirror  /test-02;
+    mirror  /test-03;
+    mirror  /test-04;
+    mirror  /test-05;
+    mirror  /test-06;
+    mirror  /test-07;
+    mirror  /test-08;
+    mirror  /test-09;
+    mirror  /test-10;
+}
+
+location = /test-01 {
+    internal;
+    # 头信息视情况添加/删除
+    proxy_pass_header Server;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $remote_addr;
+
+    proxy_pass http://upstream_test-01$request_uri;
+}
+
+upstream upstream_test-01 {
+    server 1.1.1.1:80 weight=100 max_fails=10 fail_timeout=60s;
+}
+ ```
+
 ## 防盗链配置
 
 `ngx_http_referer_module` 模块
@@ -642,6 +698,7 @@ server{
 * `Reading：0` ：读取客户端`Header`的信息数，请求头
 * `Writing：1`：返回给客户端的`Header`的信息署，响应头
 * `Waiting：1`：等待的请求数，开启了`keepalive`（长连接）
+
 ## Nginx访问限制模块(限流)
 
 `ngx_http_limit_req_module` 模块：用于限制每个已定义键的请求处理速率，特别是来自单个 IP 地址的请求的处理速率，使用`leaky bucket`方法完成限制；
