@@ -139,3 +139,33 @@ vim /etc/selinux/config
      ```bash
      chmod +x /usr/local/bin/docker-compose
      ```
+
+## docker容器使用显卡驱动
+
+* 安装 [nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
+
+    dockeer19.03版本之后只需要安装 `nvidia-container-runtime` 即可
+    
+    ```bash
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+        && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+        && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+
+    sudo apt-get update \
+        && sudo apt-get install -y nvidia-container-runtime
+
+    # 验证
+    sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
+
+    # 指定使用显卡1
+    sudo docker run --rm --gpus '"device=1"' nvidia/cuda:11.0-base nvidia-smi
+    ```
+
+* 查看内核显卡版本：`cat /proc/driver/nvidia/version`
+* 查看安装的显卡驱动信息： `dpkg --list | grep nvidia`
+
+执行如下命令确认是否安装成功，如果有显卡信息展示说明成功：
+
+```bash
+nvidia-smi
+```

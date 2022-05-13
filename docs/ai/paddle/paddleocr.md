@@ -5,7 +5,7 @@
 
 * `hubserving-cpu`版本(需要修改`deploy/hubserving/ocr_system`中的配置和代码)
 
-## 制作镜像
+## 制作镜像-CPU
 
 ```bash
 # 下载python3.7镜像
@@ -29,7 +29,7 @@ git clone https://github.com/PaddlePaddle/PaddleOCR.git
 # 下载要部署的推理模型，参考paddleOCR官网，放到 PaddleOCR的inference目录
 mkdir -p PaddleOCR/inference
 
-# 修改 `requirements.txt` 中的 `opencv-contrib-python` 版本限制去掉
+# arm服务器修改 `requirements.txt` 中的 `opencv-contrib-python` 版本限制去掉
 # 安装依赖项
 pip install -i https://mirror.baidu.com/pypi/simple -r requirements.txt
 
@@ -54,7 +54,7 @@ docker run -d -p 18888:8866 -w /PaddleOCR --name my-ocr mypaddleocr:1 sh -c "hub
 cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/predict/ocr_system
 ```
 
-## 官方dockerfile
+## 官方dockerfile-CPU
 
 只支持 `amd` 架构的cpu
 
@@ -88,6 +88,62 @@ RUN tar xf /PaddleOCR/inference/{file}.tar -C /PaddleOCR/inference/
 EXPOSE 8866
 
 CMD ["/bin/bash","-c","hub install deploy/hubserving/ocr_system/ && hub serving start -m ocr_system"]
+```
+
+## 制作镜像-GPU
+
+* 查看要求：
+
+```bash
+PaddlePaddle >= 2.1.2
+Python 3.7
+CUDA 10.1 / CUDA 10.2
+cuDNN 7.6
+```
+
+* 制作镜像(到dockerhub上查找 nvidia/cuda:10.2-cudnn7.6镜像)
+
+```bash
+# 拉去基础镜像
+docker pull nvidia/cuda:10.2-cudnn7-dev
+
+# 源码编译python，需要注意configure配置路径
+./configure --prefix=/usr/local --enable-optimizations
+
+# 安装paddle-gpu版本
+pip3 install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+
+# 安装paddlehub, 注意arm服务器需要源码编译出whl，其中依赖的paddle2onnx中的onnx版本依赖需要改一下
+pip3 install -i https://mirror.baidu.com/pypi/simple paddlehub
+
+# 下载paddleOCR代码
+git clone https://github.com/PaddlePaddle/PaddleOCR.git
+
+# 下载要部署的推理模型，参考paddleOCR官网，放到 PaddleOCR的inference目录
+mkdir -p PaddleOCR/inference
+
+# 安装依赖项
+pip3 install -i https://mirror.baidu.com/pypi/simple -r requirements.txt
+
+# 直接加载模型看看有报错跟着参考【问题】解决
+hub install deploy/hubserving/ocr_system/
+hub serving start -m ocr_system
+
+# 上述步骤确认没问题，退出容器，生成镜像
+docker commit paddle-dev mypaddleocr-gpu:1
+```
+
+* 启动验证
+
+```bash
+# 启动容器,如果hub命令在环境变量中，则直接用hub命令即可不用完整路径
+docker run --gpus all -e CUDA_VISIBLE_DEVICES=1 -d -p 18888:8868 -w /root/PaddleOCR --name fc-ocr mypaddleocr-gpu:1 sh -c "/opt/bin/hub install deploy/hubserving/ocr_system/ && /opt/bin/hub serving start -c deploy/hubserving/ocr_system/config.json"
+
+# 将图片base64编码之后写入test.txt中,格式如下
+{"images": ["填入图片Base64编码(需要删除'data:image/jpg;base64,'）"]}
+
+# 调用ocr容器验证
+cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/predict/ocr_system
 ```
 
 ## 问题

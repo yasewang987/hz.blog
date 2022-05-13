@@ -157,10 +157,10 @@ sqlite-devel openssl-devel xz xz-devel libffi-devel findutils
 
 ```bash
 # 下载源码
-curl -O https://www.python.org/ftp/python/3.8.1/Python-3.7.4.tar.xz
+curl -O https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tar.xz
 
 # 解压
-tar -Jxvf Python-3.8.1.tar.xz
+tar -Jxvf Python-3.7.13.tar.xz && cd Python-3.7.13
 
 # 编译安装，--enable-optimizations 配置项用于提高 Python 安装后的性能，使用会导致编译速度稍慢
 ./configure --prefix=/opt/yourpath --enable-optimizations

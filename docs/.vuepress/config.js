@@ -31,14 +31,13 @@ module.exports = {
                         items: [
                             { text: '基础知识', link: '/code/java/basics/' },
                             { text: 'Spring', link: '/code/java/spring/' },
-                            { text: '其他', link: '/code/java/tools/' }
+                            { text: '其他', link: '/code/java/tools/' },
                         ]
                     },
                     {
                         text: 'Go',
                         items: [
-                            { text: 'Gin', link: '/code/go/gin/' },
-                            { text: 'Go常用功能', link: '/code/go/common/' },
+                            { text: 'Go基础库', link: '/code/go/common/' },
                             { text: '其他', link: '/code/go/other/' },
                             { text: 'Demos', link: '/code/go/demo/' }
                         ]
@@ -52,7 +51,8 @@ module.exports = {
                             { text: 'CSS', link: '/code/web/css/' },
                             { text: 'Other', link: '/code/web/other/' }
                         ]
-                    }
+                    },
+                    { text: 'Python', link: '/code/python/' }
                 ]
             },
             {
@@ -152,30 +152,21 @@ module.exports = {
                 'install',
                 'other'
             ],
-            '/code/go/gin/': [
-                'gin'
-            ],
             '/code/go/common/': [
                 'base',
                 'http',
-                'mongodb',
                 'lock',
                 'rw',
                 'file',
                 'rpc',
-                'mysql',
                 'scanf',
-                'orm',
                 'time',
-                'server',
                 'io',
                 'strings',
                 'test',
                 'channel',
                 'select',
                 'context',
-                'di',
-                'ssh',
                 'generic'
             ],
             '/code/go/other/': [
@@ -185,13 +176,22 @@ module.exports = {
                 'cmd',
                 'version',
                 'common',
-                'notice',
+                'best',
                 'package',
                 'gpm'
             ],
             '/code/go/demo/': [
                 'loadbalance',
-                'myrpc'
+                'myrpc',
+                'gin',
+                'di',
+                'mongodb',
+                'sql',
+                'orm',
+                'server',
+                'ssh',
+                'conf',
+                'redis'
             ],
             '/code/web/npm/': [
                 'base',
@@ -220,6 +220,9 @@ module.exports = {
                 'microapp',
                 'electron',
                 'tauri'
+            ],
+            '/code/python/': [
+                'devops'
             ],
             '/microservices/consul/': [
                 'base',

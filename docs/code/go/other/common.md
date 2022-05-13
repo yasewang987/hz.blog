@@ -1,11 +1,5 @@
 # Go常用开源库
 
-## Gin
-
-github地址：https://github.com/gin-gonic/gin
-
-`Gin`是一个用Go编写的Web框架，它是一个类似于martini但拥有更好性能的API框架。
-
 ## zap
 
 github地址：https://github.com/uber-go/zap
@@ -22,12 +16,6 @@ github地址：https://github.com/uber-go/zap
 github地址：https://github.com/json-iterator/go
 
 做业务开发离不开`json`的序列化与反序列化，标准库虽然提供了`encoding/json`，但是它主要是通过反射来实现的，所以性能消耗比较大。`jsoniter`可以解决这个痛点，其是一款快且灵活的 JSON 解析器，具有良好的性能并能100%兼容标准库，我们可以使用`jsoniter`替代`encoding/json`，官方文档称可以比标准库快6倍多，后来Go官方在go1.12版本对 `json.Unmarshal` 函数使用 `sync.Pool` 缓存了 `decoder`，性能较之前的版本有所提升，所以现在达不到快6倍多。
-
-## gorm
-
-github地址：https://github.com/go-gorm/gorm
-
-`gorm`是一个使用Go语言编写的ORM框架，文档齐全，对开发者友好，并且支持主流的数据库：`MySQL, PostgreSQL, SQlite, SQL Server`。
 
 ## robfig/cron
 
@@ -55,17 +43,6 @@ func main() {
   time.Sleep(time.Second * 10)
 }
 ```
-
-## wire
-
-github地址：https://github.com/google/wire
-
-应该不会有人不知道依赖注入的作用了吧。我们本身也可以自己实现依赖注入，但是这是在代码量少、结构不复杂的情况下，当结构之间的关系变得非常复杂的时候，这时候手动创建依赖，然后将他们组装起来就会变的异常繁琐，并且很容出错。Go语言社区有很多依赖注入的框架，可以分为两个类别：
-
-* 依赖反射实现的运行时依赖注入：`inject、uber、dig`
-* 使用代码生成实现的依赖注入：`wire`
-
-个人觉的使用`wire`进行项目管理是最好的，在代码编译阶段就可以发现依赖注入的问题，在代码生成时即可报出来，不会拖到运行时才报，更便于debug。
 
 ## ants
 

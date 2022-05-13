@@ -1,61 +1,10 @@
-# Go操作MySQL
+# Go操作SQL
 
 Go语言中的`database/sql`包提供了保证SQL或类SQL数据库的泛用接口，并不提供具体的数据库驱动。所以使用database/sql包时必须注入（至少）一个数据库驱动。
 
-## 初始化连接
-
-下载mysql驱动：
-
-```bash
-go get -u github.com/go-sql-driver/mysql
-```
-
-其中`sql.DB`是一个数据库（操作）句柄，代表一个具有零到多个底层连接的连接池。它可以安全的被多个go程同时使用。database/sql包会自动创建和释放连接；它也会维护一个闲置连接的连接池。
-
-```go
-package main
-
-import (
-	"database/sql"
-	"log"
-	"time"
-
-	_ "github.com/go-sql-driver/mysql"
-)
-
-// 定义全局数据库连接
-var db *sql.DB
-
-// 初始化数据库连接
-func initDB() (err error) {
-	// 数据库连接字符串
-	connectStr := "root:Yht@324000@tcp(121.5.123.202:23307)/yht"
-	// 不会校验账号密码是否正确
-    // Open函数可能只是验证其参数，而不创建与数据库的连接
-	db, err = sql.Open("mysql", connectStr)
-	if err != nil {
-		return err
-	}
-	// 尝试与数据库建立连接，确认链接是否正常可用
-	err = db.Ping()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func main() {
-	err := initDB()
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-}
-```
-
 ## SetMaxOpenConns
 
-`SetMaxOpenConns`设置与数据库建立连接的最大数目。
+`SetMaxOpenConns`设置与数据库建立连接的最大数目。需要查看数据库有没有限制最大连接，如果有需要设置小于等于这个值
 * 如果n大于0且小于最大闲置连接数，会将最大闲置连接数减小到匹配最大开启连接数的限制。
 * 如果n<=0，不会限制最大开启连接数，默认为0（无限制）。
 
@@ -69,7 +18,18 @@ func (db *DB) SetMaxOpenConns(n int)
 * 如果n大于最大开启连接数，则新的最大闲置连接数会减小到匹配最大开启连接数的限制。
 * 如果n<=0，不会保留闲置连接。
 
-## 简单CRUD实用示例
+## SetConnMaxLifetime
+
+设置连接可重用的最大时间长度。如果您的SQL数据库也实现了最大连接生命周期，或者—例如—您希望方便地在负载均衡器后交换数据库，那么这将非常有用。
+
+从理论上讲，ConnMaxLifetime越短，连接过期的频率就越高——因此，需要从头创建连接的频率就越高。
+
+```go
+// 将连接的最大生存期设置为1小时。将其设置为0意味着没有最大生存期，连接将永远可重用(这是默认行为)
+db.SetConnMaxLifetime(time.Hour)
+```
+
+## 通用CRUD实用示例
 
 创建测试表
 
@@ -172,6 +132,57 @@ func deleteRowDemo() {
 		return
 	}
 	fmt.Printf("delete success, affected rows:%d\n", n)
+}
+```
+
+## Mysql初始化连接
+
+下载mysql驱动：
+
+```bash
+go get -u github.com/go-sql-driver/mysql
+```
+
+其中`sql.DB`是一个数据库（操作）句柄，代表一个具有零到多个底层连接的连接池。它可以安全的被多个go程同时使用。database/sql包会自动创建和释放连接；它也会维护一个闲置连接的连接池。
+
+```go
+package main
+
+import (
+	"database/sql"
+	"log"
+	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+// 定义全局数据库连接
+var db *sql.DB
+
+// 初始化数据库连接
+func initDB() (err error) {
+	// 数据库连接字符串
+	connectStr := "root:Yht@324000@tcp(121.5.123.202:23307)/yht"
+	// 不会校验账号密码是否正确
+    // Open函数可能只是验证其参数，而不创建与数据库的连接
+	db, err = sql.Open("mysql", connectStr)
+	if err != nil {
+		return err
+	}
+	// 尝试与数据库建立连接，确认链接是否正常可用
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func main() {
+	err := initDB()
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
 }
 ```
 
@@ -290,3 +301,137 @@ func transactionDemo() {
 	fmt.Println("exec trans success!")
 }
 ```
+
+## postgres
+
+```go
+import (
+    "database/sql"
+    "fmt"
+    _ "https://github.com/lib/pq"
+)
+
+func main() {
+    db, err := sql.Open("postgres", "user=astaxie password=astaxie dbname=test sslmode=disable")
+    checkErr(err)
+
+	// 设置当前最大开放连接数（包括空闲和正在使用的）为5。
+	// 如果设置为0代表连接数没有限制，默认是没有限制数量的。
+	db.SetMaxOpenConns(5)
+
+    //插入数据
+    stmt, err := db.Prepare("INSERT INTO userinfo(username,departname,created) VALUES($1,$2,$3) RETURNING uid")
+    checkErr(err)
+
+    res, err := stmt.Exec("astaxie", "研发部门", "2012-12-09")
+    checkErr(err)
+
+    //pg不支持这个函数，因为他没有类似MySQL的自增ID
+    id, err := res.LastInsertId()
+    checkErr(err)
+
+    fmt.Println(id)
+
+    //更新数据
+    stmt, err = db.Prepare("update userinfo set username=$1 where uid=$2")
+    checkErr(err)
+
+    res, err = stmt.Exec("astaxieupdate", 1)
+    checkErr(err)
+
+    affect, err := res.RowsAffected()
+    checkErr(err)
+
+    fmt.Println(affect)
+
+    //查询数据
+    rows, err := db.Query("SELECT * FROM userinfo")
+    checkErr(err)
+
+    for rows.Next() {
+        var uid int
+        var username string
+        var department string
+        var created string
+        err = rows.Scan(&uid, &username, &department, &created)
+        checkErr(err)
+        fmt.Println(uid)
+        fmt.Println(username)
+        fmt.Println(department)
+        fmt.Println(created)
+    }
+
+    //删除数据
+    stmt, err = db.Prepare("delete from userinfo where uid=$1")
+    checkErr(err)
+
+    res, err = stmt.Exec(1)
+    checkErr(err)
+
+    affect, err = res.RowsAffected()
+    checkErr(err)
+
+    fmt.Println(affect)
+
+    db.Close()
+}
+
+func checkErr(err error) {
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+## sqlite3
+
+`https://github.com/mattn/go-sqlite3` 支持database/sql接口，基于cgo(关于cgo的知识请参看官方文档或者本书后面的章节)写的
+
+```go
+package main
+
+import (
+	"database/sql"
+	"fmt"
+
+	_ "github.com/mattn/go-sqlite3"
+)
+
+func main() {
+	// 初始化
+	db, err := sql.Open("sqlite3", "./mytest.db")
+	if err != nil {
+		panic(err)
+	}
+	// 插入数据
+	stmt, err := db.Prepare("insert into userinfo(username, departname, created) values (?,?,?)")
+	if err != nil {
+		panic(err)
+	}
+	defer stmt.Close()
+	res, _ := stmt.Exec("astaxie", "研发部门", "2012-12-09")
+	id, _ := res.LastInsertId()
+	fmt.Println(id)
+	// 更新数据
+	res, _ = db.Exec("update userinfo set username=? where uid=?", "astaxieupdate", id)
+	affect, _ := res.RowsAffected()
+	fmt.Println(affect)
+	// 查询数据
+	rows, _ := db.Query("select * from userinfo")
+	for rows.Next() {
+		var uid int
+		var username string
+		var departname string
+		var created string
+		err = rows.Scan(&uid, &username, &departname, &created)
+		fmt.Printf("uid=%d,username=%s,departname=%s,created=%s\n", uid, username, departname, created)
+	}
+	// 删除数据
+	res, _ = db.Exec("delete from userinfo where uid=?", id)
+	affect, _ = res.RowsAffected()
+	fmt.Println(affect)
+}
+
+```
+
+

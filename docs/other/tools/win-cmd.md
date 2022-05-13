@@ -105,3 +105,19 @@ bcdedit /set hypervisorlaunchtype off
 # 打开
 bcdedit /set hypervisorlaunchtype auto
 ```
+
+## Windows安装gcc
+
+官网：https://www.mingw-w64.org/ ，这里可以下载到最新的版本
+
+参考文档：
+
+https://www.cnblogs.com/feipeng8848/p/15227688.html
+
+https://cloud.tencent.com/developer/article/1627901
+
+下载地址【直接选择x86_64-posix-seh下载】：https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/
+
+mingw的工作是集成gcc源码与Windows API，用于把gcc移植到Windows上用原生的方式编译程序。用得到的gcc.exe编译的程序可以在Windows上原生运行。
+
+安装完mingw之后，系统变量中找到 Path 变量，在后面加入 min-gw 的安装目录如：`D:\MinGw\bin`
