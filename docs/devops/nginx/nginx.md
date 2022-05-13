@@ -476,13 +476,23 @@ stream {
 
 ## Nginx WebSocket配置
 
+客户端发起请求时是和反响代理服务器建立请求， 此时客户端携带的 Upgrade、Connection头是不会被反向代理服务器直接转发到后端服务的(这就是逐跳标头)， 后端服务获取不到这两个头信息自然也不会主动去切换协议。
+
+因此，需要在反向代理服务器转发上游时带上客户端原来的请求头，才可以完成协议的升级或切换。
+
+ `Upgrade、Connection`，这两个请求头都是逐跳标头(只能传输一次，不能透传)
+
 ```conf
 location / {
     proxy_pass http://127.0.0.1:8088/;
+    # 设置http协议版本1.1
     proxy_http_version 1.1;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # 能且只能在http1.1版本中使用， 用来标识协议升级/转换
+    # Upgrade: websocket； 表示客户端希望使用websocket协议通信， 那么后端的ws程序取到头信息后会返回101状态码(协议转换),此时浏览器就会使用当前的TCP连接建立websocket通道。
     proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection $http_connection;
+    # Connection头信息取值upgrade, 表示本次请求是一次协议升级(协议转换)请求, 配合 Upgrade: websocket信息, 完整表达了这个请求要升级到websocket协议。
+    proxy_set_header Connection $connection_upgrade;
 }
 ```
 ## proxy_pass 相对/绝对 路径
@@ -893,11 +903,11 @@ server {
         # 大于10MB的文件会采用直接IO的当时进行缓冲读取
         directio 10m;
         # 对齐文件系统块大小4096
-	directio_alignment 4096;
-	# 启用分块传输标识
-	chunked_transfer_encoding on;
-	# 文件输出的缓冲区大小为128KB
-	output_buffers 4 32k;
+        directio_alignment 4096;
+        # 启用分块传输标识
+        chunked_transfer_encoding on;
+        # 文件输出的缓冲区大小为128KB
+        output_buffers 4 32k;
     }
 }
 ```
