@@ -168,7 +168,8 @@ module.exports = {
                 'channel',
                 'select',
                 'context',
-                'generic'
+                'generic',
+                'error'
             ],
             '/code/go/other/': [
                 'install',
