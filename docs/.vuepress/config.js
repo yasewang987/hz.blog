@@ -150,7 +150,8 @@ module.exports = {
             '/code/java/spring/': [],
             '/code/java/tools/' : [
                 'install',
-                'other'
+                'other',
+                'problem'
             ],
             '/code/go/common/': [
                 'base',
