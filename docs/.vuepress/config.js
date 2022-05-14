@@ -212,7 +212,8 @@ module.exports = {
                 'vue3',
                 'vitevue',
                 'setupscript',
-                'vueuse'
+                'vueuse',
+                'dynamic'
             ],
             '/code/web/css/': [
                 'resources',

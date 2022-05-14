@@ -5,3 +5,4 @@
 * [Vite+Vue3+TS](./vitevue.md)
 * [Setup Script](./setupscript.md)
 * [VueUse](./vueuse.md)
+* [Vue动态页面](./dynamic.md)
