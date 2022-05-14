@@ -150,7 +150,8 @@ module.exports = {
             '/code/java/spring/': [],
             '/code/java/tools/' : [
                 'install',
-                'other'
+                'other',
+                'problem'
             ],
             '/code/go/common/': [
                 'base',
@@ -167,7 +168,8 @@ module.exports = {
                 'channel',
                 'select',
                 'context',
-                'generic'
+                'generic',
+                'error'
             ],
             '/code/go/other/': [
                 'install',
@@ -191,7 +193,8 @@ module.exports = {
                 'server',
                 'ssh',
                 'conf',
-                'redis'
+                'redis',
+                'encrypt'
             ],
             '/code/web/npm/': [
                 'base',
@@ -209,7 +212,8 @@ module.exports = {
                 'vue3',
                 'vitevue',
                 'setupscript',
-                'vueuse'
+                'vueuse',
+                'dynamic'
             ],
             '/code/web/css/': [
                 'resources',

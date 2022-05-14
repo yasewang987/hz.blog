@@ -3,3 +3,4 @@
 * [JAVA开发环境搭建](./install.md)
 
 * [Java其他操作](./other.md)
+* [Java问题处理](./problem.md)
