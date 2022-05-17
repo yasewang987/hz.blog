@@ -223,7 +223,8 @@ module.exports = {
                 'qiankun',
                 'microapp',
                 'electron',
-                'tauri'
+                'tauri',
+                'flutter'
             ],
             '/code/python/': [
                 'devops'

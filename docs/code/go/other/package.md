@@ -1,4 +1,4 @@
-# Go项目结构
+# Go项目规范
 
 ## 应用项目结构
 
@@ -23,6 +23,9 @@ demo
 ├── pkg2
 │   └── pkg2.go
 └── vendor # 存储项目的依赖包，但由于现今Go项目都是使用go module进行依赖管理，因此这个目录是可省略的。
+└── docs # 说明文档
+└── deploy # 部署文档
+
 ```
 
 * 常规项目
@@ -82,6 +85,7 @@ demo
 │   └── pkg1.go
 └── pkg2
     └── pkg2.go
+│___examples # 示例
 ```
 
 * 一般一个公司的所有基础库都应该归到一个仓库中，通过文件夹来区分不同的基础功能
@@ -115,6 +119,127 @@ demo
     +-- internal
         |-- core
         +-- filewriter
+```
+
+## 命名规范
+
+* 项目名可以通过`中划线`来连接多个单词。
+
+### 文件
+
+* 文件名要简短有意义，应`小写`并使用`下划线`分割单词。
+* 测试文件名必须以 `_test.go` 结尾
+
+
+### 包
+
+* 包名必须和目录名一致，尽量采取有意义、简短的包名，不要和标准库冲突。
+* 包名全部`小写`，没有大写或下划线，使用多级目录来`划分层级`。
+* 包名以及包所在的目录名，不要使用复数，比如 `net/utl` 而不是 `net/urls`。
+* 不要用 `common`、`util`、`shared` 或者 `lib` 这类宽泛的、无意义的包名。
+* 包名要简单明了，例如 `net`、`time`、`log`。
+
+### 函数
+
+* 函数名采用驼峰式，首字母根据`访问控制`决定使用大写或小写，例如：`MixedCaps` 或者 `mixedCaps`。
+* 测试用例函数必须以 `Test、Benchmark、Example`
+    * 单元测试:测试代码功能是否正常，其函数名称必须以 `Test` 开头，参数为 `t *testing.T`
+    * 基准测试:其函数名称必须以 `Benchmark` 开头，参数为 `t *testing.B`
+
+
+### 结构体
+
+* 采用驼峰命名方式，首字母根据访问控制决定使用大写或小写，例如 MixedCaps 或者 mixedCaps。
+* 结构体名不应该是动词，应该是名词，比如 Node、NodeSpec。
+* 避免使用 Data、Info 这类无意义的结构体名。
+* 结构体的声明和初始化应采用多行：
+
+```go
+// User 多行声明
+type User struct {
+    Name  string
+    Email string
+}
+
+// 多行初始化
+u := User{
+    UserName: "aa",
+    Email:    "aa@bb.com",
+}
+```
+
+### 接口
+
+* 单个函数的接口名以 `er` 作为后缀（例如 Reader，Writer），有时候可能导致蹩脚的英文，但是没关系。
+* 两个函数的接口名以两个函数名命名，例如 ReadWriter。
+* 三个以上函数的接口名，类似于结构体名。
+
+```go
+type Seeker interface {
+    Seek(offset int64, whence int) (int64, error)
+}
+
+// ReadWriter is the interface that groups the basic Read and Write methods.
+type ReadWriter interface {
+    Reader
+    Writer
+}
+```
+
+### 变量
+
+* 变量名必须遵循驼峰式，首字母根据访问控制决定使用大写或小写。
+* 在相对简单（对象数量少、针对性强）的环境中，可以将一些名称由完整单词简写为单个字母，比如：user 可简写为 u；userID 可简写 uid。
+* 对于私有特有名词为首个单词则使用小写（如 apiClient）。其他特有名词都应当使用该名词原有的写法，如 APIClient、repoID、UserID。
+* 若变量类型为 bool 类型，则名称应以 `Has,Is,Can,Allow` 开头。
+* 局部变量应当尽可能短小，比如使用 `buf` 指代 `buffer`，使用 `i` 指代 `index`。
+
+### 常量
+
+常量名必须遵循驼峰式，首字母根据访问控制决定使用大写或小写。
+
+如果是枚举类型的常量，需要先创建相应类型：
+
+```go
+type Code int
+
+// Internal errors.
+const (
+    // ErrUnknown - 0: An unknown error occurred.
+    ErrUnknown Code = iota
+    // ErrFatal - 1: An fatal error occurred.
+    ErrFatal
+)
+```
+
+### Error
+
+* `Error` 类型应该写成 `FooError` 的形式，比如 `type ExitError struct {}`。
+* `Error` 变量写成 `ErrFoo` 的形式，比如 `var ErrFormat = errors.New("unknown format")`。
+
+### 注释规范
+
+* 每个可导出的名字都要有注释，该注释对导出的变量、函数、结构体、接口等进行简要介绍。
+* 全部使用单行注释，禁止使用多行注释。
+* 和代码的规范一样，单行注释不要过长，禁止超过 120 字符，超过的请使用换行展示，尽量保持格式优雅。
+* 注释必须是完整的句子，以需要注释的内容作为开头，句点作为结尾，格式为 `// 名称 描述`。
+    * 每个`包`都有且仅有一个包级别的注释，格式统一为 `// Package 包名 包描述`
+    * 导出的`变量和常量`常量都必须有注释说明，格式为 `// 变量名 变量描述`
+    * 导出的`结构体或者接口`都必须有注释，格式为 `// 结构体名 结构体描述`.
+    * 导出的`函数或者方法`都必须有注释，格式为 `// 函数名 函数描述`
+    * 每个需要导出的`类型定义和类型别名`都必须有注释说明，格式为 `// 类型名 类型描述`.
+
+### 错误规范
+
+```bash
+无发生错误 +--- 开发调试时需要：Debug
+          +--- 非开发调试时也需要：info
+             
+发生错误   +--- 基本无影响/影响暂时：Warn
+          +--- 影响有限/只影响某次请求：Error
+          |                       
+          +--- 肯定会出现严重问题 ---+--- defer 处理后可运行：Panic
+                                   +--- 完全无法运行：Fatal
 ```
 
 ## Go正常包导入
