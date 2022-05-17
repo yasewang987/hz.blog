@@ -8,5 +8,5 @@
 * [Go常用开源库](./common.md)
 
 * [Go使用注意事项](./best.md)
-* [Go项目结构](./package.md)
+* [Go项目规范](./package.md)
 * [Go-GPM解析](./gpm.md)
