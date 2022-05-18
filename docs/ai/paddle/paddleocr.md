@@ -5,7 +5,7 @@
 
 * `hubserving-cpu`版本(需要修改`deploy/hubserving/ocr_system`中的配置和代码)
 
-## 制作镜像-CPU
+## 制作镜像-CPU-hubserving
 
 ```bash
 # 下载python3.7镜像
@@ -54,43 +54,7 @@ docker run -d -p 18888:8866 -w /PaddleOCR --name my-ocr mypaddleocr:1 sh -c "hub
 cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/predict/ocr_system
 ```
 
-## 官方dockerfile-CPU
-
-只支持 `amd` 架构的cpu
-
-```dockerfile
-FROM registry.baidubce.com/paddlepaddle/paddle:2.0.0
-
-# PaddleOCR base on Python3.7
-RUN pip3.7 install --upgrade pip -i https://mirror.baidu.com/pypi/simple
-
-RUN pip3.7 install paddlehub --upgrade -i https://mirror.baidu.com/pypi/simple
-
-RUN git clone https://github.com/PaddlePaddle/PaddleOCR.git /PaddleOCR
-
-WORKDIR /PaddleOCR
-
-RUN pip3.7 install -r requirements.txt -i https://mirror.baidu.com/pypi/simple
-
-RUN mkdir -p /PaddleOCR/inference/
-# Download orc detect model(light version). if you want to change normal version, you can change ch_ppocr_mobile_v2.0_det_infer to ch_ppocr_server_v2.0_det_infer, also remember change det_model_dir in deploy/hubserving/ocr_system/params.py）
-ADD {link} /PaddleOCR/inference/
-RUN tar xf /PaddleOCR/inference/{file} -C /PaddleOCR/inference/
-
-# Download direction classifier(light version). If you want to change normal version, you can change ch_ppocr_mobile_v2.0_cls_infer to ch_ppocr_mobile_v2.0_cls_infer, also remember change cls_model_dir in deploy/hubserving/ocr_system/params.py）
-ADD {link} /PaddleOCR/inference/
-RUN tar xf /PaddleOCR/inference/{file}.tar -C /PaddleOCR/inference/
-
-# Download orc recognition model(light version). If you want to change normal version, you can change ch_ppocr_mobile_v2.0_rec_infer to ch_ppocr_server_v2.0_rec_infer, also remember change rec_model_dir in deploy/hubserving/ocr_system/params.py）
-ADD {link} /PaddleOCR/inference/
-RUN tar xf /PaddleOCR/inference/{file}.tar -C /PaddleOCR/inference/
-
-EXPOSE 8866
-
-CMD ["/bin/bash","-c","hub install deploy/hubserving/ocr_system/ && hub serving start -m ocr_system"]
-```
-
-## 制作镜像-GPU
+## 制作镜像-GPU-hubserving
 
 * 查看要求：
 
@@ -104,7 +68,7 @@ cuDNN 7.6
 * 制作镜像(到dockerhub上查找 nvidia/cuda:10.2-cudnn7.6镜像)
 
 ```bash
-# 拉去基础镜像
+# 拉取基础镜像
 docker pull nvidia/cuda:10.2-cudnn7-dev
 
 # 源码编译python，需要注意configure配置路径
@@ -144,6 +108,110 @@ docker run --gpus all -e CUDA_VISIBLE_DEVICES=1 -d -p 18888:8868 -w /root/Paddle
 
 # 调用ocr容器验证
 cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/predict/ocr_system
+```
+
+## 制作镜像-CPU-pdserving
+
+* 参考文档：`https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.4/deploy/pdserving/README_CN.md`
+
+```bash
+# 下载python3.7镜像
+docker pull python3.7
+
+# 启动镜像
+docker run -itd --name paddle-dev python3.7 bash
+
+# 进入容器安装相关依赖
+docker exec -it paddle-dev bash
+
+# 修改里面的apt源，安装vim等
+apt install -y vim
+mv /etc/source.list /etc/source.list.back
+
+# 安装paddle，注意arm服务器需要用源码编译出whl本地安装
+pip install -i https://mirror.baidu.com/pypi/simple paddlepaddle
+
+# 下载paddleOCR代码
+git clone https://github.com/PaddlePaddle/PaddleOCR.git
+
+# arm服务器修改 `requirements.txt` 中的 `opencv-contrib-python` 版本限制去掉
+# 安装依赖项
+pip install -i https://mirror.baidu.com/pypi/simple -r requirements.txt
+
+# 安装基础依赖项
+apt install libgl1
+
+# 安装PaddleServing的运行环境
+# 最新版本查看 https://github.com/PaddlePaddle/Serving 的最新release分支
+pip install https://paddle-serving.bj.bcebos.com/test-dev/whl/paddle_serving_server-0.9.0.post102-py3-none-any.whl
+pip install https://paddle-serving.bj.bcebos.com/test-dev/whl/paddle_serving_client-0.9.0-cp37-none-any.whl
+pip install https://paddle-serving.bj.bcebos.com/test-dev/whl/paddle_serving_app-0.9.0-py3-none-any.whl
+
+# 进入到运行目录
+cd PaddleOCR/deploy/pdserving
+# 下载并解压 OCR 文本检测模型
+wget https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_det_infer.tar -O ch_PP-OCRv3_det_infer.tar && tar -xf ch_PP-OCRv3_det_infer.tar
+# 下载并解压 OCR 文本识别模型
+wget https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar -O ch_PP-OCRv3_rec_infer.tar &&  tar -xf ch_PP-OCRv3_rec_infer.tar
+
+# 用安装的paddle_serving_client把下载的inference模型转换成易于server部署的模型格式
+# 转换检测模型，需要注意看一下config.yml文件里面的模型位置来确定serving_server
+python3 -m paddle_serving_client.convert --dirname ./ch_PP-OCRv3_det_infer/ \
+                                         --model_filename inference.pdmodel          \
+                                         --params_filename inference.pdiparams       \
+                                         --serving_server ./ppocr_det_v3_serving/ \
+                                         --serving_client ./ppocr_det_v3_client/
+
+# 转换识别模型
+python3 -m paddle_serving_client.convert --dirname ./ch_PP-OCRv3_rec_infer/ \
+                                         --model_filename inference.pdmodel          \
+                                         --params_filename inference.pdiparams       \
+                                         --serving_server ./ppocr_rec_v3_serving/  \
+                                         --serving_client ./ppocr_rec_v3_client/
+
+# 调整 config.yml 中的并发个数获得最大的QPS, 一般检测和识别的并发数为2：1
+det:
+    #并发数，is_thread_op=True时，为线程并发；否则为进程并发
+    concurrency: 8
+    ...
+rec:
+    #并发数，is_thread_op=True时，为线程并发；否则为进程并发
+    concurrency: 4
+    ...
+
+# 启动服务，运行日志保存在log.txt
+python3 web_service.py &>log.txt &
+
+# 查看log文件信息内容如下：
+I0518 09:04:34.550848  4064 naive_executor.cc:102] ---  skip [sigmoid_0.tmp_0], fetch -> fetch
+I0518 09:04:34.557600  4077 analysis_predictor.cc:1007] ======= optimize end =======
+I0518 09:04:34.560288  4077 naive_executor.cc:102] ---  skip [feed], feed -> x
+I0518 09:04:34.564229  4077 naive_executor.cc:102] ---  skip [sigmoid_0.tmp_0], fetch -> fetch
+I0518 09:04:34.570278  4104 analysis_predictor.cc:1007] ======= optimize end =======
+I0518 09:04:34.572505  4104 naive_executor.cc:102] ---  skip [feed], feed -> x
+I0518 09:04:34.576280  4104 naive_executor.cc:102] ---  skip [sigmoid_0.tmp_0], fetch -> fetch
+I0518 09:04:34.578187  4135 analysis_predictor.cc:1007] ======= optimize end =======
+I0518 09:04:34.580248  4135 naive_executor.cc:102] ---  skip [feed], feed -> x
+I0518 09:04:34.583575  4135 naive_executor.cc:102] ---  skip [sigmoid_0.tmp_0], fetch -> fetch
+
+# 发送服务请求
+python3 pipeline_http_client.py
+
+# 上述步骤确认没问题，退出容器，生成镜像
+docker commit paddle-dev mypaddleocr:1
+```
+
+* 运行容器及测试脚本如下
+
+```bash
+# 运行容器
+docker run -d -p 18888:9998 -w /PaddleOCR/deploy/pdserving --name my-ocr mypaddleocr:1 python3 web_service.py
+
+# 将图片base64编码之后写入test.txt中,格式如下
+{"key":["image"], "value": ["填入图片Base64编码(需要删除'data:image/jpg;base64,'）"]}
+
+# 调用ocr容器验证
+cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/ocr/prediction
 ```
 
 ## 问题
