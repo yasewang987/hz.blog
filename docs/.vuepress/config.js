@@ -224,7 +224,9 @@ module.exports = {
                 'microapp',
                 'electron',
                 'tauri',
-                'flutter'
+                'flutter',
+                'serve',
+                'config'
             ],
             '/code/python/': [
                 'devops'
