@@ -466,7 +466,8 @@ module.exports = {
             '/ai/paddle/': [
                 'paddle',
                 'paddleocr',
-                'paddlespeech'
+                'paddlespeech',
+                'paddleserving'
             ]
         },
         sidebarDepth: 2

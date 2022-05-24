@@ -3,3 +3,4 @@
 * [paddlepaddle](./paddle.md)
 * [PaddleOCR](./paddleocr.md)
 * [PaddleSpeech](./paddlespeech.md)
+* [PaddleServing](./paddleserving.md)

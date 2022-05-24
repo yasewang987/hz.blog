@@ -94,6 +94,8 @@ make TARGET=ARMV8 -j10
 
 ### amd
 
+在支持`AVX2`指令集的`Intel` CPU平台上请指定`-DWITH_MKL=ON`编译选项
+
 直接pip安装即可，不需要编译
 
 ## 问题
