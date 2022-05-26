@@ -55,7 +55,7 @@ make -j
 make install
 ```
 
-## 官方镜像源码编译-CPU
+## 源码编译验证-CPU
 
 * 参考文档
 
@@ -170,4 +170,6 @@ python3.7 -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_
 python3.7 ocr_cpp_client.py /home/models/ppocr_det_v3_client /home/models/ppocr_rec_v3_client
 ```
 
-## python基础镜像源码编译-CPU
+## 部署服务端-CPU
+
+## 部署客户端-CPU

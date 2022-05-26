@@ -84,7 +84,11 @@ nginx_upstream_check_module
 ```conf
 upstream tomcat_pools {
     ip_hash;
+    # 3s内出现3次错误，则认为后端服务有问题，等待3s之后再分配请求进来
     server 172.16.1.91:8080 weight=1 max_fails=3 fail_timeout=3s;
+    # fail_timeout=0: 无论后端失败了多少次， NGINX 会继续把请求分发到这个后端服务
+    # max_fails=0: 认为服务器是一直可用的
+    server 172.16.1.91:8081 weight=1 max_fails=0 fail_timeout=0;
     server 172.16.1.91:8081 weight=1 max_fails=3 fail_timeout=3s;
     check interval=2000 rise=3 fall=2 timeout=1000 type=http;
     #对tomcat_pools这个负载均衡池中的所有节点，每个2秒检测一次，
