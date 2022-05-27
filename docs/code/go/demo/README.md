@@ -1,5 +1,6 @@
 # Go Demos
 
+* [Go设计模式](./design.md)
 * [Go-负载均衡](./loadbalance.md)
 * [Go-自定义RPC](./myrpc.md)
 * [Gin](./gin.md)

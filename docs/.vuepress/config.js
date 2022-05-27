@@ -183,6 +183,7 @@ module.exports = {
                 'gpm'
             ],
             '/code/go/demo/': [
+                'design',
                 'loadbalance',
                 'myrpc',
                 'gin',
