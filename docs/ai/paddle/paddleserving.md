@@ -20,7 +20,7 @@ libXext|1.3.3
 libSM|1.2.2
 libXrender|0.9.10
 
-## 源码编译opencv
+## 源码编译安装opencv
 
 ```bash
 # 下载源码
@@ -53,6 +53,68 @@ cmake .. \
 make -j
 # 安装成功之后会在 opencv3 目录下生成 bin,include,lib,lib64,share 目录
 make install
+```
+
+## 源码编译安装openssl
+
+到 `https://github.com/openssl/openssl/tags` 查找符合要求的版本
+
+```bash
+# 下载源码包
+wget https://github.com/openssl/openssl/releases/tag/OpenSSL_1_0_2p
+tar xf OpenSSL_1_0_2p.tar.gz
+cd openssl_OpenSSL_1_0_2p
+
+# 安装
+./config --prefix=/usr/local/openssl1.0.0
+make && make install
+
+# 查看版本
+openssl version
+```
+
+* 生成OpenSSL1_0_0，如果只是需要该`so`库的话，就不一定非要执行`make install`操作了
+
+```bash
+# 在源码根目录创建一个链接脚本文件，添加OPENSSL_1.0.0的信息。
+cat > openssl.ld << EOF
+OPENSSL_1.0.0 {
+    global:
+    *;
+};
+OPENSSL_1.0.1 {
+    global:
+    *;
+};
+OPENSSL_1.0.1_EC {
+    global:
+    *;
+};
+OPENSSL_1.0.2 {
+    global:
+    *;
+};
+EOF
+
+# 使用config的时候需要附加上刚才创建的链接脚本文件，该文件可使编译后生成的动态库文件中包含该版本信息
+./config --prefix=/usr/local/ --openssldir=/usr/local/openssl shared -Wl,--version-script=openssl.ld -Wl,-Bsymbolic-functions
+
+# 编译
+make -j4
+
+# 编译结束后，会生成一个libcrypto.so.1.0.0动态库文件，查看它是否包含“OPENSSL_1.0.0”信息
+strings libcrypto.so.1.0.0 | grep OPENSSL_1
+OPENSSL_1.0.0
+OPENSSL_1.0.1
+OPENSSL_1.0.1_EC
+OPENSSL_1.0.2
+OPENSSL_1.0.1
+OPENSSL_1.0.1_EC
+OPENSSL_1.0.0
+OPENSSL_1.0.2
+
+# 已经包含该版本,可以单独将libcrypto.so.1.0.0文件放置到系统库目录下了。
+cp libcrypto.so.1.0.0 /usr/lib64/
 ```
 
 ## 源码编译验证-CPU
@@ -155,7 +217,7 @@ python3.7 -m paddle_serving_client.convert --dirname ./ch_PP-OCRv3_rec_infer/ \
                                          --serving_server ./ppocr_rec_v3_serving/  \
                                          --serving_client ./ppocr_rec_v3_client/
 
-### 启动服务
+### ocr启动服务
 python3.7 -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_v3_serving --op GeneralDetectionOp GeneralInferOp --port 9293
 
 # C++Server部分进行前后处理，为了加速传入C++Server的仅仅是图片的base64编码的字符串，故需要手动修改 ppocr_det_v3_client/serving_client_conf.prototxt 中 feed_type 字段 和 shape 字段
@@ -166,10 +228,6 @@ python3.7 -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_
  feed_type: 20
  shape: 1
  }
-### 客户端验证
+### ocr客户端验证
 python3.7 ocr_cpp_client.py /home/models/ppocr_det_v3_client /home/models/ppocr_rec_v3_client
 ```
-
-## 部署服务端-CPU
-
-## 部署客户端-CPU

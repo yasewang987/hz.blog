@@ -110,7 +110,7 @@ docker run --gpus all -e CUDA_VISIBLE_DEVICES=1 -d -p 18888:8868 -w /root/Paddle
 cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/predict/ocr_system
 ```
 
-## 制作镜像-CPU-pdserving
+## 制作镜像-CPU-pdserving-py
 
 * 参考文档：`https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.4/deploy/pdserving/README_CN.md`
 
@@ -212,6 +212,54 @@ docker run -d -p 18888:9998 -w /PaddleOCR/deploy/pdserving --name my-ocr mypaddl
 
 # 调用ocr容器验证
 cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/ocr/prediction
+```
+
+## ## 制作镜像-CPU-pdserving-c++
+
+```bash
+# 下载python3.7镜像
+docker pull python3.7
+
+# 启动镜像
+docker run -itd --name paddle-dev python3.7 bash
+
+# 将pdserveing源码编译出来的server-whl安装
+docker cp paddle_serving_server-0.0.0-py3-none-any.whl paddle-dev:/data
+# 将pdserving转换出来的模型拷贝进容器
+docker cp ppocr_det_v3_serving paddle-dev:/data
+docker cp ppocr_rec_v3_serving paddle-dev:/data
+
+# 进入容器安装相关依赖
+docker exec -it paddle-dev bash
+
+# 修改里面的apt源，安装vim等
+apt install -y vim
+mv /etc/source.list /etc/source.list.back
+
+# 安装paddle，注意arm服务器需要用源码编译出whl本地安装
+pip install -i https://mirror.baidu.com/pypi/simple paddlepaddle
+
+# 安装源码编译的server
+pip install -i https://mirror.baidu.com/pypi/simple /data/paddle_serving_server-0.0.0-py3-none-any.whl
+
+# 启动服务验证
+python -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_v3_serving --op GeneralDetectionOp GeneralInferOp --port 9293
+
+# 上一步启动之后没有问题则可以生成镜像
+docker commit paddle-dev myocr2:1
+```
+
+* 正常部署验证
+
+```bash
+# 启动服务端
+docker run -d -p 18890:9293 -v $PWD:/data -w /data/inference --name myocr2 myocr2:1 python -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_v3_serving --op GeneralDetectionOp GeneralInferOp --port 9293
+
+# 客户端参考pdserving文档
+# 注意事项：
+export LD_LIBRARY_PATH=/usr/lib
+cat test10.txt | curl -X POST -d @- http://localhost:18890/GeneralModelService/inference 
+curl -X POST http://localhost:9293/GeneralModelService/inference -d '{"tensor":[{"string_data":["base64imge"],"elem_type":20,"name":"x","alias_name":"x","shape":[1]}],"log_id":0}'
 ```
 
 ## 问题
