@@ -281,7 +281,8 @@ module.exports = {
                 'cap-base',
                 'idgenerater',
                 'ddd',
-                'architecture'
+                'architecture',
+                'abac'
             ],
             '/test/jmeter/': [
                 'install-docker',
