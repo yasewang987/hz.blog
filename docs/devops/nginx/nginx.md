@@ -768,6 +768,16 @@ http {
     }
 }
 ```
+
+## 限制下载速度
+
+```conf
+location /download { 
+    limit_rate_after 10m; 
+    limit_rate 128k; 
+}
+```
+
 ## Niginx访问控制模块（黑白名单）
 
 `ngx_http_access_module`: 基于ip操作
@@ -1010,6 +1020,9 @@ configure arguments:
         gzip  on;
         # 加载其他配置文件，一般下面的内容会放到单独的文件中
         include /etc/nginx/conf.d/*.conf;
+
+        # 请求体大小限制
+        client_max_body_size 18m
 
         # upstream
         upstream aaa{

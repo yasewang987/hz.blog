@@ -21,6 +21,7 @@ func main(){
 // 把一些参数做成变量而不是直接放到url中
 
 func main(){
+    // 组合到querystring上
     params := url.Values{}
     Url, err := url.Parse("http://httpbin.org/get")
     if err != nil {
@@ -53,18 +54,6 @@ func main() {
 ### POST使用
 
 ```go
-func main() {
-    urlValues := url.Values{
-        "name":{"zhaofan"},
-        "age":{"23"},
-    }
-    reqBody:= urlValues.Encode()
-    resp, _ := http.Post("http://httpbin.org/post", "text/html",strings.NewReader(reqBody))
-    defer resp.Body.Close()
-    body,_:= ioutil.ReadAll(resp.Body)
-    fmt.Println(string(body))
-}
-
 // 发送JSON数据的post请求
 func main() {
     client := &http.Client{}
