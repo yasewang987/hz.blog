@@ -61,9 +61,9 @@ make install
 
 ```bash
 # 下载源码包
-wget https://github.com/openssl/openssl/releases/tag/OpenSSL_1_0_2p
-tar xf OpenSSL_1_0_2p.tar.gz
-cd openssl_OpenSSL_1_0_2p
+wget https://github.com/openssl/openssl/releases/tag/OpenSSL_1_0_2g
+tar zxf OpenSSL_1_0_2g.tar.gz
+cd openssl_OpenSSL_1_0_2g
 
 # 安装
 ./config --prefix=/usr/local/openssl1.0.0

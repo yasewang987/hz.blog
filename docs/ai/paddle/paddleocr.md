@@ -214,7 +214,9 @@ docker run -d -p 18888:9998 -w /PaddleOCR/deploy/pdserving --name my-ocr mypaddl
 cat test.txt | curl -H 'Content-Type:application/json' -X POST -d @- http://localhost:18888/ocr/prediction
 ```
 
-## ## 制作镜像-CPU-pdserving-c++
+## 制作镜像-CPU-pdserving-c++
+
+### 服务端
 
 ```bash
 # 下载python3.7镜像
@@ -254,12 +256,72 @@ docker commit paddle-dev myocr2:1
 ```bash
 # 启动服务端
 docker run -d -p 18890:9293 -v $PWD:/data -w /data/inference --name myocr2 myocr2:1 python -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_v3_serving --op GeneralDetectionOp GeneralInferOp --port 9293
-
 # 客户端参考pdserving文档
 # 注意事项：
 export LD_LIBRARY_PATH=/usr/lib
 cat test10.txt | curl -X POST -d @- http://localhost:18890/GeneralModelService/inference 
 curl -X POST http://localhost:9293/GeneralModelService/inference -d '{"tensor":[{"string_data":["base64imge"],"elem_type":20,"name":"x","alias_name":"x","shape":[1]}],"log_id":0}'
+```
+
+### 客户端
+
+```bash
+# 下载python3.7镜像
+docker pull python3.7
+
+# 启动镜像
+docker run -itd --name paddle-dev python3.7 bash
+
+# 将openssl相关lib拷贝到容器
+docker cp mypath/libssl.so.1.0.2k paddle-dev:/usr/lib/x86_64-linux-gnu
+docker cp mypath/libcrypto.so.1.0.2k paddle-dev:/usr/lib/x86_64-linux-gnu
+# 将ocr代码拷贝到容器（需要修改ocr_cpp_client.py里面对应的配置项）
+docker cp PaddleOCR/deploy/pdserving paddle-dev:/data
+docker cp PaddleOCR/doc/imgs paddle-dev:/data/pdserving
+docker cp PaddleOCR/ppocr/utils/ppocr_keys_v1.txt :/data/pdserving
+# 将pdserving转换出来的模型拷贝进容器
+docker cp ppocr_det_v3_client paddle-dev:/data/pdserving
+docker cp ppocr_rec_v3_client paddle-dev:/data/pdserving
+
+# 进入容器安装相关依赖
+docker exec -it paddle-dev bash
+
+# 创建ssl软链接
+ln -s /usr/lib/x86_64-linux-gnu/libssl.so.1.0.2k /usr/lib/x86_64-linux-gnu/libssl.so.10
+ln -s /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.2k /usr/lib/x86_64-linux-gnu/libcrypto.so.10
+
+# 安装libGL
+apt install libgl1
+# 安装paddlepaddle、client、app
+pip install -i https://mirror.baidu.com/pypi/simple paddle-serving-client==0.9.0 paddle-serving-app==0.9.0 paddlepaddle
+# 其他依赖项
+pip install -i https://mirror.baidu.com/pypi/simple pyyaml
+
+# C++Server部分进行前后处理，为了加速传入C++Server的仅仅是图片的base64编码的字符串，故需要手动修改 ppocr_det_v3_client/serving_client_conf.prototxt 中 feed_type 字段 和 shape 字段
+ feed_var {
+ name: "x"
+ alias_name: "x"
+ is_lod_tensor: false
+ feed_type: 20
+ shape: 1
+ }
+
+# 调用服务端验证
+python ocr_cpp_client.py ppocr_det_v3_client ppocr_rec_v3_client
+
+# 上一步启动之后没有问题则可以生成镜像
+docker commit paddle-dev myocr2-client:1
+```
+
+
+
+
+## 制作镜像-GPU-pdserving-c++
+
+### 服务端
+
+```bash
+# todo
 ```
 
 ## 问题
