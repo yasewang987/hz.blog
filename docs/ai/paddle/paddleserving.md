@@ -65,9 +65,22 @@ wget https://github.com/openssl/openssl/releases/tag/OpenSSL_1_0_2g
 tar zxf OpenSSL_1_0_2g.tar.gz
 cd openssl_OpenSSL_1_0_2g
 
-# 安装
-./config --prefix=/usr/local/openssl1.0.0
+# shared 表示生成动态库
+# prefix 表示安装目录
+# openssldir 表示配置文件目录,ubuntu默认是/usr/lib/openssl,若设置其他目录,执行openssl命令时会有警告.
+./config shared --prefix=/usr/local/openssl --openssldir=/usr/lib/openssl
 make && make install
+
+# 添加环境变量
+export PATH=$PATH:/usr/local/openssl/bin
+
+ #执行这一步的时候有可能会失败，提示/usr/bin/openssl已经存在，那就将/usr/bin/openssl改个名字，重新做软连接
+ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl 
+ln -s /usr/local/ssl/openinclude/openssl /usr/include/openssl
+
+# 刷新动态库配置(有些安装文档有这一步，不过我没做)
+# 在文件末尾加入/usr/local/ssl/lib
+vim /etc/ld.so.conf 
 
 # 查看版本
 openssl version
