@@ -164,3 +164,13 @@ curl -X PUT http://localhost:9200/_all/_settings?preserve_existing=true -d '{
 * discovery.zen.minimum_master_nodes: //自动发现master节点的最小数，如果这个集群中配置进来的master节点少于这个数目，es的日志会一直报master节点数目不足。（默认为1）为了避免脑裂，个数请遵从该公式 => (totalnumber of master-eligible nodes / 2 + 1)。* 脑裂是指在主备切换时，由于切换不彻底或其他原因，导致客户端和Slave误以为出现两个active master，最终使得整个集群处于混乱状态*
 * discovery.zen.ping.unicast.hosts：集群个节点IP地址，也可以使用es-node等名称，需要各节点能够解析
 
+## 问题
+
+* es启动自动被杀掉【killed】
+
+```bash
+# 修改config目录的jvm.options
+-Xms1g
+-Xmx2g
+```
+

@@ -6,138 +6,142 @@
 
 ```ts
 <template>
+  <h1>{{ name }}</h1>
   // 调用方法
   <button @click='changeName'>按钮</button>  
 </template>
+
 <script setup>
-  import { reactive, ref, toRefs, computed, watch, nextTick } from 'vue'
-  import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
-  import { useStore } from 'vuex'
-  import { key } from '../store/index'
+import { reactive, ref, toRefs, computed, watch, nextTick } from 'vue'
+import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
+import { useStore } from 'vuex'
+import { key } from '../store/index'
 
-  // ref声明响应式数据，用于声明基本数据类型
-  const name = ref('Jerry')
-  // 修改
-  name.value = 'Tom'
+// ref声明响应式数据，用于声明基本数据类型
+const name = ref('Jerry')
+const myname = ref<string | null>('AAAA')
+// 修改
+name.value = 'Tom'
 
-  // reactive声明响应式数据，用于声明引用数据类型
-  const state = reactive({
-    name: 'Jerry',
-    sex: '男',
-    count: 1,
-    color: 'red'
-  })
-  // 修改
+// reactive声明响应式数据，用于声明引用数据类型
+const state = reactive({
+  name: 'Jerry',
+  sex: '男',
+  count: 1,
+  color: 'red'
+})
+// 修改
+state.name = 'Tom'
+
+// 使用toRefs解构
+const {name, sex} = toRefs(state)
+// template可直接使用{{name}}、{{sex}}
+
+////// methods
+// 声明method方法
+const changeName = () => {
   state.name = 'Tom'
-  
-  // 使用toRefs解构
-  const {name, sex} = toRefs(state)
-  // template可直接使用{{name}}、{{sex}}
+}
+const getNodeServices = async () => {
+state.nodeService = await nodeApis.getNodeService({
+  nodeIp: props.nodeIp,
+  nodePort: props.nodePort,
+} as NodeModel)
+}
 
-  ////// methods
-  // 声明method方法
-  const changeName = () => {
-    state.name = 'Tom'
+//// computed
+const count = ref(1)
+
+// 通过computed获得doubleCount
+const doubleCount = computed(() => {
+  return count.value * 2
+})
+
+////// watch
+// 监听count
+watch(
+  () => state.count,
+  (newVal, oldVal) => {
+    console.log(state.count)
+    console.log(`watch监听变化前的数据：${oldVal}`)
+    console.log(`watch监听变化后的数据：${newVal}`)
+  },
+  {
+    immediate: true, // 立即执行
+    deep: true // 深度监听
   }
+)
+// 侦听多个数据源(数组)
+const state = reactive({count: 1});
+const num = ref(0);
+// 监听一个数组
+watch([()=>state.count,num],([newCount,newNum],[oldCount,oldNum])=>{
+  console.log('new:',newCount,newNum);
+  console.log('old:',oldCount,oldNum);
+})
 
-  //// computed
-  const count = ref(1)
+// 侦听复杂的嵌套对象
+const state = reactive({
+  person: {
+    name: '张三',
+    fav: ['帅哥','美女','音乐']
+  },
+});
+watch(
+  () => state.person,
+  (newType, oldType) => {
+    console.log("新值:", newType, "老值:", oldType);
+  },
+  { deep: true }, // 立即监听，如果不设置是无法监听的
+);
 
-  // 通过computed获得doubleCount
-  const doubleCount = computed(() => {
-    return count.value * 2
-  })
+////// nextTick
+nextTick(() => {
+  // ...
+})
 
-  ////// watch
-  // 监听count
-  watch(
-    () => state.count,
-    (newVal, oldVal) => {
-      console.log(state.count)
-      console.log(`watch监听变化前的数据：${oldVal}`)
-      console.log(`watch监听变化后的数据：${newVal}`)
-    },
-    {
-      immediate: true, // 立即执行
-      deep: true // 深度监听
-    }
-  )
-  // 侦听多个数据源(数组)
-  const state = reactive({count: 1});
-  const num = ref(0);
-  // 监听一个数组
-  watch([()=>state.count,num],([newCount,newNum],[oldCount,oldNum])=>{
-    console.log('new:',newCount,newNum);
-    console.log('old:',oldCount,oldNum);
-  })
+////// route,router
+// 必须先声明调用
+const route = useRoute()
+const router = useRouter()
 
-  // 侦听复杂的嵌套对象
-  const state = reactive({
-    person: {
-      name: '张三',
-      fav: ['帅哥','美女','音乐']
-    },
-  });
-  watch(
-    () => state.person,
-    (newType, oldType) => {
-      console.log("新值:", newType, "老值:", oldType);
-    },
-    { deep: true }, // 立即监听，如果不设置是无法监听的
-  );
+// 路由信息
+console.log(route.query)
 
-  ////// nextTick
-  nextTick(() => {
-    // ...
-  })
+// 路由跳转
+router.push('/newPage')
+// 添加一个导航守卫，在当前组件将要离开时触发。
+onBeforeRouteLeave((to, from, next) => {
+  next()
+})
 
-  ////// route,router
-  // 必须先声明调用
-  const route = useRoute()
-  const router = useRouter()
-	
-  // 路由信息
-  console.log(route.query)
+// 添加一个导航守卫，在当前组件更新时触发。
+// 在当前路由改变，但是该组件被复用时调用。
+onBeforeRouteUpdate((to, from, next) => {
+  next()
+})
 
-  // 路由跳转
-  router.push('/newPage')
-  // 添加一个导航守卫，在当前组件将要离开时触发。
-  onBeforeRouteLeave((to, from, next) => {
-    next()
-  })
+// 生命周期
+onMounted(() => {})
+onBeforeMount
+onMounted
+onBeforeUpdate
+onUpdated
+onBeforeUnmount
+onUnmount
+onErrorCaptured
+onRenderTraced
+onRenderTriggered
+onActivated
+onDeactivated
+</script>
 
-  // 添加一个导航守卫，在当前组件更新时触发。
-  // 在当前路由改变，但是该组件被复用时调用。
-  onBeforeRouteUpdate((to, from, next) => {
-    next()
-  })
-
-  ////// store
-  // 必须先声明调用
-  const store = useStore(key)
-	
-  // 获取Vuex的state
-  store.state.xxx
-
-  // 触发mutations的方法
-  store.commit('fnName')
-
-  // 触发actions的方法
-  store.dispatch('fnName')
-
-  // 获取Getters
-  store.getters.xxx
-
-  ///// await
-  <script>
-    const post = await fetch('/api').then(() => {})
-  </script>
-  <style scoped>
-    span {
-      // 使用v-bind绑定state中的变量
-      color: v-bind('state.color');
-    }  
-  </style>
+<style scoped>
+  span {
+    // 使用v-bind绑定state中的变量
+    color: v-bind('state.color');
+  }  
+</style>
 ```
 ## watchEffect
 
@@ -175,17 +179,7 @@ watchEffect((onInvalidate) => {
 ## 生命周期
 
 ```bash
-onBeforeMount
-onMounted
-onBeforeUpdate
-onUpdated
-onBeforeUnmount
-onUnmount
-onErrorCaptured
-onRenderTraced
-onRenderTriggered
-onActivated
-onDeactivated
+
 ```
 
 ```html

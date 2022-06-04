@@ -632,3 +632,13 @@ touch test.conf
 # echo方式
 echo "server {\n    listen 80;\n    server_name hello;\n}" > test.conf
 ```
+
+## 修改服务器时区
+
+```bash
+tzselect
+
+# 选择亚洲 Asia，确认之后选择中国（China)，最后选择北京(Beijing)
+
+cp /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
+```

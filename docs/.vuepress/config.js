@@ -183,6 +183,7 @@ module.exports = {
                 'gpm'
             ],
             '/code/go/demo/': [
+                'design',
                 'loadbalance',
                 'myrpc',
                 'gin',
@@ -224,7 +225,9 @@ module.exports = {
                 'microapp',
                 'electron',
                 'tauri',
-                'flutter'
+                'flutter',
+                'serve',
+                'config'
             ],
             '/code/python/': [
                 'devops'
@@ -277,7 +280,9 @@ module.exports = {
                 'note',
                 'cap-base',
                 'idgenerater',
-                'ddd'
+                'ddd',
+                'architecture',
+                'abac'
             ],
             '/test/jmeter/': [
                 'install-docker',
@@ -463,7 +468,8 @@ module.exports = {
             '/ai/paddle/': [
                 'paddle',
                 'paddleocr',
-                'paddlespeech'
+                'paddlespeech',
+                'paddleserving'
             ]
         },
         sidebarDepth: 2
