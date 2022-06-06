@@ -1,5 +1,57 @@
 # Linux常用命令
 
+## 下载源修改
+
+参考：https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
+
+```bash
+#### Ubuntu
+# 查看系统版本
+lsb_release -a
+# 备份老文件
+mv /etc/apt/sources.list /etc/apt/sources.list.back
+# 输入新源
+sudo vim /etc/apt/sources.list
+# 更新
+sudo apt-get update
+sudo apt-get upgrade
+```
+
+## 修改IP，DNS
+
+```bash
+#### Ubuntu
+sudo vim /etc/systemd/resolved.conf
+DNS=114.114.114.114 233.5.5.5 8.8.8.8
+# 重启生效
+systemctl restart systemd-resolved
+vim /etc/netplan/xx-netcfg.yaml
+# DNS修改(修改文件中的nameservers)
+nameservices:
+  addresses: [8.8.8.8,114.114.114.114]
+# 生效
+netplan apply
+
+
+#### Centos
+# 查看网卡id
+ip addr
+# centos7 / kylin-v10
+vi /etc/sysconfig/network-scripts/ifcfg-网卡id
+# 修改如下内容
+BOOTPROTO=static  # static/dhcp
+ONBOOT=yes
+# 加入如下内容
+IPADDR=192.168.1.160
+NETMASK=255.255.255.0
+# 下面的如果不需要可以不设置
+GATEWAY=192.168.1.1
+DNS1=119.29.29.29
+DNS2=8.8.8.8
+# 重启网络服务生效
+systemctl restart network
+```
+
 ## 允许root用户远程登陆
 
 ```bash

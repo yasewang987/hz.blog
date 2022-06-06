@@ -404,15 +404,12 @@ module.exports = {
             '/other/linux/': [
                 'cmd',
                 'problem',
-                'firewall',
+                'attack',
                 'info',
-                'install',
+                'firewall',
                 'systemd',
                 'vim',
                 'screen',
-                'ubuntu',
-                'manjaro',
-                'ddns',
                 'crontab',
                 'curl',
                 'awk',
@@ -420,8 +417,8 @@ module.exports = {
                 'rsync',
                 'rpm',
                 'shell',
-                'attack',
-                'centos'
+                'manjaro',
+                'ddns'
             ],
             '/other/mac/': [
                 'install',
