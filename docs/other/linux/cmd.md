@@ -642,3 +642,25 @@ tzselect
 
 cp /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
 ```
+
+## 禁止内核自动更新
+
+```bash
+#### Ubuntu
+# 查看内核版本
+uname -r
+> 5.4.0-105-generic
+# 查看内核列表
+dpkg --list | grep linux-image
+dpkg --list | grep linux-headers
+dpkg --list | grep linux-modules
+# 禁止内核自动更新
+apt-mark hold linux-image-5.4.0-105-generic
+apt-mark hold linux-headers-5.4.0-105-generic
+apt-mark hold linux-modules-extra-5.4.0-105-generic
+apt-mark hold linux-image-generic linux-headers-generic
+# 查看是否禁用
+dpkg --get-selections |grep linux-image
+
+#### Centos
+```
