@@ -138,6 +138,16 @@ demo
 * 包名以及包所在的目录名，不要使用复数，比如 `net/utl` 而不是 `net/urls`。
 * 不要用 `common`、`util`、`shared` 或者 `lib` 这类宽泛的、无意义的包名。
 * 包名要简单明了，例如 `net`、`time`、`log`。
+* 如果程序包名称与导入路径的最后一个元素不匹配，则必须使用导入别名。
+    ```go
+    import (
+        "net/http"
+
+        client "example.com/client-go"  
+        trace "example.com/trace/v2" // 最后一个元素是v2
+        nettrace "golang.net/x/trace" // 没有冲突，不使用别名
+    )
+    ```
 
 ### 函数
 
@@ -186,31 +196,48 @@ type ReadWriter interface {
 }
 ```
 
-### 变量
+### 变量/常量
 
-* 变量名必须遵循驼峰式，首字母根据访问控制决定使用大写或小写。
+* `变量/常量`名必须遵循驼峰式，首字母根据访问控制决定使用大写或小写。
 * 在相对简单（对象数量少、针对性强）的环境中，可以将一些名称由完整单词简写为单个字母，比如：user 可简写为 u；userID 可简写 uid。
 * 对于私有特有名词为首个单词则使用小写（如 apiClient）。其他特有名词都应当使用该名词原有的写法，如 APIClient、repoID、UserID。
 * 若变量类型为 bool 类型，则名称应以 `Has,Is,Can,Allow` 开头。
 * 局部变量应当尽可能短小，比如使用 `buf` 指代 `buffer`，使用 `i` 指代 `index`。
+* 对于未导出的全局(包内)`vars`和`consts`， 前面加上前缀`_`,错误类型的变量例外，错误类型变量应以`err`开头
+    ```go
+    // 包内变量
+    const (
+        _defaultPort = 8080
+        _defaultUser = "user"
+    )
+    ```
+* 相似声明放一组
+    ```go
+    // 常量
+    const (
+        a = 1
+        b = 2
+    )
 
-### 常量
+    var (
+        a = 1
+        b = 2
+    )
 
-常量名必须遵循驼峰式，首字母根据访问控制决定使用大写或小写。
+    type (
+        Area float64
+        Volume float64
+    )
+    // 将相关的声明放在一组
+    type Operation int
 
-如果是枚举类型的常量，需要先创建相应类型：
-
-```go
-type Code int
-
-// Internal errors.
-const (
-    // ErrUnknown - 0: An unknown error occurred.
-    ErrUnknown Code = iota
-    // ErrFatal - 1: An fatal error occurred.
-    ErrFatal
-)
-```
+    const (
+        Add Operation = iota + 1
+        Subtract
+        Multiply
+    )
+    const EnvVar = "MY_ENV"
+    ```
 
 ### Error
 

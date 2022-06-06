@@ -2,6 +2,19 @@
 
 ## defer
 
+```go
+
+p.Lock()
+defer p.Unlock()
+
+if p.count < 10 {
+  return p.count
+}
+
+p.count++
+return p.count
+```
+
 * 不要在`for`循环中使用`defer`，因为`defer`只有在函数最后去执行。
 
 ```go
@@ -181,58 +194,6 @@ func main() {
 }
 ```
 
-## 在初始化slice，map的时候尽量指定容量
-
-注意，与 slice 不同。map capacity 提示并不保证完全的抢占式分配，而是用于估计所需的 hashmap bucket 的数量。因此，在将元素添加到 map 时，甚至在指定 map 容量时，仍可能发生分配。
-
-* map
-
-```go
-make(map[T1]T2, hint)
-
-// Bad
-m := make(map[string]os.FileInfo)
-
-files, _ := ioutil.ReadDir("./files")
-for _, f := range files {
-    m[f.Name()] = f
-}
-// m 是在没有大小提示的情况下创建的； 在运行时可能会有更多分配。
-
-// Good
-files, _ := ioutil.ReadDir("./files")
-
-m := make(map[string]os.FileInfo, len(files))
-for _, f := range files {
-    m[f.Name()] = f
-}
-// m 是有大小提示创建的；在运行时可能会有更少的分配。
-```
-
-* slice
-
-方法2相较于方法1，就只有一个区别：在初始化`[]int slice`的时候在`make`中设置了`cap`的长度，就是`slice`的大小。
-
-这两种方法对应的功能和输出结果是没有任何差别的，但是实际运行的时候，方法2会比少运行了一个`growslice`的命令。`growslice`的作用就是扩充`slice`的容量大小。就好比是原先我们没有定制容量，系统给了我们一个能装两个鞋子的盒子，但是当我们装到第三个鞋子的时候，这个盒子就不够了，我们就要换一个盒子，而换这个盒子，我们势必还需要将原先的盒子里面的鞋子也拿出来放到新的盒子里面。所以这个`growsslice`的操作是一个比较复杂的操作，它的表现和复杂度会高于最基本的初始化`make`方法。对追求性能的程序来说，应该能避免尽量避免。
-```go
-// 方法1
-package main
-import "fmt"
-func main() {
-	arr := []int{}
-	arr = append(arr, 1,2,3,4, 5)
-	fmt.Println(arr)
-}
-
-// 方法2
-package main
-import "fmt"
-func main() {
-   arr := make([]int, 0, 5)
-   arr = append(arr, 1,2,3,4, 5)
-   fmt.Println(arr)
-}
-```
 
 ## 类的构造参数较多，尽量使用Option写法
 
@@ -388,27 +349,29 @@ if err := server.ListenAndServer; err != nil {
 
 Go 语言标准库以及很多开源软件中都使用了 Go 语言的反射能力，例如用于序列化和反序列化的 json、ORM 框架 gorm、xorm 等。
 
-### 优先使用 strconv 而不是 fmt
+## 字符串操作
 
-基本数据类型与字符串之间的转换，优先使用 strconv 而不是 fmt，因为前者性能更佳。fmt使用了反射
+* 使用 **``** ，避免转义
 
 ```go
-// Bad
-for i := 0; i < b.N; i++ {
- s := fmt.Sprint(rand.Int())
-}
-
-BenchmarkFmtSprint-4    143 ns/op    2 allocs/op
-
-// Good
-for i := 0; i < b.N; i++ {
- s := strconv.Itoa(rand.Int())
-}
-
-BenchmarkStrconv-4    64.2 ns/op    1 allocs/op
+// 反面示例
+wantError := "unknown name:\"test\""
+//推荐写法
+wantError := `unknown error:"test"`
 ```
 
-## 避免重复的字符串到字节切片的转换
+* 格式化字符串使用 `const` 定义
+
+```go
+// 反面示例
+msg := "unexpected values %v, %v\n"
+fmt.Printf(msg, 1, 2)
+// 推荐写法
+const msg = "unexpected values %v, %v\n"
+fmt.Printf(msg, 1, 2)
+```
+
+* 避免重复的字符串到字节切片的转换
 
 ```go
 // Bad
@@ -427,7 +390,23 @@ for i := 0; i < b.N; i++ {
 BenchmarkGood-4  500000000   3.25 ns/op
 ```
 
-## 字符串拼接方式的选择
+* 优先使用 `strconv` 而不是 `fmt`, fmt使用了反射
+
+```go
+// Bad
+for i := 0; i < b.N; i++ {
+ s := fmt.Sprint(rand.Int())
+}
+
+BenchmarkFmtSprint-4    143 ns/op    2 allocs/op
+
+// Good
+for i := 0; i < b.N; i++ {
+ s := strconv.Itoa(rand.Int())
+}
+
+BenchmarkStrconv-4    64.2 ns/op    1 allocs/op
+```
 
 ### 行内拼接字符串推荐使用运算符+
 
@@ -556,3 +535,441 @@ BenchmarkJoinStrWithStringsBuilderPreAlloc-8    60079003                20.95 ns
 ```
 
 使用了 Grow 优化后的版本的性能测试结果如下。可以看出相较于不预先分配空间的方式，性能提升了很多。
+
+## import 分组
+
+```go
+import (
+  "fmt"
+  "os"
+
+  "go.uber.org/atomic" // 其他库 
+  "golang.org/x/sync/errgroup" // 其他库 
+)
+```
+
+## Channel的size
+
+`Channel` 的 `size` 要么是 `1`，要么是无缓冲的
+
+```go
+// 大小：1
+c := make(chan int, 1)
+// 或者无缓冲 channel，大小为 0
+c := make(chan int)
+```
+
+## 枚举从1开始
+```go
+type Operation int
+
+const (
+  Add Operation = iota + 1
+  Subtract
+  Multiply
+)
+```
+
+## 断言使用
+```go
+// 反面示例
+t := i.(string)
+
+// 推荐写法
+t, ok := i.(string)
+if !ok {
+  // 优雅地处理错误
+}
+```
+
+## 不要使用panic
+
+在生产环境中运行的代码必须避免出现 `panic`。`panic` 是 级联失败 的主要根源 。如果发生错误，该函数必须返回错误，并允许调用方决定如何处理它。
+
+```go
+//// 反面例子
+func run(args []string) {
+  if len(args) == 0 {
+    panic("an argument is required")
+  }
+  // ...
+}
+
+func main() {
+  run(os.Args[1:])
+}
+
+//// 推荐写法
+func run(args []string) error {
+  if len(args) == 0 {
+    return errors.New("an argument is required")
+  }
+  // ...
+  return nil
+}
+
+func main() {
+  if err := run(os.Args[1:]); err != nil {
+    fmt.Fprintln(os.Stderr, err)
+    os.Exit(1)
+  }
+}
+```
+
+## 避免使用init()
+
+尽可能避免使用`init()`。当`init()`是不可避免或可取的，代码应先尝试：
+
+1. 无论程序环境或调用如何，都要完全确定。
+1. 避免依赖于其他`init()`函数的顺序或副作用。虽然`init()`顺序是明确的，但代码可以更改， 因此`init()`函数之间的关系可能会使代码变得脆弱和容易出错。
+1. 避免访问或操作全局或环境状态，如机器信息、环境变量、工作目录、程序参数/输入等。
+1. 避免`I/O`，包括文件系统、网络和系统调用。
+
+尽可能的作为`main()`函数流程中调用的一个环节。
+
+```go
+//// 反面示例
+type Config struct {
+    // ...
+}
+var _config Config
+func init() {
+    // Bad: 基于当前目录
+    cwd, _ := os.Getwd()
+    // Bad: I/O
+    raw, _ := ioutil.ReadFile(
+        path.Join(cwd, "config", "config.yaml"),
+    )
+    yaml.Unmarshal(raw, &_config)
+}
+
+//// 推荐写法
+type Config struct {
+    // ...
+}
+// 提供一个获取配置的方法
+func loadConfig() Config {
+    cwd, err := os.Getwd()
+    // handle err
+    raw, err := ioutil.ReadFile(
+        path.Join(cwd, "config", "config.yaml"),
+    )
+    // handle err
+    var config Config
+    yaml.Unmarshal(raw, &config)
+    return config
+}
+```
+
+## 流程优化ifelse
+
+代码应尽可能先处理错误情况、特殊情况并尽早返回，依次来减少嵌套。
+
+```go
+//// 反面示例
+for _, v := range data {
+  if v.F1 == 1 {
+    v = process(v)
+    if err := v.Call(); err == nil {
+      v.Send()
+    } else {
+      return err
+    }
+  } else {
+    log.Printf("Invalid v: %v", v)
+  }
+}
+
+//// 推荐写法
+for _, v := range data {
+  if v.F1 != 1 {
+    log.Printf("Invalid v: %v", v)
+    continue
+  }
+
+  v = process(v)
+  if err := v.Call(); err != nil {
+    return err
+  }
+  v.Send()
+}
+
+// 反面示例
+var a int
+if b {
+  a = 100
+} else {
+  a = 10
+}
+
+// 推荐写法
+a := 10
+if b {
+  a = 100
+}
+```
+
+## 结构体
+
+* 嵌入的类型，应放在结构体内字段列表的顶部，并且必须有一个空行将嵌入式字段与常规字段分隔开。
+
+```go
+//// 反面示例
+
+type Client struct {
+  version int
+  http.Client
+}
+
+//// 推荐写法
+
+// 1.嵌入类型在顶部 
+// 2.空行将嵌入式字段与常规字段分隔开
+type Client struct {
+  http.Client
+
+  version int
+}
+```
+
+* 使用字段名初始化
+
+```go
+// 反面示例
+k := User{"John", "Doe", true}
+
+// 推荐写法
+k := User{
+    FirstName: "John",
+    LastName: "Doe",
+    Admin: true,
+}
+```
+
+* 对零值结构使用 `var`
+
+```go
+// 反面示例
+user := User{}
+
+// 推荐
+var user User
+```
+
+* 初始化 `Struct` 引用,请使用`&T{}`代替`new(T)`，以使其与结构体初始化一致
+
+```go
+// 反面示例
+sptr := new(T)
+sptr.Name = "bar"
+
+// 推荐
+sptr := &T{Name: "bar"}
+```
+
+## slice操作
+
+* 当返回长度为零的切片时使用`nil`
+
+```go
+// 反面示例
+if x == "" {
+  return []int{}
+}
+
+// 推荐写法
+if x == "" {
+  return nil
+}
+```
+
+* 检查切片是否为空
+
+```go
+// 反面示例
+func isEmpty(s []string) bool {
+  return s == nil
+}
+
+// 推荐示例
+func isEmpty(s []string) bool {
+  return len(s) == 0
+}
+```
+
+* 零值切片（用`var`声明的切片）可立即使用，无需调用`make()`创建。
+
+```go
+//// 反面示例
+
+nums := []int{}
+// or, nums := make([]int)
+
+if add1 {
+  nums = append(nums, 1)
+}
+
+if add2 {
+  nums = append(nums, 2)
+}
+
+//// 推荐写法
+
+var nums []int
+
+if add1 {
+  nums = append(nums, 1)
+}
+
+if add2 {
+  nums = append(nums, 2)
+}
+```
+
+### 初始化时尽量指定容量
+
+方法2相较于方法1，就只有一个区别：在初始化`[]int slice`的时候在`make`中设置了`cap`的长度，就是`slice`的大小。
+
+这两种方法对应的功能和输出结果是没有任何差别的，但是实际运行的时候，方法2会比少运行了一个`growslice`的命令。`growslice`的作用就是扩充`slice`的容量大小。就好比是原先我们没有定制容量，系统给了我们一个能装两个鞋子的盒子，但是当我们装到第三个鞋子的时候，这个盒子就不够了，我们就要换一个盒子，而换这个盒子，我们势必还需要将原先的盒子里面的鞋子也拿出来放到新的盒子里面。所以这个`growsslice`的操作是一个比较复杂的操作，它的表现和复杂度会高于最基本的初始化`make`方法。对追求性能的程序来说，应该能避免尽量避免。
+
+```go
+// 反面示例
+package main
+import "fmt"
+func main() {
+	arr := []int{}
+	arr = append(arr, 1,2,3,4, 5)
+	fmt.Println(arr)
+}
+
+//// 推荐写法
+package main
+import "fmt"
+func main() {
+   arr := make([]int, 0, 5)
+   arr = append(arr, 1,2,3,4, 5)
+   fmt.Println(arr)
+}
+```
+
+## map操作
+
+### 初始化时指定容量
+
+注意，与 slice 不同。map capacity 提示并不保证完全的抢占式分配，而是用于估计所需的 hashmap bucket 的数量。因此，在将元素添加到 map 时，甚至在指定 map 容量时，仍可能发生分配。
+
+* map
+
+```go
+make(map[T1]T2, hint)
+
+// Bad
+m := make(map[string]os.FileInfo)
+
+files, _ := ioutil.ReadDir("./files")
+for _, f := range files {
+    m[f.Name()] = f
+}
+// m 是在没有大小提示的情况下创建的； 在运行时可能会有更多分配。
+
+// Good
+files, _ := ioutil.ReadDir("./files")
+
+m := make(map[string]os.FileInfo, len(files))
+for _, f := range files {
+    m[f.Name()] = f
+}
+// m 是有大小提示创建的；在运行时可能会有更少的分配。
+```
+
+## 参数和返回(slice & map)
+
+`slice` 和 `map` 包含了指向底层数据的指针，因此当在函数中使用他们作为参数和返回值时，需要特别注意。
+
+### 作为参数
+
+```go
+//// 反面示例
+
+type User struct {
+ Likes []string
+}
+
+func (u *User) SetLikes(likes []string) {
+ u.Likes = likes
+}
+func TestRun(t *testing.T) {
+ like := []string{"篮球", "旅游", "听歌"}
+ user := new(User)
+  // 切片作为参数传递
+ user.SetLikes(like)
+ fmt.Println("user Like1: ", user.Likes)
+ // 这里修改变量，会影响到user对象中的属性
+ like[1] = "学习"
+ fmt.Println("user Like2 : ", user.Likes)
+}
+/**输出
+=== RUN   TestRun
+user Like1:  [篮球 旅游 听歌]
+user Like2 :  [篮球 学习 听歌]
+--- PASS: TestRun (0.00s)
+PASS
+*/
+
+//// 推荐写法
+
+// 只需要修改这个方法，其他不变
+func (u *User) SetLikes(likes []string) {
+ u.Likes = make([]string, len(likes))
+ // 这里使用了复制
+ copy(u.Likes, likes)
+}
+/**输出
+=== RUN   TestRun
+user Like1:  [篮球 旅游 听歌]
+user Like2 :  [篮球 旅游 听歌]
+--- PASS: TestRun (0.00s)
+PASS
+*/
+```
+
+### 作为返回值
+
+```go
+//// 反面示例
+type Stats struct {
+  mu sync.Mutex
+  counters map[string]int
+}
+// Snapshot 返回当前状态。
+func (s *Stats) Snapshot() map[string]int {
+  s.mu.Lock()
+  defer s.mu.Unlock()
+  // 返回的对象中的属性
+  return s.counters
+}
+// snapshot 不再受互斥锁保护
+// 因此对 snapshot 的任何访问都将受到数据竞争的影响
+// 影响 stats.counters
+snapshot := stats.Snapshot()
+
+//// 推荐写法
+
+type Stats struct {
+  mu sync.Mutex
+  counters map[string]int
+}
+
+func (s *Stats) Snapshot() map[string]int {
+  s.mu.Lock()
+  defer s.mu.Unlock()
+  // 这里重新定义一个变量，复制结果返回
+  result := make(map[string]int, len(s.counters))
+  for k, v := range s.counters {
+    result[k] = v
+  }
+  return result
+}
+// snapshot 现在是一个拷贝
+snapshot := stats.Snapshot()
+```
