@@ -69,7 +69,7 @@ cuDNN 7.6
 
 ```bash
 # 拉取基础镜像
-docker pull nvidia/cuda:10.2-cudnn7-dev
+docker pull nvidia/cuda:10.2-cudnn7-devel
 
 # 源码编译python，需要注意configure配置路径
 ./configure --prefix=/usr/local --enable-optimizations
@@ -313,10 +313,46 @@ python ocr_cpp_client.py ppocr_det_v3_client ppocr_rec_v3_client
 docker commit paddle-dev myocr2-client:1
 ```
 
-
-
-
 ## 制作镜像-GPU-pdserving-c++
+
+```bash
+# 拉取基础镜像,运行容器
+docker pull nvidia/cuda:10.2-cudnn7-devel
+docker run -itd --name paddle-dev nvidia/cuda:10.2-cudnn7-dev bash
+
+# 将pdserving转换出来的模型拷贝进容器
+docker cp ppocr_det_v3_serving paddle-dev:/data
+docker cp ppocr_rec_v3_serving paddle-dev:/data
+
+# 进入容器安装相关依赖
+docker exec -it paddle-dev bash
+
+# 修改里面的apt源，安装vim等
+apt install -y vim
+mv /etc/source.list /etc/source.list.back
+
+# 源码编译python，需要注意configure配置路径
+./configure --prefix=/usr/local --enable-optimizations
+
+# 安装paddle-gpu版本
+pip3 install paddlepaddle-gpu -i https://mirror.baidu.com/pypi/simple
+
+# 安装server
+pip3 install -i https://mirror.baidu.com/pypi/simple https://paddle-serving.bj.bcebos.com/test-dev/whl/paddle_serving_server_gpu-0.9.0.post102-py3-none-any.whl
+
+# 启动服务验证
+python3 -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_v3_serving --op GeneralDetectionOp GeneralInferOp --port 9293
+
+# 上一步启动之后没有问题则可以生成镜像
+docker commit paddle-dev myocr2:1
+```
+
+* 正常部署验证
+
+```bash
+# 启动服务端
+docker run -d -p 18890:9293 -v $PWD:/data -w /data/inference --name myocr2 myocr2:1 python -m paddle_serving_server.serve --model ppocr_det_v3_serving ppocr_rec_v3_serving --op GeneralDetectionOp GeneralInferOp --port 9293
+```
 
 ### 服务端
 

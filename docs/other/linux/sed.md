@@ -163,5 +163,8 @@ sed -n '/' "$teststr" '/=' testfile.txt
 
 # 如果需要替换的字符中有 / 则可以用 # 替换分隔符
 sed -i "s#abc#cde#g" file.txt
+
+# 删除当前文件夹下所有.log文件匹配到user_defined的行
+sed -i '/user_defined/d' *.log
 ```
 
