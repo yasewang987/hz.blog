@@ -380,7 +380,8 @@ module.exports = {
                 'gh-ost',
                 'announcements',
                 'explain',
-                'pxb'
+                'pxb',
+                'recover'
             ],
             '/sql/mongo/': [
                 'install'

@@ -5,3 +5,4 @@
 * [Mysql使用注意事项](./announcements.md)
 * [MySql执行计划](./explain.md)
 * [PXB - MySql热备](./pxb.md)
+* [mysql数据恢复](./recover.md)

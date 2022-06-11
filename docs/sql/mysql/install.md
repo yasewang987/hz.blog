@@ -17,7 +17,7 @@
     # firewall-cmd --zone=public --add-port=3308/tcp --permanent
     ```
 
-1. 如果mysql是 8 版本以上应该会出一下错误:`ERROR 2059 (HY000): Authentication plugin 'caching_sha2_password' cannot be loaded: ÕÒ²»µ½Ö¸¶¨µÄÄ£¿é¡£`  
+1. 如果mysql是 8 版本以上应该会出一下错误:`ERROR 2059 (HY000): Authentication plugin 'caching_sha2_password' cannot be loaded:`  
    解决方案  
    1. 进入mysql容器:`docker exec -it mysql /bin/bash`
    1. 进入mysql:`mysql -uroot -p123456`
@@ -38,12 +38,17 @@ datadir         = /var/lib/mysql
 #bind-address   = 127.0.0.1
 # Disabling symbolic-links is recommended to prevent assorted security risks
 symbolic-links=0
+sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'
+# 开启binlog
+log-bin=mysql_bin
+server-id=1
+binlog_format=Row
 ```
 
 运行容器命令(mysql文件夹下运行)：
 
 ```bash
-sudo docker run -d --restart=always -p 3306:3306 \
+sudo docker run -d --restart=always -p 33306:3306 \
 -v "$PWD/mysqld.cnf":/etc/mysql/mysql.conf.d/mysqld.cnf \
 -v "$PWD/data":/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD="ifuncun888" \
