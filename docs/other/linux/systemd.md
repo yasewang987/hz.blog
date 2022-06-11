@@ -127,3 +127,41 @@ $ sudo systemctl daemon-reload
 # 显示某个 Unit 的所有底层参数
 $ systemctl show firewalld.service
 ```
+
+## python示例
+
+* 在`/root`创建`xx`文件
+
+```py
+#!/usr/bin/python
+import time
+i=0
+while True:
+    print (i)
+    i+=1
+    time.sleep(20)
+```
+
+* 在`/root`目录创建 `xx.service`
+
+```txt
+[Unit]
+Description=xx service
+[Service]
+ExecStart=python3 /root/xx
+[Install]
+WantedBy=multi-user.target
+```
+
+* 设置`systemctl`
+
+```bash
+# 开机启动
+systemctl -f enable /root/xx.service
+
+# 启动xx服务
+systemctl start xx
+
+# 查看状态
+systemctl status xx
+```

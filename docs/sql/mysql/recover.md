@@ -2,6 +2,8 @@
 
 ## 基本介绍
 
+binlog的目录一般在 `/var/lib/mysql` 
+
 ```bash
 # 查看binlog配置
 mysql> show variables like '%log_bin%';
