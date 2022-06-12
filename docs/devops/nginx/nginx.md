@@ -545,6 +545,8 @@ server {
 ```
 ## 隐藏版本信息
 
+作用域：`http server location`
+
 http {
     server_tokens off;
 }

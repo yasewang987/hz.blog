@@ -453,7 +453,8 @@ module.exports = {
                 'minio',
                 'nginx',
                 'python',
-                'redis'
+                'redis',
+                'openssh'
             ],
             '/ai/deploy/': [
                 'problem',

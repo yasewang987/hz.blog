@@ -732,3 +732,14 @@ dpkg --get-selections |grep linux-image
 
 #### Centos
 ```
+
+## 服务器禁ping
+
+```bash
+vim /etc/sysctl.conf
+# 增加如下内容
+net.ipv4.icmp_echo_ignore_all = 1
+
+# 生效
+sysctl -p
+```

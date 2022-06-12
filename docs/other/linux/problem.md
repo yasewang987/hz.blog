@@ -143,3 +143,33 @@ vim passwd
 passwd
 # 这时候应该就提示输入root的新密码了
 ```
+
+## rpm 和 yum 执行卡住，解决方法
+
+执行安装：`rpm -ivh xxx.rpm`  一直卡住不动。
+然后 使用  `rpm -ivh  -vv  xxx.rpm` 看到一直卡在：
+
+```bash
+D: loading keyring from pubkeys in /var/lib/rpm/pubkeys/*.key
+D: couldnt find any keys in /var/lib/rpm/pubkeys/*.key
+D: loading keyring from rpmdb
+# ..  卡在这里不在动了。
+```
+
+* 解决办法一：
+
+```bash
+# 查看锁文件的位置
+find / -name '.dbenv.lock'
+# 删除文件
+rm -f /var/lib/rpm/.dbenv.lock
+```
+
+* 解决方法二
+
+```bash
+# 删除rpm数据文件
+rm -f /var/lib/rpm/__db.00*
+# 重新创建rpm数据文件
+rpm --rebuilddb
+```
