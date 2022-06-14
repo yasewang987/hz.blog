@@ -34,55 +34,62 @@ sed [-hnV][-e<script>][-f<script文件>][文本文件]
 
 ```bash
 # 在log.txt文件的第四行后添加一行
-sed -e '4 a newLine' log.txt
+sed -e '4a newLine' log.txt
 
 # 在第二行后，加 drink tea
-nl /etc/passwd | sed '2 a drink tea'
+nl /etc/passwd | sed '2a drink tea'
 
 # 在第二行前
-nl /etc/passwd | sed '2 i drink tea' 
+nl /etc/passwd | sed '2i drink tea' 
 
 # 增加两行以上，在第二行后面加入两行字
-nl /etc/passwd | sed '2 a Drink tea or\ndrink beer' 
+nl /etc/passwd | sed '2a Drink tea or\ndrink beer' 
 
 # 可以添加一个完全为空的空行
-sed '4 a \\'
+sed '4a \\'
 
 # 可以添加两个完全为空的空行
-sed '4 a \\n'
+sed '4a \\n'
 
 # 最后一行新增
-sed '$ a xxxxx'
+sed '$a xxxxx'
+
+# 新增多行
+sed '2a Hello \
+World' 1.txt
 ```
 
 **以行为单位的删除**
 ```bash
 # 将 /etc/passwd 的内容列出并且列印行号，同时，请将第 2~5 行删除！
-nl /etc/passwd | sed '2,5 d'
+nl /etc/passwd | sed '2,5d'
 
 # 删除第二行
-nl /etc/passwd | sed '2 d'
+nl /etc/passwd | sed '2d'
 
 # 删除3到最后一行
-nl /etc/passwd | sed '3,$ d' 
+nl /etc/passwd | sed '3,$d' 
 
 # 删除/etc/passwd所有包含root的行，其他行输出
 nl /etc/passwd | sed  '/root/d'
+
+# 删除当前文件夹下所有.log文件匹配到user_defined的行
+sed -i '/user_defined/d' *.log
 ```
 
-**以行为单位的替换与显示**
+**以行为单位的替换**
 
 ```bash
 # 将第2-5行的内容取代成为 No 2-5 number
-nl /etc/passwd | sed '2,5 c No 2-5 number'
-
-# 仅列出 /etc/passwd 文件内的第 5-7 行
-nl /etc/passwd | sed -n '5,7p'
+nl /etc/passwd | sed '2,5c No 2-5 number'
 ```
 
-**数据的搜寻并显示**
+**数据的显示**
 
 ```bash
+# 仅列出 /etc/passwd 文件内的第 5-7 行
+nl /etc/passwd | sed -n '5,7p'
+
 # 搜索 /etc/passwd有root关键字的行，除了输出所有行，还会输出匹配行
 nl /etc/passwd | sed '/root/p'
 
@@ -96,66 +103,12 @@ nl /etc/passwd | sed -n '/root/p'
 # 搜索/etc/passwd,找到root对应的行，执行后面花括号中的一组命令，每个命令之间用分号分隔，这里把bash替换为blueshell，再输出这行：
 # 最后的q是退出
 nl /etc/passwd | sed -n '/root/{s/bash/blueshell/;p;q}' 
-```
 
-**数据的搜寻并替换**
+# 查找文档中的aa并在下一行插入222
+sed '/aa/a 222' 1.txt
 
-```bash
+# 替换
 sed 's/要被取代的字串/新的字串/g'
-```
-
-先观察原始信息，利用 `/sbin/ifconfig` 查询 IP
-
-```bash
-sbin/ifconfig eth0
----------------------
-eth0 Link encap:Ethernet HWaddr 00:90:CC:A6:34:84
-inet addr:192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
-inet6 addr: fe80::290:ccff:fea6:3484/64 Scope:Link
-UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1
-```
-
-将 IP 前面的部分予以删除
-
-```bash
-/sbin/ifconfig eth0 | grep 'inet addr' | sed 's/^.*addr://g'
-192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
-```
-
-将 IP 后面的部分予以删除
-
-```bash
-/sbin/ifconfig eth0 | grep 'inet addr' | sed 's/^.*addr://g' | sed 's/Bcast.*$//g'
-192.168.1.100
-```
-
-**多点编辑**
-
-```bash
-# 一条sed命令，删除/etc/passwd第三行到末尾的数据，并把bash替换为blueshell
-nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
-```
-
-## 直接修改文件内容
-
-sed 可以直接修改文件的内容，不必使用管道命令或数据流重导向
-
-regular_express.txt 文件内容如下：
-
-```txt
-google.
-taobao.
-facebook.
-zhihu-
-weibo-
-```
-
-```bash
-# 利用 sed 将 regular_express.txt 内每一行结尾若为 . 则换成!
-sed -i 's/\.$/\!/g' regular_express.txt
-
-# 直接在 regular_express.txt 最后一行加入 # This is a test:
-sed -i '$a # This is a test' regular_express.txt
 
 # 使用变量替换
 teststr="IBM"
@@ -163,5 +116,26 @@ sed -n '/' "$teststr" '/=' testfile.txt
 
 # 如果需要替换的字符中有 / 则可以用 # 替换分隔符
 sed -i "s#abc#cde#g" file.txt
+
+# 利用 sed 将 regular_express.txt 内每一行结尾若为 . 则换成!
+sed -i 's/\.$/\!/g' regular_express.txt
+```
+
+```bash
+# 先观察原始信息 IP
+sbin/ifconfig eth0
+---------------------
+eth0 Link encap:Ethernet HWaddr 00:90:CC:A6:34:84
+inet addr:192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
+inet6 addr: fe80::290:ccff:fea6:3484/64 Scope:Link
+UP BROADCAST RUNNING MULTICAST MTU:1500 Metric:1
+
+# 将 IP 前面的部分予以删除
+/sbin/ifconfig eth0 | grep 'inet addr' | sed 's/^.*addr://g'
+192.168.1.100 Bcast:192.168.1.255 Mask:255.255.255.0
+
+# 将 IP 后面的部分予以删除
+/sbin/ifconfig eth0 | grep 'inet addr' | sed 's/^.*addr://g' | sed 's/Bcast.*$//g'
+192.168.1.100
 ```
 

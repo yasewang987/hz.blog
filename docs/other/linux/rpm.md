@@ -164,6 +164,7 @@ rm -rf %{buildroot}		//清理临时存放软件包构建的目录
 
 ```bash
 sudo rpm -ivh xxxx.rpm
+rpm -Uvh *.rpm --nodeps --force
 
 # 或者
 

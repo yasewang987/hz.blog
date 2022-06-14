@@ -55,6 +55,30 @@ curl http://localhost:9200
 curl http://localhost:9200/_cat/indices?v 
 ```
 
+## 开启用户名密码认证
+
+* 在 `elasticsearch.yml` 中添加如下配置
+
+```yml
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+http.cors.allow-headers: Authorization
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+```
+
+* 重启 `elasticsearch` 服务
+
+```bash
+systemctl restart elasticsearch
+```
+
+* 设置密码，根据提示多次输入一样的账号密码即可
+
+```bash
+./usr/share/elasticsearch/bin/elasticsearch-setup-passwords interactive
+```
+
 ## Docker搭建es集群
 
 ```bash

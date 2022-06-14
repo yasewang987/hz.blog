@@ -195,7 +195,8 @@ module.exports = {
                 'ssh',
                 'conf',
                 'redis',
-                'encrypt'
+                'encrypt',
+                'viper'
             ],
             '/code/web/npm/': [
                 'base',
@@ -380,7 +381,8 @@ module.exports = {
                 'gh-ost',
                 'announcements',
                 'explain',
-                'pxb'
+                'pxb',
+                'recover'
             ],
             '/sql/mongo/': [
                 'install'
@@ -404,15 +406,12 @@ module.exports = {
             '/other/linux/': [
                 'cmd',
                 'problem',
-                'firewall',
+                'attack',
                 'info',
-                'install',
+                'firewall',
                 'systemd',
                 'vim',
                 'screen',
-                'ubuntu',
-                'manjaro',
-                'ddns',
                 'crontab',
                 'curl',
                 'awk',
@@ -420,8 +419,8 @@ module.exports = {
                 'rsync',
                 'rpm',
                 'shell',
-                'attack',
-                'centos'
+                'manjaro',
+                'ddns'
             ],
             '/other/mac/': [
                 'install',
@@ -455,7 +454,8 @@ module.exports = {
                 'minio',
                 'nginx',
                 'python',
-                'redis'
+                'redis',
+                'openssh'
             ],
             '/ai/deploy/': [
                 'problem',

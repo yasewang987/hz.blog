@@ -1,5 +1,18 @@
 # 蝉道部署
 
+## 官方安装
+
+* https://hub.docker.com/r/easysoft/zentao
+
+```bash
+sudo docker run --name zentao -p 18888:80 \ 
+-v [ZenTao Data Host Root]:/www/zentaopms \
+-v [MySQL Data Host Root]:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=[Database Password] \
+-d easysoft/zentao:latest
+```
+
+## 非官方安装
+
 使用docker安装禅道，在禅道官方的方式：https://www.zentao.net/book/zentaopmshelp/303.html，在官方论坛中，有一篇使用docker中央仓库的禅道二次部署
 封装的帖子（idoop/zentao）：https://www.zentao.net/thread/87209.html
 

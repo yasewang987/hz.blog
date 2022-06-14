@@ -1,5 +1,57 @@
 # Linux常用命令
 
+## 下载源修改
+
+参考：https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
+
+```bash
+#### Ubuntu
+# 查看系统版本
+lsb_release -a
+# 备份老文件
+mv /etc/apt/sources.list /etc/apt/sources.list.back
+# 输入新源
+sudo vim /etc/apt/sources.list
+# 更新
+sudo apt-get update
+sudo apt-get upgrade
+```
+
+## 修改IP，DNS
+
+```bash
+#### Ubuntu
+sudo vim /etc/systemd/resolved.conf
+DNS=114.114.114.114 233.5.5.5 8.8.8.8
+# 重启生效
+systemctl restart systemd-resolved
+vim /etc/netplan/xx-netcfg.yaml
+# DNS修改(修改文件中的nameservers)
+nameservices:
+  addresses: [8.8.8.8,114.114.114.114]
+# 生效
+netplan apply
+
+
+#### Centos
+# 查看网卡id
+ip addr
+# centos7 / kylin-v10
+vi /etc/sysconfig/network-scripts/ifcfg-网卡id
+# 修改如下内容
+BOOTPROTO=static  # static/dhcp
+ONBOOT=yes
+# 加入如下内容
+IPADDR=192.168.1.160
+NETMASK=255.255.255.0
+# 下面的如果不需要可以不设置
+GATEWAY=192.168.1.1
+DNS1=119.29.29.29
+DNS2=8.8.8.8
+# 重启网络服务生效
+systemctl restart network
+```
+
 ## 允许root用户远程登陆
 
 ```bash
@@ -516,6 +568,22 @@ find ./ -name " *.md"
 find /app -type l
 ```
 
+## 统计文件中的字节数、字数、行数
+
+```bash
+wc [选项] 文件
+#-c 统计字节数。
+#-l 统计行数。
+#-m 统计字符数。这个标志不能与 -c 标志一起使用。
+#-w 统计字数。一个字被定义为由空白、跳格或换行字符分隔的字符串。
+#-L 打印最长行的长度。
+#-help 显示帮助信息
+
+# 统计当前文件夹下的所有log文件的字符数和行数
+wc -m *.log
+wc -l *.log
+```
+
 ## cut字符截取
 
 `cut`:
@@ -641,4 +709,37 @@ tzselect
 # 选择亚洲 Asia，确认之后选择中国（China)，最后选择北京(Beijing)
 
 cp /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
+```
+
+## 禁止内核自动更新
+
+```bash
+#### Ubuntu
+# 查看内核版本
+uname -r
+> 5.4.0-105-generic
+# 查看内核列表
+dpkg --list | grep linux-image
+dpkg --list | grep linux-headers
+dpkg --list | grep linux-modules
+# 禁止内核自动更新
+apt-mark hold linux-image-5.4.0-105-generic
+apt-mark hold linux-headers-5.4.0-105-generic
+apt-mark hold linux-modules-extra-5.4.0-105-generic
+apt-mark hold linux-image-generic linux-headers-generic
+# 查看是否禁用
+dpkg --get-selections |grep linux-image
+
+#### Centos
+```
+
+## 服务器禁ping
+
+```bash
+vim /etc/sysctl.conf
+# 增加如下内容
+net.ipv4.icmp_echo_ignore_all = 1
+
+# 生效
+sysctl -p
 ```
