@@ -195,7 +195,8 @@ module.exports = {
                 'ssh',
                 'conf',
                 'redis',
-                'encrypt'
+                'encrypt',
+                'viper'
             ],
             '/code/web/npm/': [
                 'base',
