@@ -17,6 +17,9 @@ python3.7 -m pip install xxxx
 # 豆瓣的源比清华的块很多
 pip install -i https://pypi.douban.com/simple xxx
 
+# 安装本地whl
+pip install xxxx.whl
+
 # 升级pip
 python -m pip install --upgrade pip
 ```
