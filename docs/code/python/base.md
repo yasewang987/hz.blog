@@ -1,4 +1,4 @@
-# python相关资料
+# python基础资料
 
 ## 安装pip
 
@@ -15,7 +15,7 @@ python3.7 -m pip install xxxx
 
 ```bash
 # 豆瓣的源比清华的块很多
-pip install -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com xxx
+pip install -i https://pypi.douban.com/simple xxx
 
 # 升级pip
 python -m pip install --upgrade pip
@@ -66,7 +66,7 @@ python ./waf all
 
 `virtualenv`的作用是创建独立的python虚拟环境。
 
-安装`virtualenv`
+* 安装`virtualenv`
 
 ```bash
 pip install virtualenv
@@ -75,7 +75,7 @@ pip install virtualenv
 pip3 install virtualenv
 ```
 
-创建虚拟环境
+* 创建虚拟环境
 
 ```bash
 # 准备目录
@@ -89,7 +89,7 @@ virtualenv -p /usr/bin/python2.7 venv
 virtualenv -p /usr/bin/python3.6 venv
 ```
 
-进入/退出 虚拟环境
+* 进入/退出 虚拟环境
 
 ```bash
 # 进入
@@ -98,13 +98,13 @@ source venv/bin/activate
 deactivate
 ```
 
-删除虚拟环境(直接删除虚拟环境文件夹即可)
+* 删除虚拟环境(直接删除虚拟环境文件夹即可)
 
 ```bash
 rm -rf venv
 ```
 
-迁移虚拟环境
+* 迁移虚拟环境
 
 ```bash
 # 导出本地虚拟环境依赖项
@@ -122,4 +122,10 @@ python setup.py install
 
 # 编译生成whl包,在dist目录下
 python setup.py bdist_wheel
+```
+
+## python镜像无用内容清理
+
+```bash
+rm -rf ~/.cache
 ```

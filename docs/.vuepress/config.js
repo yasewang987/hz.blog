@@ -231,6 +231,8 @@ module.exports = {
                 'config'
             ],
             '/code/python/': [
+                'base',
+                'source',
                 'devops'
             ],
             '/microservices/consul/': [
@@ -458,12 +460,10 @@ module.exports = {
                 'openssh'
             ],
             '/ai/deploy/': [
-                'problem',
                 'nvidia',
                 'torchserve',
                 'tfx',
-                'tf',
-                'python'
+                'tf'
             ],
             '/ai/paddle/': [
                 'paddle',
