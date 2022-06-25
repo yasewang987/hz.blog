@@ -314,7 +314,8 @@ module.exports = {
                 'nginx',
                 'nginxhotreload',
                 'problem',
-                'test'
+                'test',
+                'nginxbest'
             ],
             '/devops/prometheus/': [
                 'prometheus',

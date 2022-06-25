@@ -743,3 +743,16 @@ net.ipv4.icmp_echo_ignore_all = 1
 # 生效
 sysctl -p
 ```
+
+## 查看linux日志方法
+
+```bash
+# 查找ERROR日志，以及它的后10行
+$ grep -A 10 ERROR app.log
+
+# 查找ERROR日志，以及它的前10行
+$ grep -B 10 ERROR app.log
+
+# -C代表前10行和后10行
+$ grep -C 10 ERROR app.log
+```

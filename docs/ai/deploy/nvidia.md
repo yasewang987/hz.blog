@@ -27,7 +27,7 @@ lsmod | grep nouveau
 
 ```bash
 ubuntu-drivers devices
-# 输出
+# 输出（推荐安装 recommended 的）
 == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
 modalias : pci:v000010DEd00001F95sv00001028sd0000097Dbc03sc02i00
 vendor   : NVIDIA Corporation

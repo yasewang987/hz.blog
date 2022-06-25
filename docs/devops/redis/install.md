@@ -88,7 +88,7 @@ docker run -d -p 6666:6379 \
 /usr/local/etc/redis/redis.conf
 ```
 
-## Redis Cluster集群
+## Redis Cluster集群（推荐）
 
 ### 集群配置启动
 
