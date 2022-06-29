@@ -185,6 +185,7 @@ module.exports = {
             '/code/go/demo/': [
                 'design',
                 'loadbalance',
+                'serviceRegister',
                 'myrpc',
                 'gin',
                 'di',
