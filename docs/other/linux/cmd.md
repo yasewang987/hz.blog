@@ -544,15 +544,28 @@ top -H -p <pid>
 ## 查看网卡带宽使用情况
 
 ```bash
-# 安装nload
-apt install nload
-
 # 查看网卡信息
 ifconfig
 ip addr
 
+#### Ubuntu
+# 安装nload
+apt install nload
 # 查看某块网卡带宽使用情况
 nload em1
+
+#### Centos
+# 安装iftop
+yum install epel-release
+yum install iftop
+# 查看某块网卡带宽使用情况，通过 q 退出
+iftop -i eth1
+#"TX"：从网卡发出的流量
+#"RX"：网卡接收流量
+#"TOTAL"：网卡发送接收总流量
+#"cum"：iftop开始运行到当前时间点的总流量
+#"peak"：网卡流量峰值
+#"rates"：分别表示最近2s、10s、40s 的平均流量
 ```
 
 ## 查找文件
@@ -647,6 +660,22 @@ yum install --downloadonly --downloaddir=/tmp/ podman
 
 # 已安装相应的软件
 yum reinstall --downloadonly --downloaddir=/tmp/ podman
+
+# 拷贝到离线机用rpm进行安装, 用--nodeps是保证可以不按顺序进行安装
+sudo rpm -ivh ./* --nodeps
+```
+
+## apt只下载不安装deb包
+
+```bash
+# 未安装相应的软件
+apt-get install -d  PackageName
+
+# 已安装相应的软件
+apt-get install -d --reinstall  PackageName
+
+# 默认保存目录
+/var/cache/apt/archives/
 ```
 
 ## 开机时间/重启历史记录

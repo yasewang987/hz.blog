@@ -147,16 +147,22 @@ vim /etc/selinux/config
     dockeer19.03版本之后只需要安装 `nvidia-container-runtime` 即可
     
     ```bash
+    #### ubuntu
     distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
-        && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add - \
+        && curl -s -L https://nvidia.github.io/nvidia-container-runtime | sudo apt-key add - \
         && curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-
     sudo apt-get update \
         && sudo apt-get install -y nvidia-container-runtime
-
+    #### centos
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+    && curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
+    && sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+    
+    # 重启容器
+    systemctl daemon-reload
+    systemctl restart docker
     # 验证
     sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
-
     # 指定使用显卡1
     sudo docker run --rm --gpus '"device=1"' nvidia/cuda:11.0-base nvidia-smi
     ```
@@ -168,4 +174,22 @@ vim /etc/selinux/config
 
 ```bash
 nvidia-smi
+```
+
+## centos离线安装nvidia-container-runtime
+
+```bash
+# 在上网机更新nvidia-container-runtime的yum源
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+# 离线下载nvidia-container-runtime安装包
+yum install nvidia-container-runtime --downloadonly --downloaddir=./
+
+# 无序安装
+sudo rpm -ivh ./* --nodeps
+
+systemctl restart docker
+# 验证
+sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
 ```
