@@ -234,6 +234,15 @@ sudo kill -9 <PID>
 ps -aux | grep nginx
 
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+
+# 批量关闭进程,xargs命令把前面命令的输出结果（PID）作为"kill -9"命令的参数
+ps -ef|grep GSM_run.py|grep -v grep|awk '{print $2}'|xargs kill -9
+# 更简单的方式
+pkill -9 GSM_run.py
+# kill pc 用户的所有的用户的进程
+pkill -u pc
+# kill 除了 root 用户外的所有的用户的进程
+pkill -vu root
 ```
 ## 服务器内存释放
 
