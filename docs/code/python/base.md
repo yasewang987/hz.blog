@@ -117,6 +117,28 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
+## venv虚拟环境
+
+* python3.3之后自带venv的虚拟环境
+
+```bash
+# 创建虚拟环境
+python3 -m venv /home/mypython/env3
+python3 -m venv /home/mypython/env3 /home/mypython/env4
+
+# 激活虚拟环境
+source /home/mypython/env3/bin/activate
+
+# 激活虚拟环境后安装依赖
+(env3): pip install xxxx
+
+# 退出虚拟环境
+deactivate
+
+# 未激活虚拟环境安装依赖
+/home/mypython/env3/bin/pip install xxxx
+```
+
 ## python项目源码编译
 
 ```bash
