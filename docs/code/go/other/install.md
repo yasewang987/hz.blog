@@ -50,6 +50,23 @@ go env -w GOPROXY=https://goproxy.cn,direct
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 ```
 
+## Go 工作区
+
+在上层目录放置`go.work`，也可以将多个目录组织成一个`workspace`，并且由于上层目录本身不受`git`管理，所以也不用去管`gitignore`之类的问题，是比较省心的方式。
+
+```bash
+# 生成go.work
+go work init .
+
+# 修改work文件引入项目目录
+go 1.18
+
+directory (
+    ./common
+    ./my_service
+)
+```
+
 ## Go Debug
 
 如果是用的是 vscode 安装go插件之后，随便创建一个 `main.go` 文件会提示安装调试需要的依赖项，直接全部确认安装即可。
