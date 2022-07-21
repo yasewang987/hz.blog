@@ -141,3 +141,30 @@ esac
 done
 ```
 
+
+## shell脚本自动交互
+
+例子：mysql数据备份
+
+```sh
+#!/bin/bash
+#导出sql脚本
+echo $(date "+%Y-%m-%d") backup start
+echo mysql backup start
+mysqldump -u数据库用户名 -p数据库密码 pm_prod2.0 > /mnt/data/mysql_backup/pm_shandong_$(date "+%Y-%m-%d").sql
+echo mysql backup finish
+#scp跨机器备份
+echo sql scp start
+/usr/bin/expect <<-EOF
+set timeout -1;
+spawn scp -P ssh端口号 /mnt/data/mysql_backup/pm_shandong_$(date "+%Y-%m-%d").sql 另一台机器用户名@另一台机器IP:/mnt/data/mysql_backup/
+expect {
+    "*password:" {send "另一台机器密码\r";exp_continue;}
+    "yes/no" {send "yes\r";}
+}
+EOF
+#删除过期sql
+echo remove file /mnt/data/mysql_backup/pm_shandong_$(date -d "7 day ago" +%Y-%m-%d).sql
+rm -rf /mnt/data/mysql_backup/pm_shandong_$(date -d "7 day ago" +%Y-%m-%d).sql
+echo finish! The file is pm_shandong_$(date "+%Y-%m-%d").sql
+```

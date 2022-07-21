@@ -10,7 +10,7 @@ export VIRTUAL_ENV
 
 ## 激活环境
 
-使用 `virtualenv` 建立虚拟环境，直接放到涉密服务器即可。
+使用 `virtualenv` 获取 `python3 -m venv` 建立虚拟环境，直接放到涉密服务器即可。
 
 ```bash
 # 激活虚拟环境
@@ -63,7 +63,7 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 ```text
 Name: funcun-code
-Version: 4.1.22
+Version: 2022.07.15
 Release:        1
 Summary:        funcun code
 

@@ -721,10 +721,10 @@ Context:	http， server，location
 ```conf
 #  Example Configuration
 http {
-    #limit_req_zone ：限制请求
-    # $binary_remote_addr ：二进制地址
+    #limit_req_zone ：限制单位时间内的请求数，即速率限制,采用的漏桶算法 "leaky bucket"
+    # $binary_remote_addr ：限制同一客户端ip地址
     # zone=one:10m ：限制策略的名称：占用10M空间
-    # rate=1r/s：允许每秒1次请求
+    # rate=1r/s：允许相同标识的客户端的访问频次，这里限制的是每秒1次，还可以有比如30r/m
     limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
 
     ...
@@ -735,8 +735,11 @@ http {
 
         location /search/ {
             # limit_req zone=one：引用限制策略的名称one
-            # burst=5 表示最大延迟请求数量不大于5。如果太过多的请求被限制延迟是不需要的，这时需要使用nodelay参数，服务器会立刻返回503状态码。
-            limit_req zone=one burst=5;
+            # burst=5：设置一个大小为5的缓冲区当有大量请求（爆发）过来时，超过了访问频次限制的请求可以先放到这个缓冲区内
+            # nodelay：超过访问频次而且缓冲区也满了的时候就会直接返回503，如果没有设置，则所有请求会等待排队
+            limit_req zone=one burst=5 nodelay;
+            # 自定义返回状态码
+            limit_req_status 598;
         }
     }
 }
@@ -754,7 +757,7 @@ Context:	http, server, location
 示例
 
 ```conf
-# 官网示例
+# 一次只允许每个IP地址一个连接
 http {
     limit_conn_zone $binary_remote_addr zone=addr:10m;
 
@@ -768,6 +771,15 @@ http {
             limit_conn addr 1;
         }
     }
+}
+
+limit_conn_zone $binary_remote_addr zone=perip:10m;
+limit_conn_zone $server_name zone=perserver:10m;
+
+server {
+    ...
+    limit_conn perip 10;
+    limit_conn perserver 100;
 }
 ```
 
