@@ -386,7 +386,8 @@ module.exports = {
                 'announcements',
                 'explain',
                 'pxb',
-                'recover'
+                'recover',
+                'problem'
             ],
             '/sql/mongo/': [
                 'install'

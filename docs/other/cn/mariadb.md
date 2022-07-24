@@ -77,7 +77,10 @@ sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'
 启动mariadb
 
 ```bash
-/opt/mytest/mariadb/bin/mysqld_safe --defaults-file=/opt/mytest/mariadb/my.cnf
+/opt/mytest/mariadb/bin/mysqld_safe --defaults-file=/opt/mytest/mariadb/my.cnf &
+
+# 日志文件在
+data/07bf32e32341.err 
 ```
 
 ## systemctl管理

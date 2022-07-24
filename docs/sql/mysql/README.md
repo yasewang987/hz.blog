@@ -6,3 +6,4 @@
 * [MySql执行计划](./explain.md)
 * [PXB - MySql热备](./pxb.md)
 * [mysql数据恢复](./recover.md)
+* [Mysql问题处理](./problem.md)
