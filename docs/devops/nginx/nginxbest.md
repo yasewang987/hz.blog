@@ -1,5 +1,49 @@
 # Nginx优化配置
 
+## nginx基础配置
+
+```conf
+user  root;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid   /var/run/nginx.pid;
+
+events {
+    use epoll;
+    worker_connections  65534;
+    accept_mutex on;
+    multi_accept on;
+}
+
+http {
+    include        /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main        '$remote_addr - $remote_user [$time_local] "$request" '
+                                            'rc:$status $body_bytes_sent "$http_referer" '
+                                            '"$http_user_agent" "$http_x_forwarded_for"'
+                                            '$upstream_addr '
+                                            'ups_resp_time: $upstream_response_time '
+                                            'request_time: $request_time';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+
+    client_max_body_size 200M;
+    keepalive_timeout  300s;
+    client_body_timeout 240s;
+    send_timeout 240s;
+    keepalive_requests 30000;
+    proxy_read_timeout 180s;
+    client_header_buffer_size 512k;
+    large_client_header_buffers 4 512k;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
 ## 打开长连接配置
 
 建议开启HTTP长连接，用户减少握手的次数，降低服务器损耗，具体如下：

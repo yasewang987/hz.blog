@@ -234,7 +234,8 @@ module.exports = {
             '/code/python/': [
                 'base',
                 'source',
-                'devops'
+                'devops',
+                'problem'
             ],
             '/microservices/consul/': [
                 'base',
