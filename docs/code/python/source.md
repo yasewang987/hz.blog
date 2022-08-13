@@ -84,6 +84,45 @@ todo
 
 todo
 
+## tensorflow源码编译
+
+```bash
+#### 安装依赖项
+apt install python3-dev python3-pip
+pip install -U --user pip numpy wheel
+pip install -U --user keras_preprocessing --no-deps
+# 安装jdk
+apt search openjdk
+apt install openjdk-11-jdk
+
+
+#### 安装protoc
+wget https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.8.0.tar.gz
+tar zxvf v3.8.0.tar.gz
+cd protobuf-3.8.0
+./autogen.sh
+./configure
+make && make install
+ldconfig
+# 验证protoc
+protoc --version
+# protoc执行报错
+vim /etc/ld.so.conf.d/libprotobuf.conf 
+/usr/local/lib
+ln -s /usr/lib/libprotobuf.so.10.0.0 /usr/lib/libprotobuf.so
+
+# 安装protoc-gen-grpc-java
+git clone https://github.com/grpc/grpc-java
+cd grpc-java/compiler
+../gradlew java_pluginExecutable
+
+#### 安装bazel
+wget https://github.com/bazelbuild/bazel/archive/refs/tags/0.26.1.zip
+tar zxf 0.26.1.tar.gz && cd bazel-0.26.1
+export PROTOC=/usr/local/bin/protoc
+./compile.sh
+```
+
 ### 问题处理
 
 * `library dfftpack has Fortran sources but no Fortran compiler found`
@@ -91,6 +130,7 @@ todo
     ```bash
     apt install gfortran
     ```
+
 
 
 ## 其他错误
