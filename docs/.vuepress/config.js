@@ -407,7 +407,8 @@ module.exports = {
                 'cmd',
                 'git-hook',
                 'gl-hook',
-                'problem'
+                'problem',
+                'submodule'
             ],
             '/other/linux/': [
                 'cmd',
