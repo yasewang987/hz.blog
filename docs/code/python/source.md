@@ -2,6 +2,14 @@
 
 * 编译打包的时候一定要确认打包环境和目标机器的python版本一致
 
+```bash
+# 直接编译安装
+python setup.py install
+
+# 编译生成whl包,在dist目录下
+python setup.py bdist_wheel
+```
+
 ## pyltp源码编译
 
 ```bash

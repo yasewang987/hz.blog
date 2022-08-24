@@ -139,16 +139,6 @@ deactivate
 /home/mypython/env3/bin/pip install xxxx
 ```
 
-## python项目源码编译
-
-```bash
-# 直接编译安装
-python setup.py install
-
-# 编译生成whl包,在dist目录下
-python setup.py bdist_wheel
-```
-
 ## python镜像无用内容清理
 
 ```bash

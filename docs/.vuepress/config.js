@@ -235,7 +235,8 @@ module.exports = {
                 'base',
                 'source',
                 'devops',
-                'problem'
+                'problem',
+                'install'
             ],
             '/microservices/consul/': [
                 'base',
