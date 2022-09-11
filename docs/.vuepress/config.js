@@ -229,7 +229,8 @@ module.exports = {
                 'tauri',
                 'flutter',
                 'serve',
-                'config'
+                'config',
+                'chromeextensions'
             ],
             '/code/python/': [
                 'base',

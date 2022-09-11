@@ -142,6 +142,8 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 
 ## 源码编译
 
+每个环境最好都是重新编译
+
 * 安装依赖
 
 ```bash
@@ -170,6 +172,6 @@ make
 make install
 
 # 添加软链接
-ln -s /usr/local/python3/bin/python3.8 /usr/bin/python3
-ln -s /usr/local/python3/bin/pip3.8 /usr/bin/pip3
+ln -s /opt/yourpath/bin/python3.8 /usr/bin/python3
+ln -s /opt/yourpath/bin/pip3.8 /usr/bin/pip3
 ```

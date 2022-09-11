@@ -13,7 +13,7 @@ sudo  apt-get install build-essential zlib1g-dev libpcre3 libpcre3-dev  libssl-d
 
 # 配置编译生成的目录
 # 如果提示 prefix 参数无效，则需要手动输入下面命令，不要复制
-./configure –-prefix=/opt/mytest/nginx --with-http_ssl_module --with-stream --with-mail=dynamic
+./configure --prefix=/opt/mytest/nginx --with-http_ssl_module --with-stream --with-mail=dynamic
 
 # 编译
 make && make install
@@ -31,7 +31,7 @@ sbin/nginx
 %global mname nginx
 %global mpath base/%{mname}
 Name: mytest-%{mname}
-Version: 1.0.0
+Version: 2022.04
 Summary: funcun %{mname}
 Release: 1
 License: GPLv3+
