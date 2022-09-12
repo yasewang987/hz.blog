@@ -65,6 +65,17 @@ python ./waf all
 
 * 安装完上面的bootloader之后，如果打包的时候还是报错，主要一下打包时的提示信息中`Bootloader`的加载位置，目前在`mips64`平台上打包时会去`/usr/local/lib/python3.7/dist-packages/PyInstaller/bootloader/Linux-64bit-unknown/run` 找，但是上面安装的会生成 `Linux-64bit-mips`版本的bootloader，这个时候只需要将`Linux-64bit-mips`复制一份改成`Linux-64bit-unknown`即可
 
+## pyvenv
+
+python3.4版本之后也可以自带的虚拟环境管理工具
+
+```bash
+# 创建虚拟环境（个格式可以明确的指导使用的是当前调用的解释器）
+python3.7 -m /myvenv
+# 下面方式已经过时
+pyvenv /path/to/new/virtual/enviorment
+```
+
 ## virtualenv安装
 
 `virtualenv`的作用是创建独立的python虚拟环境。
