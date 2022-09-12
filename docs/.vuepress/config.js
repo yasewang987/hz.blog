@@ -197,7 +197,8 @@ module.exports = {
                 'conf',
                 'redis',
                 'encrypt',
-                'viper'
+                'viper',
+                'spider'
             ],
             '/code/web/npm/': [
                 'base',
