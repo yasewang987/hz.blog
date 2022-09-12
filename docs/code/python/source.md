@@ -1,23 +1,32 @@
-# 深度学习部署问题记录
+# python库源码编译
 
-
-## pyltp 在 arm64 等cpu架构的系统中安装报错
-
-直接使用 pip 去安装 pyltp 时如果报错，则需要使用源码安装。
+* 编译打包的时候一定要确认打包环境和目标机器的python版本一致
 
 ```bash
+# 直接编译安装
+python setup.py install
+
+# 编译生成whl包,在dist目录下
+python setup.py bdist_wheel
+```
+
+## pyltp源码编译
+
+```bash
+# Ubuntu/Debian 安装cmake
+apt-get install cmake
+
+# 下载源码
 git clone https://github.com.cnpmjs.org/HIT-SCIR/pyltp && cd pyltp
 git submodule init
 git submodule update --recursive
+# 直接安装
 python setup.py install
+# 生成whl
+python setup.py bdist_wheel
 ```
 
-源码安装如果碰到 `cmake` 命令找不到时只需要安装cmake即可
-
-```bash
-# Ubuntu/Debian
-apt-get install cmake
-```
+### pyltp 在 arm64 等cpu架构的系统中安装报错
 
 如果 `mem.cc` 报错 `mm_malloc.h` 文件找不到，则按照如下命令修改文件
 
@@ -29,18 +38,7 @@ sed -i 's/_mm_malloc/aligned_alloc/g' /home/pyltp/ltp/thirdparty/dynet/dynet/mem
 sed -i 's/_mm_free(mem)/\/\/_mm_free(mem)/g' /home/pyltp/ltp/thirdparty/dynet/dynet/mem.cc
 ```
 
-## pyltp在高版本python中安装问题
-
-一般如果不是python3.6的环境安装pyltp都不会成功
-
-那就需要使用源码的方式安装：
-
-```bash
-git clone https://github.com/HIT-SCIR/pyltp && cd pyltp
-git submodule init
-git submodule update
-python setup.py install
-```
+### pyltp在高版本python中安装问题
 
 在安装的时候一般都会报错，例如：`expected , or ; before __m256`
 
@@ -53,7 +51,7 @@ python setup.py install
   663 |   __m256 OUTPUT##_0 = _mm512_extractf32x8_ps(INPUT, 0) __m256 OUTPUT##_1 = \
 ```
 
-修改代码位置如下：
+* 修改代码位置如下：
 
 ```txt
 #ifdef EIGEN_VECTORIZE_AVX512DQ
@@ -64,7 +62,11 @@ python setup.py install
 #else
 ```
 
-## 源码安装 pytorch 报错
+## pytorch源码编译
+
+todo
+
+### 问题处理
 
 * `Cuda runtime error (48) : no kernel image is available for execution`
 
@@ -86,7 +88,62 @@ python setup.py install
 
     一般来讲，输出主要是报48号错误，也就是CUDA的问题，出现这个问题在于硬件的支持情况，对于算力3.0的显卡来说，如果安装了9.0的CUDA就会出现这个问题，解决的办法是退回CUDA8.0，或者更换更加高端的显卡，或者直接从源码编译，并在源码中做相应设置（修改setup.py文件里的`TORCH_CUDA_ARCH_LIST`，将这个值改成你当前使用的GPU对应算力！）
 
-## arm64提示Failed building wheel for tokenizers
+## scipy源码编译
+
+todo
+
+## tensorflow源码编译
+
+```bash
+#### 安装依赖项
+apt install python3-dev python3-pip
+pip install -U --user pip numpy wheel
+pip install -U --user keras_preprocessing --no-deps
+# 安装jdk
+apt search openjdk
+apt install openjdk-11-jdk
+
+
+#### 安装protoc
+wget https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.8.0.tar.gz
+tar zxvf v3.8.0.tar.gz
+cd protobuf-3.8.0
+./autogen.sh
+./configure
+make && make install
+ldconfig
+# 验证protoc
+protoc --version
+# protoc执行报错
+vim /etc/ld.so.conf.d/libprotobuf.conf 
+/usr/local/lib
+ln -s /usr/lib/libprotobuf.so.10.0.0 /usr/lib/libprotobuf.so
+
+# 安装protoc-gen-grpc-java
+git clone https://github.com/grpc/grpc-java
+cd grpc-java/compiler
+../gradlew java_pluginExecutable
+
+#### 安装bazel
+wget https://github.com/bazelbuild/bazel/archive/refs/tags/0.26.1.zip
+tar zxf 0.26.1.tar.gz && cd bazel-0.26.1
+export PROTOC=/usr/local/bin/protoc
+./compile.sh
+```
+
+### 问题处理
+
+* `library dfftpack has Fortran sources but no Fortran compiler found`
+
+    ```bash
+    apt install gfortran
+    ```
+
+
+
+## 其他错误
+
+### arm64提示Failed building wheel for tokenizers
 
 `error: can not find Rust Compiler` 
 
@@ -96,15 +153,7 @@ python setup.py install
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-## 源码安装scipy报错
-
-* `library dfftpack has Fortran sources but no Fortran compiler found`
-
-    ```bash
-    apt install gfortran
-    ```
-
-## pip安装时报【fatal error: Python.h: No such file or directory compilation terminated】错误
+### pip安装时报【fatal error: Python.h: No such file or directory compilation terminated】错误
 
 ```bash
 # ubuntu,debian
@@ -116,13 +165,7 @@ sudo yum install python-devel   # for python2.x installs
 sudo yum install python3-devel   # for python3.4 installs
 ```
 
-## 镜像无用内容清理
-
-```bash
-rm -rf ~/.cache
-```
-
-## No module named yaml
+### No module named yaml
 
 ```bash
 pip install pyyaml

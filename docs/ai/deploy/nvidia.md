@@ -27,7 +27,7 @@ lsmod | grep nouveau
 
 ```bash
 ubuntu-drivers devices
-# 输出
+# 输出（推荐安装 recommended 的）
 == /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0 ==
 modalias : pci:v000010DEd00001F95sv00001028sd0000097Dbc03sc02i00
 vendor   : NVIDIA Corporation
@@ -70,18 +70,43 @@ Wed Nov 11 22:45:21 2020
 
 ## centos7显卡驱动安装
 
-* 安装依赖环境
-
-```bash
-yum install kernel-devel gcc -y
-```
-
 * 检查内核版本和源码版本，保证一致
 
 ```bash
 ls /boot | grep vmlinu
+vmlinuz-0-rescue-leabcassxx123asfs34
+vmlinuz-3.10.0-957.el7.x86_64
 
 rpm -aq | grep kernel-devel
+# 如果没有下面这个或者与上面的不一致，则安装对应的版本
+kernel-devel-3.10.0-957.el7.x86_64
+```
+
+* 安装依赖环境
+
+```bash
+# 在线安装
+yum install kernel-devel gcc -y
+# 离线安装
+wget https://people.centos.org/arrfab/shim/results/kernel/20181108233701/3.10.0-957.el7.x86_64/kernel-3.10.0-957.el7.x86_64.rpm
+wget https://people.centos.org/arrfab/shim/results/kernel/20181108233701/3.10.0-957.el7.x86_64/kernel-devel-3.10.0-957.el7.x86_64.rpm
+wget https://people.centos.org/arrfab/shim/results/kernel/20181108233701/3.10.0-957.el7.x86_64/kernel-headers-3.10.0-957.el7.x86_64.rpm
+
+rpm  -ivh kernel-3.10.0-957.el7.x86_64.rpm
+rpm -ivh kernel-devel-3.10.0-957.el7.x86_64.rpm
+rpm -ivh kernel-headers-3.10.0-957.el7.x86_64.rpm
+```
+
+* 下载显卡驱动文件：https://www.nvidia.cn/Download/index.aspx?lang=cn ，选择对应版本的显卡
+
+* 安装显卡驱动(正常来说到这里就可以了，安装完之后直接执行`nvidia-smi`验证)：
+
+```bash
+wget https://cn.download.nvidia.com/tesla/460.106.00/NVIDIA-Linux-x86_64-460.106.00.run
+
+chmod +x NVIDIA-Linux-x86_64-440.64.run
+
+./NVIDIA-Linux-x86_64-440.64.run
 ```
 
 * 屏蔽系统自带的nouveau
@@ -117,17 +142,17 @@ systemctl set-default multi-user.target
 
 * 重启系统：`reboot`
 
-* 下载显卡驱动文件：https://www.nvidia.cn/Download/index.aspx?lang=cn ，选择对应版本的显卡
-
-* 安装显卡驱动：
-
-```bash
-chmod +x NVIDIA-Linux-x86_64-440.64.run
-
-./NVIDIA-Linux-x86_64-440.64.run
-```
-
 * 验证：`nvidia-smi`
+
+## CentOS7离线安装显卡驱动
+```bash
+# 查看系统内核
+ls /boot | grep vmlinu
+
+rpm -aq | grep kernel-devel
+# 升级内核
+
+```
 
 ## nvidia运行docker容器选择
 

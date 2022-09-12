@@ -102,7 +102,7 @@ keepalive_timeout 0;
 
 ```conf
 # nginx进程数，按照CPU数目指定
-worker_processes 8;
+worker_processes auto;
 # nginx 子进程允许打开的文件次数
 worker_rlimit_nofile 102400;
 ```

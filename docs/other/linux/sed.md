@@ -95,6 +95,9 @@ nl /etc/passwd | sed '/root/p'
 
 # 使用-n的时候将只打印包含模板的行
 nl /etc/passwd | sed -n '/root/p'
+
+# 导出02:14到02:16分的日志
+sed -n '/2022-06-24T02:14/,/2022-06-24T02:1[6-9]/p' app.log > app0215.log
 ```
 
 **数据的搜寻并执行命令**

@@ -28,8 +28,14 @@ elif [ ! -z "$JAVA_HOME" ]; then
   JAVA="$JAVA_HOME/bin/java"
   JAVA_TYPE="JAVA_HOME"
 
+# 限制内存使用，先找到config目录的jvm.options改一下
+-Xms10g
+-Xmx10g
+
 # 启动 -d 后台运行
 /opt/mytest/elasticsearch/bin/elasticsearch -d
+
+# 日志在 logs/elasticsearch.log
 
 # 查看到es对应的版本和基本信息
 curl http://localhost:9200

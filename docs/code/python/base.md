@@ -1,4 +1,4 @@
-# python相关资料
+# python基础资料
 
 ## 安装pip
 
@@ -15,7 +15,10 @@ python3.7 -m pip install xxxx
 
 ```bash
 # 豆瓣的源比清华的块很多
-pip install -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com xxx
+pip install -i https://pypi.douban.com/simple xxx
+
+# 安装本地whl
+pip install xxxx.whl
 
 # 升级pip
 python -m pip install --upgrade pip
@@ -77,7 +80,7 @@ pyvenv /path/to/new/virtual/enviorment
 
 `virtualenv`的作用是创建独立的python虚拟环境。
 
-安装`virtualenv`
+* 安装`virtualenv`
 
 ```bash
 pip install virtualenv
@@ -86,7 +89,7 @@ pip install virtualenv
 pip3 install virtualenv
 ```
 
-创建虚拟环境
+* 创建虚拟环境
 
 ```bash
 # 准备目录
@@ -100,7 +103,7 @@ virtualenv -p /usr/bin/python2.7 venv
 virtualenv -p /usr/bin/python3.6 venv
 ```
 
-进入/退出 虚拟环境
+* 进入/退出 虚拟环境
 
 ```bash
 # 进入
@@ -109,13 +112,13 @@ source venv/bin/activate
 deactivate
 ```
 
-删除虚拟环境(直接删除虚拟环境文件夹即可)
+* 删除虚拟环境(直接删除虚拟环境文件夹即可)
 
 ```bash
 rm -rf venv
 ```
 
-迁移虚拟环境
+* 迁移虚拟环境
 
 ```bash
 # 导出本地虚拟环境依赖项
@@ -125,12 +128,30 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
-## python项目源码编译
+## venv虚拟环境
+
+* python3.3之后自带venv的虚拟环境
 
 ```bash
-# 直接编译安装
-python setup.py install
+# 创建虚拟环境
+python3 -m venv /home/mypython/env3
+python3 -m venv /home/mypython/env3 /home/mypython/env4
 
-# 编译生成whl包,在dist目录下
-python setup.py bdist_wheel
+# 激活虚拟环境
+source /home/mypython/env3/bin/activate
+
+# 激活虚拟环境后安装依赖
+(env3): pip install xxxx
+
+# 退出虚拟环境
+deactivate
+
+# 未激活虚拟环境安装依赖
+/home/mypython/env3/bin/pip install xxxx
+```
+
+## python镜像无用内容清理
+
+```bash
+rm -rf ~/.cache
 ```

@@ -15,4 +15,9 @@ flushall
 # 清理指定数据库5
 select 5
 flushdb
+
+# 统计key数量
+dbsize
+# 或者
+info keyspace
 ```

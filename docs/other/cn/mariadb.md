@@ -4,6 +4,10 @@
 
 源码下载地址： https://mariadb.org/download/  注意选择 `Operating System` 为 `Source`.
 
+```bash
+wget https://mirrors.aliyun.com/mariadb//mariadb-10.8.3/source/mariadb-10.8.3.tar.gz
+```
+
 安装依赖项：
 
 ```bash
@@ -49,9 +53,6 @@ make && make install
 ```bash
 # 执行之后会在/opt/mytest/mariadb/data目录生成初始数据库
 /opt/mytest/mariadb/scripts/mariadb-install-db --basedir=/opt/mytest/mariadb --datadir=/opt/mytest/mariadb/data
-
-# 设置管理员密码
-/opt/mytest/mariadb/bin/mysqladmin -u root password 'yourpassword'
 ```
 
 编辑配置文件
@@ -77,7 +78,23 @@ sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'
 启动mariadb
 
 ```bash
-/opt/mytest/mariadb/bin/mysqld_safe --defaults-file=/opt/mytest/mariadb/my.cnf
+/opt/mytest/mariadb/bin/mysqld_safe --defaults-file=/opt/mytest/mariadb/my.cnf &
+
+# 设置管理员密码
+/opt/mytest/mariadb/bin/mysqladmin -S /opt/mytest/mariadb/mysqld.sock -uroot password 'yourpassword'
+
+# 日志文件在
+data/07bf32e32341.err 
+
+# 登录mysql
+bin/mysql -S mysqld.sock -uroot -p
+
+# 进入mysql之后创建账号
+create user 'root'@'%' identified by 'yourpassword';
+# 更新密码
+SET PASSWORD FOR 'test'@'localhost' = PASSWORD('yourpassword');
+# 生效配置
+FLUSH PRIVILEGES;
 ```
 
 ## systemctl管理

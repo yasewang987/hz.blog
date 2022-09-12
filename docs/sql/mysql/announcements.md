@@ -68,3 +68,11 @@ set global slow_query_log=off
 -- long_query_time : 超多多长时间的查询被定义为慢查询，默认10s，可以通过如下命令设置
 set long_query_time=5
 ```
+
+## Mysql访问IP限制
+
+```bash
+update user set host='%' where host='localhost';
+# 生效
+flush privileges;
+```

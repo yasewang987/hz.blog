@@ -185,6 +185,7 @@ module.exports = {
             '/code/go/demo/': [
                 'design',
                 'loadbalance',
+                'serviceRegister',
                 'myrpc',
                 'gin',
                 'di',
@@ -196,7 +197,8 @@ module.exports = {
                 'conf',
                 'redis',
                 'encrypt',
-                'viper'
+                'viper',
+                'spider'
             ],
             '/code/web/npm/': [
                 'base',
@@ -228,10 +230,15 @@ module.exports = {
                 'tauri',
                 'flutter',
                 'serve',
-                'config'
+                'config',
+                'chromeextensions'
             ],
             '/code/python/': [
-                'devops'
+                'base',
+                'source',
+                'devops',
+                'problem',
+                'install'
             ],
             '/microservices/consul/': [
                 'base',
@@ -312,7 +319,8 @@ module.exports = {
                 'nginx',
                 'nginxhotreload',
                 'problem',
-                'test'
+                'test',
+                'nginxbest'
             ],
             '/devops/prometheus/': [
                 'prometheus',
@@ -382,7 +390,8 @@ module.exports = {
                 'announcements',
                 'explain',
                 'pxb',
-                'recover'
+                'recover',
+                'problem'
             ],
             '/sql/mongo/': [
                 'install'
@@ -401,7 +410,8 @@ module.exports = {
                 'cmd',
                 'git-hook',
                 'gl-hook',
-                'problem'
+                'problem',
+                'submodule'
             ],
             '/other/linux/': [
                 'cmd',
@@ -458,12 +468,10 @@ module.exports = {
                 'openssh'
             ],
             '/ai/deploy/': [
-                'problem',
                 'nvidia',
                 'torchserve',
                 'tfx',
-                'tf',
-                'python'
+                'tf'
             ],
             '/ai/paddle/': [
                 'paddle',

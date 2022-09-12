@@ -365,14 +365,21 @@ docker run -d -p 18890:9293 -v $PWD:/data -w /data/inference --name myocr2 myocr
 * arm服务器PaddleHub安装报错，onnx编译无法通过（是因为依赖的 paddle2onnx 中限制了onnx的版本 `<=1.9.0`）
 
 ```bash
-# 下载paddle2onnx
-git clone https://github.com/PaddlePaddle/Paddle2ONNX.git
+# 【建议】参考官方编译文档在指定环境编译
+https://github.com/PaddlePaddle/Paddle2ONNX/blob/develop/docs/zh/compile.md
 
+# 用开发镜像打包编译可以直接通过
+registry.baidubce.com/qili93/paddle-base:ubuntu18-aarch64
+# 下载paddle2onnx
+apt install cmake
+git clone https://github.com/PaddlePaddle/Paddle2ONNX.git
+cd Paddle2ONNX
+git submodule init
+git submodule update --recursive
 # 将 `requirements.txt` 和 `setup.py` 中的onnx版本限制去掉
 onnx <= 1.9.0 改成 onnx
-
-# 安装
-python setup.py install
+# 生成whl
+python setup.py bdist_wheel
 ```
 
 * `OSError: Could not find library geos_c or load any of its variants ['libgeos_c.so.1', 'libgeos_c.so']`

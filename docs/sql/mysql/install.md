@@ -15,6 +15,10 @@
     # systemctl start firewalld
     //开启3306端口
     # firewall-cmd --zone=public --add-port=3308/tcp --permanent
+
+    # 去除localhost限制
+    update user set host='%' where host='localhost';
+    flush privileges;
     ```
 
 1. 如果mysql是 8 版本以上应该会出一下错误:`ERROR 2059 (HY000): Authentication plugin 'caching_sha2_password' cannot be loaded:`  

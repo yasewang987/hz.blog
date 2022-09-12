@@ -354,13 +354,33 @@ $ docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 
 * `Temporary failure resolving 'xxx.aa.org'`
 
-    ```bash
-    vim /etc/docker/daemon.json
-    # 添加如下内容
-    {
-        "dns": ["114.114.114.114", "8.8.8.8"]
-    }
+```bash
+vim /etc/docker/daemon.json
+# 添加如下内容
+{
+    "dns": ["114.114.114.114", "8.8.8.8"]
+}
 
-    # 重启docker服务
-    systemctl restart docker
-    ```
+# 重启docker服务
+systemctl restart docker
+```
+
+## container with id exists xxxx unknown
+
+```bash
+# 进入如下目录
+cd /run/docker/runtime-runc/moby
+
+# 执行ls命令可以查看到类似显示
+ls
+2901da5462f792296b36ce7e982d8ef66233fce3c78c8c150522893625768e56
+c29c0bc9836880aa883d1ac7e50da56656ed9b2c5499831f3610d775997aa5f2
+ed4c1c5e03c74b3ce4c41aafbb5f276064d51546f8359ed493b3623a0baaf648
+
+# 通过rm -rf命令删除文件夹
+# 例如删除症状中的错误id（c29c0bc9836880aa883d1ac7e50da56656ed9b2c5499831f3610d775997aa5f2）对应的文件夹
+rm -rf c29c0bc9836880aa883d1ac7e50da56656ed9b2c5499831f3610d775997aa5f2/
+
+# 删除后重新执行命令，即可启动容器
+docker start mysqlserver
+```

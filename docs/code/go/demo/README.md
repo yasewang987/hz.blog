@@ -2,6 +2,7 @@
 
 * [Go设计模式](./design.md)
 * [Go-负载均衡](./loadbalance.md)
+* [Go-服务注册发现](./serviceRegister.md)
 * [Go-自定义RPC](./myrpc.md)
 * [Gin](./gin.md)
 * [MongoDb操作](./mongodb.md)
@@ -14,3 +15,4 @@
 * [Go-Redis](./redis.md)
 * [Go加密](./encrypt.md)
 * [Go-Viper配置文件](./viper.md)
+* [Go-爬虫](./spider.md)

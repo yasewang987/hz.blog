@@ -352,92 +352,70 @@ build-image:
 
 ```yaml
 variables:
-  SEVER_NAME: 'law'
-  SEVER_PORT: '18400:18111'
-  IMG_AMD: 'ifuncun/py-work-amd64:6'
-  IMG_ARM: 'ifuncun/py-work-arm64:6'
+  SEVER_NAME: 'word'
+  SEVER_PORT: '18350:18109'
+  IMG_AMD: 'ifuncun/py-work-amd64:8'
+  GIT_CMD: 'git pull'
+  GIT_PATH_DIR: '/opt/funcun/git/'
+  GIT_PATH: '/opt/funcun/git/$SEVER_NAME'
+  GIT_PATH_BUILD: '/opt/funcun/git/$SEVER_NAME/build'
   TARFILE_AMD: '/data/tars/code/$SEVER_NAME.tar.gz'
-  TARFILE_ARM: '/home/data/tars/code/$SEVER_NAME.tar.gz'
-  TEST_BASEPATH_AMD: '/data/deploy'
-  TEST_BASEPATH_ARM: '/home/data/deploy'
-  TEST_SSH_AMD: 'root@192.168.1.2'
-  TEST_SSH_ARM: 'root@192.168.1.128'
-  TEST_TMP_AMD: '$TEST_BASEPATH_AMD/tmp/$SEVER_NAME'
-  TEST_TMP_ARM: '$TEST_BASEPATH_ARM/tmp/$SEVER_NAME'
-  TEST_RUNPATH_AMD: '$TEST_BASEPATH_AMD/$SEVER_NAME'
-  TEST_RUNPATH_ARM: '$TEST_BASEPATH_ARM/$SEVER_NAME'
+  TARFILE_AMD_SO: '/data/tars/code/$SEVER_NAME-so.tar.gz'
+  TEST_SSH_AMD: 'root@192.168.0.169'
 stages:
-  - deploy
+  - test-pull
+  - test-deploy
   - tars
-deploy-amd:
-  stage: deploy
-  allow_failure: true
-  only:
-    - test
-  script:
-    - scp -prq $(pwd) $TEST_SSH_AMD:$TEST_TMP_AMD
-    - ssh -tt $TEST_SSH_AMD << closessh
-    - if [ -d "$TEST_RUNPATH_AMD" ]; then rm -rf $TEST_RUNPATH_AMD; fi
-    - mv $TEST_TMP_AMD $TEST_BASEPATH_AMD
-    - docker run --rm -v $TEST_RUNPATH_AMD:/$SEVER_NAME -w /$SEVER_NAME $IMG_AMD python setup.py
-    - docker rm -f fc-$SEVER_NAME
-    - docker run -d --restart=always -p $SEVER_PORT -v $TEST_RUNPATH_AMD:/$SEVER_NAME -w /$SEVER_NAME --name fc-$SEVER_NAME $IMG_AMD python ./$SEVER_NAME.py --config config.test
-    - echo "deploy amd successful!"
-    - exit
-    - closessh
-  tags:
-    - deploy
 
-deploy-arm:
-  stage: deploy
-  allow_failure: true
+test-pull-amd:
+  stage: test-pull
   only:
     - test
   script:
-    - scp -prq $(pwd) $TEST_SSH_ARM:$TEST_TMP_ARM
-    - ssh -tt $TEST_SSH_ARM << closessh
-    - if [ -d "$TEST_RUNPATH_ARM" ]; then rm -rf $TEST_RUNPATH_ARM; fi
-    - mv $TEST_TMP_ARM $TEST_BASEPATH_ARM
-    - docker run --rm -v $TEST_RUNPATH_ARM:/$SEVER_NAME -w /$SEVER_NAME $IMG_ARM python setup.py
-    - sed -i 's/28000/28010/g' $TEST_RUNPATH_ARM/build/word/config.test
-    - sed -i 's/\"encrypt\"\:false/\"encrypt\"\:true/g' $TEST_RUNPATH_ARM/build/word/config.test
-    - docker rm -f fc-$SEVER_NAME
-    - docker run -d --restart=always -p $SEVER_PORT -v $TEST_RUNPATH_ARM/build/$SEVER_NAME:/$SEVER_NAME -w /$SEVER_NAME --name fc-$SEVER_NAME $IMG_ARM python ./$SEVER_NAME.py --config config.test
-    - echo "deploy arm successful!"
-    - exit
-    - closessh
+    - ssh -p 2017 -tt $TEST_SSH_AMD "
+      if [ ! -d $GIT_PATH_DIR ];then mkdir -p $GIT_PATH_DIR; fi &&
+      if [ ! -d $GIT_PATH ]; then cd $GIT_PATH_DIR && git clone -b test ssh://git@git.ifuncun.cn:2222/algorithm/$SEVER_NAME.git; fi &&
+      cd $GIT_PATH &&
+      git checkout test && 
+      git add . &&
+      $GIT_CMD" 
+    - echo "amd代码更新成功"
   tags:
-    - deploy 
+    - deploy2
+
+test-deploy-amd:
+  stage: test-deploy
+  only:
+    - test
+  script:
+    - ssh -p 2017 -tt $TEST_SSH_AMD " 
+        docker rm -f fc-$SEVER_NAME &&
+        docker run -d --restart=always -p $SEVER_PORT -v $GIT_PATH:/data -w /data --name fc-$SEVER_NAME $IMG_AMD python ./$SEVER_NAME.py --config config.test"
+    - echo "deploy amd successful"
+  dependencies:
+    - test-pull-amd
+  tags:
+    - deploy2
 
 tars-amd:
   stage: tars
   allow_failure: true
   only:
-    - master
+    - pkg
   script:
-    - ssh -tt $TEST_SSH_AMD << closessh
-    - if [ -f "$TARFILE_AMD" ]; then rm -f $TARFILE_AMD; fi
-    - cd $TEST_RUNPATH_AMD/build/
-    - tar -zcvf $TARFILE_AMD  --exclude=.git --exclude=.gitlab-ci.yml --exclude=config --exclude=config.product --exclude=config.dispatch --exclude=config.redis $SEVER_NAME
-    - echo "tar amd successful!"
-    - exit
-    - closessh
-  tags:
-    - deploy
-
-tars-arm:
-  stage: tars
-  allow_failure: true
-  only:
-    - master
-  script:
-    - ssh -tt $TEST_SSH_ARM << closessh
-    - if [ -f "$TARFILE_ARM" ]; then rm -f $TARFILE_ARM; fi
-    - cd $TEST_RUNPATH_ARM/build/
-    - tar -zcvf $TARFILE_ARM  --exclude=.git --exclude=.gitlab-ci.yml --exclude=config --exclude=config.product --exclude=config.dispatch --exclude=config.redis $SEVER_NAME
-    - echo "tar arm successful!"
-    - exit
-    - closessh
+    - ssh -p 2017 -tt $TEST_SSH_AMD "
+        if [ -f "$TARFILE_AMD" ]; then rm -f $TARFILE_AMD; fi &&
+        rm -rf $GIT_PATH-pkg &&
+        cp -r $GIT_PATH $GIT_PATH-pkg && cd $GIT_PATH-pkg &&
+        git pull && git checkout -b pkg origin/pkg && cd .. &&
+        tar -zcf $TARFILE_AMD  --exclude=.git --exclude=.gitlab-ci.yml --exclude=config.dev  --exclude=config --exclude=config.product --exclude=build $SEVER_NAME-pkg &&
+        echo "tar amd successful" &&
+        docker run --rm -v $GIT_PATH-pkg:/$SEVER_NAME -w /$SEVER_NAME $IMG_AMD python setup.py &&
+        if [ -f "$TARFILE_AMD_SO" ]; then rm -f $TARFILE_AMD_SO; fi &&
+        cd $GIT_PATH-pkg/build &&
+        tar -zcf $TARFILE_AMD_SO  --exclude=.git --exclude=.gitlab-ci.yml --exclude=config.dev --exclude=config --exclude=config.product $SEVER_NAME &&
+        cd / && rm -rf $GIT_PATH-pkg"
+    - echo "tar amd-all successful!"
   tags:
     - deploy
 ```

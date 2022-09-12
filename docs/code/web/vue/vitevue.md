@@ -800,3 +800,163 @@ mainStore.changeName('aaa')
   <div>{{mainStore.nameLength}}</div>
 </template>
 ```
+
+## svg最佳使用方式
+
+在 `vite` 里面，我们需要一个插件 `vite-svg-loader`，实际渲染出来，我们在使用 `svg` 的地方就是 `svg`原生`tag`，因此它和直接把 `svg` 的代码直接复制到 `vue` 组件里没有区别，它能自动适应宽高比，也能单独修改内部单个 `path` 的样式，原理如下：
+
+* 在 代码里 `import svg` 的时候读取 `svg`
+* 用 `svgo` 对 `svg` 预处理，比如处理 `svg` 内部的 `style` 标签等其他优化
+* 然后把这个 `svg` 转成 `vue` 组件
+
+```ts
+// ./vite.config.ts
+import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite';
+import svgLoader from 'vite-svg-loader';
+
+export default defineConfig(({ command, mode }) => {
+  return {
+    plugins: [
+      vue(),
+      svgLoader({
+        svgoConfig: {
+          plugins: [
+            {
+              name: 'cleanupIDs',
+              params: {
+                prefix: {
+                  // 避免不同 svg 内部的 filter id 相同导致样式错乱
+                  // https://github.com/svg/svgo/issues/674#issuecomment-328774019
+                  toString() {
+                    let count: number = this.count ?? 0;
+                    count++;
+                    this.count = count;
+                    return `svg-random-${count.toString(36)}-`;
+                  },
+                } as string,
+              },
+            },
+          ],
+        },
+      }),
+    ],
+  };
+});
+```
+
+* 基本使用
+
+```html
+<!-- ./App.vue -->
+<script setup lang="ts">
+import SvgRaw from './icon.svg?component'
+</script>
+<template>
+  <SvgRaw/>
+</template>
+```
+
+* 进阶优化,将所有的 `svg` 文件放在 `@/assets/svg/` 目录下，然后封装一个 `SvgRaw.vue` 的全局组件
+
+```html
+<!-- ./SvgRaw.vue -->
+<script setup lang="ts">
+import type { Component } from 'vue';
+import {
+  computed,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  useAttrs,
+  watch,
+  nextTick,
+} from 'vue';
+const modules = import.meta.globEager('@/assets/svg/*.svg', {
+  as: 'component',
+});
+
+const props = withDefaults(defineProps<{ name: string }>(), {});
+const attrs = useAttrs();
+const instance = getCurrentInstance();
+
+const currentComponent = computed<Component>(() => {
+  const fileName = '/' + props.name + '.svg';
+  for (const path in modules) {
+    const mod = modules[path];
+    if (path.endsWith(fileName)) {
+      return mod as Component;
+    }
+  }
+  throw new Error('not found svg file:' + fileName);
+});
+
+// data-v-hash
+let scopeId = '';
+if (instance?.type) {
+  // __scopeId 存在的条件是 <style scoped>
+  const __scopeId = (instance?.type as { __scopeId?: string })?.__scopeId;
+  if (__scopeId) {
+    scopeId = __scopeId;
+  }
+}
+
+const attachAttr = () => {
+  // 取到 svg dom
+  const cpt = svgRef.value;
+  if (!cpt) return;
+  const svg = cpt.$el?.nextElementSibling as HTMLElement | undefined;
+  if (!svg) return;
+
+  // 把所有的属性全部附加到 svg 上
+  Object.entries({ ...attrs, ...props }).forEach(([k, v]) => {
+    svg.setAttribute(k, String(v));
+  });
+
+  // 由于svg不在vue_template里,所以初始没有添加样式隔离,需要手动给svg和所有子dom添加 data-v-hash
+  if (scopeId) {
+    svg.setAttribute(scopeId, '');
+    svg.querySelectorAll('*').forEach((element) => {
+      element.setAttribute(scopeId, '');
+    });
+  }
+};
+
+const svgRef = ref<any>();
+
+watch(
+  () => props.name,
+  async () => {
+    await nextTick();
+    attachAttr();
+  },
+);
+
+onMounted(() => {
+  attachAttr();
+});
+</script>
+<template>
+  <component :is="currentComponent" ref="svgRef" v-bind="$attrs" />
+</template>
+
+<style scoped>
+svg {
+  width: auto;
+  height: auto;
+}
+
+* {
+  transition: fill 250ms;
+}
+</style>
+
+<!--使用方式如下，我们不再需要对每个 svg 单独 import-->
+<!-- ./App.vue -->
+<template>
+  <div>
+    <SvgRaw name="xxx"/>
+    <div> hello world </div>
+  </div>
+</template>
+```

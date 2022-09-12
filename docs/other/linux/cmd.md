@@ -234,6 +234,15 @@ sudo kill -9 <PID>
 ps -aux | grep nginx
 
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+
+# 批量关闭进程,xargs命令把前面命令的输出结果（PID）作为"kill -9"命令的参数
+ps -ef|grep GSM_run.py|grep -v grep|awk '{print $2}'|xargs kill -9
+# 更简单的方式
+pkill -9 GSM_run.py
+# kill pc 用户的所有的用户的进程
+pkill -u pc
+# kill 除了 root 用户外的所有的用户的进程
+pkill -vu root
 ```
 ## 服务器内存释放
 
@@ -544,15 +553,28 @@ top -H -p <pid>
 ## 查看网卡带宽使用情况
 
 ```bash
-# 安装nload
-apt install nload
-
 # 查看网卡信息
 ifconfig
 ip addr
 
+#### Ubuntu
+# 安装nload
+apt install nload
 # 查看某块网卡带宽使用情况
 nload em1
+
+#### Centos
+# 安装iftop
+yum install epel-release
+yum install iftop
+# 查看某块网卡带宽使用情况，通过 q 退出
+iftop -i eth1
+#"TX"：从网卡发出的流量
+#"RX"：网卡接收流量
+#"TOTAL"：网卡发送接收总流量
+#"cum"：iftop开始运行到当前时间点的总流量
+#"peak"：网卡流量峰值
+#"rates"：分别表示最近2s、10s、40s 的平均流量
 ```
 
 ## 查找文件
@@ -647,6 +669,22 @@ yum install --downloadonly --downloaddir=/tmp/ podman
 
 # 已安装相应的软件
 yum reinstall --downloadonly --downloaddir=/tmp/ podman
+
+# 拷贝到离线机用rpm进行安装, 用--nodeps是保证可以不按顺序进行安装
+sudo rpm -ivh ./* --nodeps
+```
+
+## apt只下载不安装deb包
+
+```bash
+# 未安装相应的软件
+apt-get install -d  PackageName
+
+# 已安装相应的软件
+apt-get install -d --reinstall  PackageName
+
+# 默认保存目录
+/var/cache/apt/archives/
 ```
 
 ## 开机时间/重启历史记录
@@ -742,4 +780,17 @@ net.ipv4.icmp_echo_ignore_all = 1
 
 # 生效
 sysctl -p
+```
+
+## 查看linux日志方法
+
+```bash
+# 查找ERROR日志，以及它的后10行
+$ grep -A 10 ERROR app.log
+
+# 查找ERROR日志，以及它的前10行
+$ grep -B 10 ERROR app.log
+
+# -C代表前10行和后10行
+$ grep -C 10 ERROR app.log
 ```

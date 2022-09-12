@@ -721,10 +721,10 @@ Context:	http， server，location
 ```conf
 #  Example Configuration
 http {
-    #limit_req_zone ：限制请求
-    # $binary_remote_addr ：二进制地址
+    #limit_req_zone ：限制单位时间内的请求数，即速率限制,采用的漏桶算法 "leaky bucket"
+    # $binary_remote_addr ：限制同一客户端ip地址
     # zone=one:10m ：限制策略的名称：占用10M空间
-    # rate=1r/s：允许每秒1次请求
+    # rate=1r/s：允许相同标识的客户端的访问频次，这里限制的是每秒1次，还可以有比如30r/m
     limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
 
     ...
@@ -735,8 +735,11 @@ http {
 
         location /search/ {
             # limit_req zone=one：引用限制策略的名称one
-            # burst=5 表示最大延迟请求数量不大于5。如果太过多的请求被限制延迟是不需要的，这时需要使用nodelay参数，服务器会立刻返回503状态码。
-            limit_req zone=one burst=5;
+            # burst=5：设置一个大小为5的缓冲区当有大量请求（爆发）过来时，超过了访问频次限制的请求可以先放到这个缓冲区内
+            # nodelay：超过访问频次而且缓冲区也满了的时候就会直接返回503，如果没有设置，则所有请求会等待排队
+            limit_req zone=one burst=5 nodelay;
+            # 自定义返回状态码
+            limit_req_status 598;
         }
     }
 }
@@ -754,7 +757,7 @@ Context:	http, server, location
 示例
 
 ```conf
-# 官网示例
+# 一次只允许每个IP地址一个连接
 http {
     limit_conn_zone $binary_remote_addr zone=addr:10m;
 
@@ -768,6 +771,15 @@ http {
             limit_conn addr 1;
         }
     }
+}
+
+limit_conn_zone $binary_remote_addr zone=perip:10m;
+limit_conn_zone $server_name zone=perserver:10m;
+
+server {
+    ...
+    limit_conn perip 10;
+    limit_conn perserver 100;
 }
 ```
 
@@ -796,7 +808,7 @@ Default:	—
 Context:	http, server, location, limit_except
 ```
 
-示例
+示例，也可以单独维护到一个 `blockip.conf` 文件里，然后`include`
 
 ```conf
 # 官网示例
@@ -806,6 +818,7 @@ location / {
     allow 10.1.1.0/16;  
     allow 2001:0db8::/32;
     deny  all;   # 拒绝所有
+    include /soft/nginx/ip/blockip.conf
 }
 ```
 
@@ -833,6 +846,25 @@ location / {
 }
 ```
 
+## 动静分离
+
+将项目中所有的静态资源全部拷贝到`static_resources`目录下，而后将项目中的静态资源移除重新打包。
+
+```conf
+location ~ .*\.(html|htm|gif|jpg|jpeg|bmp|png|ico|txt|js|css){
+    # 最后面的值在上线前可配置为允许的域名地址
+    valid_referers blocked 192.168.12.129;
+    if ($invalid_referer) {
+        # 可以配置成返回一张禁止盗取的图片
+        # rewrite   ^/ http://xx.xx.com/NO.jpg;
+        # 也可直接返回403
+        return   403;
+    }
+    root   /soft/nginx/static_resources;
+    expires 7d;
+}
+```
+
 ## Nginx压缩配置gzip
 
 * `http_gunzip_module`模块
@@ -855,7 +887,7 @@ http {
     gzip_buffers        32 4k;  # 压缩响应的缓冲区数量和大小(4K 内存页大小取决于平台 getconf PAGESIZE)
     gzip_proxied        any;    # 对代理的请求是否开启压缩
     # 写压缩率大的(css/js/xml/json/ttf)， image图片就不要写了，压缩空间太小，又耗CPU
-    gzip_types text/plain application/xml application/javascript application/x-javascript text/css application/json;    # 哪些类型的数据需要被压缩
+    gzip_types text/plain application/xml application/javascript text/javascript application/x-javascript text/css application/json;    # 哪些类型的数据需要被压缩
     gzip_disable     "MSIE [1-5]\.";    # User-Agent 被正则匹配到的不开启压缩
     gzip_vary on;               # 当gzip对请求生效时会被添加一个响应头 "Vary: Accept-Encoding"
 }
@@ -878,6 +910,98 @@ gzip_static on|off|always;  # always: 不管客户端是否支持压缩我他妈
 server {
     listen 80;
     return 307 https://$host$request_uri;
+}
+```
+
+## Nginx缓冲区
+
+有了缓冲后，Nginx代理可暂存后端的响应，然后按需供给数据给客户端。
+
+```conf
+http{
+    proxy_connect_timeout 10;
+    proxy_read_timeout 120;
+    proxy_send_timeout 10;
+    proxy_buffering on;
+    client_body_buffer_size 512k;
+    proxy_buffers 4 64k;
+    proxy_buffer_size 16k;
+    proxy_busy_buffers_size 128k;
+    proxy_temp_file_write_size 128k;
+    proxy_temp_path /soft/nginx/temp_buffer;
+}
+```
+
+## Nginx缓存机制
+
+```conf
+http{
+    # proxy_cache_path path [levels=levels] [use_temp_path=on|off] keys_zone=name:size [inactive=time] [max_size=size] [manager_files=number] [manager_sleep=time] [manager_threshold=time] [loader_files=number] [loader_sleep=time] [loader_threshold=time] [purger=on|off] [purger_files=number] [purger_sleep=time] [purger_threshold=time];
+    # 设置缓存的目录，并且内存中缓存区名为hot_cache，大小为128m，
+    # 三天未被访问过的缓存自动清楚，磁盘中缓存的最大容量为2GB。
+    proxy_cache_path /soft/nginx/cache levels=1:2 keys_zone=hot_cache:128m inactive=3d max_size=2g;
+    
+    server{
+        location / {
+            # 使用名为nginx_cache的缓存空间
+            proxy_cache hot_cache;
+            # 对于200、206、304、301、302状态码的数据缓存1天
+            proxy_cache_valid 200 206 304 301 302 1d;
+            # 对于其他状态的数据缓存30分钟
+            proxy_cache_valid any 30m;
+            # 定义生成缓存键的规则（请求的url+参数作为key）
+            proxy_cache_key $host$uri$is_args$args;
+            # 资源至少被重复访问三次后再加入缓存
+            proxy_cache_min_uses 3;
+            # 当后端出现异常时，是否允许Nginx返回缓存作为响应
+            # timeout|invalid_header|updating|http_500
+            ###proxy_cache_use_stale timeout;
+            # 出现重复请求时，只让一个去后端读数据，其他的从缓存中读取
+            proxy_cache_lock on;
+            # 上面的锁超时时间为3s，超过3s未获取数据，其他请求直接去后端
+            proxy_cache_lock_timeout 3s;
+            # 设置对于那些HTTP方法开启缓存,如GET、HEAD等
+            ### proxy_cache_methods HEAD;
+            # 对于请求参数或cookie中声明了不缓存的数据，不再加入缓存
+            proxy_no_cache $cookie_nocache $arg_nocache $arg_comment;
+            # 在响应头中添加一个缓存是否命中的状态（便于调试）
+            add_header Cache-status $upstream_cache_status;
+        }
+    }
+}
+```
+
+## 缓存清理
+
+第三方模块`ngx_cache_purge`
+
+```bash
+# 首先去到Nginx的安装目录下，创建一个`cache_purge`目录
+mkdir cache_purge && cd cache_purge
+
+# 通过wget指令从github上拉取安装包的压缩文件并解压：
+wget https://github.com/FRiCKLE/ngx_cache_purge/archive/2.3.tar.gz
+tar -xvzf 2.3.tar.gz
+
+# 再次去到之前Nginx的解压目录下
+cd /soft/nginx/nginx1.21.6
+
+# 重新构建一次Nginx，通过--add-module的指令添加刚刚的第三方模块
+./configure --prefix=/soft/nginx/ --add-module=/soft/nginx/cache_purge/ngx_cache_purge-2.3/
+make
+
+# 删除之前Nginx的启动文件，不放心的也可以移动到其他位置：
+rm -rf /soft/nginx/sbin/nginx
+
+# 从生成的objs目录中，重新复制一个Nginx的启动文件到原来的位置
+cp objs/nginx /soft/nginx/sbin/nginx
+
+# nginx.conf添加清理规则
+location ~ /purge(/.*) {
+  # 配置可以执行清除操作的IP（线上可以配置成内网机器）
+  # allow 127.0.0.1; # 代表本机
+  allow all; # 代表允许任意IP清除缓存
+  proxy_cache_purge $host$1$is_args$args;
 }
 ```
 

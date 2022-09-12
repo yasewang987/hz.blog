@@ -1,5 +1,7 @@
 # python国产环境适配
 
+* 编译python相关依赖库的时候，python的版本一定要和目标机器上的python版本一致。
+
 ## 不同服务器迁移
 
 一定要注意一下，如果虚拟环境文件夹的路径变了，需要修改 `bin/activate` 的如下内容：
@@ -10,7 +12,7 @@ export VIRTUAL_ENV
 
 ## 激活环境
 
-使用 `virtualenv` 建立虚拟环境，直接放到涉密服务器即可。
+使用 `virtualenv` 获取 `python3 -m venv` 建立虚拟环境，直接放到涉密服务器即可。
 
 ```bash
 # 激活虚拟环境
@@ -63,7 +65,7 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 ```text
 Name: funcun-code
-Version: 4.1.22
+Version: 2022.07.15
 Release:        1
 Summary:        funcun code
 
@@ -140,6 +142,8 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 
 ## 源码编译
 
+每个环境最好都是重新编译
+
 * 安装依赖
 
 ```bash
@@ -168,6 +172,6 @@ make
 make install
 
 # 添加软链接
-ln -s /usr/local/python3/bin/python3.8 /usr/bin/python3
-ln -s /usr/local/python3/bin/pip3.8 /usr/bin/pip3
+ln -s /opt/yourpath/bin/python3.8 /usr/bin/python3
+ln -s /opt/yourpath/bin/pip3.8 /usr/bin/pip3
 ```

@@ -17,6 +17,10 @@ make PREFIX=/mypath/redis install
 # 启动redis
 ./redis-server ../redis.conf
 
+# 后台启动，修改redis.conf
+daemonize yes
+logfile "redis.log"
+
 # reids-cli链接
 ./redis-cli
 redis> set foo bar
