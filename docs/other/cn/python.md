@@ -142,7 +142,12 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 
 ## 源码编译
 
-每个环境最好都是重新编译
+每个环境最好都是重新编译（建议在低版本的gcc环境下编译）
+
+```bash
+# 推荐在python3.6.8的镜像里编译
+gcc -v
+```
 
 * 安装依赖
 

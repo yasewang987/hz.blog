@@ -5,7 +5,7 @@
 鼠标手势：WGestures  http://www.yingdev.com/projects/wgestures  
 资源管理器插件 QTTabBar http://qttabbar.wikidot.com/  
 贴图 Snipaste https://zh.snipaste.com/  
-USB启动盘刻录：https://rufus.ie/zh_CN.html  或者 UISO  
+USB启动盘刻录：https://rufus.ie/zh_CN.html  或者 UltraISO(启动-写入硬盘镜像) 
 终端：https://github.com/Eugeny/terminus/releases  
 Windows子系统WSL: https://sspai.com/post/47719
 

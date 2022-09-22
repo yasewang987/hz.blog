@@ -27,6 +27,17 @@ apt-get install rpm
 mkdir -pv  ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS,BUILDROOT}
 ```
 
+## 安装rpm包
+
+```bash
+sudo rpm -ivh xxxx.rpm
+rpm -Uvh *.rpm --nodeps --force
+
+# 或者
+
+yum localinstall xxxx.rpm
+```
+
 
 ## rpmbuild 命令选项
 
@@ -160,16 +171,6 @@ rm -rf %{buildroot}		//清理临时存放软件包构建的目录
 
 关于`%{buildroot}`这里进行解释一下，`%{buildroot}`是`文件名`+`版本号`+`编译版本号`+`系统架构类型`的目录，它存放在`BUILDROOT`目录下。列如示例中`hadoop-2.7.0.tar.gz`软件包。它的`%{buildroot}`目录具体所指是`/root/rpmbuild/BUILDROOT/hadoop-2.7.0-1.x86_64`这个目录。
 
-## 安装rpm包
-
-```bash
-sudo rpm -ivh xxxx.rpm
-rpm -Uvh *.rpm --nodeps --force
-
-# 或者
-
-yum localinstall xxxx.rpm
-```
 ## 自定义命令示例
 
 ```text
