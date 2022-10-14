@@ -7,4 +7,6 @@
     ```bash
     import torch
     torch.cuda.is_available()
+    # 验证gpu环境
+    torch.zeros([2,5]).cuda()
     ```

@@ -14,3 +14,12 @@ ln -s /usr/lib/aarch64-linux-gnu/libffi.so.7 /usr/lib/aarch64-linux-gnu/libffi.s
 ```bash
 pip install wheel
 ```
+
+* `Could not find a package configuration file provided by “Opencv“`
+
+```bash
+# 在CMakeList.txt中查找
+find_package(OpenCV REQUIRED)
+# 在上面一行增加如下内容
+set(OpenCV_DIR /opt/opencv-4.5.2/build)
+```
