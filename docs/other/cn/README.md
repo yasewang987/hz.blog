@@ -1,5 +1,6 @@
 # 国产环境适配
 
+* [gcc资料](./gcc.md)
 * [qemu虚拟机](./qemu.md)
 * [es](./es.md)
 * [jdk](./jdk.md)

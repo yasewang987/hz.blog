@@ -457,6 +457,7 @@ module.exports = {
                 'regular'
             ],
             '/other/cn/': [
+                'gcc',
                 'qemu',
                 'es',
                 'jdk',
