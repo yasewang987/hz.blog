@@ -9,9 +9,9 @@
 ```bash
 # 其中 <version> 替换为你希望安装的 Go 版本
 # 这一步，只是安装了一个特定 Go 版本的包装器
-go get golang.org/dl/go<version>
+go install golang.org/dl/go<version>@latest
 
-# 安装特定的 Go 版本
+# 下载
 go<version> download
 
 # 如果你是第一次升级go版本，则将原来的go重命名一下

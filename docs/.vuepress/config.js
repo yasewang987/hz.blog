@@ -198,7 +198,8 @@ module.exports = {
                 'redis',
                 'encrypt',
                 'viper',
-                'spider'
+                'spider',
+                'taskschedule'
             ],
             '/code/web/npm/': [
                 'base',

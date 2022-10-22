@@ -89,6 +89,9 @@ docker top [OPTIONS] CONTAINER [ps OPTIONS]
 docker run --rm --gpus '"device=1,2"' 84b086e2ba68 nvidia-smi
 # 所有显卡
 docker run --rm --gpus all xxxx
+
+##### 查看镜像层级
+docker image history xxxx:11
 ```
 
 ## docker容器中使用docker命令
