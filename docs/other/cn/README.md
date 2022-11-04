@@ -10,3 +10,4 @@
 * [python](./python.md)
 * [redis](./redis.md)
 * [openssh](./openssh.md)
+* [其他资料](./other.md)

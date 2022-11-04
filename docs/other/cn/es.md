@@ -32,12 +32,16 @@ elif [ ! -z "$JAVA_HOME" ]; then
 -Xms10g
 -Xmx10g
 
+# 修改es启动的端口和ip，config/elasticsearch.yml
+http.port: 28001
+http.host: 0.0.0.0
+
 # 启动 -d 后台运行
 /opt/mytest/elasticsearch/bin/elasticsearch -d
 
 # 日志在 logs/elasticsearch.log
 
-# 查看到es对应的版本和基本信息
+# 查看到es对应的版本和基本信息,如果端口改过换成新的即可
 curl http://localhost:9200
 # 查看索引信息
 curl http://localhost:9200/_cat/indices?v 
@@ -48,8 +52,8 @@ curl http://localhost:9200/_cat/indices?v
 ```spec
 %global mname es
 %global mpath base/%{mname}
-Name: mytest-%{mname}
-Version: 1.0.0
+Name: funcun-%{mname}
+Version: 2022.11
 Summary: funcun %{mname}
 Release: 1
 License: GPLv3+
@@ -65,8 +69,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/mytest/%{mpath}
-cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
+mkdir -p %{buildroot}/opt/funcun/%{mpath}
+cp -rf %{_builddir}/funcun/%{mpath}/* %{buildroot}/opt/funcun/%{mpath}
 
 %post
 
@@ -74,7 +78,7 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/mytest/%{mpath}
+/opt/funcun/%{mpath}
 ```
 
 ## deb包制作

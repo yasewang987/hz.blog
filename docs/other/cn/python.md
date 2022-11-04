@@ -31,15 +31,14 @@ bin/python3
 ```text
 %define __os_install_post %{nil}
 %define debug_package %{nil}
-%global mname mytest-env
-%global mpath %{mname}
+%global mname funcun-py
 Name: %{mname}
-Version: 1.0.0
+Version: 2022.11
 Summary: %{mname}
 Release: 1
 License: GPLv3+
 Group: System Enviroment/Base
-AutoReqProv:no
+AutoReqProv: no
 
 %description
 funcun %{mname}
@@ -50,8 +49,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/mytest/%{mpath}
-cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
+mkdir -p %{buildroot}/opt/funcun/base/python
+cp -rf %{_builddir}/funcun/base/python/* %{buildroot}/opt/funcun/base/python
 
 %post
 
@@ -59,9 +58,10 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/mytest/%{mpath}
+/opt/funcun/base/python
 ```
-* python业务代码打包
+
+* `python业务代码打包`
 
 ```text
 Name: funcun-code
@@ -136,8 +136,6 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 %{installpath}
 %{_bindir}
 ```
-
-## deb包制作
 
 
 ## 源码编译

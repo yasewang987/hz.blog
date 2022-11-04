@@ -4,6 +4,29 @@
 
     https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
 
+## Nvidia显卡驱动和Cudab版本关系
+
+* `Nvidia`：英伟达显卡驱动。
+* `CUDA`：为“GPU通用计算”构建的运算平台。
+* `CUDA Toolkit (nvidia)`: CUDA完整的工具安装包，其中提供了 Nvidia 驱动程序、开发 CUDA 程序相关的开发工具包等可供安装的选项。包括 CUDA 程序的编译器、IDE、调试器等，CUDA 程序所对应的各式库文件以及它们的头文件。
+* `CUDA Toolkit (Pytorch)`： CUDA不完整的工具安装包，其主要包含在使用 CUDA 相关的功能时所依赖的动态链接库。不会安装驱动程序。
+* `NVCC`: 是CUDA的编译器，只是 CUDA Toolkit 中的一部分
+* `cudnn`：为深度学习计算设计的软件库，加速库。
+
+CUDA有两个主要的API：`runtime(运行时) API`和`driver API`，这两个API都有对应的CUDA版本。
+
+* `driver API`是通过`GPU driver installer`安装的，可理解为系统出场安装的默认驱动，`nvidia-smi`显示的是 `driver API`。
+* `runtime API`是通过  `CUDA toolkit`安装的，可理解为用户自己安装的驱动，`nvcc`显示的是`runtime API`。
+
+通常情况下，这两个显示都是不一样的，不过不用担心，只要`driver API`比`runtime API`高，一般都没问题。但是最好不要有大版本的差异，有可能会出现不能用的问题。
+
+`cuDNN（CUDA Deep Neural Network library）`：是`NVIDIA`打造的针对深度神经网络的加速库，是一个用于深层神经网络的GPU加速库。如果你要用GPU训练模型，`cuDNN`不是必须的，但是一般会采用这个加速库。
+
+```bash
+# cuDNN 版本查询
+cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+```
+
 ## Ubuntu20.04显卡驱动安装
 
 * 禁用 `nouveau` 驱动
@@ -156,13 +179,19 @@ rpm -aq | grep kernel-devel
 
 ## nvidia运行docker容器选择
 
+* 开发镜像：
+
 如果是`Tensorflow`的，到帮助目录先确认要下载的镜像版本号：https://docs.nvidia.com/deeplearning/frameworks/tensorflow-release-notes/running.html#running
 
 如果是`Pytorch`的，到这个地址确认：https://docs.nvidia.com/deeplearning/frameworks/pytorch-release-notes/index.html
 
-如果上面没有找到符合要求的镜像，也可以到 dockerhub 里面找
+如果上面没有找到符合要求的镜像，也可以到 dockerhub 里面找 【nvidia/cuda】
 
 再到Nvidia官方的容器镜像仓库下载：https://ngc.nvidia.com/catalog/containers
+
+* 运行镜像：
+
+直接到 `hub.docker.com` 找 `nvidia/cuda` 的对应版本
 
 ## 常见错误处理
 

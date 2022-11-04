@@ -467,7 +467,8 @@ module.exports = {
                 'nginx',
                 'python',
                 'redis',
-                'openssh'
+                'openssh',
+                'other'
             ],
             '/ai/deploy/': [
                 'nvidia',
