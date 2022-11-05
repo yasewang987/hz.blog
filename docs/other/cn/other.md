@@ -1,5 +1,29 @@
 # 其他资料
 
+* 龙芯的适配开源地址：`https://github.com/Loongson-Cloud-Community`
+* 龙芯官放开源社区：`http://www.loongnix.cn/zh/proj/`
+
+## 国产系统信息记录
+
+### 银河麒麟v10
+
+适配镜像：arm和x86用 `python:3.7.4`, mips用 `python:3.7.7`
+
+* 支持平台：arm，x86,mips64
+* 安装包：【安全管理平台】rpm包
+* python信息：3.7.4，/usr/bin/python3
+* gcc版本：8.3.0
+* 其他：自带了mariadb
+
+### 中科方德-SVS2.16.2
+
+适配镜像：`python:3.6.8`
+
+* 支持平台：arm，x86
+* 安装包：【安全管理平台】rpm包
+* python信息：3.6.8，/usr/bin/python3
+* 其他：自带了mariadb
+
 ## 其他specs
 
 * 通用打包（数据/代码）
