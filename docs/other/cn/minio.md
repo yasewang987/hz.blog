@@ -5,6 +5,8 @@
 
 官方包（二进制，rpm，deb）下载地址：https://min.io/download#/linux
 
+`loongarch`官方下载地址：https://github.com/Loongson-Cloud-Community/minio/releases
+
 启动命令：
 
 ```bash

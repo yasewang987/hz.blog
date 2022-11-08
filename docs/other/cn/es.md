@@ -2,13 +2,11 @@
 
 ## 源码编译
 
-源码编译参考地址：https://bbs.huaweicloud.com/forum/thread-26271-1-1.html
-
-官方包（二进制、rpm、deb）下载地址：https://www.elastic.co/cn/downloads/elasticsearch#ga-release
-
-7.14.0版本arm版本包地址：https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.14.0-linux-aarch64.tar.gz
-
-7.14.0版本amd版本包地址：https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.14.0-linux-x86_64.tar.gz
+* 源码编译参考地址：https://bbs.huaweicloud.com/forum/thread-26271-1-1.html
+* 官方包（二进制、rpm、deb）下载地址：https://www.elastic.co/cn/downloads/elasticsearch#ga-release
+* 7.14.0版本arm版本包地址：https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.14.0-linux-aarch64.tar.gz
+* 7.14.0版本amd版本包地址：https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.14.0-linux-x86_64.tar.gz
+* `loongarch`官方下载地址：`https://github.com/Loongson-Cloud-Community/elasticsearch/releases` 选择对应版本即可。
 
 ### 启动es
 

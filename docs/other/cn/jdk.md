@@ -7,7 +7,7 @@
 
 `arm、x86`官方下载安装包地址（非源码）：https://adoptopenjdk.net/releases.html?variant=openjdk8&jvmVariant=hotspot  ，选择对应版本之后直接下载压缩包解压就可以用了。
 
-`mips`官方下载地址：http://www.loongnix.cn/zh/api/java/ ，进入页面之后选择对应版本
+`loongarch`官方下载地址：http://www.loongnix.cn/zh/api/java/ ，进入页面之后选择对应版本
 
 例如下载 aarch64 版本的压缩包： https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u302-b08/OpenJDK8U-jdk_aarch64_linux_hotspot_8u302b08.tar.gz  ，使用这个地址会比较慢，这个时候可以将 `githu.com` 替换成国内的加速源，替换后 https://hub.fastgit.org/adoptium/temurin8-binaries/releases/download/jdk8u302-b08/OpenJDK8U-jdk_aarch64_linux_hotspot_8u302b08.tar.gz
 

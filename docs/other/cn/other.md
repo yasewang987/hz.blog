@@ -13,6 +13,7 @@
 * 安装包：【安全管理平台】rpm包
 * python信息：3.7.4，/usr/bin/python3
 * gcc版本：8.3.0
+* cmake版本：3.12.1
 * 其他：自带了mariadb
 
 ### 中科方德-SVS2.16.2

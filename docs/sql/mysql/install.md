@@ -19,6 +19,9 @@
     # 去除localhost限制
     update user set host='%' where host='localhost';
     flush privileges;
+
+    # 修改密码（mariadb10.x）
+    SET PASSWORD FOR 'root'@'localhost' = PASSWORD('newpass');
     ```
 
 1. 如果mysql是 8 版本以上应该会出一下错误:`ERROR 2059 (HY000): Authentication plugin 'caching_sha2_password' cannot be loaded:`  
