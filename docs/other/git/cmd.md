@@ -1,4 +1,10 @@
 # Git常用操作
+## Git常用命令
+
+```bash
+# 从tag标签迁分支
+git checkout -b tagname
+```
 ## Git删除分支
 
 * 删除本地分支  

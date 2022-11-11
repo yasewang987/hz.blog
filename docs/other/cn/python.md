@@ -205,7 +205,7 @@ ln -s /opt/yourpath/bin/python3.8 /usr/bin/python3
 ln -s /opt/yourpath/bin/pip3.8 /usr/bin/pip3
 ```
 
-## 龙芯python镜像仓库
+## 龙芯python依赖库
 
 正常的依赖包还是通过官方的引入即可。
 

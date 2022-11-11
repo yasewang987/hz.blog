@@ -1,6 +1,8 @@
 # 其他资料
 
 * 龙芯的适配开源地址：`https://github.com/Loongson-Cloud-Community`
+* 龙芯系统仓库地址：`http://pkg.loongnix.cn/loongnix-server/8.4/AppStream/loongarch64/release/Packages/`
+* 龙芯python仓库地址：`https://pypi.loongnix.cn/`
 * 龙芯官放开源社区：`http://www.loongnix.cn/zh/proj/`
 
 ## 国产系统信息记录
