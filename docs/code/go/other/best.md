@@ -320,8 +320,6 @@ var mod string
 }
 ```
 
-## Goroutine内存泄漏
-
 ### 情况一：http服务未设置超时时间
 
 * 上游服务作为客户端使用了 `http1.1` 并且将连接设置为 `keepalive`；
@@ -826,7 +824,7 @@ if add2 {
 }
 ```
 
-### 初始化时尽量指定容量
+### slice初始化时尽量指定容量
 
 方法2相较于方法1，就只有一个区别：在初始化`[]int slice`的时候在`make`中设置了`cap`的长度，就是`slice`的大小。
 
@@ -854,7 +852,7 @@ func main() {
 
 ## map操作
 
-### 初始化时指定容量
+### map初始化时指定容量
 
 注意，与 slice 不同。map capacity 提示并不保证完全的抢占式分配，而是用于估计所需的 hashmap bucket 的数量。因此，在将元素添加到 map 时，甚至在指定 map 容量时，仍可能发生分配。
 
@@ -972,4 +970,72 @@ func (s *Stats) Snapshot() map[string]int {
 }
 // snapshot 现在是一个拷贝
 snapshot := stats.Snapshot()
+```
+
+## 修改go实际分配内存
+其原理是扩大`golang runtime`的堆内存，使得实际分配的内存不容易超过堆内存的一定比例，进而减少`GC`的频率。GC的频率低了，`STW`的次数和时间也就更少，从而程序的性能也提升了。
+```go
+func main(){
+    ballast := make([]byte, 10*1024*1024*1024)
+    runtime.KeepAlive(ballast)
+    // do other things
+}
+```
+
+## 声明使用多核
+
+```go
+import _ "go.uber.org/automaxprocs"
+```
+
+## 原子操作/自旋锁
+
+```go
+var value int64 = 0
+
+atomic.AddInt64(&value, 1)           // 原子加
+atomic.AddInt64(&value, -1)          // 原子减
+
+var n uint64 = 1
+atomic.AddUint64(&n, 1)
+atomic.AddUint64(&n, ^uint64(0))   // 原子减1，无符号类型，使用反码来减
+
+newValue := atomic.LoadInt64(&value) // 内存屏障，避免乱序执行，并且同步CPU cache和内存
+atomic.StoreInt64(&value, newValue)
+
+oldValue := atomic.SwapInt64(&value, 0) // 获取当前值，并清零
+
+// 自旋锁
+var globalValue int64 = 0
+func xxx(newValue int64){
+	oldValue := atomic.LoadInt64(&globalValue)  // 相当于使用 memory barrier 指令，避免指令乱序
+	for !atomic.CompareAndSwapInt64(&globalValue, oldValue, newValue) {  // 自旋等待，直到成功
+		oldValue = atomic.LoadInt64(&globalValue)  // 失败后，说明那一瞬间值被修改了。需要重新获取最新的值
+		// 其他数值操作的准备
+	}  
+}
+```
+
+`atomic.Value`: 用于并发场景下需要切换的对象
+
+有的对象很基础，可能需要频繁访问，且有时又会发生引用的切换。比如程序中的全局配置，很多地方都会引用，有时配置更新后，又会切换为最新的配置。
+
+这种情况下，加锁的成本太高，不加锁又会带来风险。因此，使用`sync.Value`来保存全局配置的数据是个不错的选择。
+
+```go
+type Configs map[string]string
+
+var globalConfig atomic.Value
+
+func GetConfig() Configs {
+	v, ok := globalConfig.Load().(Configs)
+	if ok{
+		return v
+	}
+	return map[string]string{}
+}
+
+func SetConfig(cfg Configs){
+	globalConfig.Store(cfg)
+}
 ```

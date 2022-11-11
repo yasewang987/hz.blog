@@ -31,15 +31,14 @@ bin/python3
 ```text
 %define __os_install_post %{nil}
 %define debug_package %{nil}
-%global mname mytest-env
-%global mpath %{mname}
+%global mname funcun-py
 Name: %{mname}
-Version: 1.0.0
+Version: 2022.11
 Summary: %{mname}
 Release: 1
 License: GPLv3+
 Group: System Enviroment/Base
-AutoReqProv:no
+AutoReqProv: no
 
 %description
 funcun %{mname}
@@ -50,8 +49,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/mytest/%{mpath}
-cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
+mkdir -p %{buildroot}/opt/funcun/base/python
+cp -rf %{_builddir}/funcun/base/python/* %{buildroot}/opt/funcun/base/python
 
 %post
 
@@ -59,9 +58,10 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/mytest/%{mpath}
+/opt/funcun/base/python
 ```
-* python业务代码打包
+
+* `python业务代码打包`
 
 ```text
 Name: funcun-code
@@ -137,12 +137,15 @@ cp -rf %{_builddir}/%{pyname}-%{version}/out/usr/local/bin/* %{buildroot}%{_bind
 %{_bindir}
 ```
 
-## deb包制作
-
 
 ## 源码编译
 
-每个环境最好都是重新编译
+每个环境最好都是重新编译（建议在低版本的gcc环境下编译）
+
+```bash
+# 推荐在python3.6.8的镜像里编译
+gcc -v
+```
 
 * 安装依赖
 
@@ -152,7 +155,7 @@ sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 
-# centos
+# centos/loongarch
 sudo yum install @development zlib-devel bzip2 bzip2-devel readline-devel sqlite \
 sqlite-devel openssl-devel xz xz-devel libffi-devel findutils
 ```
@@ -166,6 +169,32 @@ curl -O https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tar.xz
 # 解压
 tar -Jxvf Python-3.7.13.tar.xz && cd Python-3.7.13
 
+###### loongarch的需要修改python源码的如下配置
+# config.guess(963行)
+    ia64:Linux:*:*)
+        echo "$UNAME_MACHINE"-unknown-linux-"$LIBC"
+        exit ;;
+    # 增加配置---------------
+    loongarch32:Linux:*:* | loongarch64:Linux:*:*)
+        echo "$UNAME_MACHINE"-unknown-linux-"$LIBC"
+        exit ;;
+    # -----------------------
+    k1om:Linux:*:*)
+        echo "$UNAME_MACHINE"-unknown-linux-"$LIBC"
+        exit ;;
+# config.sub（294，396）
+        | msp430 \
+        # 增加配置-----------------
+        | loongarch32 | loongarch64 \
+        #-------------------------
+        | nds32 | nds32le | nds32be \
+
+        | le32-* | le64-* \
+        # 增加配置--------------------
+        | loongarch32-* | loongarch64-* \
+        # ---------------------------
+        | lm32-* \
+
 # 编译安装，--enable-optimizations 配置项用于提高 Python 安装后的性能，使用会导致编译速度稍慢
 ./configure --prefix=/opt/yourpath --enable-optimizations
 make
@@ -174,4 +203,19 @@ make install
 # 添加软链接
 ln -s /opt/yourpath/bin/python3.8 /usr/bin/python3
 ln -s /opt/yourpath/bin/pip3.8 /usr/bin/pip3
+```
+
+## 龙芯python依赖库
+
+正常的依赖包还是通过官方的引入即可。
+
+```bash
+pip install -i https://pypi.douban.com/simple xxxx
+```
+
+* 使用文档：`http://docs.loongnix.cn/python/python.html`
+* 仓库地址：`https://pypi.loongnix.cn/loongson/pypi`
+* 使用示例
+```bash
+pip install xxxxx -i https://pypi.loongnix.cn/loongson/pypi --extra-index-url https://pypi.org/simple
 ```

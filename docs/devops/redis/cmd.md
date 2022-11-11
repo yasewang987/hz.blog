@@ -20,4 +20,7 @@ flushdb
 dbsize
 # 或者
 info keyspace
+
+# 查看所有key
+keys *
 ```

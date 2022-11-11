@@ -2,7 +2,8 @@
 
 ## 源码编译
 
-源码地址：https://github.com/redis/redis , 点击 `tags` 选择对应的版本下载源码即可。
+* `x86,arm`源码地址：https://github.com/redis/redis , 点击 `tags` 选择对应的版本下载源码即可。
+* `loongarch`官方源码地址: `https://github.com/Loongson-Cloud-Community/redis/releases`，选择对应版本下载。
 
 注意事项：一定要查看`pagesize`, 命令 `getconf PAGESIZE`,尽量在pagesize大的环境里面打包，因为pagesize小的环境打出来的包在大的环境中无法使用。
 
@@ -34,8 +35,8 @@ redis> get foo
 ```text
 %global mname redis
 %global mpath base/%{mname}
-Name: mytest-%{mname}
-Version: 1.0.0
+Name: funcun-%{mname}
+Version: 2022.11
 Summary: funcun %{mname}
 Release: 1
 License: GPLv3+
@@ -51,8 +52,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/mytest/%{mpath}
-cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
+mkdir -p %{buildroot}/opt/funcun/%{mpath}
+cp -rf %{_builddir}/funcun/%{mpath}/* %{buildroot}/opt/funcun/%{mpath}
 
 %post
 
@@ -60,7 +61,7 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/mytest/%{mpath}
+/opt/funcun/%{mpath}
 ```
 
 ## deb包制作

@@ -5,6 +5,8 @@
 
 官方包（二进制，rpm，deb）下载地址：https://min.io/download#/linux
 
+`loongarch`官方下载地址：https://github.com/Loongson-Cloud-Community/minio/releases
+
 启动命令：
 
 ```bash
@@ -40,13 +42,11 @@ CGO_ENABLED=0 GOOS=linux GOARCH=mips64le go build
 ```
 ## rpm包制作
 
-### make命令编译
-
 ```text
 %global mname minio
 %global mpath base/%{mname}
-Name: mytest-%{mname}
-Version: 1.0.0
+Name: funcun-%{mname}
+Version: 2022.11
 Summary: funcun %{mname}
 Release: 1
 License: GPLv3+
@@ -62,8 +62,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/mytest/%{mpath}
-cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
+mkdir -p %{buildroot}/opt/funcun/%{mpath}
+cp -rf %{_builddir}/funcun/%{mpath}/* %{buildroot}/opt/funcun/%{mpath}
 
 %post
 
@@ -71,48 +71,7 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/mytest/%{mpath}
-```
-
-### 交叉编译后直接打包
-
-```text
-Name: minio
-Version: 1.0.0
-Summary: funcun minio
-Release: 1
-#Source0: minio
-Packager: funcun
-#BuildRequires: 
-#Requires:
-AutoReqProv:no 
- 
-License: GPLv3+
-Group: System Enviroment/Base
- 
-%description
-funcun minio
- 
-%prep
-#%setup -q 
-%build
-%install
-rm -rf %{buildroot}/opt/%{name}
-mkdir -p %{buildroot}/opt/%{name}
-chmod +x %_topdir/BUILD/%{name}
-cp -rf %_topdir/BUILD/%{name} %{buildroot}/opt/%{name}
-
-%post
-#nohup /opt/minio/minio server /opt/minio > /opt/minio/minio.log 2>&1 &
- 
-%postun
-rm -rf /opt/%{name}
- 
-%clean
-#rm -rf %_builddir/%{name}
-rm -rf %{buildroot}
-%files
-/opt/%{name}
+/opt/funcun/%{mpath}
 ```
 
 ## deb包制作

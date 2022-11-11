@@ -27,6 +27,25 @@ apt-get install rpm
 mkdir -pv  ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS,BUILDROOT}
 ```
 
+## 常用命令
+
+```bash
+# 安装本地包
+sudo rpm -ivh xxxx.rpm
+rpm -Uvh *.rpm --nodeps --force
+# 或者
+yum localinstall xxxx.rpm
+
+# 更新包
+rpm -Uvh *.rpm --nodeps --force
+
+# 删除软件
+rpm -e xxx
+
+# 查看包中的内容
+rpm -qpl xxxx.rpm
+```
+
 
 ## rpmbuild 命令选项
 
@@ -160,16 +179,6 @@ rm -rf %{buildroot}		//清理临时存放软件包构建的目录
 
 关于`%{buildroot}`这里进行解释一下，`%{buildroot}`是`文件名`+`版本号`+`编译版本号`+`系统架构类型`的目录，它存放在`BUILDROOT`目录下。列如示例中`hadoop-2.7.0.tar.gz`软件包。它的`%{buildroot}`目录具体所指是`/root/rpmbuild/BUILDROOT/hadoop-2.7.0-1.x86_64`这个目录。
 
-## 安装rpm包
-
-```bash
-sudo rpm -ivh xxxx.rpm
-rpm -Uvh *.rpm --nodeps --force
-
-# 或者
-
-yum localinstall xxxx.rpm
-```
 ## 自定义命令示例
 
 ```text
@@ -209,27 +218,6 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 
 %clean
 ```
-
-## rpm包命令
-
-1）用RPM安装软件包，最简单的命令如下：
-
-1. `rpm -i example.rpm` 安装 example.rpm 包；
-1. `rpm -iv example.rpm` 安装 example.rpm 包并在安装过程中显示正在安装的文件信息；
-1. `rpm -ivh example.rpm` 安装 example.rpm 包并在安装过程中显示正在安装的文件信息及安装进度
-
-
-
-2）删除已安装的软件包
-
-要卸载软件包example，只需输入以下这行命令：`rpm -e example`
-
-注意：软件包名是example，而不是rpm文件名"example.rpm"。
-
-
-3）升级软件包
-
-升级软件类似于安装软件：`rpm -Uvh example.rpm`
 
 ## 报错处理
 

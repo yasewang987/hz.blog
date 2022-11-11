@@ -15,8 +15,15 @@ sudo  apt-get install build-essential zlib1g-dev libpcre3 libpcre3-dev  libssl-d
 # 如果提示 prefix 参数无效，则需要手动输入下面命令，不要复制
 ./configure --prefix=/opt/mytest/nginx --with-http_ssl_module --with-stream --with-mail=dynamic
 
-# 编译
-make && make install
+# 编译，会直接输入到当前文件夹的 ./objs
+make
+# 安装到prefix目录下
+make install
+
+### 更新nginx
+# 新增模块，需要从 ./configure 开始执行到 make 即可，不要执行make install
+# 编译完成后拷贝覆盖原来的nginx
+cp ./objs/nginx /usr/local/nginx/sbin/
 ```
 
 生成之后所有的文件都在 `/opt/mytest/nginx` 目录，运行命令
@@ -30,8 +37,8 @@ sbin/nginx
 ```text
 %global mname nginx
 %global mpath base/%{mname}
-Name: mytest-%{mname}
-Version: 2022.04
+Name: funcun-%{mname}
+Version: 2022.11
 Summary: funcun %{mname}
 Release: 1
 License: GPLv3+
@@ -47,8 +54,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/mytest/%{mpath}
-cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
+mkdir -p %{buildroot}/opt/funcun/%{mpath}
+cp -rf %{_builddir}/funcun/%{mpath}/* %{buildroot}/opt/funcun/%{mpath}
 
 %post
 
@@ -56,7 +63,7 @@ cp -rf %{_builddir}/mytest/%{mpath}/* %{buildroot}/opt/mytest/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/mytest/%{mpath}
+/opt/funcun/%{mpath}
 ```
 
 ## deb包制作

@@ -198,7 +198,8 @@ module.exports = {
                 'redis',
                 'encrypt',
                 'viper',
-                'spider'
+                'spider',
+                'taskschedule'
             ],
             '/code/web/npm/': [
                 'base',
@@ -457,6 +458,7 @@ module.exports = {
                 'regular'
             ],
             '/other/cn/': [
+                'gcc',
                 'qemu',
                 'es',
                 'jdk',
@@ -465,7 +467,9 @@ module.exports = {
                 'nginx',
                 'python',
                 'redis',
-                'openssh'
+                'openssh',
+                'other',
+                'problem'
             ],
             '/ai/deploy/': [
                 'nvidia',

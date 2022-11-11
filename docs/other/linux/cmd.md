@@ -230,10 +230,14 @@ top
 ps -ef | grep nginx
 # 关闭进程
 sudo kill -9 <PID>
+
 # 查看进程占用cpu，内存资源
 ps -aux | grep nginx
 
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+
+# 或者使用top命令查看
+top -p 进程id
 
 # 批量关闭进程,xargs命令把前面命令的输出结果（PID）作为"kill -9"命令的参数
 ps -ef|grep GSM_run.py|grep -v grep|awk '{print $2}'|xargs kill -9

@@ -58,7 +58,7 @@
 这个插件给VS Code增加了解决方案tab, 支持新建解决方案、新建工程、添加引用、Nuget包，这个插件非常有用
 ![4](http://cdn.go99.top/docs/other/tools/vscode4.png)
 
-## 其他
+## 常用组件
 ### Code Runner
 即选中一段代码，直接run
 ![5](http://cdn.go99.top/docs/other/tools/vscode5.png)
@@ -66,6 +66,12 @@
 ### Visual Studio IntelliCode
 VS代码智能提示，根据上下文语境，自动推荐你下一步用到的代码，后台基于AI的
 ![6](http://cdn.go99.top/docs/other/tools/vscode6.png)
+
+### 思维导图
+mindmap
+
+### UML
+plantuml
 
 ## VSCode错误处理
 
