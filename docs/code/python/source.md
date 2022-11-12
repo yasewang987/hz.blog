@@ -61,7 +61,6 @@ sed -i 's/_mm_free(mem)/\/\/_mm_free(mem)/g' ./ltp/thirdparty/dynet/dynet/mem.cc
       _mm512_extractf32x8_ps(INPUT, 1)
 #else
 ```
-
 ## pytorch源码编译
 
 ### torch
@@ -131,7 +130,6 @@ python setup.py bdist_wheel
     ```
 
     一般来讲，输出主要是报48号错误，也就是CUDA的问题，出现这个问题在于硬件的支持情况，对于算力3.0的显卡来说，如果安装了9.0的CUDA就会出现这个问题，解决的办法是退回CUDA8.0，或者更换更加高端的显卡，或者直接从源码编译，并在源码中做相应设置（修改setup.py文件里的`TORCH_CUDA_ARCH_LIST`，将这个值改成你当前使用的GPU对应算力！）
-
 ## scipy源码编译
 
 ```bash
@@ -152,23 +150,6 @@ tar scipy-1.7.3.tar.gz && cd scipy-1.7.3
 # 编译
 python setup.py bdist_wheel
 ```
-## scikit-learn源码编译
-```bash
-### 龙芯
-# 下载源码
-wget https://files.pythonhosted.org/packages/05/04/507280f20fafc8bc94b41e0592938c6f4a910d0e066be7c8ff1299628f5d/scikit-learn-0.24.2.tar.gz
-tar zxf scikit-learn-0.24.2.tar.gz && cd scikit-learn-0.24.2
-
-# 编译(如果中途编译错误，可以多试几次)
-python setup.py bdist_wheel
-
-# 编译后验证报错
-libblas.so.3: cannot open shared object file: No such file or directory
-# 下载blas库安装处理
-wget http://pkg.loongnix.cn/loongnix-server/8.4/AppStream/loongarch64/release/Packages/blas-3.8.0-8.lns8.loongarch64.rpm
-wget http://pkg.loongnix.cn/loongnix-server/8.4/AppStream/loongarch64/release/Packages/blas-devel-3.8.0-8.lns8.loongarch64.rpm
-wget http://pkg.loongnix.cn/loongnix-server/8.4/AppStream/loongarch64/release/Packages/blas-devel-3.8.0-8.lns8.loongarch64.rpm
-```
 ## numpy源码编译
 
 ```bash
@@ -181,7 +162,6 @@ wget http://pypi.loongnix.cn/loongson/pypi/+f/6e4/12643f64e9159/numpy-1.21.6.tar
 ### 编译
 python setup.py bdist_wheel
 ```
-
 ## Pillow源码编译
 ```bash
 ### 龙芯
@@ -204,6 +184,43 @@ yum install ninja-build
 # 下载代码
 wget https://files.pythonhosted.org/packages/2d/c0/27bef0839c674b1dd84f18079704430896f3b29c17ad8bf3ef2ffc2d5f44/Levenshtein-0.20.7.tar.gz
 tar zxf Levenshtein-0.20.7.tar.gz && cd Levenshtein-0.20.7
+
+# 编译
+python setup.py bdist_wheel
+```
+## scikit-learn源码编译
+```bash
+### 龙芯
+# 下载源码
+wget https://files.pythonhosted.org/packages/05/04/507280f20fafc8bc94b41e0592938c6f4a910d0e066be7c8ff1299628f5d/scikit-learn-0.24.2.tar.gz
+tar zxf scikit-learn-0.24.2.tar.gz && cd scikit-learn-0.24.2
+
+# 编译(如果中途编译错误，可以多试几次)
+python setup.py bdist_wheel
+
+# 编译后验证报错
+libblas.so.3: cannot open shared object file: No such file or directory
+# 下载blas库安装处理
+wget http://pkg.loongnix.cn/loongnix-server/8.4/AppStream/loongarch64/release/Packages/blas-3.8.0-8.lns8.loongarch64.rpm
+wget http://pkg.loongnix.cn/loongnix-server/8.4/AppStream/loongarch64/release/Packages/blas-devel-3.8.0-8.lns8.loongarch64.rpm
+wget http://pkg.loongnix.cn/loongnix-server/8.4/AppStream/loongarch64/release/Packages/blas-devel-3.8.0-8.lns8.loongarch64.rpm
+```
+## lxml源码编译
+```bash
+### 龙芯
+# 安装依赖
+yum install libxslt-devel libxml2-devel
+# 下载源码
+wget https://files.pythonhosted.org/packages/39/2b/0a66d5436f237aff76b91e68b4d8c041d145ad0a2cdeefe2c42f76ba2857/lxml-4.5.0.tar.gz
+tar zxf lxml-4.5.0.tar.gz && cd lxml-4.5.0
+# 编译
+python setup.py bdist_wheel
+```
+## sentencepiece源码编译
+```bash
+# 下载源码
+wget https://files.pythonhosted.org/packages/95/bc/b39f9627c41027caf669cf4d1e47a7415cfa018a7dcb899aebd122af7c91/sentencepiece-0.1.95.tar.gz
+tar zxf sentencepiece-0.1.95.tar.gz && cd sentencepiece-0.1.95
 
 # 编译
 python setup.py bdist_wheel
