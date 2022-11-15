@@ -709,7 +709,7 @@ server{
 
 ## Nginx访问限制模块(限流)
 
-`ngx_http_limit_req_module` 模块：用于限制每个已定义键的请求处理速率，特别是来自单个 IP 地址的请求的处理速率，使用`leaky bucket`方法完成限制；
+`ngx_http_limit_req_module` 模块（限制请求速度）：用于限制每个已定义键的请求处理速率，特别是来自单个 IP 地址的请求的处理速率，使用`leaky bucket`方法完成限制；
 
 ```conf
 # 语法
@@ -725,9 +725,11 @@ Context:	http， server，location
 http {
     #limit_req_zone ：限制单位时间内的请求数，即速率限制,采用的漏桶算法 "leaky bucket"
     # $binary_remote_addr ：限制同一客户端ip地址
-    # zone=one:10m ：限制策略的名称：占用10M空间
+    # zone=one:10m ：限制策略的名称：占用10M空间 zone=perip（每个ip）zone=perserver（每个网站）
     # rate=1r/s：允许相同标识的客户端的访问频次，这里限制的是每秒1次，还可以有比如30r/m
     limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+    # 每个网站
+    limit_req_zone $server_name zone=perserver:10m rate=10r/s;
 
     ...
 
@@ -739,7 +741,10 @@ http {
             # limit_req zone=one：引用限制策略的名称one
             # burst=5：设置一个大小为5的缓冲区当有大量请求（爆发）过来时，超过了访问频次限制的请求可以先放到这个缓冲区内
             # nodelay：超过访问频次而且缓冲区也满了的时候就会直接返回503，如果没有设置，则所有请求会等待排队
+            # 限制每个IP每秒不超过1个请求，突发不超过5个请求
             limit_req zone=one burst=5 nodelay;
+            # 限制每个网站每秒不超过10个请求，突发不超过10个请求。
+            limit_req zone=perserver burst=10;
             # 自定义返回状态码
             limit_req_status 598;
         }
@@ -747,7 +752,7 @@ http {
 }
 ```
 
-`ngx_http_limit_conn_module` 模块: 用于限制链接（TCP），特别是来自单个IP地址的连接数。不是所有的连接都被计算在内。只有当服务器正在处理一个请求，并且整个请求头已经被读取时，连接才会被计数。
+`ngx_http_limit_conn_module` 模块（限制连接数）: 用于限制链接（TCP），特别是来自单个IP地址的连接数。不是所有的连接都被计算在内。只有当服务器正在处理一个请求，并且整个请求头已经被读取时，连接才会被计数。
 
 ```conf
 # 语法
@@ -759,9 +764,11 @@ Context:	http, server, location
 示例
 
 ```conf
-# 一次只允许每个IP地址一个连接
 http {
+    # 限制ip
     limit_conn_zone $binary_remote_addr zone=addr:10m;
+    # 限制网站
+    limit_conn_zone $server_name zone=perserver:10m;
 
     ...
 
@@ -770,27 +777,75 @@ http {
         ...
 
         location /download/ {
+            # 一次只允许每个IP地址一个连接
             limit_conn addr 1;
+            # 每个网站最多接受100个连接
+            limit_conn perserver 100;
         }
     }
 }
-
-limit_conn_zone $binary_remote_addr zone=perip:10m;
-limit_conn_zone $server_name zone=perserver:10m;
-
-server {
-    ...
-    limit_conn perip 10;
-    limit_conn perserver 100;
-}
 ```
 
-## 限制下载速度
+* `limit_rate`：限制网速
 
 ```conf
 location /download { 
-    limit_rate_after 10m; 
-    limit_rate 128k; 
+    # 当请求的流量超500KB后进行限速
+    limit_rate_after 500k;
+    # 限速 50KB/s
+    limit_rate 50k;
+}
+```
+
+* 完整例子
+
+```conf
+http  {
+    # 限速IP白名单
+    geo $limit {
+        default 1;
+        10.0.0.0/8 0;
+        192.168.0.0/24 0;
+        172.20.0.35 0;
+    }
+    
+    # 白名单不限速，非白名单按照客户端IP限速
+    map $limit $limit_key {
+        0 "";
+        1 $binary_remote_addr;
+    }
+    
+    limit_conn_zone $server_name zone=perserver:10m;
+    limit_req_zone $server_name zone=perserverreq:10m rate=10r/s;
+    limit_conn_zone $limit_key zone=perip:10m;
+    limit_req_zone $limit_key zone=two:10m rate=2r/s;
+    limit_req_zone $limit_key zone=one:10m rate=1r/s;
+    ...
+    server  {
+        ...
+        # 限制每个网站每秒不超过10个请求，突发不超过10个请求。
+        limit_req zone=perserverreq burst=10;
+        # 限制每个网站最多接受100个请求
+        limit_conn perserver 100;
+        # 限制每个IP能够最多建立10个请求
+        limit_conn perip 10;
+        # 限制每个IP每秒不超过1个请求，突发不超过3个请求。
+        limit_req zone=one burst=3 nodelay;
+        
+        location /search/ {
+            # 限制每个IP每秒不超过1个请求。
+            limit_req zone=one;
+        }
+        
+        location /download/ {
+            # 限制每个IP只能建立一个连接
+            limit_conn perip 1;
+            # 当请求的流量超500KB后进行限速
+            limit_rate_after 500k;
+            # 限速 50KB/s
+            limit_rate 50k;
+        }
+    } 
 }
 ```
 
