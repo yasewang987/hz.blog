@@ -18,6 +18,8 @@ go<version> download
 sudo mv /usr/local/go/bin/go /usr/local/go/bin/go<oldversion>
 # 做一个软链接到新版本（以后有新版本改一下软链接即可）
 sudo ln -s $GOPATH/bin/go<version> /usr/local/go/bin/go
+
+# 注意一下如果环境变量设置了GOROOT，一定要确保go env中的GOROOT和环境变量一致
 ```
 
 注意点：
@@ -28,7 +30,7 @@ sudo ln -s $GOPATH/bin/go<version> /usr/local/go/bin/go
 ### 方式二：
 
 ```bash
-export GOROOT=$(go<version> env GOROOT)
+export GOROOT=$(go env GOROOT)
 export PATH=${GOROOT}/bin:$PATH
 ```
 

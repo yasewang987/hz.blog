@@ -199,7 +199,8 @@ module.exports = {
                 'encrypt',
                 'viper',
                 'spider',
-                'taskschedule'
+                'taskschedule',
+                'execCmd'
             ],
             '/code/web/npm/': [
                 'base',
