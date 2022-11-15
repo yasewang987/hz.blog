@@ -25,6 +25,7 @@
 * [Vite3](https://vitejs.cn/vite3-cn/)
 * [Vue3相关资料大全](https://vue3js.cn/)
 * [TailwindCSS](https://www.tailwindcss.cn/)
+* [Lodash文档](https://www.lodashjs.com/)
 * [iconfont矢量图标](https://www.iconfont.cn/home/index)
 * [ionicons](https://ionic.io/ionicons)
 * [Electron](https://www.electronjs.org/zh/docs/latest/tutorial/quick-start)
