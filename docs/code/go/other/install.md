@@ -27,6 +27,8 @@
     vim $HOME/.profile
 
     # 添加一下内容
+    export GOSTART=/usr/local/go/bin
+    export PATH=$PATH:$GOSTART
     export GOROOT=$(go env GOROOT)
     export GOPATH=/var/gopath  #自己定义的gopath
     export PATH=$PATH:$GOROOT/bin:$GOPATH/bin

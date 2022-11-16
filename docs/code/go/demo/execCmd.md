@@ -139,5 +139,159 @@ func demo7() {
 
 ## cobra
 
+cobra遵循 `commands, arguments & flags`结构。
+
+```bash
+#appname command  arguments
+docker pull alpine:latest
+
+#appname command flag
+docker ps -a
+
+#appname command flag argument
+git commit -m "msg"
+```
+
+* 轻松创建基于子命令的 CLI：如 app server、 app fetch等。
+* 自动添加 -h, --help等帮助性Flag
+* 自动生成命令和Flag的帮助信息
+* 创建完全符合 POSIX 的Flag(标志)（包括长、短版本）
+* 支持嵌套子命令
+* 支持全局、本地和级联Flag
+* 智能建议（ app srver... did you mean app server?）
+* 为应用程序自动生成 shell 自动完成功能（bash、zsh、fish、powershell）
+* 为应用程序自动生成man page
+* 命令别名，可以在不破坏原有名称的情况下进行更改
+* 支持灵活自定义help、usege等。
+* 无缝集成viper构建12-factor应用
+
+初始化：
+
+```bash
+# 安装cli，快速创建出一个cobra基础代码结构
+go install github.com/spf13/cobra-cli@latest
+
+mkdir myapp && cd myapp
+# 初始化之后会自动引入cobra
+go mod init myapp
+# 添加wget子命令
+cobra-cli add wget
+```
+
+示例代码
+
 ```go
+////// main.go
+package main
+
+import "myapp/cmd"
+
+func main() {
+	cmd.Execute()
+}
+
+////// cmd/root.go
+package cmd
+
+import (
+	"os"
+
+	"github.com/spf13/cobra"
+)
+
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:   "myapp",
+	// 简介
+	Short: "这是myapp的demo",
+	// 详细介绍
+	Long: `这是myapp的详细介绍，使用示例如下：
+	myapp ping
+	myapp wget`,
+	// Uncomment the following line if your bare application
+	// has an action associated with it:
+	// Run: func(cmd *cobra.Command, args []string) { },
+}
+
+func Execute() {
+	err := rootCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
+}
+
+func init() {
+	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+////// cmd/wget.go
+package cmd
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/spf13/cobra"
+)
+
+var output string
+
+// wgetCmd represents the wget command
+var wgetCmd = &cobra.Command{
+	Use:     "wget",
+	Example: "myapp wget www.baidu.com",
+	Short:   "wget用于下载使用",
+	Long:    `wget可以从互联网下载任意可下载的资源`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("wget start")
+		out, err := os.Create(output)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer out.Close()
+
+		res, err := http.Get(args[0])
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer res.Body.Close()
+
+		_, err = io.Copy(out, res.Body)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println("wget end")
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(wgetCmd)
+
+	// args:cobra内置的参数验证也是比较多，NoArgs、OnlyValidArgs、MinimumNArgs、MaximumNArgs
+	// flags:flag包含局部和全局两种，全局flag在父命令定义后子命令也会生效，而局部flag则在哪定义就在哪生效。
+	// StringVarp、 BoolVarP 用于flag数据类型限制
+	wgetCmd.Flags().StringVarP(&output, "output", "o", "", "output file")
+	// 约束flag的参数必须输入
+	wgetCmd.MarkFlagRequired("output")
+}
+```
+
+在go中很流行的包`viper`用于解析配置文件，比如kubectl 的yml，以及各种json
+
+```go
+var author string
+var u string
+var pw string
+func init () {
+	rootCmd.PersistentFlags().StringVar(&author,"author","YOUR NAME","Author name for copyright attribution")
+	viper.BindPFlag("author",rootCmd.PersistentFlags().Lookup("author"))
+
+	// flag还可以做依赖，比如下面username和password必须同时接收到参数
+	rootCmd.Flags().StringVarP(&u,"username","u","","Username (required if password is set)")
+	rootCmd.Flags().StringVarP(&pw,"password","p","","Password (required if username is set)")
+	rootCmd.MarkFlagsRequiredTogether("username","password")
+}
 ```
