@@ -7,6 +7,8 @@
 * Web方案：Vue3+Vite
 * 数据库：lowdb
 
+建议electron使用普通项目创建、加载的首页使用另外一个项目vite单独创建。
+
 ## 参考资料
 
 * 官网文档：https://www.electronjs.org/zh/docs/latest/
@@ -15,7 +17,109 @@
 > 注意事项：`chrome94`版本之后会默认开启阻止不安全的专用网络请求`chrome://flags/#block-insecure-private-network-requests`,可以使用`electron：14.2.1`版本来规避这个问题。
 
 
-## 初始化项目
+## Vite项目demo
+
+```bash
+# 创建vite项目
+yarn create vite
+
+# 引入electron
+yarn add -D electron@14.2.1
+
+# 创建electron的文件夹
+mkdir electron && cd electron
+
+# 新增两个文件内容如下
+```
+
+```js
+//////// main.js
+// 控制应用生命周期和创建原生浏览器窗口的模组
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
+
+function createWindow () {
+  // 创建浏览器窗口
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  // 加载 index.html
+  mainWindow.loadURL('http://localhost:5173') // 此处跟electron官网路径不同，需要注意
+
+  // 打开开发工具
+  if (NODE_ENV === "development") {
+    mainWindow.webContents.openDevTools()
+  }
+}
+
+// 这段程序将会在 Electron 结束初始化
+// 和创建浏览器窗口的时候调用
+// 部分 API 在 ready 事件触发后才能使用。
+app.whenReady().then(() => {
+  createWindow()
+
+  app.on('activate', function () {
+    // 通常在 macOS 上，当点击 dock 中的应用程序图标时，如果没有其他
+    // 打开的窗口，那么程序会重新创建一个窗口。
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
+
+// 除了 macOS 外，当所有窗口都被关闭的时候退出程序。 因此，通常对程序和它们在
+// 任务栏上的图标来说，应当保持活跃状态，直到用户使用 Cmd + Q 退出。
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+})
+
+
+
+////// preload.js
+// 所有Node.js API都可以在预加载过程中使用。
+// 它拥有与Chrome扩展一样的沙盒。
+window.addEventListener('DOMContentLoaded', () => {
+  const replaceText = (selector, text) => {
+    const element = document.getElementById(selector)
+    if (element) element.innerText = text
+  }
+
+  for (const dependency of ['chrome', 'node', 'electron']) {
+    replaceText(`${dependency}-version`, process.versions[dependency])
+  }
+})
+```
+
+修改 `package.json`，内容如下：
+
+```json
+{
+  "name": "quasardemo",
+  "private": true,
+  "version": "0.0.0",
+  // 新增内容
+  "main": "electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    // 新增内容
+    "start": "vite & (sleep 2 && electron .)"
+  }
+}
+```
+
+调试:
+
+```bash
+yarn start
+```
+
+## 普通项目demo(推荐)
 
 1. 需要提前安装 `node`
 1. 初始化项目, `init` 初始化的时候需要注意 `entry point 应为 main.js`,
@@ -41,10 +145,6 @@
     }
     ```
 1. 到这里就可以启动正常启动electron应用了。
-
-## 示例应用
-
-Demo演示参考: https://github.com/yasewang987/electron-demo
 
 ## 动态读取后端服务
 
@@ -249,3 +349,15 @@ app.on('ready', initApp)
 ```
 * 采用 asar 打包：会加快启动速度
 * 增加视觉过渡：loading + 骨架屏
+
+## 报错处理
+
+* 安装electron报错 `RequestError: socket hang up`
+
+```bash
+# 先设置electron的国内镜像源
+export ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/
+
+# 安装
+yarn add -D electron@14.2.1
+```

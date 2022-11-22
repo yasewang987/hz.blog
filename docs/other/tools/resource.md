@@ -24,6 +24,7 @@
 * [Vue3](https://cn.vuejs.org/guide/introduction.html)
 * [Vite3](https://vitejs.cn/vite3-cn/)
 * [Vue3相关资料大全](https://vue3js.cn/)
+* [Quasar中文文档](http://www.quasarchs.com/start/quasar-cli)
 * [TailwindCSS](https://www.tailwindcss.cn/)
 * [Lodash文档](https://www.lodashjs.com/)
 * [iconfont矢量图标](https://www.iconfont.cn/home/index)

@@ -2,7 +2,7 @@
 
 官网：https://tauri.app/
 
-先用 `vite` 等先创建好项目，然后按照如下执行，或者直接使用`tauri-app` 直接创建 `yarn create tauri-app` 然后执行初始化 `yarn` 即可
+先用 `vite` 等先创建好项目，然后按照如下执行，或者直接使用`tauri-app` 直接创建 `yarn create tauri-app` 然后执行初始化 `yarn` 即可。
 
 ## 安装依赖项
 
