@@ -230,6 +230,7 @@ module.exports = {
                 'microapp',
                 'electron',
                 'tauri',
+                'wails',
                 'flutter',
                 'serve',
                 'config',

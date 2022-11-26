@@ -9,6 +9,17 @@ nvidia-smi
 
 # 通过systemctl查看对应信息,可以查看到对应的用户名、登录ip，相关session信息
 systemctl status pid
+# 关注systemctl出来的MAIN PID，说明这个服务主要是main pid这个进程来启动的
+systemctl stop main-pid
+# 查看之前进程的执行目录
+ls -l /proc/pid
+# 删除执行目录
+rm -rf /var/tmp/xxxxxx
+# 关闭进程
+kill -9 pid
+# 如果有定时任务也需要删除
+# 禁用main-pid
+systemctl disable main-pid.service
 
 ### 确认用户是否有登录记录
 # centos
