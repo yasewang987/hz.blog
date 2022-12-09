@@ -1,5 +1,7 @@
 # Electron介绍
 
+* 引用electron前需要先设置electron的国内镜像源`ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/`。
+
 ## 技术选型
 
 * 语言：TypeScript

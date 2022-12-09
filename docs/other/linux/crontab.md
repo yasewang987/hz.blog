@@ -88,3 +88,15 @@ crontab -l > crontab_tmp
 echo "* * * * * echo hello" > crontab_tmp
 crontab crontab_tmp
 ```
+
+## 问题处理
+
+* 服务器时间没问题，`crontab`执行时间晚8小时
+
+```bash
+# 修改 /etc/crontab
+vim /etc/crontab
+
+# 增加如下内容
+CRON_TZ=Asia/Shanghai
+```

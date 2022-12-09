@@ -222,6 +222,7 @@ module.exports = {
                 'dynamic'
             ],
             '/code/web/css/': [
+                'flex',
                 'resources',
                 'animation'
             ],
