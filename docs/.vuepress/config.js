@@ -224,7 +224,8 @@ module.exports = {
             '/code/web/css/': [
                 'flex',
                 'resources',
-                'animation'
+                'animation',
+                'problem'
             ],
             '/code/web/other/': [
                 'qiankun',
