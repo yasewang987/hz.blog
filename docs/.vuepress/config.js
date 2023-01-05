@@ -387,7 +387,8 @@ module.exports = {
                 'zentao'
             ],
             '/sql/mssql/': [
-                'usesul'
+                'usesul',
+                'sqlite'
             ],
             '/sql/mysql/': [
                 'install',
