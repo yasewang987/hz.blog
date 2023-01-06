@@ -88,121 +88,56 @@ func main() {
         
         c.JSON(http.StatusOK, gin.H{"status": "you are logged in"})
     })
+
+    // 绑定URL查询字符串
+    //curl -XGET https://xxx.com/binding/query?year=2022&month=10
+    type queryUri struct {
+        Id int `uri:"id"`
+        Name string `uri:"name"`
+    }
+    router.GET("/binding/query", func(c *gin.Context) {
+        var q queryUri
+        err:= c.ShouldBindQuery(&q)
+    })
+
+    // 绑定URL路径的位置参数
+    // curl -XGET https://xxx.com/binding/100/XiaoWang
+    type queryParameter struct {
+        Year int `form:"year"`
+        Month int `form:"month"`
+    }
+    router.GET("/binding/:id/:name", func(c *gin.Context) {
+        var q queryParameter
+        err:= c.ShouldBindUri(&q)
+    })
+
+    // 绑定HTTP Header
+    // curl -H "token: a1b2c3" -H "platform: 5"
+    type queryHeader struct {
+        Token string `header:"token"`
+        Platform string `header:"platform"`
+    }
+    router.GET("/binding/header",func(c *gin.Context) {
+        var q queryHeader
+        err := c.ShouldBindHeader(&q)
+    })
+
+    // 绑定FormData
+    type InfoParam struct {
+        A string `form:"a" json:"a"`
+        B int    `form:"b" json:"b"`
+    }
+    router.GET("/test1", func(c *gin.Context) {
+        var info InfoParam
+        c.ShouldBind(&info)
+    })
 ​
     // 监听并服务于 0.0.0.0:8080
     router.Run(":8080")
 }
 ```
-## 简单使用Gin
-
-```go
-package main
-
-import (
-	"log"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
-
-
-func main() {
-	// 禁用控制台颜色，当你将日志写入到文件的时候，你不需要控制台颜色
-    gin.DisableConsoleColor()
-	// 记录日志的颜色
-    //gin.ForceConsoleColor()
-​
-    // 写入日志文件
-    f, _ := os.Create("gin.log")
-    gin.DefaultWriter = io.MultiWriter(f)
-​
-    // 如果你需要同时写入日志文件和控制台上显示，使用下面代码
-    // gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-
-	// 默认已经连接了 Logger and Recovery 中间件
-	r := gin.Default()
-	// 简单的post示例
-	r.POST("/git/pipeline/wechat", func(context *gin.Context) {
-		var request GitlabRequest
-
-		context.ShouldBindJSON(&request)
-		text := fmt.Sprint("流水线执行结果\n流水线id：", request.ObjectAttributes.Id,
-			"\n执行状态：", request.ObjectAttributes.Status,
-			"\n项目名：", request.Project.Name,
-			"\n发布主题：", request.MergeRequest.Title,
-			"\n合并内容链接：", request.MergeRequest.Url)
-
-		// send message
-		url := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=mykey"
-		method := "POST"
-		playload := strings.NewReader(`{
-	"msgtype": "text",
-	"text": {
-		"content": "` + text + `"
-	}
-	}`)
-		client := &http.Client{}
-		req,err := http.NewRequest(method,url, playload)
-
-		if err != nil {
-			context.JSON(http.StatusInternalServerError, err)
-		}
-
-		req.Header.Add("Content-Type","application/json")
-		res,err := client.Do(req)
-		if err != nil {
-			context.JSON(http.StatusInternalServerError, err)
-		}
-
-		defer res.Body.Close()
-
-		body,err := ioutil.ReadAll(res.Body)
-
-		if err != nil {
-			context.JSON(http.StatusInternalServerError, err)
-		}
-		//data,_ := json.Marshal(request)
-		context.JSON(http.StatusOK, string(body))
-	})
-	// get示例
-	r.GET("/tasks/", handleGetTasks)
-	// put示例
-	r.PUT("/tasks/", handleCreateTask)
-	// 启动
-	r.Run()
-}
-
-func handleGetTasks(c *gin.Context)  {
-	var tasks []Task
-	var task Task
-	task.Title = "Title1"
-	task.Body = `- Body1
-	- Body1 - 1
-	- Body1 - 2`
-	tasks = append(tasks, task)
-	c.JSON(http.StatusOK, gin.H {"tasks": tasks})
-}
-
-func handleCreateTask(c *gin.Context)  {
-	var task Task
-
-	if err := c.ShouldBindJSON(&task); err != nil {
-		log.Print(err)
-		c.JSON(http.StatusBadRequest, gin.H{"msg": err})
-		return
-	}
-
-	id, err := Create(&task)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"msg": err})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"id":id})
-}
-```
-
-## query+post 表单
+## 不绑定直接获取数据
+### query+post 表单
 
 ```go
 // 简单示例
@@ -245,7 +180,7 @@ func main() {
 }
 ```
 
-## 路由参数
+### 路由参数
 
 ```go
 func main() {
@@ -275,7 +210,7 @@ func main() {
 }
 ```
 
-## Multipart/Urlencoded 表单
+### Multipart/Urlencoded 表单
 
 ```go
 func main() {
@@ -295,6 +230,95 @@ func main() {
 }
 ```
 
+## 参数验证
+
+常用验证规则：
+
+* `uppercase`:只允许包含大写字母
+* `lowercase`:只允许包含小写字母
+* `require`: 必填
+* `contains`:包含指定的字串
+* `alphanum`:只允许包含英文字母和数字
+* `alpha`:只允许包含英文字母
+* `endswith`: 字符串以指定子串结尾
+* `startwith`: 字符串以指定子串开始
+
+```go
+// 参数必填验证
+// 其 binding 标签里用require进行声明
+type queryBody struct {
+  Name string `json:"name" binding:"require"`
+ Age int `json:"age"`
+ Sex int `json:"sex"`
+}
+
+// 手机号、邮箱地址、地区码验证
+type Body struct {
+   FirstName string `json:"firstName" binding:"required"`
+   LastName string `json:"lastName" binding:"required"`
+   // email: 使用通用正则表达式验证电子邮件
+   Email string `json:"email" binding:"required,email"`
+   // e164: 使用国际 E.164 标准验证电话
+   Phone string `json:"phone" binding:"required,e164"`
+   // iso3166_1_alpha2: 使用 ISO-3166-1 两字母标准验证国家代码
+   CountryCode string `json:"countryCode" binding:"required,iso3166_1_alpha2"`
+}
+
+// 字符串输入验证
+// 手机类产品的SKU，在SKU码中都会包含MB关键字，产品编码都以PC关键字前缀开头
+type MobileBody struct {
+   ProductCode string `json:"productCode" binding:"required,startswith=PC,len=10"`
+  SkuCode string `json:"skuCode" binding:"required,contains=MB,len=12"`
+}
+
+// 字段组合验证和比较
+type Body struct {
+    // 必填，1 <= Width <= 100，Width 大于 Height 字段的值
+   Width int `json:"width" binding:"required,gte=1,lte=100,gtfield=Height"`
+   // 必填，1<= Height <= 100
+   Height int `json:"height" binding:"required,gte=1,lte=100"`
+}
+
+// 验证时间是否有效
+type Body struct {
+    // 必填，小于EndDate字段的值，参数中的格式为："2006-01-02" 即 "yyy-mm-dd" 的形式
+   StartDate time.Time `form:"start_date" binding:"required,ltefield=EndDate" time_format:"2006-01-02"`
+   EndDate time.Time `form:"end_date" binding:"required" time_format:"2006-01-02"`
+}
+
+// 自定义验证
+// 官方的验证器里提供了一个oneof验证
+type ReqBody struct {
+    // 只能是列举出的标签值red blue pink值其中一个，这些值必须是数值或字符串，每个值以空格分隔
+   Color string `json:"name" uri:"name" binding:"oneof=red blue pink"`
+}
+// 自定义一个notoneof的自定义验证
+func main() {
+  route := gin.Default()
+  ...
+  // 获取验证引擎，并类型转换成*validator.Validate
+  if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+     // 注册notoneof的验证函数
+     v.RegisterValidation("notoneof", func(fl validator.FieldLevel) bool {
+       // split values using ` `. eg. notoneof=bob rob job
+       // 用空格分割ontoneof的值 比如：notoneof=red blue pink
+        match:=strings.Split(fl.Param()," ")
+       // 把用反射获取的字段值由reflect.Value 转为 string
+        value:=fl.Field().String()
+        for _,s:=range match {
+           // 判断字段值是否等于notoneof指定的那些值
+           if s==value {
+              return false
+           }
+        }
+        return true
+     })
+  }
+  ...
+  route.Run(":8080")
+}
+
+```
 ## 上传文件
 
 上传文件的文件名可以由用户自定义，所以可能包含非法字符串，为了安全起见，应该由服务端统一文件名规则。
@@ -455,3 +479,113 @@ func main() {
     router.Run(":8080")
 }
 ```
+
+## 简单使用Gin
+
+```go
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+
+func main() {
+	// 禁用控制台颜色，当你将日志写入到文件的时候，你不需要控制台颜色
+    gin.DisableConsoleColor()
+	// 记录日志的颜色
+    //gin.ForceConsoleColor()
+​
+    // 写入日志文件
+    f, _ := os.Create("gin.log")
+    gin.DefaultWriter = io.MultiWriter(f)
+​
+    // 如果你需要同时写入日志文件和控制台上显示，使用下面代码
+    // gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+
+	// 默认已经连接了 Logger and Recovery 中间件
+	r := gin.Default()
+	// 简单的post示例
+	r.POST("/git/pipeline/wechat", func(context *gin.Context) {
+		var request GitlabRequest
+
+		context.ShouldBindJSON(&request)
+		text := fmt.Sprint("流水线执行结果\n流水线id：", request.ObjectAttributes.Id,
+			"\n执行状态：", request.ObjectAttributes.Status,
+			"\n项目名：", request.Project.Name,
+			"\n发布主题：", request.MergeRequest.Title,
+			"\n合并内容链接：", request.MergeRequest.Url)
+
+		// send message
+		url := "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=mykey"
+		method := "POST"
+		playload := strings.NewReader(`{
+	"msgtype": "text",
+	"text": {
+		"content": "` + text + `"
+	}
+	}`)
+		client := &http.Client{}
+		req,err := http.NewRequest(method,url, playload)
+
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, err)
+		}
+
+		req.Header.Add("Content-Type","application/json")
+		res,err := client.Do(req)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, err)
+		}
+
+		defer res.Body.Close()
+
+		body,err := ioutil.ReadAll(res.Body)
+
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, err)
+		}
+		//data,_ := json.Marshal(request)
+		context.JSON(http.StatusOK, string(body))
+	})
+	// get示例
+	r.GET("/tasks/", handleGetTasks)
+	// put示例
+	r.PUT("/tasks/", handleCreateTask)
+	// 启动
+	r.Run()
+}
+
+func handleGetTasks(c *gin.Context)  {
+	var tasks []Task
+	var task Task
+	task.Title = "Title1"
+	task.Body = `- Body1
+	- Body1 - 1
+	- Body1 - 2`
+	tasks = append(tasks, task)
+	c.JSON(http.StatusOK, gin.H {"tasks": tasks})
+}
+
+func handleCreateTask(c *gin.Context)  {
+	var task Task
+
+	if err := c.ShouldBindJSON(&task); err != nil {
+		log.Print(err)
+		c.JSON(http.StatusBadRequest, gin.H{"msg": err})
+		return
+	}
+
+	id, err := Create(&task)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"id":id})
+}
+```
+
