@@ -208,8 +208,10 @@ location / {
 
 ### 绝对路径
 
+* 端口后面带上 `/` 的都是绝对路径
+
 ```conf
-# 注意在proxy_pass地址后面带上 /
+# 注意在proxy_pass地址端口后面带上 /
 location /proxy/ {
     proxy_pass http://192.168.137.181:8080/;
 }
@@ -217,11 +219,17 @@ location /proxy/ {
 location /proxy/ {
     proxy_pass http://10.0.0.1:8080/static01/;
 }
+
+location /proxy/ {
+    proxy_pass http://10.0.0.1:8080/static01;
+}
 ```
 
 第一个： 当访问 `http://127.0.0.1/proxy/test/test.txt` 时，nginx匹配到 `/proxy/` 路径，把请求转发给 `192.168.137.181:8080` 服务，实际请求路径为`http://10.0.0.1:8080/test/test.txt`，nginx会去掉匹配的`/proxy/`。
 
 第二个： 当访问 `http://127.0.0.1/proxy/test/test.txt` 时，nginx匹配到`/proxy/`路径，把请求转发给`192.168.137.181:8080`服务，实际请求代理服务器的路径为`http://10.0.0.1:8080/static01/test/test.txt`。
+
+第三个： 当访问 `http://127.0.0.1/proxy/cuffs/css/toosimple.txt`时，nginx匹配到`/proxy/`路径，把请求转发给`10.0.0.1:8080`服务，实际请求代理服务器的路径为 `http://10.0.0.1:8080/static01cuffs/css/toosimple.txt`
 
 ### 相对路径
 
