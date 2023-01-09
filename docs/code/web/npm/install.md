@@ -46,6 +46,11 @@ npm config set registry https://registry.npm.taobao.org
 
 # 使用一下命令验证
 npm config get registry
+
+# yarn设置镜像源，官方：https://registry.yarnpkg.com
+yarn config set registry https://registry.npm.taobao.org
+# 获取
+yarn config get registry
 ```
 
 安装yarn

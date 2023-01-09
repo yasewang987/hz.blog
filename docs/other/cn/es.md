@@ -27,6 +27,7 @@ elif [ ! -z "$JAVA_HOME" ]; then
   JAVA_TYPE="JAVA_HOME"
 
 # 限制内存使用，先找到config目录的jvm.options改一下
+# 设置总内存的50%，并且建议 xms 和 xmx 值一样大
 -Xms10g
 -Xmx10g
 

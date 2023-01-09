@@ -121,3 +121,7 @@ https://cloud.tencent.com/developer/article/1627901
 mingw的工作是集成gcc源码与Windows API，用于把gcc移植到Windows上用原生的方式编译程序。用得到的gcc.exe编译的程序可以在Windows上原生运行。
 
 安装完mingw之后，系统变量中找到 Path 变量，在后面加入 min-gw 的安装目录如：`D:\MinGw\bin`
+
+## Windows字体增加
+
+下载字体ttf文件（阿里云盘）之后放到 `C:\Windows\Fonts` 文件夹，wps等软件能自动识别到

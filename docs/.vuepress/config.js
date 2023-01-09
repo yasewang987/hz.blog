@@ -199,7 +199,8 @@ module.exports = {
                 'encrypt',
                 'viper',
                 'spider',
-                'taskschedule'
+                'taskschedule',
+                'execCmd'
             ],
             '/code/web/npm/': [
                 'base',
@@ -221,14 +222,17 @@ module.exports = {
                 'dynamic'
             ],
             '/code/web/css/': [
+                'flex',
                 'resources',
-                'animation'
+                'animation',
+                'problem'
             ],
             '/code/web/other/': [
                 'qiankun',
                 'microapp',
                 'electron',
                 'tauri',
+                'wails',
                 'flutter',
                 'serve',
                 'config',
@@ -383,7 +387,8 @@ module.exports = {
                 'zentao'
             ],
             '/sql/mssql/': [
-                'usesul'
+                'usesul',
+                'sqlite'
             ],
             '/sql/mysql/': [
                 'install',

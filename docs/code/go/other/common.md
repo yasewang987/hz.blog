@@ -50,6 +50,11 @@ github地址：https://github.com/panjf2000/ants
 
 某些业务场景还会使用到`goroutine`池，`ants`就是一个广泛使用的`goroute`池，可以有效控制协程数量，防止协程过多影响程序性能。`ants`也是国人开发的，设计博文写的也很详细的，目前很多大厂也都在使用`ants`，经历过线上业务检验的，所以可以放心使用。
 
+## cobra
+
+github地址：https://github.com/spf13/cobra
+
+用于快速构建命令行程序的golang包cobra，基于cobra写命令行的著名项目一只手数不过来：Docker CLI、Helm、istio、etcd、Git、Github CLI
 
 
 

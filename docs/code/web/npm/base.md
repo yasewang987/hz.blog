@@ -13,6 +13,8 @@ npm list --depth=0 -global
 npm install --save xxx
 npm install -S xxx
 yarn add xxx
+# 安装指定版本
+yarn add xxx@1.1.1
 
 # 把webpack包安装到node_modules目录
 # 在package.json的devDependencies属性下(项目开发时需要)

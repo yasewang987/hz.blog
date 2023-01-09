@@ -507,8 +507,12 @@ sudo -u gitlab-runner -H docker info
 
 ## 后台执行命令
 
-```
+```bash
+# 输出到当前目录的 nohup.out
 nohup 命令 &
+
+# 输出到指定文件
+nohup yourcmd > ./myfile.log 2>&1 &
 ```
 
 ## 执行远程服务器脚本

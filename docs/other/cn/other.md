@@ -18,6 +18,80 @@
 * cmake版本：3.12.1
 * 其他：自带了mariadb
 
+资源下载地址：
+
+1. 银河麒麟高级服务器操作系统V10
+
+兆芯版 海光版 AMD64版
+
+下载地址：http://distro-images.kylinos.cn:8802/web_pungi/download/share/wA7vpuh4S5ZrxLWRXVBgGO0d9TfJqijD
+
+提取码：NA
+
+飞腾版 鲲鹏版
+
+下载地址： http://distro-images.kylinos.cn:8802/web_pungi/download/share/BP9pZlFhKjANkwoWrsgETDMXLmOxait1
+
+提取码：NA
+
+龙芯-MIPS64el
+
+下载地址： http://distro-images.kylinos.cn:8802/web_pungi/download/share/aru2QCiVKcZYlHpfnqX4AzLJBxNGsUvt
+
+提取码：NA
+
+龙芯-LoongArch64
+
+下载地址：http://distro-images.kylinos.cn:8802/web_pungi/download/share/eqGsIRMaf1uU02SHovQrJCnj6DikBmNz
+
+提取码：NA
+
+申威版
+
+下载地址：https://pan.baidu.com/s/1S8Myz_YxZyYi4rPxNw1DiQ
+
+提取码：j2sa
+
+2. 银河麒麟桌面操作系统V10
+
+兆芯版 海光版
+
+下载地址：http://distro-images.kylinos.cn:8802/web_pungi/download/share/9nl7ve2CSfEaQyqXYt8bRWUFdTBgj5hJ
+
+提取码：NA
+
+飞腾版 鲲鹏版
+
+下载地址：http://distro-images.kylinos.cn:8802/web_pungi/download/share/tXbGgIYCdQEv5z0lPypmKTqAse2rojJx
+
+提取码：NA
+
+龙芯3a4000版
+
+下载地址：http://distro-images.kylinos.cn:8802/web_pungi/download/share/EKvckinmNw1p9HXAsxLhB5Mf3eDUJ0VW
+
+提取码：NA
+
+龙芯3a5000版
+
+下载地址：http://distro-images.kylinos.cn:8802/web_pungi/download/share/wrmC6ciOgptjAn5eMy1uhxfN8B7q9XRK
+
+提取码：NA
+
+申威版
+
+AMD64版 intel版
+
+下载地址：http://distro-images.kylinos.cn:8802/web_pungi/download/share/HXDYtGjZm3daA4UvOTLkiPl1nB9ErM0c
+
+提取码：NA
+
+海思麒麟
+
+下载地址：https://pan.baidu.com/s/1oUvKP7xGbdXnD8aZTs95fA
+
+提取码：rn8q
+
 ### 中科方德-SVS2.16.2
 
 适配镜像：`python:3.6.8`
