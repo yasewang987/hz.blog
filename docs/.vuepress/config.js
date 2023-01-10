@@ -373,6 +373,7 @@ module.exports = {
                 'install',
                 'base',
                 'cmd',
+                'sync',
                 'problem',
                 'mq',
                 'redissearch'
