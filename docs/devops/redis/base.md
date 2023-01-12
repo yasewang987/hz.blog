@@ -52,11 +52,15 @@
 
 redis一共有五种基础数据类型：`String,Hash,List,Set,ZSet`
 
+3 种特殊数据结构 ：`HyperLogLogs`（基数统计）、`Bitmap`（位存储）、`Geospatial`(地理位置)。
+
 ### String
 
 ```bash
 # 单值存储
 set key1 value1
+# 设置值+过期时间
+setex key1 5 value1
 # 单值获取
 get key1
 # 多值存储
@@ -260,7 +264,18 @@ zrevrange ranking 0 2
 zrem ranking name3
 1
 ```
+## Redis数据淘汰策略
 
+数据淘汰策略|具体含义说明
+---|---
+noeviction|淘汰新进入的数据，即拒绝新内容写入缓存，直到缓存有新的空间。
+allkeys-lru|将内存中已有的key内容按照LRU策略将最久没有使用的记录淘汰掉，然后腾出空间用来存放新的记录。
+volatile-lru|从设置了过期时间的key里面按照LRU策略，淘汰掉最久没有使用的记录。与allkeys-lru相比，这种方式仅会在设定了过期时间的key里面进行淘汰。
+allkeys-random|从已有的所有key里面随机剔除部分，腾出空间容纳新数据。
+volatile-random|从已有的设定了过期时间的key里面随机剔除部分，腾出空间容纳新的数据
+volatile-ttl|从已有的设定了过期时间的key里面，将最近将要过期的数据提前剔除掉，与volatile-lru的区别在于排序逻辑不一样，一个基于ttl规则排序，一个基于lru策略排序。
+volatile-lfu|从已设置过期时间的数据集（server.db[i].expires）中挑选最不经常使用的数据淘汰
+allkeys-lfu|当内存不足以容纳新写入数据时，在键空间中，移除最不经常使用的 key
 
 ## Redis持久化
 
@@ -283,7 +298,7 @@ save 300 10
 save 60 10000
 ```
 
-如果执行`save`命令会造成`Redis`正常读写收到影响，我们可以用`bgsave`（写时复制）命令来生成`RDB`快照，`bgsave`是用一个子线程来实现快照功能，主线程继续他的读写任务。
+如果执行`save`命令会造成`Redis`正常读写受到影响，我们可以用`bgsave`（写时复制）命令来生成`RDB`快照，`bgsave`是用一个子线程来实现快照功能，主线程继续他的读写任务。
 
 ### AOF
 

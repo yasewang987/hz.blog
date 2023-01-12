@@ -33,6 +33,9 @@ delete from server where id=1;
 # 查询数据
 select * from server;
 
+# 查看表结构
+ select * from sqlite_master where name = 'tablename';
+
 # 退出
 .exit
 ```

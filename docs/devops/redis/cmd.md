@@ -23,4 +23,11 @@ info keyspace
 
 # 查看所有key
 keys *
+
+# 数据在 60s 后过期
+expire key 60 
+# 数据在 60s 后过期 (setex:[set] + [ex]pire)
+setex key 60 value 
+# 查看数据还有多久过期
+ttl key
 ```
