@@ -19,7 +19,7 @@ sqlite3 test.db
 # 创建server表
 create table server (
   id integer primary key autoincrement not null,
-  ip varchar(15) not null,
+  ip varchar(15) unique not null,
   port int not null,
   username varchar(50) not null,
   pwd varchar(100) not null
@@ -34,7 +34,12 @@ delete from server where id=1;
 select * from server;
 
 # 查看表结构
- select * from sqlite_master where name = 'tablename';
+select * from sqlite_master where name = 'tablename';
+
+# 修改表结构增加唯一索引
+create unique index 索引的名字 on 表名(字段名1，字段名2);
+# 新增列
+alter table service add column nginxport varchar(50) not null default '';
 
 # 退出
 .exit
