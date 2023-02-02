@@ -92,6 +92,21 @@ docker run --rm --gpus all xxxx
 
 ##### 查看镜像层级
 docker image history xxxx:11
+
+#### 格式化输出容器信息
+# .ID 容器ID
+#.Image 镜像ID
+#.Command Quoted command
+#.CreatedAt 创建容器的时间点.
+#.RunningFor 从容器创建到现在过去的时间.
+#.Ports 暴露的端口.
+#.Status 容器状态.
+#.Size 容器占用硬盘大小.
+#.Names 容器名称.
+#.Labels 容器所有的标签.
+#.Label 指定label的值 例如'{{.Label “com.docker.swarm.cpu”}}’
+#.Mounts 挂载到这个容器的数据卷名称
+docker ps --format "容器ID：{{.ID}}\n名称：{{.Names}}\n镜像：{{.Image}}\n状态：{{.Status}}\n端口：{{.Ports}}\n"
 ```
 
 ## docker容器中使用docker命令

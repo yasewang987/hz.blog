@@ -4,6 +4,9 @@
 ```bash
 # 从tag标签迁分支
 git checkout -b tagname
+
+# 从commit签分支
+git checkou -b commitId
 ```
 ## Git删除分支
 
