@@ -273,19 +273,26 @@ go get -u google.golang.org/grpc
 # 协议插件
 go get -u google.golang.org/golang/protobuf
 go get -u google.golang.org/golang/protobuf/protoc-gen-go
+
 # 下载protoc，如果是mac m1 下载 x86版本即可
 curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.19.3/protoc-3.19.3-osx-x86_64.zip
 # 解压之后，移动到 $GOPATH/bin 目录下
 unzip protoc-3.19.3-osx-x86_64.zip
 mv protoc-3.19.3-osx-x86_64/bin/protoc $GOPATH/bin
+
+# ubuntu安装protoc
+apt install -y protobuf-compiler
 ```
 
 ### 生成proto的go文件
 
 准备 `mygrpc/test.proto` 文件，内容如下
 
-```proto
+```go
 syntax = "proto3";
+
+// 引入其他pb
+import "google/protobuf/wrappers.proto";
 
 // 包名
 package  test;
@@ -299,7 +306,7 @@ option go_package = "./;test";
 // option csharp_package="MyTest";
 
 service Tester{
-  rpc MyTest(Request) returns (Response){}
+  rpc MyTest(Request) returns (Response);
 }
 
 // 函数参数
@@ -310,6 +317,34 @@ message  Request{
 // 函数返回值
 message  Response{
   string  backJson = 1;
+}
+
+// 数组
+message SearchResponse {
+  repeated Result results = 1;
+}
+
+message Result {
+  string url = 1;
+  string title = 2;
+  repeated string snippets = 3;
+}
+
+// 枚举
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 result_per_page = 3;
+  enum Corpus {
+    UNIVERSAL = 0;
+    WEB = 1;
+    IMAGES = 2;
+    LOCAL = 3;
+    NEWS = 4;
+    PRODUCTS = 5;
+    VIDEO = 6;
+  }
+  Corpus corpus = 4;
 }
 ```
 
