@@ -58,11 +58,11 @@ module.exports = {
             {
                 text: 'MicroServices',
                 items: [
-                    { text: 'Consul', link: '/microservices/consul/' },
-                    { text: 'Ocelot', link: '/microservices/ocelot/' },
-                    { text: 'ELK', link: '/microservices/elk/' },
-                    { text: 'Identity', link: '/microservices/identity/' },
-                    { text: 'Skywalking', link: '/microservices/skywalking/' },
+                    { text: '注册配置中心', link: '/microservices/register_config/' },
+                    { text: '网关', link: '/microservices/ocelot/' },
+                    { text: '日志中心', link: '/microservices/elk/' },
+                    { text: '认证授权', link: '/microservices/identity/' },
+                    { text: '链路跟踪', link: '/microservices/skywalking/' },
                     { text: 'MQ', link: '/microservices/mq/' },
                     { text: 'Dapr', link: '/microservices/dapr/' },
                     { text: '随笔', link: '/microservices/other/' }
@@ -245,11 +245,9 @@ module.exports = {
                 'problem',
                 'install'
             ],
-            '/microservices/consul/': [
-                'base',
-                'cmd',
-                'config',
-                'docker'
+            '/microservices/register_config/': [
+                'consul',
+                'etcd'
             ],
             '/microservices/elk/': [
                 'install',
