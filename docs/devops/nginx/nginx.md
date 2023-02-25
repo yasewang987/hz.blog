@@ -46,6 +46,14 @@ location /train {
      alias  /data/trainning/;
      index  index.html index.html;
 }
+
+# 跳转示例
+location / {
+    rewrite / http://www.baidu.com permanent;
+}
+location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css|ico)?$ {
+    proxy_pass http://www.baidu.com;
+}
 ```
 
 如果配置两个 `root`，http://xxxx/train 会提示404。

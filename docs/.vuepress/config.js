@@ -236,7 +236,8 @@ module.exports = {
                 'flutter',
                 'serve',
                 'config',
-                'chromeextensions'
+                'chromeextensions',
+                'element'
             ],
             '/code/python/': [
                 'base',
