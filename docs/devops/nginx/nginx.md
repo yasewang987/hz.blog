@@ -42,7 +42,7 @@ location / {
         # vue history
         try_files $uri $uri/ /index.html;
 }
-location /train {
+location /train/ {
      alias  /data/trainning/;
      index  index.html index.html;
 }
@@ -58,7 +58,7 @@ location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css|ico)?$ {
 
 如果配置两个 `root`，http://xxxx/train 会提示404。
 
-`root`的处理结果是：root路径＋location路径 `alias`的处理结果是：使用alias路径替换location路径 `alias`是一个目录别名的定义，root则是最上层目录的定义。 还有一个重要的区别是alias后面必须要用 `/` 结束，否则会找不到文件的。。。而root则可有可无~~
+`root`的处理结果是：root路径＋location路径(请求时会去掉前面的/) `alias`的处理结果是：使用alias路径替换location路径 `alias`是一个目录别名的定义，root则是最上层目录的定义。 还有一个重要的区别是alias后面必须要用 `/` 结束，否则会找不到文件的。。。而root则可有可无~~
 
 ## Nginx 反向代理配置
 

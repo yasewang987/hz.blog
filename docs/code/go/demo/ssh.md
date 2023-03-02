@@ -78,7 +78,7 @@ func main() {
   password = "your password"
   addr     = "ip:22"
  )
-
+//////// 远程拷贝到本地
  // 1. 建立 ssh client
  config := &ssh.ClientConfig{
   User: username,
@@ -122,5 +122,51 @@ func main() {
  }
  log.Println("Succeed to copy file: ", n)
 
+}
+
+//// 本地拷贝到远程
+func server_RunSCP(server serverInfo, filename string) (res string, err error) {
+	fileFullName := FILE_PATH + "/" + filename
+	// 打开本地文件
+	srcFile, err := os.Open(fileFullName)
+	if err != nil {
+		return "", err
+	}
+	defer srcFile.Close()
+
+	addr := server.Ip + ":" + strconv.Itoa(server.Port)
+	config := &ssh.ClientConfig{
+		User: server.UserName,
+		Auth: []ssh.AuthMethod{
+			ssh.Password(server.Pwd),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+
+	client, err := ssh.Dial("tcp", addr, config)
+	if err != nil {
+		return "", err
+	}
+	defer client.Close()
+
+	sftpClient, err := sftp.NewClient(client)
+	if err != nil {
+		return "", err
+	}
+	defer sftpClient.Close()
+
+	// 操作远程文件备份 - 新建
+	sftpClient.Rename(fileFullName, fileFullName+".back")
+	destFile, err := sftpClient.Create(fileFullName)
+	if err != nil {
+		return "", err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, srcFile)
+	if err != nil {
+		return "", err
+	}
+	return "success", nil
 }
 ```

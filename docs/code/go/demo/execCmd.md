@@ -111,6 +111,7 @@ func demo6() {
 	ageEnv := "AGE=18"
 	myEnvs := append(os.Environ(), nameEnv, ageEnv)
 
+	//cmd := exec.Command("bash", "echo $NAME && echo $AGE")
 	cmd := exec.Command("sh", "-c", "echo $NAME && echo $AGE")
 	cmd.Env = myEnvs
 	out, err := cmd.CombinedOutput()
