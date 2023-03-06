@@ -37,8 +37,8 @@ http {
     send_timeout 240s;
     keepalive_requests 30000;
     proxy_read_timeout 180s;
-    client_header_buffer_size 512k;
-    large_client_header_buffers 4 512k;
+    client_header_buffer_size 128k;
+    large_client_header_buffers 4 128k;
 
     include /etc/nginx/conf.d/*.conf;
 }

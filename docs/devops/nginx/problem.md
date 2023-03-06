@@ -17,3 +17,12 @@
 
 容器启动使用如下命令 `nginx -g daemon off;`
 
+## Nginx占用内存过高
+
+Nginx 使用 `client_header_buffer_size` 缓存客户端的请求头，对于大部分请求，1K的默认值已经足够了。一旦请求头超过了1K，空间不够了，nginx就通过 `large_client_header_buffers` 按需扩容，这样做可以平衡资源和性能。
+
+```conf
+client_header_buffer_size 2000k;
+#修改为
+client_header_buffer_size 32k;
+```
