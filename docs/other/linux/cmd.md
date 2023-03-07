@@ -749,6 +749,14 @@ touch test.conf
 
 # echo方式
 echo "server {\n    listen 80;\n    server_name hello;\n}" > test.conf
+
+# cat方式
+cat <<EOF >> test.conf
+server {
+  listen 80;
+  server_name _;
+}
+EOF
 ```
 
 ## 修改服务器时区

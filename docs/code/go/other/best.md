@@ -545,7 +545,28 @@ import (
   "golang.org/x/sync/errgroup" // 其他库 
 )
 ```
+## 有效地使用并发性
+Golang的并发模型是强大而高效的，但明智地使用它是很重要的。例如，使用过多的goroutines或不适当地同步访问共享资源会导致性能下降。
 
+```go
+// Bad: Spawning a new goroutine for each iteration
+for i := 0; i < 100; i++ {
+	go func() {
+		// do something concurrently
+	}()
+}
+
+// Good: Using a fixed number of goroutines
+const numWorkers = 10
+jobs := make(chan int, 100)
+for i := 0; i < numWorkers; i++ {
+ go func() {
+  for j := range jobs {
+   // do something concurrently
+  }
+ }()
+}
+```
 ## Channel的size
 
 `Channel` 的 `size` 要么是 `1`，要么是无缓冲的
@@ -765,6 +786,20 @@ sptr.Name = "bar"
 sptr := &T{Name: "bar"}
 ```
 
+## 使用正确的数据结构
+为任务选择正确的数据结构可以显著影响性能。例如，使用map而不是slice，或者反之，在查找时间和内存使用方面会有很大的不同。
+
+```go
+// Bad: Using a slice to store key-value pairs
+type Pair struct {
+	key   string
+	value int
+}
+pairs := []Pair{}
+
+// Good: Using a map to store key-value pairs
+pairs := make(map[string]int)
+```
 ## slice操作
 
 * 当返回长度为零的切片时使用`nil`
@@ -952,7 +987,6 @@ func (s *Stats) Snapshot() map[string]int {
 snapshot := stats.Snapshot()
 
 //// 推荐写法
-
 type Stats struct {
   mu sync.Mutex
   counters map[string]int
@@ -972,6 +1006,51 @@ func (s *Stats) Snapshot() map[string]int {
 snapshot := stats.Snapshot()
 ```
 
+## 明智地使用指针
+Golang使用指针来引用内存位置。虽然指针在某些情况下很有用，但如果过度或不正确地使用，它们也会导致性能下降。例如，使用指针向函数传递大的结构或 slice 会导致不必要的内存分配和复制。相反，可以考虑通过值传递这些类型。
+
+```go
+// Bad: Passing a large slice by pointer
+func slowFunction(s *[]int) {
+	// do something with s
+}
+
+// Good: Passing a large slice by value
+func fastFunction(s []int) {
+ // do something with s
+}
+```
+## 代码进行剖析和基准测试
+衡量你的代码的性能以确保它符合预期的要求是很重要的。Golang提供了一些工具，如pprof和go test -bench来帮助你对代码进行剖析和基准测试。这些工具将使你能够识别瓶颈并相应地优化你的代码
+```go
+// Using the pprof tool to profile CPU usage
+go test -run=^$ -bench=. -cpuprofile=cpu.out
+go tool pprof cpu.out
+
+// Using the go test -bench flag to benchmark performance
+func BenchmarkMyFunction(b *testing.B) {
+ for i := 0; i < b.N; i++ {
+  MyFunction()
+ }
+}
+go test -bench=BenchmarkMyFunction
+```
+## 避免不必要的分配
+配内存是一个昂贵的操作，特别是在高并发环境下。为了提高性能，尽量减少你的代码的分配次数。做到这一点的一个方法是重复使用切片和其他引用类型，而不是创建新的引用类型。
+
+```go
+// Bad: Allocating a new slice for each iteration
+for i := 0; i < 100; i++ {
+	s := make([]int, 10)
+	// do something with s
+}
+
+// Good: Reusing the same slice
+s := make([]int, 10)
+for i := 0; i < 100; i++ {
+ // do something with s
+}
+```
 ## 修改go实际分配内存
 其原理是扩大`golang runtime`的堆内存，使得实际分配的内存不容易超过堆内存的一定比例，进而减少`GC`的频率。GC的频率低了，`STW`的次数和时间也就更少，从而程序的性能也提升了。
 ```go
