@@ -197,23 +197,7 @@ version=`date +%y%m%d%H%M%s`
 ## 查看linux cpu，磁盘、内存
 
 ```bash
-# cpu
-lscpu
-
-# 磁盘
-lsblk
-
-# 内存
-free -h
-```
-
-## 查看内存、cpu使用情况
-
-使用`shift+m`会按照内存使用从大到小排序。
-
-```bash
-top
-
+# 使用`shift+m`会按照内存使用从大到小排序。
 # us: 用户空间cpu使用占比
 # sy: 内核空间cpu使用占比
 # ni：用户进程空间内改变过优先级的进程占用cpu百分比
@@ -221,6 +205,26 @@ top
 # wa：等待输入输出的cpu时间百分比
 # hi：cpu服务于硬件中断所消耗的时间总额
 # si：cpu服务软中断所消耗的时间总额
+top
+
+# cpu
+lscpu
+# cpu空闲 - 百分比
+vmstat | awk '{print $15}' | sed -n '$p'
+# cpu型号
+cat /proc/cpuinfo | grep name | sort | uniq | awk -F ':' '{print $2}'
+# cpu路数
+cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l
+# cpu线程数
+cat /proc/cpuinfo | grep "physical id" | wc -l
+
+# 磁盘
+lsblk
+# 磁盘使用情况（磁盘，容量，已用，可用，已用%，挂载点）
+df -hl | awk '$1 ~ /\/dev\//'
+
+# 内存
+free -h
 ```
 
 ## 查看系统进程及占用资源情况
@@ -745,6 +749,14 @@ touch test.conf
 
 # echo方式
 echo "server {\n    listen 80;\n    server_name hello;\n}" > test.conf
+
+# cat方式
+cat <<EOF >> test.conf
+server {
+  listen 80;
+  server_name _;
+}
+EOF
 ```
 
 ## 修改服务器时区

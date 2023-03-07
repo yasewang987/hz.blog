@@ -329,7 +329,7 @@ curl -u 'bob' https://google.com/login
 
 ## -v
 
-`-v`参数输出通信的整个过程，用于调试。
+`-v`参数输出通信的整个过程，用于调试。能输出详细的请求，响应头信息
 
 ```bash
 curl -v https://www.example.com

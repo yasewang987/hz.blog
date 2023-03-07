@@ -10,6 +10,7 @@ Nginx 是一个采用主从架构的 Web 服务器，可用于反向代理、负
 ```bash
 # 首次启动 Nginx Web 服务器
 sudo nginx
+nginx -c conf/nginx.conf
 
 # 检查配置文件
 /usr/local/nginx/sbin/nginx -t -c /usr/local/nginx/conf/nginx.conf
@@ -17,6 +18,7 @@ sudo nginx
 # 重新加载正在运行的 Nginx Web 服务器
 sudo nginx -s reload
 sudo /usr/local/nginx/sbin/nginx -s reload
+nginx -s reload -c conf/nginx.conf
 
 # 直接关闭worker子进程
 sudo nginx -s stop
@@ -42,15 +44,23 @@ location / {
         # vue history
         try_files $uri $uri/ /index.html;
 }
-location /train {
+location /train/ {
      alias  /data/trainning/;
      index  index.html index.html;
+}
+
+# 跳转示例
+location / {
+    rewrite / http://www.baidu.com permanent;
+}
+location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css|ico)?$ {
+    proxy_pass http://www.baidu.com;
 }
 ```
 
 如果配置两个 `root`，http://xxxx/train 会提示404。
 
-`root`的处理结果是：root路径＋location路径 `alias`的处理结果是：使用alias路径替换location路径 `alias`是一个目录别名的定义，root则是最上层目录的定义。 还有一个重要的区别是alias后面必须要用 `/` 结束，否则会找不到文件的。。。而root则可有可无~~
+`root`的处理结果是：root路径＋location路径(请求时会去掉前面的/) `alias`的处理结果是：使用alias路径替换location路径 `alias`是一个目录别名的定义，root则是最上层目录的定义。 还有一个重要的区别是alias后面必须要用 `/` 结束，否则会找不到文件的。。。而root则可有可无~~
 
 ## Nginx 反向代理配置
 
@@ -356,10 +366,17 @@ server {
     add_header 'Access-Control-Allow-Methods' *;
     # 允许携带的请求头
     add_header 'Access-Control-Allow-Headers' *;
+    # 允许发送按段获取资源的请求(非必填)
+    add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';  
 
     # 如果服务端里面没有处理 options 请求，需要加如下配置
     if ( $request_method = 'OPTIONS' ) {
-        return 200;
+        # add_header下面3个（非必填）
+        add_header 'Access-Control-Max-Age' 1728000;  
+        add_header 'Content-Type' 'text/plain; charset=utf-8';  
+        add_header 'Content-Length' 0;  
+        # 对于Options方式的请求返回204或者200，表示接受跨域请求  
+        return 204;
     }
 
     location / {
@@ -524,6 +541,26 @@ upstream upstream_test-01 {
     server 1.1.1.1:80 weight=100 max_fails=10 fail_timeout=60s;
 }
  ```
+## rewrite使用
+```conf
+rewrite ^/(user_\d)/(\d).html$ https://$host/?$1 permanent;
+```
+* () : 用于匹配括号之间的内容，通过$1、$2调用
+* $1 就是 user_\d
+* $2 就是 \d
+
+`https://www.example.com/user_1/2.html`,这里`$1` 就是 `user_1`,`$2`就是`2`
+
+```conf
+# 例子
+location /ABC/api/pgk-abc/ {
+  rewrite ^/ABC/(.*)$ /$1 break;
+  proxy_pass http://ip:port;
+  # 这里重写掉 ABC ,  $1 就是 api/pgk-abc/
+  # 实际请求地址是： http://ip:port/api/pgk-abc/
+  proxy_http_version 1.1;
+}
+```
 
 ## 防盗链配置
 
@@ -551,7 +588,23 @@ server {
         }
     }
     charset utf-8;
+
+    # 在动静分离的location中开启防盗链机制  
+    location ~ .*\.(html|htm|gif|jpg|jpeg|bmp|png|ico|txt|js|css){  
+        # 最后面的值在上线前可配置为允许的域名地址  
+        valid_referers blocked 192.168.12.129;  
+        if ($invalid_referer) {  
+            # 可以配置成返回一张禁止盗取的图片  
+            # rewrite   ^/ http://xx.xx.com/NO.jpg;  
+            # 也可直接返回403  
+            return   403;  
+        }  
+        
+        root   /soft/nginx/static_resources;  
+        expires 7d;  
+    }
 }
+
 ```
 ## 隐藏版本信息
 
@@ -948,7 +1001,7 @@ http {
 
     gzip                on;     # 开启gzip
     gzip_comp_level     6;      # 压缩等级：1-9 1:压缩最快/CPU消耗最少/压缩率最低 以次类推
-    gzip_min_length     1000;   # 小于此大小的数据不压缩(单位字节/byte)；数据来源"Content-Length"头
+    gzip_min_length     1K;   # 小于此大小的数据不压缩(单位字节/byte)；数据来源"Content-Length"头
     gzip_buffers        32 4k;  # 压缩响应的缓冲区数量和大小(4K 内存页大小取决于平台 getconf PAGESIZE)
     gzip_proxied        any;    # 对代理的请求是否开启压缩
     # 写压缩率大的(css/js/xml/json/ttf)， image图片就不要写了，压缩空间太小，又耗CPU
@@ -984,16 +1037,17 @@ server {
 
 ```conf
 http{
-    proxy_connect_timeout 10;
-    proxy_read_timeout 120;
-    proxy_send_timeout 10;
-    proxy_buffering on;
-    client_body_buffer_size 512k;
-    proxy_buffers 4 64k;
-    proxy_buffer_size 16k;
-    proxy_busy_buffers_size 128k;
-    proxy_temp_file_write_size 128k;
-    proxy_temp_path /soft/nginx/temp_buffer;
+    proxy_connect_timeout 10; # 设置与后端服务器建立连接时的超时时间。
+    proxy_read_timeout 120; # 设置从后端服务器读取响应数据的超时时间。
+    proxy_send_timeout 10; # 设置向后端服务器传输请求数据的超时时间。
+    proxy_buffering on; # 是否启用缓冲机制，默认为关闭状态
+    client_body_buffer_size 512k;  # 设置缓冲客户端请求数据的内存大小
+    proxy_buffers 4 64k; # 为每个请求/连接设置缓冲区的数量和大小，默认4 4k/8k
+    proxy_buffer_size 16k; # 设置用于存储响应头的缓冲区大小
+    proxy_busy_buffers_size 128k; # 在后端数据没有完全接收完成时，Nginx可以将busy状态的缓冲返回给客户端，该参数用来设置busy状态的buffer具体有多大，默认为proxy_buffer_size*2
+    proxy_temp_file_write_size 128k; # 设置每次写数据到临时文件的大小限制。
+    proxy_max_temp_file_size 512k # 设置临时的缓冲目录中允许存储的最大容量。
+    proxy_temp_path /soft/nginx/temp_buffer; # 当内存缓冲区存满时，可以将数据临时存放到磁盘，该参数是设置存储缓冲数据的目录。
 }
 ```
 
@@ -1036,7 +1090,7 @@ http{
 }
 ```
 
-## 缓存清理
+## nginx第三方模块安装-缓存清理
 
 第三方模块`ngx_cache_purge`
 
@@ -1069,7 +1123,17 @@ location ~ /purge(/.*) {
   proxy_cache_purge $host$1$is_args$args;
 }
 ```
+## 大文件传输
+在某些业务场景中需要传输一些大文件，但大文件传输时往往都会会出现一些Bug，比如文件超出限制、文件传输过程中请求超时等，那么此时就可以在Nginx稍微做一些配置，先来了解一些关于大文件传输时可能会用的配置项：
 
+```conf
+server {
+    client_max_body_size 500M;
+    client_header_timeout 10s;
+    proxy_read_timeout 20s;
+    proxy_send_timeout 5m;
+}
+```
 ## Nginx基本信息及模块信息查看
 
 ```bash

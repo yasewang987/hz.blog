@@ -25,11 +25,6 @@ docker rm $(docker ps -a | grep "Exited" | awk '{print $1 }')
 ####### 获取容器名称
 docker ps --format {{.Names}}
 
-####### 删除所有镜像
-docker rmi $(docker images -qa)
-# 删除<none>的镜像
-docker rmi $(docker images | grep none | awk '{print $3}')
-
 ####### 查找dockerhub镜像
 docker search
 
@@ -57,18 +52,6 @@ docker cp 宿主机文件夹/文件 容器id:/path
 # 拷贝容器文件到宿主机
 docker cp 容器id:/path 宿主机文件夹/文件
 
-###### 查看指定镜像的创建历史
-docker history [OPTIONS] IMAGE
-
-###### 将指定镜像保存成 tar 归档文件
-# -o :输出到的文件
-docker save [OPTIONS] IMAGE [IMAGE...]
-# 多个镜像打包示例
-docker save -o abc.tar image:1 image:2
-# 导入使用 docker save 命令导出的镜像,--input , -i : 指定导入的文件
-docker load [OPTIONS]
-docker load -i abc.tar
-
 ##### 将容器导出为镜像
 # -o :将输入内容写到文件。
 docker export [OPTIONS] CONTAINER
@@ -90,8 +73,43 @@ docker run --rm --gpus '"device=1,2"' 84b086e2ba68 nvidia-smi
 # 所有显卡
 docker run --rm --gpus all xxxx
 
+#### 格式化输出容器信息
+# .ID 容器ID
+#.Image 镜像ID
+#.Command Quoted command
+#.CreatedAt 创建容器的时间点.
+#.RunningFor 从容器创建到现在过去的时间.
+#.Ports 暴露的端口.
+#.Status 容器状态.
+#.Size 容器占用硬盘大小.
+#.Names 容器名称.
+#.Labels 容器所有的标签.
+#.Label 指定label的值 例如'{{.Label “com.docker.swarm.cpu”}}’
+#.Mounts 挂载到这个容器的数据卷名称
+docker ps --format "容器ID：{{.ID}}\n名称：{{.Names}}\n镜像：{{.Image}}\n状态：{{.Status}}\n端口：{{.Ports}}\n"
+
+###### 将指定镜像保存成 tar 归档文件
+# -o :输出到的文件
+docker save [OPTIONS] IMAGE [IMAGE...]
+# 多个镜像打包示例
+docker save -o abc.tar image:1 image:2
+# 导入使用 docker save 命令导出的镜像,--input , -i : 指定导入的文件
+docker load [OPTIONS]
+docker load -i abc.tar
+
+####### 删除所有镜像
+docker rmi $(docker images -qa)
+# 删除<none>的镜像
+docker rmi $(docker images | grep none | awk '{print $3}')
+
 ##### 查看镜像层级
 docker image history xxxx:11
+
+# 查看镜像详细信息
+docker image inspect xxxxx:11
+
+# 修改镜像名称
+docker tag souceImage:[tag] targetImage:[tag]
 ```
 
 ## docker容器中使用docker命令

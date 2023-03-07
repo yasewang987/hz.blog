@@ -142,7 +142,37 @@ done
 ```
 
 
-## shell脚本自动交互
+## shell脚本自动交互-expect
+
+基本命令：
+
+* send：向进程发送字符串，用于模拟用户的输入，该命令不能自动回车换行，一般要加 `\r`（回车）
+* expect: expect的一个内部命令，判断上次输出结果里是否包含指定的字符串，如果有则立即返回，否则就等待超时时间后返回。只能捕捉由`spawn`启动的进程的输出
+* spawn: 启动进程，并跟踪后续交互信息
+* interact：执行完成后保持交互状态，把控制权交给控制台
+* Timeout：指定超时时间，过期则继续执行后续指令
+* exp_continue：允许expect`继续`向下执行指令
+* send_user: 回显命令，相当于echo
+
+
+```bash
+# 安装
+yum -y install expect
+apt install -y expect
+
+## 源码安装
+# 下载
+wget  http://core.tcl.tk/tcl/zip/release/tcl.zip
+wget https://jaist.dl.sourceforge.net/project/expect/Expect/5.45.3/expect5.45.3.tar.gz
+# 安装tcl
+unzip tcl.zip && cd ./tcl/unix
+./configure && make && make install
+# 安装expect
+cd /tmp && tar -xzvf expect5.45.3.tar.gz && cd expect5.45.3/
+./configure && make && make install
+# 检查是否安装好
+expect -v
+```
 
 例子：mysql数据备份
 
@@ -167,4 +197,44 @@ EOF
 echo remove file /mnt/data/mysql_backup/pm_shandong_$(date -d "7 day ago" +%Y-%m-%d).sql
 rm -rf /mnt/data/mysql_backup/pm_shandong_$(date -d "7 day ago" +%Y-%m-%d).sql
 echo finish! The file is pm_shandong_$(date "+%Y-%m-%d").sql
+```
+
+例子：简单更改密码脚本
+
+```bash
+#!/usr/bin/expect -d                  #"#!/usr/bin/expect"这一行告诉操作系统脚本里的代码使用那一个shell来执行。 -d 启用调试模式(可加可不加)。
+set timeout 30  　　　　　　　　　　　　  #设置超时时间为30s
+spawn passwd user5　　　　　　　　　　　 #spawn是进入expect环境后才可以执行的expect内部命令，如果没有装expect或者直接在默认的SHELL下执行是找不到spawn命令的。所以不要用 “which spawn“之类的命令去找spawn命令。好比windows里的dir就是一个内部命令，这个命令由shell自带，你无法找到一个dir.com 或 dir.exe 的可执行文件。它主要的功能是给ssh运行进程加个壳，用来传递交互指令。
+expect "New password:" {send "123456\r" } #这个命令的意思是判断上次输出结果里是否包含“New password:”的字符串，如果有则立即返回"123456","\r"代表是返回字符，否则就等待一段时间后返回，这里等待时长就是前面设置的30秒 。
+expect "new password:" {send "123456\r"}  #在平常我们设置密码的时候会让我输入一次后再输入一次进行确认，这个是匹配第二次输出，然后再次输入密码。
+expect eof　　　　　　　　　　　　　　　　#表示读取到文件结束符
+```
+
+例子：登陆远程服务器并停留在远程服务器上
+
+```bash
+#!/usr/bin/expect
+spawn ssh 192.168.123.218   #ssh 远程登陆
+expect {
+"*yes/no" {send "yes\r";exp_continue} #匹配输出内容，返回内容，exp_continue表示继续执行下一步
+"*password" {send "123456\r"}
+}
+interact #执行完成后保持交互状态，把控制权交给控制台，这个时候就可以手工操作了。如果没有这一句登录完成后会退出，而不是留在远程终端上。如果你只是登录过去执行一段命令就退出，可改为［expect eof］
+```
+
+例子：传输参数执行登陆
+
+```bash
+#!/usr/bin/expect 
+set ip [lindex $argv 0]  #这条命令是将变量ip的值设置为传入进来的第一个参数。[lindex $argv 0]表示的就是第一个参数的值
+set port [lindex $argv 1] #这条命令是将变量port的值设置为传入进来的第二个参数。[lindex $argv 1]表示的就是第二个参数的值
+set passwd "123456"
+spawn ssh $ip -p$port  #使用变量，这里使用的方法跟shell脚本一样
+expect {
+    "yes/no" {send "yes\r";exp_continue}
+    "password:" {send "$passwd\r"}
+}
+interact
+
+[root@localhost shell]# ./login2.exp  192.168.123.218 22 #多个参数直接以空格间隔，第一个参数：192.168.123.218 第二个参数22
 ```

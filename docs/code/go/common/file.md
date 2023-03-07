@@ -324,3 +324,60 @@ func CopyFile(src, dest string) (written int64, err error) {
 }
 
 ```
+
+## 文件夹扫描
+
+```go
+// 获取文件列表
+func QueryFiles(c *gin.Context) {
+	files, err := os.ReadDir("./tar")
+	if err != nil {
+		c.JSON(200, ResponseModel{
+			Message: "扫描文件目录出错，请确认文件是否存在",
+		})
+		return
+	}
+	fileNames := make([]string, 0)
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+	}
+	c.JSON(200, ResponseModel{
+		Code: 200,
+		Data: fileNames,
+	})
+}
+```
+
+## 文件移除
+
+```go
+type removeFilesReq struct {
+	FileNames []string `json:"fileNames"`
+}
+
+// 移除文件
+func RemoveFiles(c *gin.Context) {
+	var req removeFilesReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		c.JSON(200, ResponseModel{
+			Message: REQ_ERROR_PARAMS,
+		})
+		return
+	}
+
+	for _, fileName := range req.FileNames {
+		err = os.Remove("./tar/" + fileName)
+		if err != nil {
+			continue
+		}
+	}
+
+	c.JSON(200, ResponseModel{
+		Code: 200,
+		Data: "删除成功",
+	})
+}
+```

@@ -79,6 +79,30 @@ systemctl restart elasticsearch
 ./usr/share/elasticsearch/bin/elasticsearch-setup-passwords interactive
 ```
 
+## nginx反向代理
+
+```conf
+upstream elasticsearch {
+  server 127.0.0.1:9200;
+  keepalive 15;
+}
+server {
+  listen 8881;
+
+  location / {
+    # auth_basic "Restricted Access";
+    # auth_basic_user_file /etc/nginx/htpasswd.users;
+    proxy_pass http://elasticsearch;
+    proxy_redirect off;
+    proxy_buffering off;
+
+    proxy_http_version 1.1;
+    proxy_set_header Connection "Keep-Alive";
+    proxy_set_header Proxy-Connection "Keep-Alive";
+  }
+}
+```
+
 ## Docker搭建es集群
 
 ```bash

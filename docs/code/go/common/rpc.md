@@ -273,19 +273,26 @@ go get -u google.golang.org/grpc
 # 协议插件
 go get -u google.golang.org/golang/protobuf
 go get -u google.golang.org/golang/protobuf/protoc-gen-go
+
 # 下载protoc，如果是mac m1 下载 x86版本即可
 curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.19.3/protoc-3.19.3-osx-x86_64.zip
 # 解压之后，移动到 $GOPATH/bin 目录下
 unzip protoc-3.19.3-osx-x86_64.zip
 mv protoc-3.19.3-osx-x86_64/bin/protoc $GOPATH/bin
+
+# ubuntu安装protoc
+apt install -y protobuf-compiler
 ```
 
 ### 生成proto的go文件
 
 准备 `mygrpc/test.proto` 文件，内容如下
 
-```proto
+```go
 syntax = "proto3";
+
+// 引入其他pb
+import "google/protobuf/wrappers.proto";
 
 // 包名
 package  test;
@@ -299,7 +306,7 @@ option go_package = "./;test";
 // option csharp_package="MyTest";
 
 service Tester{
-  rpc MyTest(Request) returns (Response){}
+  rpc MyTest(Request) returns (Response);
 }
 
 // 函数参数
@@ -311,12 +318,53 @@ message  Request{
 message  Response{
   string  backJson = 1;
 }
+
+// 数组
+message SearchResponse {
+  repeated Result results = 1;
+}
+
+message Result {
+  string url = 1;
+  string title = 2;
+  repeated string snippets = 3;
+}
+
+// 枚举
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 result_per_page = 3;
+  enum Corpus {
+    UNIVERSAL = 0;
+    WEB = 1;
+    IMAGES = 2;
+    LOCAL = 3;
+    NEWS = 4;
+    PRODUCTS = 5;
+    VIDEO = 6;
+  }
+  Corpus corpus = 4;
+}
 ```
 
 生成 `go` 文件, 会在 `mygrpc` 文件夹生成 `test.pb.go` 文件
 
 ```bash
+# 生成1：
 protoc --go_out=plugins=grpc:mygrpc mygrpc/*.proto
+
+# 生成2：
+protoc -I ./pb \
+--go_out ./test --go_opt paths=source_relative \
+--go-grpc_out ./test --go-grpc_opt paths=source_relative \
+./pb/test.proto
+# 生成2的目录
+test
+├── test.pb.go
+└── test_grpc.pb.go
+pb
+└── test.proto
 ```
 
 主要关注生成的两个 `Tester` 接口
@@ -333,7 +381,7 @@ type TesterClient interface {
 }
 ```
 
-### 服务端实现
+### Simple服务端实现
 
 需要先实现 `TesterServer` 接口
 
@@ -379,7 +427,7 @@ func main() {
    // Tester 注册服务实现者
 	// 此函数在 test.pb.go 中，自动生成
 	test.RegisterTesterServer(grpcServer, &test.MyGrpcServer{})
-   // 在 gRPC 服务上注册反射服务
+   // 在 gRPC 服务上注册反射服务(这个可以不要)
 	// func Register(s *grpc.Server)
 	reflection.Register(grpcServer)
 
@@ -389,7 +437,7 @@ func main() {
 
 启动服务端 `go run main.go`
 
-### 客户端实现
+### Simple客户端实现
 
 创建 `main_cli.go` 文件，内容如下
 
@@ -428,3 +476,338 @@ func main() {
 ```
 
 启动客户端 `go run main_cli.go`，每次按回车都会在服务端和客户端出现一行请求记录。
+
+### Server-Streaming RPC 服务器端流式 RPC
+
+服务器端流式 RPC，显然是单向流，并代指 Server 为 Stream 而 Client 为普通 RPC 请求
+
+简单来讲就是客户端发起一次普通的 RPC 请求，服务端通过流式响应多次发送数据集，客户端 Recv 接收数据集。
+
+* `pb` 定义
+```go
+syntax = "proto3";
+
+package ecommerce;
+
+option go_package = "ecommerce/";
+
+import "google/protobuf/wrappers.proto";
+
+message Order {
+  string id = 1;
+  repeated string items = 2;
+  string description = 3;
+  float price = 4;
+  string destination = 5;
+}
+
+service OrderManagement {
+  rpc searchOrders(google.protobuf.StringValue) returns (stream Order);
+}
+```
+
+* `server`实现
+
+注意与Simple RPC的区别：因为我们的服务端是流式响应的，因此对于服务端来说函数入参多了一个`stream OrderManagement_SearchOrdersServer`参数用来写入多个响应，可以把它看作是客户端的对象
+
+可以通过调用这个流对象的`Send(...)`，来往客户端写入数据
+
+通过返回`nil`或者`error`来表示全部数据写完了
+
+```go
+func (s *server) SearchOrders(query *wrapperspb.StringValue,
+                              stream pb.OrderManagement_SearchOrdersServer) error {
+ for _, order := range orders {
+  for _, str := range order.Items {
+   if strings.Contains(str, query.Value) {
+    err := stream.Send(&order)
+    if err != nil {
+     return fmt.Errorf("error send: %v", err)
+    }
+   }
+  }
+ }
+
+ return nil
+}
+```
+
+* `client` 实现
+
+注意与Simple RPC的区别：因为我们的服务端是流式响应的，因此 RPC 函数返回值`stream`是一个流，可以把它看作是服务端的对象
+
+使用`stream`的`Recv`函数来不断从服务端接收数据
+
+当`Recv`返回`io.EOF`代表流已经结束
+
+```go
+c := pb.NewOrderManagementClient(conn)
+ctx, cancelFn := context.WithCancel(context.Background())
+defer cancelFn()
+
+stream, err := c.SearchOrders(ctx, &wrapperspb.StringValue{Value: "Google"})
+if err != nil{
+  panic(err)
+}
+
+for{
+  order, err := stream.Recv()
+  if err == io.EOF{
+    break
+  }
+
+  log.Println("Search Result: ", order)
+}
+```
+
+### Client-Streaming RPC 客户端流式 RPC
+
+客户端流式 RPC，显然也是单向流，客户端通过流式发起多次 RPC 请求给服务端，服务端发起一次响应给客户端。
+
+服务端没有必要等到客户端发送完所有请求再响应，可以在收到部分请求之后就响应
+
+* `pb`定义
+
+```go
+syntax = "proto3";
+
+package ecommerce;
+
+option go_package = "ecommerce/";
+
+import "google/protobuf/wrappers.proto";
+
+message Order {
+  string id = 1;
+  repeated string items = 2;
+  string description = 3;
+  float price = 4;
+  string destination = 5;
+}
+
+service OrderManagement {
+  rpc updateOrders(stream Order) returns (google.protobuf.StringValue);
+}
+```
+
+* `server` 实现
+
+注意与Simple RPC的区别：因为我们的客户端是流式请求的，因此请求参数`stream OrderManagement_UpdateOrdersServer`就是流对象
+
+可以从`stream OrderManagement_UpdateOrdersServer`的`Recv`函数读取消息
+
+当`Recv`返回`io.EOF`代表流已经结束
+
+使用`stream OrderManagement_UpdateOrdersServer`的`SendAndClose`函数关闭并发送响应
+
+```go
+// 在这段程序中，我们对每一个 Recv 都进行了处理
+// 当发现 io.EOF (流关闭) 后，需要将最终的响应结果发送给客户端，同时关闭正在另外一侧等待的 Recv
+func (s *server) UpdateOrders(stream pb.OrderManagement_UpdateOrdersServer) error {
+ ordersStr := "Updated Order IDs : "
+ for {
+  order, err := stream.Recv()
+  if err == io.EOF {
+   // Finished reading the order stream.
+   return stream.SendAndClose(
+    &wrapperspb.StringValue{Value: "Orders processed " + ordersStr})
+  }
+  // Update order
+  orders[order.Id] = *order
+
+  log.Println("Order ID ", order.Id, ": Updated")
+  ordersStr += order.Id + ", "
+ }
+}
+```
+
+* `Client` 实现
+
+ 注意与Simple RPC的区别：因为我们的客户端是流式响应的，因此 RPC 函数返回值`stream`是一个流
+
+ 可以通过调用这个流对象的`Send(...)`，来往这个对象写入数据
+
+ 使用`stream`的`CloseAndRecv`函数关闭并发送响应
+
+```go
+c := pb.NewOrderManagementClient(conn)
+ctx, cancelFn := context.WithCancel(context.Background())
+defer cancelFn()
+
+stream, err := c.UpdateOrders(ctx)
+if err != nil {
+  panic(err)
+}
+
+if err := stream.Send(&pb.Order{
+  Id:          "00",
+  Items:       []string{"A", "B"},
+  Description: "A with B",
+  Price:       0.11,
+  Destination: "ABC",
+}); err != nil {
+  panic(err)
+}
+
+if err := stream.Send(&pb.Order{
+  Id:          "01",
+  Items:       []string{"C", "D"},
+  Description: "C with D",
+  Price:       1.11,
+  Destination: "ABCDEFG",
+}); err != nil {
+  panic(err)
+}
+
+res, err := stream.CloseAndRecv()
+if err != nil {
+  panic(err)
+}
+
+log.Printf("Update Orders Res : %s", res)
+```
+
+### Bidirectional-Streaming RPC 双向流式 RPC
+
+双向流相对还是比较复杂的，大部分场景都是使用事件机制进行异步交互。
+
+双向流式 RPC，顾名思义是双向流。由客户端以流式的方式发起请求，服务端同样以流式的方式响应请求。
+
+首个请求一定是 `Client` 发起，但具体交互方式（谁先谁后、一次发多少、响应多少、什么时候关闭）根据程序编写的方式来确定（可以结合协程）
+
+假设该双向流是按顺序发送的话
+
+* `pb` 定义
+
+```go
+syntax = "proto3";
+
+package ecommerce;
+
+option go_package = "ecommerce/";
+
+import "google/protobuf/wrappers.proto";
+
+message Order {
+  string id = 1;
+  repeated string items = 2;
+  string description = 3;
+  float price = 4;
+  string destination = 5;
+}
+
+message CombinedShipment {
+  string id = 1;
+  string status = 2;
+  repeated Order orderList = 3;
+}
+
+service OrderManagement {
+  rpc processOrders(stream google.protobuf.StringValue)
+      returns (stream CombinedShipment);
+}
+```
+
+* `server` 实现
+
+函数入参`OrderManagement_ProcessOrdersServer`是用来写入多个响应和读取多个消息的对象引用
+
+可以通过调用这个流对象的`Send(...)`，来往这个对象写入响应
+
+以通过调用这个流对象的`Recv(...)`函数读取消息，当`Recv`返回`io.EOF`代表流已经结束
+
+通过返回`nil`或者`error`表示全部数据写完了
+
+```go
+func (s *server) ProcessOrders(stream pb.OrderManagement_ProcessOrdersServer) error {
+
+ batchMarker := 1
+ var combinedShipmentMap = make(map[string]pb.CombinedShipment)
+ for {
+  orderId, err := stream.Recv()
+  log.Printf("Reading Proc order : %s", orderId)
+  if err == io.EOF {
+   log.Printf("EOF : %s", orderId)
+   for _, shipment := range combinedShipmentMap {
+    if err := stream.Send(&shipment); err != nil {
+     return err
+    }
+   }
+   return nil
+  }
+  if err != nil {
+   log.Println(err)
+   return err
+  }
+
+  destination := orders[orderId.GetValue()].Destination
+  shipment, found := combinedShipmentMap[destination]
+
+  if found {
+   ord := orders[orderId.GetValue()]
+   shipment.OrderList = append(shipment.OrderList, &ord)
+   combinedShipmentMap[destination] = shipment
+  } else {
+   comShip := pb.CombinedShipment{Id: "cmb - " + (orders[orderId.GetValue()].Destination), Status: "Processed!"}
+   ord := orders[orderId.GetValue()]
+   comShip.OrderList = append(shipment.OrderList, &ord)
+   combinedShipmentMap[destination] = comShip
+   log.Print(len(comShip.OrderList), comShip.GetId())
+  }
+
+  if batchMarker == orderBatchSize {
+   for _, comb := range combinedShipmentMap {
+    log.Printf("Shipping : %v -> %v", comb.Id, len(comb.OrderList))
+    if err := stream.Send(&comb); err != nil {
+     return err
+    }
+   }
+   batchMarker = 0
+   combinedShipmentMap = make(map[string]pb.CombinedShipment)
+  } else {
+   batchMarker++
+  }
+ }
+}
+```
+
+* `Client` 实现
+
+函数返回值`OrderManagement_ProcessOrdersClient`是用来获取多个响应和写入多个消息的对象引用
+
+可以通过调用这个流对象的`Send(...)`，来往这个对象写入响应
+
+可以通过调用这个流对象的`Recv(...)`函数读取消息，当`Recv`返回`io.EOF`代表流已经结束
+
+```go
+c := pb.NewOrderManagementClient(conn)
+ctx, cancelFn := context.WithCancel(context.Background())
+defer cancelFn()
+
+stream, err := c.ProcessOrders(ctx)
+if err != nil {
+  panic(err)
+}
+
+go func() {
+  if err := stream.Send(&wrapperspb.StringValue{Value: "101"}); err != nil {
+    panic(err)
+  }
+
+  if err := stream.Send(&wrapperspb.StringValue{Value: "102"}); err != nil {
+    panic(err)
+  }
+
+  if err := stream.CloseSend(); err != nil {
+    panic(err)
+  }
+}()
+
+for {
+  combinedShipment, err := stream.Recv()
+  if err == io.EOF {
+    break
+  }
+  log.Println("Combined shipment : ", combinedShipment.OrderList)
+}
+```
