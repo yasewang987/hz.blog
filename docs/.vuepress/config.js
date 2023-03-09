@@ -237,7 +237,8 @@ module.exports = {
                 'serve',
                 'config',
                 'chromeextensions',
-                'element'
+                'element',
+                'wps'
             ],
             '/code/python/': [
                 'base',

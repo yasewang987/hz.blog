@@ -10,3 +10,4 @@
 * [自定义配置文件](./config.md)
 * [Chrome插件开发](./chromeextensions.md)
 * [Element](./element.md)
+* [WPS开发](./wps.md)

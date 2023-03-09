@@ -44,3 +44,26 @@ getComputedStyle(element).getPropertyValue("--my-var");
 // 修改一个 Dom 节点上的 CSS 变量
 element.style.setProperty("--my-var", jsVar + 4);
 ```
+
+## input,textarea文本样式不一致
+
+通过以下配置统一
+```css
+input,
+textarea,
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder
+{
+  font-family: "微软雅黑"!important;
+  font-size: 14px!important;
+}
+```
+
+## 滚动条置顶
+
+```js
+document.getElementById('speechSceneId').scrollTo({
+  top:0,
+  behavior:'smooth'
+})
+```
