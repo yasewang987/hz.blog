@@ -138,6 +138,70 @@ func demo7() {
 }
 ```
 
+## 结合协程调用，可控制中断调用
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os/exec"
+    "time"
+)
+
+type result struct {
+    output []byte
+    err    error
+}
+// 执行一个cmd，让他在一个协程里面执行2s，
+// 1s的时候  杀死cmd
+func main() {
+    var (
+        ctx        context.Context
+        cancelFunc context.CancelFunc
+        cmd        *exec.Cmd
+        resultChan chan *result
+        res        *result
+    )
+
+    // 创建一个结果队列
+    resultChan = make(chan *result, 1)
+    /*
+        1. WithCancel()函数接受一个 Context 并返回其子Context和取消函数cancel
+        2. 新创建协程中传入子Context做参数，且需监控子Context的Done通道，若收到消息，则退出
+        3. 需要新协程结束时，在外面调用 cancel 函数，即会往子Context的Done通道发送消息
+        4. 注意：当 父Context的 Done() 关闭的时候，子 ctx 的 Done() 也会被关闭
+    */
+    ctx, cancelFunc = context.WithCancel(context.TODO())
+    // 起一个协程
+    go func() {
+        var (
+            output []byte
+            err    error
+        )
+        // 生成命令
+        cmd = exec.CommandContext(ctx, "bash", "-c", "sleep 3;echo hello;")
+        // 执行命令cmd.CombinedOutput(),且捕获输出
+        output, err = cmd.CombinedOutput()
+        // 用chan跟主携程通信,把任务输出结果传给main协程
+        resultChan <- &result{
+            err:    err,
+            output: output,
+        }
+    }()
+    // Sleep 1s
+    time.Sleep(time.Second * 1)
+    // 取消上下文,取消子进程,子进程就会被干掉
+    cancelFunc()
+    // 从子协程中取出数据
+    res = <-resultChan
+    // 打印子协程中取出数据
+    fmt.Println(res.err)
+    fmt.Println(string(res.output))
+}
+```
+
 ## cobra
 
 cobra遵循 `commands, arguments & flags`结构。

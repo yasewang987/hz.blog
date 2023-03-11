@@ -103,3 +103,10 @@ developuseribbon=true
 ### chrome浏览器不显示安装界面
 
 在浏览器访问：`chrome://flags/#block-insecure-private-network-requests`，将Default设置为`Disable`，然后重新加载浏览器
+
+### Dialog不显示界面
+
+```js
+// 在对应的vue页面中 mounted 之后执行 window.close() 关闭
+wps.ShowDialog(Util.GetUrlPath()+"actiontemp","",1,1,false,false,0)
+```

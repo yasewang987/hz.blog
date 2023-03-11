@@ -1134,6 +1134,60 @@ server {
     proxy_send_timeout 5m;
 }
 ```
+## keepalive
+
+对于Nginx，有两大keepalive使用场景：
+
+1. Nginx 对客户端（上游）。
+1. Nginx对tomcat服务（下游）。
+
+是http协议中的keepalive。使用keepalive ，可以有多个请求复用同一个TCP连接。这样可以减少TCP的握手次数，减少并发连接数去降低对服务器的资源消耗。当请求发起时，客户端可以决定是否使用keepalive。
+
+keepalive涉及到的http协议头部有以下两个：
+
+1. `Connection`头部:
+    * Connection头部可用于决定当前的事务完成后，是否会关闭连接。
+    * 若Connection头部的值为`close`，则表示请求完成后就关闭连接。
+    * 若Connection头部的值为`keep-alive`，则表示可复用连接处理请求。
+1. `keep-alive`头部
+    * 使用`keep-alive`头部可以用于告诉客户端连接多少秒后超时，还有最大连接数是多少。
+
+```conf
+# keepalive和keepalive-requests参数配置小时，当接口并发量增大，缓存的32个空闲连接肯定不够用，于是nginx会不断创建新的连接向后端服务发起请求，由于后端服务的TCP连接队列长度是有限的，因此大量连接到来必然会出现TCP队列溢出从而丢弃SYN报文的情况。所以需要调大keepalive的值
+upstream aaa {
+    server 1.1.1.1;
+    # 表示nginx和upstream pod之间最大空闲连接缓存数（默认最多缓存32个空闲连接）。
+    keepalive 32;
+    # 表示nginx和upstream pod之间的连接超时时间。
+    keepalive_timeout 58s;
+    # 表示nginx和upstream pod之间单个连接可承载的最大请求数。
+    keepalive_requests 98;
+}
+
+# keepalive_disable指令可用于指定某类浏览器禁止使用keepalive。
+Syntax:  keepalive_disable none | browser ...;
+# 默认值是msie6，因为微软的IE6浏览器比较旧，对keepalive支持不好。
+Default:  keepalive_disable msie6;
+# keepalive_disable指令可出现在http, server, location的上下文中。
+Context:  http, server, location
+
+# keepalive_requests指令可用于设置一个keepalive连接可提供服务的最大请求数。
+Syntax:  keepalive_requests number;
+# 当到达最大的请求数后，连接将会关闭。默认值是100。
+Default:  keepalive_requests 1000;
+# keepalive_requests指令可出现在http, server, location的上下文中
+Context:  http, server, location
+
+# keepalive_timeout指令可用于设置keepalive超时时间
+# 第一个参数用于设置keep-alive的客户端连接与服务端保持打开的超时时间。如果时间到了还没连接则关闭。
+# 设置为0表示禁止keep-alive客户端连接
+# 第二个可选的参数用户设置响应头部中“Keep-Alive: timeout=time”的值。
+Syntax:  keepalive_timeout timeout [header_timeout];
+Default:  keepalive_timeout 75s;
+Context:  http, server, location
+```
+
+
 ## Nginx基本信息及模块信息查看
 
 ```bash
