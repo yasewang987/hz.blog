@@ -226,7 +226,7 @@ module.exports = {
                 'flex',
                 'resources',
                 'animation',
-                'problem'
+                'common'
             ],
             '/code/web/other/': [
                 'qiankun',

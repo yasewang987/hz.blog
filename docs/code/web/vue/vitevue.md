@@ -79,7 +79,7 @@ export default defineConfig({
 * 安装依赖
 ```bash
 # eslint 安装
-yarn add eslint --dev
+yarn add eslint -D
 # eslint 插件安装
 yarn add eslint-plugin-vue --dev
 

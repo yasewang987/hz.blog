@@ -67,3 +67,18 @@ document.getElementById('speechSceneId').scrollTo({
   behavior:'smooth'
 })
 ```
+
+## 浮动按钮等实现
+
+使用固定定位,如果同时设置了 `top`和 `bottom`，则元素的高度会根据父元素的高度自适应；如果同时设置了 `left` 和 `right`，则元素的宽度也会根据父元素的宽度自适应。
+
+```css
+element {
+  position: fixed;
+  top: value;
+  right: value;
+  bottom: value;
+  left: value;
+  z-index: 9999;
+}
+```
