@@ -201,7 +201,8 @@ module.exports = {
                 'viper',
                 'spider',
                 'taskschedule',
-                'execCmd'
+                'execCmd',
+                'terminal'
             ],
             '/code/web/npm/': [
                 'base',

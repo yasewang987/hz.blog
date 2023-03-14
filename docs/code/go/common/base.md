@@ -287,7 +287,7 @@ func genPlayer(name string) func() (string, int)  {
 }
 ```
 
-## 对象
+## 对象 / 结构体
 
 ```go
 type Student struct { // 首字母大写可包外访问
@@ -296,9 +296,78 @@ type Student struct { // 首字母大写可包外访问
 	Name string
 	birth string //不可对外访问
 }
+
+// 嵌入其他结构体
+type Student2 struct {
+	Student
+	school string
+}
+// 嵌入其他结构体时，可以直接访问被嵌入结构体属性
+s2 := Student2{}
+s2.Name = "name2"
+s2.birth = "2022-12-02"
+s2.school = "清华"
+// 初始化时需要整体初始化被嵌入结构体
+s2 := Student2 {
+	Student: Student {
+		StudentID: 1
+		Name: "name"
+		birth: "2022-12-02"
+	},
+	school: "school"
+}
+// 被嵌入结构体的方法也可以直接被使用
+func (s Student) ToString() string {
+	return s.Name + s.birth
+}
+s2.ToString()
+
+///// 被嵌入的字段被覆盖
+type Base struct {
+  b   int
+  tag string
+}
+
+func (base Base) DescribeTag() string {
+  return fmt.Sprintf("Base tag is %s", base.tag)
+}
+
+type Container struct {
+  Base
+  c   string
+  tag string
+}
+
+func (co Container) DescribeTag() string {
+  return fmt.Sprintf("Container tag is %s", co.tag)
+}
+// 调用
+b := Base{b: 10, tag: "b's tag"}
+co := Container{Base: b, c: "foo", tag: "co's tag"}
+fmt.Println(b.DescribeTag())
+fmt.Println(co.DescribeTag())
+// 输出
+Base tag is b's tag
+Container tag is co's tag
 ```
 
 ## defer
 
 * `defer` 延迟执行的函数会在 `return` 返回前执行，所以一般用来进行资源释放等清理工作
 * 多个被 `defer` 的函数会按照先进后出的顺序被调用
+
+## 接口
+
+```go
+// 接口定义
+type A interface {
+	Amethod()
+}
+
+// 接口嵌套
+// B接口包含了A接口的所有方法定义及自身的定义
+type B interface {
+	A
+	Bmethod()
+}
+```
