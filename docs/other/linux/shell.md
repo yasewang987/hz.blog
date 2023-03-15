@@ -1,5 +1,38 @@
 # Shell 脚本
 
+## 中括号用法总结
+
+Shell 里面的中括号（包括单中括号与双中括号）可用于一些条件的测试：
+
+* 算术比较, 比如一个变量是否为0, `[ $var -eq 0 ]`。
+* 文件属性测试，比如一个文件是否存在，`[ -e $var ]`, 是否是目录，`[ -d $var ]`。
+* 字符串比较, 比如两个字符串是否相同， `[[ $var1 = $var2 ]]`。
+
+`[]` 常常可以使用 `test` 命令来代替
+
+```bash
+if [ $var -eq 0 ]; then echo "True"; fi
+# 等于
+if test $var -eq 0; then echo "True"; fi
+```
+
+## 算术比较
+
+```bash
+# -gt 大于
+# -lt 小于
+# -ge 大于或等于
+# -le 小于或等于
+
+# 需要注意的是 [ 与 ] 与操作数之间一定要有一个空格，否则会报错。
+[ $var -eq 0 ]  # 当 $var 等于 0 时，返回真
+[ $var -ne 0 ]  # 当 $var 不等于 0 时，返回真
+
+# 可以通过 -a (and) 或 -o (or) 结合多个条件进行测试：
+[ $var1 -ne 0 -a $var2 -gt 2 ]  # 使用逻辑与 -a
+[ $var1 -ne 0 -o $var2 -gt 2 ]  # 使用逻辑或 -o
+```
+
 ## 文件/文件夹相关判断
 
 参数详解：
@@ -55,12 +88,49 @@ else
 fi
 ```
 
+## 判断字符串是否相等
+
+```bash
+# 如果 str1 与 str2 不相同，则返回真
+[[ $str1 != $str2 ]]
+# 如果 str1 是空字符串，则返回真
+[[ -z $str1 ]]
+# 如果 str1 是非空字符串，则返回真
+[[ -n $str1 ]]
+
+# 当 str1等于str1等于str2 时，返回真。也就是说，str1 和 str2 包含的文本是一样的。其中的单等于号也可以写成双等于号，也就是说，上面的字符串比较等效于 [[ $str1 == $str2 ]]。
+# 注意 = 前后有一个空格，如果忘记加空格, 就变成了赋值语句，而非比较关系了。
+if [[ $str1 = $str2 ]]; then
+  echo '相等'
+else
+  echo '不相等'
+fi
+
+# 使用逻辑运算符 && 和 || 可以轻松地将多个条件组合起来
+str1="Not empty"
+str2=""
+if [[ -n $str1 ]] && [[ -z $str2 ]];
+then
+  echo str1 is nonempty and str2 is empty string.
+fi
+```
+
 ## 判断字符串是否为空
 
 ```bash
 # 判断是否存在runnertest-master容器
 if [ $(docker ps -a --format {{.Names}} | grep runnertest-master) ]; then
     echo "runnertest-master already run"
+fi
+```
+
+## 判断系统命令是否存在
+
+```bash
+if (command -v docker2 > /dev/null 2>&1); then
+  echo exits
+else
+  echo not exits
 fi
 ```
 

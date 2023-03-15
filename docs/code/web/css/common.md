@@ -13,6 +13,31 @@
 }
 ```
 
+## 滚动条样式设置
+
+```css
+::-webkit-scrollbar {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin-left: -10px;
+}
+::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  background-color: #f0f1f5;
+  background-clip: content-box;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 1px 2px;
+  border-radius: 7px;
+}
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-right: none;
+  border-left: none;
+}
+```
+
 ## css变量定义
 
 最佳实践是定义在根伪类 `:root` 下，这样就可以在 `HTML` 文档的任何地方访问到它了

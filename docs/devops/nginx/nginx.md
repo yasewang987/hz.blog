@@ -211,7 +211,8 @@ location / {
     # Upgrade: websocket； 表示客户端希望使用websocket协议通信， 那么后端的ws程序取到头信息后会返回101状态码(协议转换),此时浏览器就会使用当前的TCP连接建立websocket通道。
     proxy_set_header Upgrade $http_upgrade;
     # Connection头信息取值upgrade, 表示本次请求是一次协议升级(协议转换)请求, 配合 Upgrade: websocket信息, 完整表达了这个请求要升级到websocket协议。
-    proxy_set_header Connection $connection_upgrade;
+    # proxy_set_header Connection $connection_upgrade;
+    proxy_set_header Connection "upgrade";
 }
 ```
 ## proxy_pass 相对/绝对 路径
