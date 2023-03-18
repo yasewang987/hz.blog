@@ -45,8 +45,10 @@ docker node promote node02
 ## 常用命令
 
 ```bash
-# 查看节点信息
+# 查看节点列表
 docker node ls
+# 查看指定节点详细信息
+docker node inspect master1
 # 管理节点删除指定工作节点
 docker node rm node1
 # 退出swarm集群 - 工作节点
@@ -113,4 +115,63 @@ docker service update --image nginx:1.13 my-web
 docker service update --rollback my-web
 ### 移除服务
 docker service rm my-web
+```
+
+## Label节点标签及服务约束
+
+多节点 Swarm 集群下，可能节点的配置不同（比如 CPU、内存等），部署着不同类型的服务（比如 Web服务、Job服务等），当这些服务以 Service 或者 Stack 的形式部署到集群，默认情况下会随机分配到各个节点。
+
+`constraints` 可以匹配 `node` 标签和 `engine` 标签，`engine.labels` 适用于 Docker Engine 标签，如操作系统，驱动程序等，`node.labels` 适用于上述人为添加到节点的。
+
+node|attribute matches|example
+---|---|---
+node.id|Node ID|node.id==2ivku8v2gvtg4
+node.hostname|Node hostname|node.hostname!=node-2
+node.role|Node role|node.role==manager
+node.labels|user defined node labels|node.labels.security==high
+engine.labels|Docker Engine's labels|engine.labels.operatingsystem==ubuntu 14.04
+
+可以通过设置Label等方式部署到指定节点
+
+标签方式：
+```bash
+# 添加标签
+docker node update --label-add role=masl master1
+# 查看节点标签
+docker node inspect master1
+# 删除标签
+docker node update --label-rm role master1
+# 服务运行到指定标签的节点
+docker service create --name my-web -e TZ="Asia/Shanghai" --replicas 2 -p 8081:8080 --constraint 'node.labels.role == masl' nginx:1.20.1
+```
+其他方式：
+```bash
+# 设置hostname
+hostnamectl set-hostname fcmaster
+# host方式
+docker service create --name my-web -e TZ="Asia/Shanghai" --replicas 2 -p 8081:8080 --constraint 'node.hostname==fcmaster' nginx:1.20.1
+
+# role方式(manager表示管理节点)
+docker service create --name my-web -e TZ="Asia/Shanghai" --replicas 2 -p 8081:8080 --constraint 'node.role==manager' nginx:1.20.1
+```
+
+## docker stack
+
+```yaml
+services:
+    nginx:
+         image: nginx
+         ports:
+           - target: 80
+           - published: 80
+           - protocol: tcp
+           - mode: ingress
+         deploy:
+           mode: global
+           placement:
+              constraints:                      # 添加条件约束
+                - node.hostname==fcmaster
+           restart_policy:
+             condition: on-failure
+             max_attempts: 3
 ```
