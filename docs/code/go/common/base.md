@@ -158,6 +158,12 @@ arr = append(arr[:index], arr[index+1:]...)
 arr[0:0]
 // 复制切片到另一个切片(目标切片必须有足够的空间来装载源切片的元素个数。)
 copy(destSlice, srcSlice)
+
+
+///// 修改slice值,通过索引下标实现
+for i,_ := range s {
+	s[i] = "asdasd"
+}
 ```
 
 ### 通道channel

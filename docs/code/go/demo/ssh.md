@@ -48,7 +48,7 @@ func main() {
   // 调用远程服务器脚本脚本
  // res, err := session.CombinedOutput("sh /opt/test.sh")
  if err := session.Run("/usr/bin/whoami"); err != nil {
-  log.Fatal("Failed to run: " + err.Error())
+  return b.string() + "\n" +err.Error()
  }
  fmt.Println(b.String())  // root
 }

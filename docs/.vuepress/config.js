@@ -311,6 +311,7 @@ module.exports = {
                 'buildx',
                 'network',
                 'update',
+                'swarm',
                 'composefile',
                 'compose-netcore',
                 'portainer'
