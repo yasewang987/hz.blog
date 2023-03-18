@@ -9,6 +9,8 @@
 * [Docker网络](./network.md)
 * [Docker容器配置调整](./update.md)
 
+* [Docker Swarm](./swarm.md)
+
 * [Docker-Compose File详解](./composefile.md)
 * [Docker-Compose部署NetCore](./compose-netcore.md)
 

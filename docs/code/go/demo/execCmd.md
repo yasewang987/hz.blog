@@ -138,6 +138,129 @@ func demo7() {
 }
 ```
 
+## 结合协程调用，可控制中断调用
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os/exec"
+    "time"
+)
+
+type result struct {
+    output []byte
+    err    error
+}
+// 执行一个cmd，让他在一个协程里面执行2s，
+// 1s的时候  杀死cmd
+func main() {
+    var (
+        ctx        context.Context
+        cancelFunc context.CancelFunc
+        cmd        *exec.Cmd
+        resultChan chan *result
+        res        *result
+    )
+
+    // 创建一个结果队列
+    resultChan = make(chan *result, 1)
+    /*
+        1. WithCancel()函数接受一个 Context 并返回其子Context和取消函数cancel
+        2. 新创建协程中传入子Context做参数，且需监控子Context的Done通道，若收到消息，则退出
+        3. 需要新协程结束时，在外面调用 cancel 函数，即会往子Context的Done通道发送消息
+        4. 注意：当 父Context的 Done() 关闭的时候，子 ctx 的 Done() 也会被关闭
+    */
+    ctx, cancelFunc = context.WithCancel(context.TODO())
+    // 起一个协程
+    go func() {
+        var (
+            output []byte
+            err    error
+        )
+        // 生成命令
+        cmd = exec.CommandContext(ctx, "bash", "-c", "sleep 3;echo hello;")
+        // 执行命令cmd.CombinedOutput(),且捕获输出
+        output, err = cmd.CombinedOutput()
+        // 用chan跟主携程通信,把任务输出结果传给main协程
+        resultChan <- &result{
+            err:    err,
+            output: output,
+        }
+    }()
+    // Sleep 1s
+    time.Sleep(time.Second * 1)
+    // 取消上下文,取消子进程,子进程就会被干掉
+    cancelFunc()
+    // 从子协程中取出数据
+    res = <-resultChan
+    // 打印子协程中取出数据
+    fmt.Println(res.err)
+    fmt.Println(string(res.output))
+}
+```
+
+## 模拟交互terminal
+
+```go
+package main
+
+import (
+    "golang.org/x/crypto/ssh"
+    "log"
+    "os"
+)
+
+func main() {
+    // 建立SSH客户端连接
+    client, err := ssh.Dial("tcp", "127.0.0.1:2222", &ssh.ClientConfig{
+        User:            "root",
+        Auth:            []ssh.AuthMethod{ssh.Password("123456")},
+        HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+    })
+    if err != nil {
+        log.Fatalf("SSH dial error: %s", err.Error())
+    }
+
+    // 建立新会话
+    session, err := client.NewSession()
+    defer session.Close()
+    if err != nil {
+        log.Fatalf("new session error: %s", err.Error())
+    }
+
+    session.Stdout = os.Stdout // 会话输出关联到系统标准输出设备
+    session.Stderr = os.Stderr // 会话错误输出关联到系统标准错误输出设备
+    session.Stdin = os.Stdin   // 会话输入关联到系统标准输入设备
+    modes := ssh.TerminalModes{
+        ssh.ECHO:          0,  // 禁用回显（0禁用，1启动）
+        ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+        ssh.TTY_OP_OSPEED: 14400, //output speed = 14.4kbaud
+    }
+    if err = session.RequestPty("linux", 32, 160, modes); err != nil {
+        log.Fatalf("request pty error: %s", err.Error())
+    }
+    if err = session.Shell(); err != nil {
+        log.Fatalf("start shell error: %s", err.Error())
+    }
+    if err = session.Wait(); err != nil {
+        log.Fatalf("return error: %s", err.Error())
+    }
+}
+
+///////输出
+
+//如果不禁用回显
+[root@65a9c031a770 ~]# ls
+ls
+anaconda-ks.cfg
+//禁用回显
+[root@65a9c031a770 ~]# ls
+anaconda-ks.cfg
+```
+
 ## cobra
 
 cobra遵循 `commands, arguments & flags`结构。

@@ -169,7 +169,8 @@ module.exports = {
                 'select',
                 'context',
                 'generic',
-                'error'
+                'error',
+                'tags'
             ],
             '/code/go/other/': [
                 'install',
@@ -200,7 +201,8 @@ module.exports = {
                 'viper',
                 'spider',
                 'taskschedule',
-                'execCmd'
+                'execCmd',
+                'terminal'
             ],
             '/code/web/npm/': [
                 'base',
@@ -225,7 +227,7 @@ module.exports = {
                 'flex',
                 'resources',
                 'animation',
-                'problem'
+                'common'
             ],
             '/code/web/other/': [
                 'qiankun',
@@ -237,7 +239,8 @@ module.exports = {
                 'serve',
                 'config',
                 'chromeextensions',
-                'element'
+                'element',
+                'wps'
             ],
             '/code/python/': [
                 'base',
@@ -308,6 +311,7 @@ module.exports = {
                 'buildx',
                 'network',
                 'update',
+                'swarm',
                 'composefile',
                 'compose-netcore',
                 'portainer'
