@@ -195,3 +195,15 @@ systemctl restart docker
 # 验证
 sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
 ```
+
+## 私有镜像仓库
+
+```bash
+# 安装
+docker run --restart=always -d -p 5000:5000 -v /opt/fc/registry:/var/lib/registry --name fc-registry registry
+
+# 查看镜像仓库中的镜像列表
+curl http://localhost:5000/v2/_catalog
+# 列出指定镜像的所有标签
+curl http://localhost:5000/v2/es/tags/list
+```

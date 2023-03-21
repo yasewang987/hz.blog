@@ -17,6 +17,7 @@
 /* 指定容器采用flex布局 */
 .box{
   display: flex;
+  gap: 10px; /**元素间距 */
 }
 
 /* 行内元素 Flex 布局 */
