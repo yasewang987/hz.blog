@@ -26,3 +26,23 @@ client_header_buffer_size 2000k;
 #修改为
 client_header_buffer_size 32k;
 ```
+
+## 动态Upstream引入变量的导致Proxy_pass转发规则产生异常
+
+`Nginx`会在请求DNS后把对应的IP信息缓存起来，后续的请求就一直用缓存的IP。直到下次`reload`的时候才会再次查询domain，不想经常`reload`，需要通过set设置一个变量变量实现
+
+```conf
+# 当请求 /foo/bar/baz时，转发的给后端请求将变为 / 而不是预期的 /bar/baz
+location /foo/ {
+  set $upstream_endpoint http://service-xxxxxxxx.elb.amazonaws.com/;
+  proxy_pass $upstream_endpoint;
+}
+
+# 解决办法
+location /foo/ {
+  set $upstream_endpoint http://service-xxxxxxxx.elb.amazonaws.com/;
+  rewrite ^/foo/(.*)$ /$1 break;
+  proxy_pass $upstream_endpoint;
+}
+```
+

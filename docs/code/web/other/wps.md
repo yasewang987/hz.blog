@@ -110,3 +110,34 @@ developuseribbon=true
 // 在对应的vue页面中 mounted 之后执行 window.close() 关闭
 wps.ShowDialog(Util.GetUrlPath()+"actiontemp","",1,1,false,false,0)
 ```
+
+### 按钮控制可用
+
+调用的是 `ribbon.js` 的 `OnGetEnabled` 方法
+
+```js
+function OnGetEnabled(control) {
+    const eleId = control.Id
+    switch (eleId) {
+        case "btnShowDialog":
+            {
+                // 通过pluginstorage保存显示标记
+                let bFlag = wps.PluginStorage.getItem("EnableFlag")
+                return bFlag
+            }
+        case "btnShowTaskPane":
+            {
+                let bFlag = wps.PluginStorage.getItem("EnableFlag")
+                return bFlag
+            }
+        default:
+            break
+    }
+    return true
+}
+
+// 刷新单个按钮状态
+wps.ribbonUI.InvalidateControl("btnIsEnbable")
+// 刷新所有按钮
+wps.ribbonUI.Invalidate()
+```

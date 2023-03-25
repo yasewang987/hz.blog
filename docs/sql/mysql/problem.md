@@ -22,3 +22,13 @@ flush privileges;
 alter user 'root'@'XX.XX.XX.XX' identified by ‘PASSWORD’;
 flush privileges;
 ```
+
+## mariadb升级导致的问题
+
+`Column count of mysql.proc is wrong. Expected 21, found 20`:
+
+解决：
+
+```bash
+mysql_upgrade -u root -p
+```

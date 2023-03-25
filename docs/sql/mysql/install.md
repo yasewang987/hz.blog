@@ -50,6 +50,8 @@ sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'
 log-bin=mysql_bin
 server-id=1
 binlog_format=Row
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
 ```
 
 运行容器命令(mysql文件夹下运行)：
@@ -58,7 +60,7 @@ binlog_format=Row
 sudo docker run -d --restart=always -p 33306:3306 \
 -v "$PWD/mysqld.cnf":/etc/mysql/mysql.conf.d/mysqld.cnf \
 -v "$PWD/data":/var/lib/mysql \
--e MYSQL_ROOT_PASSWORD="ifuncun888" \
+-e MYSQL_ROOT_PASSWORD="abc" \
 --name mysql mysql:5.7
 ```
 

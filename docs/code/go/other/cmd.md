@@ -3,6 +3,9 @@
 ## 编译build
 
 ```bash
+# 查看支持的架构列表
+go tool dist list
+# 例子
 CGO_ENABLED=0 GOOS=linux GOARCH=mips64le go build -o hello
 ```
 
