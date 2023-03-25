@@ -129,3 +129,12 @@ body {
   white-space: pre-line;
 }
 ```
+
+## box-sizing
+
+* `content-box`: 默认值，标准盒子模型。`width` 与 `height` 只包括内容的宽和高，不包括边框（border），内边距（padding），外边距（margin）。
+    * `width` = 内容的宽度
+    * `height` = 内容的高度
+* `border-box`: `width` 和 `height` 属性包括内容，内边距和边框，但不包括外边距。
+    * `width` = border + padding + 内容的宽度
+    * `height` = border + padding + 内容的高度

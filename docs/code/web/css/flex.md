@@ -164,70 +164,413 @@ align-self属性允许单个项目有与其他项目不一样的对齐方式，�
 
 ## demo
 
-### 圣杯布局
+### 垂直居中
 
 ```html
 <!DOCTYPE html>
-<html lang="en" style="font-size: 62.5%;">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./my.css">
   <title>Document</title>
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: darkgreen;
+    }
+
+    .main {
+      background-color: aquamarine;
+      width: 300px;
+      height: 200px;
+
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <button onclick="mybtnClick()">三</button>
-    </div>
-    <div class="content">
-      <div class="left"></div>
-      <div class="center"></div>
-      <div class="right"></div>
-    </div>
-    <div class="footer"></div>
+  <div class="main">
+    <h2>我是居中标题</h2>
+    <p>我是居中的内容aaaaaaaaa</p>
   </div>
 </body>
-<script>
-  function mybtnClick() {
-    let left = document.getElementsByClassName('left')[0]
-    left.style.display=''
-    console.log(display)
-    left.setAttribute('display', display === '' ? 'none': '')
-  }
-</script>
 </html>
 ```
 
-```css
-.container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: aquamarine;
-}
+### sticky footer布局
 
-.footer,
-.header {
-  flex-basis: 10rem;
-  background-color: darkgray;
-}
+当页面内容少时，让页脚粘在底部；当内容超过一屏时，页脚跟在后面。
 
-.content {
-  display: flex;
-  flex: 1 1 0%;
-  background-color:burlywood;
-}
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
 
-.left,
-.right {
-  flex-basis: 10rem;
-  background-color:brown;
-}
+    html,body {
+      height: 100%;
+      background-color: black;
+    }
 
-.center {
-  flex: auto;
-  background-color: blue;
-}
+    .container {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    header,footer {
+      height: 100px;
+      line-height: 100px;
+      font-size: large;
+      font-weight: bold;
+      background-color: green;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 20px 0;
+      background-color: aqua;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>Header</header>
+    <main>
+      <div class="content">
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        今夜我遇见了世上的一切</br>
+        今夜我不会遇见你 </br>
+        但不会遇见你。
+      </div>
+    </main>
+    <footer>Footer</footer>
+  </div>
+</body>
+</html>
+```
+
+
+### 圣杯布局
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    /* 响应式布局 */
+    @media (max-width: 768px) {
+      .body {
+        flex-direction: column;
+      }
+      .main, .nav, .aside {
+        flex: 1;
+      }
+    }
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      background-color: aqua;
+      min-height: 100vh;
+    }
+    header, footer {
+      text-align: center;
+      font-size: x-large;
+      font-weight: 600;
+      height: 100px;
+      line-height: 100px;
+      background-color: green;
+    }
+    .body {
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
+    }
+    .nav, .aside {
+      flex: 0 0 100px;
+      background-color: antiquewhite;
+    }
+    .main {
+      flex: 1;
+      background-color: aquamarine;
+    }
+    .nav {
+      order: -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>Header</header>
+    <div class="body">
+      <main class="content">content</main>
+      <nav class="nav">nav</nav>
+      <aside class="aside">aside</aside>
+    </div>
+    <footer>Footer</footer>
+  </div>
+</body>
+</html>
+```
+
+### 经典导航栏布局
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      height: 60px;
+      padding: 0 20px;
+      background-color: black;
+      color: white;
+      box-sizing: border-box;
+    }
+    .my-header__left, .my-header__right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .logo {
+      flex: 0 0 32px;
+      height: 32px;
+      width: 32px;
+      border-radius: 5px;
+      background-color: coral;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="my-header__left">
+      <div class="logo"></div>
+      <a>首页</a>
+      <a>详情</a>
+    </div>
+    <div class="my-header__right">
+      <div class="user">张三</div>
+      <div class="logout">退出</div>
+    </div>
+  </header>
+</body>
+</html>
+```
+
+### 栅格布局
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+    }
+    .grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .cell {
+      background-color: aquamarine;
+      min-height: 40px;
+      border: solid black 1px;
+    }
+    .cell__2 {
+      flex: 0 0 50%;
+    }
+    .cell__3 {
+      flex: 0 0 33.3%;
+    }
+    .cell__auto {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <div class="cell cell__2">1/2</div>
+    <div class="cell cell__2">1/2</div>
+  </div>
+  <div class="grid">
+    <div class="cell cell__3">1/3</div>
+    <div class="cell cell__3">1/3</div>
+    <div class="cell cell__3">1/3</div>
+  </div>
+  <div class="grid">
+    <div class="cell cell__3">1/3</div>
+    <div class="cell cell__auto">auto</div>
+    <div class="cell cell__auto">auto</div>
+    <div class="cell cell__auto">auto</div>
+  </div>
+  <div class="grid">
+    <div class="cell cell__2">比较少的数据</div>
+    <div class="cell cell__2">
+      <div>很多数据很多数据很多数据</div>
+      <div>很多数据很多数据很多数据</div>
+      <div>很多数据很多数据很多数据</div>
+      <div>很多数据很多数据很多数据</div>
+      <div>很多数据很多数据很多数据</div>
+      <div>很多数据很多数据很多数据</div>
+      <div>很多数据很多数据很多数据</div>
+    </div>
+  </div>
+</body>
+</html>
+```
+
+### 悬挂式布局
+
+在做一个新闻列表模块时，通常它每一栏的的左侧或右侧，需要展示一个图片栏。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+    }
+    .list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px
+    }
+    .item {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+    .image {
+      height: 32px;
+      width: 32px;
+      border-radius: 10px;
+      background-color: burlywood;
+    }
+    .info {
+      flex: 1;
+      height: 32px;
+      background-color: darkgray;
+    }
+  </style>
+</head>
+<body>
+  <div class="list">
+    <div class="item">
+      <div class="image"></div>
+      <div class="info"></div>
+    </div>
+    <div class="item">
+      <div class="image"></div>
+      <div class="info"></div>
+    </div>
+  </div>
+</body>
+</html>
+```
+
+### 输入框附加布局
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .input-group {
+      display: flex;
+      width: 500px;
+      height: 40px;
+      line-height: 40px;
+    }
+    .input-info {
+      flex: 1;
+      border: solid cornflowerblue 1px;
+      border-radius: 8px 0 0 8px;
+    }
+    .input-btn {
+      flex: 0 0 60px;
+      background-color: cadetblue;
+      color: white;
+      border: solid cornflowerblue 1px;
+      border-radius: 0 8px 8px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="input-group">
+    <input class="input-info" type="text">
+    <div class="input-btn">搜索</div>
+  </div>
+</body>
+</html>
 ```
