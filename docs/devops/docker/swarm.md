@@ -705,3 +705,9 @@ Options:
   -w, --workdir string                     Working directory inside the container
                                             定义容器内的workdir
 ```
+
+## 常见问题记录
+
+swarm中如果在`nginx`中配置服务名，会有`DNS缓存`问题
+
+解决方案：参考`nginx`问题处理文档中的`缓存`相关处理，通过`变量+rewrite`方式处理。

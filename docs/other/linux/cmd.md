@@ -435,8 +435,13 @@ tar xvf xxx.tar
 ## 复制文件
 
 ```bash
-# 复制
+# 一般cp和mv命令被系统设置了别名，自带了-i参数，强制需要交互确认
+alias
+
+# 复制文件夹
 cp -r myproject newproject
+# 强制覆盖文件夹里面的文件(会覆盖my下面的data)
+/bin/cp -rf test/data my
 
 # 移动
 mv -f newproject /home
@@ -671,6 +676,19 @@ rm -rf ./xxx/
 
 ```bash
 docker inspect $(docker ps -q) --format '{{.State.Pid}}, {{.Name}}' | grep 56249
+```
+
+## 查看已安装包
+
+```bash
+# ubuntu,debian
+apt list --installed
+# 或者
+dpkg-query -l
+# 如果是snap
+snap list
+# Flatpak
+flatpak list
 ```
 
 ## yum命令只下载rpm包不安装

@@ -3,10 +3,10 @@
 
 ```bash
 # 从tag标签迁分支
-git checkout -b tagname
+git checkout -b branchname tagname
 
-# 从commit签分支
-git checkou -b commitId
+# 从commit签分支,commitid取前8位
+git checkou -b branchname commid_id 
 ```
 ## Git删除分支
 
