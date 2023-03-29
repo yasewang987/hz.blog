@@ -1,6 +1,6 @@
 # 常用操作集合
 
-## iframe滚动条
+## iframe滚动条问题
 
 `iframe`设置了`height: 100%`时有滚动条
 
@@ -36,6 +36,90 @@
   border-right: none;
   border-left: none;
 }
+```
+
+## 滚动条置顶
+
+```js
+document.getElementById('speechSceneId').scrollTo({
+  top:0,
+  behavior:'smooth'
+})
+```
+
+## 滚动加载
+
+```html
+<script>
+import infiniteScroll from 'vue-infinite-scroll'
+loadMoreRelatedArticleDisabled() {
+  return this.recentArticleResult.loadmore == 0 || this.loading
+},
+async loadMoreRelatedArticle() {
+  this.loading = true
+  let res = await api.queryRelatedArticleListByScroll({
+    scrollid: this.relatedArticleResult.scrollId,
+    terms: this.normalResult.relatedqueryinfo.terms
+  })
+  this.relatedArticleResult.loadmore = res.loadmore
+  this.relatedArticleResult.scrollid = res.scrollid
+  this.relatedArticleResult.list = this.relatedArticleResult.list.concat(res.list)
+  this.loading = false
+}
+</script>
+<template>
+  <div class="card-container2"
+    v-infinite-scroll="loadMoreRelatedArticle" 
+    infinite-scroll-disabled="loadMoreRelatedArticleDisabled"
+    infinite-scroll-distance="30">
+    <el-card v-for="article,index in relatedArticleResult.list" :key="index">
+      <div class="card-text" v-html="article.title" :title="cleanContent(article.title)">
+      </div>
+      <div class="card-footer">
+        <div>
+          <span>{{ getDate(article.pubdate) }}</span>
+          <span>{{ article.source }}</span>
+        </div>
+        <div>
+          <el-link @click="click_LookDetail(article.uid)">查看详情</el-link>
+        </div>
+      </div>
+    </el-card>
+    <div class="nomore" v-if="relatedArticleResult.loadmore == 0">没有更多数据</div>
+  </div>
+</template>
+<style>
+.card-container2 {
+  height: calc(97vh - 209px);
+  overflow-x: hidden;
+  overflow-y: scroll;
+  margin-left: 5px;
+}
+.card-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2d3237;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+}
+.card-footer {
+  display: flex;
+  padding-top: 8px;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 400;
+  color: #b9b9b9;
+}
+.nomore {
+  color: #93959a;
+  font-size: 14px;
+  text-align: center;
+  padding: 10px 0;
+}
+</style>
 ```
 
 ## css变量定义
@@ -82,15 +166,6 @@ textarea::-webkit-input-placeholder
   font-family: "微软雅黑"!important;
   font-size: 14px!important;
 }
-```
-
-## 滚动条置顶
-
-```js
-document.getElementById('speechSceneId').scrollTo({
-  top:0,
-  behavior:'smooth'
-})
 ```
 
 ## 浮动按钮等实现

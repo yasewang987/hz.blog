@@ -384,3 +384,12 @@ rm -rf c29c0bc9836880aa883d1ac7e50da56656ed9b2c5499831f3610d775997aa5f2/
 # 删除后重新执行命令，即可启动容器
 docker start mysqlserver
 ```
+
+## 日志无法用grep过滤
+
+这是因为管道符仅对`stdout`有效，如果容器将日志记录到`stderr`，这种情况就会无效。
+
+```bash
+# 2>&1 把stderr重定向到stdout中
+docker logs nginx 2>&1 | grep 500
+```

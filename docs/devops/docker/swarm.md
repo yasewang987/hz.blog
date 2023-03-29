@@ -630,6 +630,16 @@ docker service update --rollback my-web
 
 ## 常见问题记录
 
+### nginx缓存问题
+
 swarm中如果在`nginx`中配置服务名，会有`DNS缓存`问题
 
 解决方案：参考`nginx`问题处理文档中的`缓存`相关处理，通过`变量+rewrite`方式处理。
+
+### 日志无法使用grep过滤
+
+```bash
+# 2>&1 把stderr重定向到stdout中
+docker service logs --raw --tail 500 nginx 2>&1 | grep 500
+```
+
