@@ -832,3 +832,11 @@ $ grep -B 10 ERROR app.log
 # -C代表前10行和后10行
 $ grep -C 10 ERROR app.log
 ```
+
+## grep带空格等字符
+
+通过`\`反斜杠转译
+
+```bash
+sh -c 'curl -sS http://localhost:18350/check | grep serviceStatus\":\ 0,\ \"serviceItems || exit 1'
+```
