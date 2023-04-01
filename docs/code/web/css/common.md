@@ -213,3 +213,27 @@ body {
 * `border-box`: `width` 和 `height` 属性包括内容，内边距和边框，但不包括外边距。
     * `width` = border + padding + 内容的宽度
     * `height` = border + padding + 内容的高度
+
+## 文字溢出显示省略号
+
+```html
+<html lang="en">
+<head>
+  <style>
+    .test {
+      background-color:darkgrey;
+      font-size: 16px;
+      width: 100px;
+
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="test">
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  </div>
+</body>
+</html>
+```

@@ -742,6 +742,8 @@ reboot   system boot  3.10.0-957.12.2. Tue May 19 09:52 - 20:49 (8+10:57)
 history
 # 将缓存中的历史命令保存到.bash_history
 history -w
+# 清理历史命令需要删除.bash_history中的历史
+rm -rf ~/.bash_history
 # 清空历史命令
 history -c
 # 设置历史命令保存条数10000
