@@ -64,6 +64,7 @@ cp -rf %{_builddir}/funcun/base/python/* %{buildroot}/opt/funcun/base/python
 * `python业务代码打包`
 
 ```text
+%define _binaries_in_noarch_packages_terminate_build 0
 Name: funcun-code
 Version: 2022.07.15
 Release:        1

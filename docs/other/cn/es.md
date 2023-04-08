@@ -31,9 +31,11 @@ elif [ ! -z "$JAVA_HOME" ]; then
 -Xms10g
 -Xmx10g
 
-# 修改es启动的端口和ip，config/elasticsearch.yml
+# 修改es启动的端口和ip，并禁用geoip，config/elasticsearch.yml
 http.port: 28001
 http.host: 0.0.0.0
+# 添加到最后即可
+ingest.geoip.downloader.enabled: false
 
 # 启动 -d 后台运行
 /opt/mytest/elasticsearch/bin/elasticsearch -d

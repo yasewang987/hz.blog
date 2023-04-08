@@ -231,3 +231,7 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 * `ELF load command address not properly aligned`
 
 1. `torch`: 使用 `1.8.1` 版本
+
+* `Arch dependent binaries in noarch package`
+
+加上`BuildArch:noarch`报上面错误，需要在 `spec` 文件最上面添加 `%define _binaries_in_noarch_packages_terminate_build 0`
