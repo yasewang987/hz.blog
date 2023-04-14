@@ -189,10 +189,17 @@ locale
 version=`date +%y%m%d%H%M%s`
 ```
 
-## 查看系统版本
+## 查看系统信息
 
 1. 查看发行版本：`cat /etc/os-release` , `cat /etc/issue`
 1. 查看内核版本：`uname -a`，`uname -m`, `uname -s`，`uname -p`
+
+```bash
+uname -m 显示机器的处理器架构
+uname -r 显示正在使用的内核版本
+lspci -tv 罗列 PCI 设备
+lsusb -tv 显示 USB 设备
+```
 
 ## 查看linux cpu，磁盘、内存
 
