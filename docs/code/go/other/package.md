@@ -45,6 +45,22 @@ app 目录下有 api、cmd、configs、internal 目录。一般还会放置 READ
 |-- web
 ```
 
+* 常规项目2
+
+```bash
+|-- service
+    |-- api             API 定义（protobuf 等）以及对应生成的 client 代码，基于 pb 生成的 swagger.json。
+    |-- cmd
+    |-- configs         服务配置文件，比如 database.yaml、redis.yaml、application.yaml。
+    |-- internal        避免有同业务下被跨目录引用了内部的 model、dao 等内部 struct。
+        |-- router      路由定义
+        |-- controller  业务逻辑实现层（主要实现gin的HandleFunc，只依赖领域层，不依赖仓储实现，便于替换不同数据库仓储实现）
+        |-- repository  仓储实现，主要操作数据库
+        |-- domain      领域层（定义了仓库接口，数据库实体等）
+        |-- server      依赖 proto 定义的服务作为入参，提供快捷的启动服务全局方法。
+|-- web
+```
+
 * DDD项目
 
 ```bash
