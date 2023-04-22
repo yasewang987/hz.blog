@@ -202,7 +202,8 @@ module.exports = {
                 'spider',
                 'taskschedule',
                 'execCmd',
-                'terminal'
+                'terminal',
+                'websocket'
             ],
             '/code/web/npm/': [
                 'base',
