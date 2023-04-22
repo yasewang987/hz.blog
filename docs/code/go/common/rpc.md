@@ -261,6 +261,8 @@ func main()  {
 
 ## GRPC示例
 
+gRPC的通信模式分为`unary`和`streaming`两种模式
+
 ### 准备
 
 ```bash
@@ -811,3 +813,327 @@ for {
   log.Println("Combined shipment : ", combinedShipment.OrderList)
 }
 ```
+### 服务端拦截器
+
+服务端的拦截器从请求开始按顺序执行拦截器，在执行完对应RPC的逻辑之后，再按反向的顺序执行拦截器中对响应的处理逻辑
+
+服务器只能配置一个 `unary interceptor`和 `stream interceptor`，否则会报错，客户端也是，虽然不会报错，但是只有最后一个才起作用。
+
+想配置多个，可以使用拦截器链或者自己实现一个
+
+```go
+// 服务端拦截器
+s := grpc.NewServer(
+  grpc.ChainUnaryInterceptor(
+    orderUnaryServerInterceptor1,
+    orderUnaryServerInterceptor2,
+  ),
+  grpc.ChainStreamInterceptor(
+    orderServerStreamInterceptor1,
+    orderServerStreamInterceptor2,
+  ),
+)
+
+// 客户端拦截器
+conn, err := grpc.Dial("127.0.0.1:8009",
+  grpc.WithInsecure(),
+  grpc.WithChainUnaryInterceptor(
+   orderUnaryClientInterceptor1,
+      orderUnaryClientInterceptor2,
+  ),
+  grpc.WithChainStreamInterceptor(
+   orderStreamClientInterceptor1,
+      orderStreamClientInterceptor2,
+  ),
+)
+```
+
+**`unary interceptors`:**
+
+需实现`UnaryServerInterceptor`接口即可
+
+```go
+// ctx context.Context：单个请求的上下文
+// req interface{}：RPC服务的请求结构体
+// info *UnaryServerInfo：RPC的服务信息
+// handler UnaryHandler：它包装了服务实现，通过调用它我们可以完成RPC并获取到响应
+func(ctx context.Context, req interface{}, 
+     info *UnaryServerInfo, handler UnaryHandler) (resp interface{}, err error)
+```
+
+假设我们的客户端请求了`GetOrder`，根据示例再重新看下拦截器接口的每一个参数
+
+* `req interface{}`: RPC服务的请求结构体，对于`GetOrder`来说就是`orderId *wrapperspb.StringValue`
+* `info *UnaryServerInfo`包含两个字段：
+    * `FullMethod`是请求的method名字（例如`/ecommerce.OrderManagement/getOrder`）；
+    * `Server`就是服务实现（就是示例`RegisterOrderManagementServe`r中的`&OrderManagementImpl{}`）
+* `handler`包装了服务实现：所以在调用它之前我们可以进行改写`req`或`ctx`、记录逻辑开始时间等操作，调用完`handler`即完成了RPC并获取到响应，我们不仅可以记录响应还可以改写响应。
+
+示例：
+
+```go
+// 实现 unary interceptors
+func orderUnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+ // Pre-processing logic*
+ s := time.Now()
+
+ // Invoking the handler to complete the normal execution of a unary RPC.
+ m, err := handler(ctx, req)
+
+ // Post processing logic
+ log.Printf("Method: %s, req: %s, resp: %s, latency: %s\n",
+  info.FullMethod, req, m, time.Now().Sub(s))
+  
+ return m, err
+}
+
+func main() {
+ s := grpc.NewServer(
+    // 使用 unary interceptors
+  grpc.UnaryInterceptor(orderUnaryServerInterceptor),
+ )
+ 
+  pb.RegisterOrderManagementServer(s, &OrderManagementImpl{})
+  
+ // ...
+}
+```
+
+**`streaming interceptors`:**
+
+要实现`StreamServerInterceptor`接口
+
+```go
+// srv interface{}：服务实现
+// ss ServerStream：服务端视角的流。怎么理解呢？无论是哪一种流式RPC对于服务端来说发送（SendMsg）就代表着响应数据，接收（RecvMsg）就代表着请求数据，不同的流式RPC的区别就在于是多次发送数据（服务器端流式 RPC）还是多次接收数据（客户端流式 RPC）或者两者均有（双向流式 RPC）。因此仅使用这一个抽象就代表了所有的流式RPC场景
+// info *StreamServerInfo：RPC的服务信息
+// handler StreamHandler：它包装了服务实现，通过调用它我们可以完成RPC
+func(srv interface{}, ss ServerStream, 
+     info *StreamServerInfo, handler StreamHandler) error
+```
+
+示例：
+
+```go
+func orderStreamServerInterceptor(srv interface{},
+ ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+
+ // Pre-processing logic
+ s := time.Now()
+
+ // Invoking the StreamHandler to complete the execution of RPC invocation
+ err := handler(srv, ss)
+
+ // Post processing logic
+ log.Printf("Method: %s, latency: %s\n", info.FullMethod, time.Now().Sub(s))
+
+ return err
+}
+
+func main() {
+ s := grpc.NewServer(
+  grpc.StreamInterceptor(orderStreamServerInterceptor),
+ )
+
+ pb.RegisterOrderManagementServer(s, &OrderManagementImpl{})
+
+ //...
+}
+```
+* `srv interface{}`：服务实现（就是示例`RegisterOrderManagementServer`中的`&OrderManagementImpl{}`）
+* `ss grpc.ServerStream`：服务端发送和接收数据的接口，注意它是一个接口
+* `info *grpc.StreamServerInfo`包含三个字段：
+    * `FullMethod`是请求的`method`名字（例如`/ecommerce.OrderManagement/updateOrders`）；
+    * `IsClientStream` 是否是客户端流
+    * `IsServerStream` 是否是服务端流
+* `handler`包装了服务实现：所以在调用它之前我们可以进行改写数据流、记录逻辑开始时间等操作，调用完`handler`即完成了RPC，因为是流式调用所以不会返回响应数据，只有`error`
+
+修改 `stream` 请求响应示例：
+
+```go
+// SendMsg method call.
+type wrappedStream struct {
+ Recv []interface{}
+ Send []interface{}
+ grpc.ServerStream
+}
+
+func (w *wrappedStream) RecvMsg(m interface{}) error {
+ err := w.ServerStream.RecvMsg(m)
+
+ w.Recv = append(w.Recv, m)
+
+ return err
+}
+
+func (w *wrappedStream) SendMsg(m interface{}) error {
+ err := w.ServerStream.SendMsg(m)
+
+ w.Send = append(w.Send, m)
+
+ return err
+}
+
+func newWrappedStream(s grpc.ServerStream) *wrappedStream {
+ return &wrappedStream{
+  make([]interface{}, 0),
+  make([]interface{}, 0),
+  s,
+ }
+}
+
+func orderStreamServerInterceptor(srv interface{},
+ ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+
+ // Pre-processing logic
+ s := time.Now()
+
+ // Invoking the StreamHandler to complete the execution of RPC invocation
+ nss := newWrappedStream(ss)
+ err := handler(srv, nss)
+
+ // Post processing logic
+ log.Printf("Method: %s, req: %+v, resp: %+v, latency: %s\n",
+  info.FullMethod, nss.Recv, nss.Send, time.Now().Sub(s))
+
+ return err
+} 
+```
+
+### 客户端拦截器
+
+客户端拦截器和服务端拦截器类似，从请求开始按顺序执行拦截器，在获取到服务端响应之后，再按反向的顺序执行拦截器中对响应的处理逻辑
+
+**`unary interceptors`：**
+
+client端要实现`UnaryClientInterceptor`接口实现的接口如下:
+
+```go
+// ctx context.Context：单个请求的上下文
+// method string：请求的method名字（例如/ecommerce.OrderManagement/getOrder)
+// req, reply interface{}：请求和响应数据
+// cc *ClientConn：客户端与服务端的链接
+// invoker UnaryInvoker：通过调用它我们可以完成RPC并获取到响应
+// opts ...CallOption：RPC调用的所有配置项，包含设置到conn上的，也包含配置在每一个调用上的
+func(ctx context.Context, method string, req, reply interface{}, 
+     cc *ClientConn, invoker UnaryInvoker, opts ...CallOption) error
+
+//// 示例
+func orderUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{},
+ cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+ // Pre-processor phase
+ s := time.Now()
+
+ // Invoking the remote method
+ err := invoker(ctx, method, req, reply, cc, opts...)
+
+ // Post-processor phase
+ log.Printf("method: %s, req: %s, resp: %s, latency: %s\n",
+  method, req, reply, time.Now().Sub(s))
+
+ return err
+}
+func main() {
+ conn, err := grpc.Dial("127.0.0.1:8009",
+  grpc.WithInsecure(),
+  grpc.WithUnaryInterceptor(orderUnaryClientInterceptor),
+ )
+ if err != nil {
+  panic(err)
+ }
+ c := pb.NewOrderManagementClient(conn)
+  // ...
+}
+```
+* `cc *grpc.ClientConn`客户端与服务端的链接：这里的`cc`就是示例代码中`c := pb.NewOrderManagementClient(conn)`的`conn`
+* `invoker grpc.UnaryInvoker`包装了服务实现：调用完`invoker`即完成了RPC，所以我们可以改写`req`或者在获取到`reply`之后修改响应
+
+**`streaming interceptors`:**
+
+要实现的接口`StreamClientInterceptor`
+
+```go
+func(ctx context.Context, desc *StreamDesc, cc *ClientConn, 
+     method string, streamer Streamer, opts ...CallOption) (ClientStream, error)
+
+//// 示例
+func orderStreamClientInterceptor(ctx context.Context, desc *grpc.StreamDesc,
+ cc *grpc.ClientConn, method string, streamer grpc.Streamer,
+ opts ...grpc.CallOption) (grpc.ClientStream, error) {
+
+ // Pre-processing logic
+ s := time.Now()
+
+ cs, err := streamer(ctx, desc, cc, method, opts...)
+
+ // Post processing logic
+ log.Printf("method: %s, latency: %s\n", method, time.Now().Sub(s))
+
+ return cs, err
+}
+
+func main() {
+ conn, err := grpc.Dial("127.0.0.1:8009",
+  grpc.WithInsecure(),
+  grpc.WithStreamInterceptor(orderStreamClientInterceptor),
+ )
+ if err != nil {
+  panic(err)
+ }
+
+ c := pb.NewOrderManagementClient(conn)
+  
+  // ...
+}
+
+
+//// 修改流拦截器的请求响应数据
+// SendMsg method call.
+type wrappedStream struct {
+ method string
+ grpc.ClientStream
+}
+
+func (w *wrappedStream) RecvMsg(m interface{}) error {
+ err := w.ClientStream.RecvMsg(m)
+
+ log.Printf("method: %s, res: %s\n", w.method, m)
+
+ return err
+}
+
+func (w *wrappedStream) SendMsg(m interface{}) error {
+ err := w.ClientStream.SendMsg(m)
+
+ log.Printf("method: %s, req: %s\n", w.method, m)
+
+ return err
+}
+
+func newWrappedStream(method string, s grpc.ClientStream) *wrappedStream {
+ return &wrappedStream{
+  method,
+  s,
+ }
+}
+
+func orderStreamClientInterceptor(ctx context.Context, desc *grpc.StreamDesc,
+ cc *grpc.ClientConn, method string, streamer grpc.Streamer,
+ opts ...grpc.CallOption) (grpc.ClientStream, error) {
+
+ // Pre-processing logic
+ s := time.Now()
+
+ cs, err := streamer(ctx, desc, cc, method, opts...)
+
+ // Post processing logic
+ log.Printf("method: %s, latency: %s\n", method, time.Now().Sub(s))
+
+ return newWrappedStream(method, cs), err
+}
+```
+
+和`serve`端类似的参数类似，重点关注下面几个参数
+
+* `cs ClientStream`：客户端视角的流。类比服务端的`ss ServerStream`，无论是哪一种流式RPC对于客户端来说发送（SendMsg）就代表着请求数据，接收（RecvMsg）就代表着响应数据（正好和服务端是反过来的）
+* `streamer Streamer`：完成RPC请求的调用
