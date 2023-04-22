@@ -18,7 +18,7 @@
 
 `databases 16` #数据库个数（可选），我修改了这个只是查看是否生效。。
 
-`dir  ./` #输入本地redis数据库存放文件夹（可选）
+`dir  ./` #输入本地redis数据库存放文件夹（可选，推荐使用固定地址 /data/redis）
 
 `appendonly yes` #redis持久化（可选）
 

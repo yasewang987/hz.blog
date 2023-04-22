@@ -16,6 +16,9 @@ python -m pip install --upgrade pip
 pipdeptree -p xxx
 # 只能显示依赖的包
 pip show xxx
+
+# 下载whl文件
+pip download shapely==2.0.1 -d /tmp
 ```
 
 ## miniconda安装管理

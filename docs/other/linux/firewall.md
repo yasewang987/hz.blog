@@ -5,6 +5,9 @@
 ### 1. 基本操作
 
 ```bash
+# 查看端口列表
+iptables -L -n
+
 # 查看防火墙状态
 service iptables status  
 # 停止防火墙
@@ -23,6 +26,10 @@ chkconfig iptables on
 ### 2. 开启指定端口
 
 ```bash
+### 临时操作
+iptables -I INPUT -p tcp --dport 9000 -j ACCEPT
+
+### 永久修改
 vim /etc/sysconfig/iptables
 # 加入如下代码
 -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
