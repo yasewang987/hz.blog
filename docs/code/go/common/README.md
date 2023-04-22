@@ -17,3 +17,4 @@
 * [Go泛型](./generic.md)
 * [Go-Error](./error.md)
 * [Go-Tags](./tags.md)
+* [Go-Sync](./sync.md)

@@ -170,7 +170,8 @@ module.exports = {
                 'context',
                 'generic',
                 'error',
-                'tags'
+                'tags',
+                'sync'
             ],
             '/code/go/other/': [
                 'install',
