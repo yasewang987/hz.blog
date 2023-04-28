@@ -235,3 +235,16 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 * `Arch dependent binaries in noarch package`
 
 加上`BuildArch:noarch`报上面错误，需要在 `spec` 文件最上面添加 `%define _binaries_in_noarch_packages_terminate_build 0`
+
+## rpm、deb包互相转换
+
+使用debian系统，修改完清华源之后进行如下操作：
+
+```bash
+# 安装alien
+apt install -y alien
+# -d #转为deb
+alien -d xxx.rpm
+# -r #转为rpm
+alien -r xxx.deb
+```
