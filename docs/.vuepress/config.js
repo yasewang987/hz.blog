@@ -204,7 +204,8 @@ module.exports = {
                 'taskschedule',
                 'execCmd',
                 'terminal',
-                'websocket'
+                'websocket',
+                'sse'
             ],
             '/code/web/npm/': [
                 'base',
