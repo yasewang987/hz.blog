@@ -73,7 +73,12 @@ server {
         proxy_pass http://IP:8080/projectName/;
         # 这条是设置cookie
         proxy_cookie_path /projectName /;
-        proxy_set_header   Host    $host;
+        proxy_cookie_domain {backend-domain} {request-domain};
+
+        proxy_http_version 1.1;                               # 指明版本（1.1默认为keep-alive长连接，1.0默认为短连接）
+        proxy_ignore_client_abort on;                         # 客户端断网时，是否中断对后端的请求
+
+        proxy_set_header   Host    $host;   # 保持原来的请求域名
         proxy_set_header   X-Real-IP   $remote_addr;
         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -938,6 +943,11 @@ location / {
     allow 2001:0db8::/32;
     deny  all;   # 拒绝所有
     include /soft/nginx/ip/blockip.conf
+}
+
+###### 指定文件拒绝所有访问
+location ~ ^/(\.user.ini|\.ht|\.git|\.svn|\.project|LICENSE|README.md){
+    deny all;
 }
 ```
 

@@ -325,7 +325,7 @@ module.exports = {
                 'yml'
             ],
             '/devops/nginx/': [
-                'nginx-docker',
+                'base',
                 'nginx',
                 'nginxhotreload',
                 'problem',
