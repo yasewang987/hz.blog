@@ -44,6 +44,9 @@ rpm -e xxx
 
 # 查看包中的内容
 rpm -qpl xxxx.rpm
+
+# 查看包中的执行脚本
+rpm -qp --scripts nginx-1.8.1-1.el7.ngx.x86_64.rpm
 ```
 
 
