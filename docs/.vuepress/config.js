@@ -205,7 +205,8 @@ module.exports = {
                 'execCmd',
                 'terminal',
                 'websocket',
-                'sse'
+                'sse',
+                'goweb'
             ],
             '/code/web/npm/': [
                 'base',

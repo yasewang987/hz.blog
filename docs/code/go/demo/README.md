@@ -21,3 +21,4 @@
 * [Go实现网页Terminal](./terminal.md)
 * [Go-WebSocket](./websocket.md)
 * [Go-SSE](./sse.md)
+* [Go静态资源使用](./goweb.md)
