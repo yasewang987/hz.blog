@@ -87,7 +87,8 @@ module.exports = {
                 text: 'AI',
                 items: [
                     { text: 'AI部署资料', link: '/ai/deploy/' },
-                    { text: 'Paddle系列', link: '/ai/paddle/' }
+                    { text: 'Paddle系列', link: '/ai/paddle/' },
+                    { text: '学习资料', link: '/ai/docs/' }
                 ]
             },
             {
@@ -495,6 +496,9 @@ module.exports = {
                 'paddleocr',
                 'paddlespeech',
                 'paddleserving'
+            ],
+            '/ai/docs/': [
+                'tensor'
             ]
         },
         sidebarDepth: 2
