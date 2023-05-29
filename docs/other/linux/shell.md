@@ -140,6 +140,48 @@ fi
 ip addr | grep global | head -1 | awk '{print $2}' | cut -d / -f 1
 ```
 
+## for循环
+
+```bash
+# 数组定义
+services=(crm word sql redis)
+# 循环1(不带数组下标)
+for s in ${services[@]}
+do
+if [[ -z $(docker service ls -f name=fc-${s} --format {{.Name}}) ]]; then
+  echo 【${s}】未部署，请先部署服务
+  exit 1
+fi
+done
+
+# 获取数组长度
+echo ${#services[@]}
+# 循环2（使用数组下标）
+for ((i=1; i<=${#services[@]}; i++))
+do
+if [[ -z $(docker service ls -f name=fc-${services[i]} --format {{.Name}}) ]]; then
+  echo 【${services[i]}】未部署，请先部署服务
+  exit 1
+fi
+done
+```
+
+## 算术运算
+
+```bash
+((expression))
+
+Sum=$((10+3))
+
+Num1=10  
+Num2=3  
+((Sum=Num1+Num2)) 
+
+Num1=10  
+Num2=3  
+Sum=$((Num1+Num2))  
+```
+
 ## shell脚本自定义参数
 
 ```shell
