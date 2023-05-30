@@ -182,6 +182,47 @@ Num2=3
 Sum=$((Num1+Num2))  
 ```
 
+## 字符串操作
+
+```bash
+# 替换（只替换一个）
+var="AAAszip_BBB.zip";var2=${var/zip/ZIP};echo $var2};
+AAAsZIP_BBB.zip
+var="AAAszip_BBB.zip";var2=${var/.zip/.ZIP};echo $var2;
+AAAszip_BBB.ZIP
+
+# 替换所有
+var="AAAszip_BBB.zip";var2=${var//zip/ZIP};echo $var2;
+AAAsZIP_BBB.ZIP
+
+# 替换开头一个
+var=".zipAAAszip_BBB.zip_CCC";var2=${var/#.zip/.ZIP};echo $var2;
+.ZIPAAAszip_BBB.zip_CCC
+
+# 替换结尾一个
+var="AAAszip_BBB.zip_CCC.zip";var2=${var/%.zip/.ZIP};echo $var2;
+AAAszip_BBB.zip_CCC.ZIP
+
+# 截取，删除右边，保留左边，从右起最短匹配
+a="aaa=bbb";b=${a%=*};echo $b
+aaa
+a="http://localhost:3000/china/shanghai.html";b=${a%/*};echo $b
+http://localhost:3000/china
+#  截取，删除右边，保留左边，从右起最长匹配
+a="http://localhost:3000/china/shanghai.html";b=${a%%/*};echo $b
+http:
+
+# 截取，删除左边，保留右边，从左起最短匹配
+a="aaa=bbb";b=${a#*=};echo $b
+bbb
+a="http://localhost:3000/china/shanghai.html";b=${a#*/};echo $b
+/localhost:3000/china/shanghai.html
+
+# 截取，删除左边，保留右边，从左起最长匹配
+a="http://localhost:3000/china/shanghai.html";b=${a##*/};echo $b
+shanghai.html
+```
+
 ## shell脚本自定义参数
 
 ```shell
