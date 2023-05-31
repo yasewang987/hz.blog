@@ -393,7 +393,8 @@ module.exports = {
                 'minio',
                 'nextterminal',
                 'jumpserver',
-                'zentao'
+                'zentao',
+                'shells'
             ],
             '/sql/mssql/': [
                 'usesul',
