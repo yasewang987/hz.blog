@@ -207,7 +207,8 @@ module.exports = {
                 'terminal',
                 'websocket',
                 'sse',
-                'goweb'
+                'goweb',
+                'file'
             ],
             '/code/web/npm/': [
                 'base',
