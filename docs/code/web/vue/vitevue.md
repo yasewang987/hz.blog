@@ -960,3 +960,9 @@ svg {
   </div>
 </template>
 ```
+
+## 环境变量获取
+
+```ts
+const baseUrl = import.meta.env.PROD ? 'http://localhost:19999/api' : 'http://localhost:19998/api'
+```

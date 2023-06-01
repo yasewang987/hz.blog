@@ -143,3 +143,39 @@ make clean
 # 同时也将configure生成dao的文件全部删除掉
 make distclean
 ```
+
+## 其他spec
+
+### 永中插件
+
+```conf
+%define _binaries_in_noarch_packages_terminate_build 0
+Name: funcun-yozo
+Version: 2023.05
+Release:        1
+Summary:        funcun yozo
+
+Group:          funcun
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+funcun yozo
+
+%prep
+
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/fcwy
+mkdir -p %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/fcwy
+cp -rf %{_builddir}/funcun/fcwy/* %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/fcwy
+
+%files
+/opt/Yozosoft/Yozo_Office/Plugins/fcwy
+
+
+
+%changelog
+```

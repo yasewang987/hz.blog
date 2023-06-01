@@ -393,3 +393,22 @@ docker start mysqlserver
 # 2>&1 把stderr重定向到stdout中
 docker logs nginx 2>&1 | grep 500
 ```
+
+## overlay2: the backing xfs filesystem is formatted without d_type support, which leads to incorrect behavior.
+
+```bash
+# 查看docker挂载的目录ftype，会发现ftype是0
+xfs_info /home
+# 查看目录挂载的分区
+df -h
+# 卸载分区磁盘
+unmount /dev/mapper/centos-home
+# 如果提示device is busy,强制卸载同时要重启
+umount -l /dev/mapper/centos-home
+# 设置ftype
+mkfs.xfs -n ftype=1 /dev/mapper/centos-home -f
+# 重新挂载
+mount /dev/mapper/centos-home
+# 查看挂载情况
+df -h
+```

@@ -141,3 +141,12 @@ wps.ribbonUI.InvalidateControl("btnIsEnbable")
 // 刷新所有按钮
 wps.ribbonUI.Invalidate()
 ```
+
+## wps离线部署
+
+`wpsjs publish`命令中选择`离线部署`不会生效，需要用`build`
+
+```bash
+wpsjs build
+# 选择离线部署
+```

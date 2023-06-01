@@ -1,6 +1,7 @@
 # WebSocket
 
 client注册流程：client请求建立websocket -> 服务端将请求升级为websocket -> 加入到全局管理器统一管理所有websocket 
+
 消息发送流程：client向websocket发送消息 -> 服务端对应的websocket接收消息 -> 发送到全局管理器广播频道 -> 全局管理器发送给所有client
 
 ## 服务端

@@ -225,15 +225,94 @@ cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l
 # cpu线程数
 cat /proc/cpuinfo | grep "physical id" | wc -l
 
-# 磁盘
+# 查看物理磁盘情况
 lsblk
+# 查看所有磁盘
+fdisk -l
 # 磁盘使用情况（磁盘，容量，已用，可用，已用%，挂载点）
 df -hl | awk '$1 ~ /\/dev\//'
+# 查看所有挂载的磁盘使用情况
+df -h
+# 查看当前目录下各个文件及目录占用空间大小
+du -sh *
+# 查看/home 下的所有的一级目录文件大小
+du -h --max-depth=1 /home
 
 # 内存
 free -h
 ```
+## 挂载磁盘
+```bash
+# -a,--all:挂载/etc/fstab里面所有的文件系统；
+# -r,--read-only:以只读的权限挂载文件系统；
+# -w,--re,--read-write:以读写权限挂载文件系统；
+# -L,--label LABEL:根据指定的卷标挂载文件系统；
+# -U,--uuid UUID:根据指定的uuid挂载文件系统；
+# -o OPTIONS:指定挂载文件系统的方式；
+#    ro:以只读方式挂载；
+#    rw:以读写方式挂载，默认挂载选项；
+#    async:异步IO，数据写操作优先于内存完成，然后再根据某种策略同步至硬盘中，默认挂载选项；
+#    sync:同步IO；
+#    atime/noatime:设置文件和目录被访问时是否更新最近一次的访问时间戳；
+#    auto/noauto:设置设备是否支持mount的-a选项自动挂载，默认挂载为auto；
+#    diratime/nodiratime:目录被访问时是否更新最近一次的访问时间戳；
+#    dev/nodev:设置是否支持在此设备上使用设备，默认挂载为dev；
+#    exec/noexec:设置是否允许执行此设备上得二进制程序文件，默认挂载为exec；
+#    suid/nosuid:设置是否支持在此设备的文件上使用suid，默认挂载为suid；
+#    user/nouser:设置是否允许普通挂载此文件设备，默认挂载为nouser；
+#    remount:重新挂载选项；
+#    acl:设置在此设备上是否支持使用facl，默认不支持；
 
+# 查看所有磁盘
+fdisk -l
+# 对新增磁盘进行分区
+fdisk /dev/vdb
+# 按提示操作 p查看分区表  n新增 d 删除 w操作生效 q退出
+n
+# 选择默认 p 选择主分区  e 扩展分区 直接默认回车就是选择 p
+p
+# 输入分区号，默认从1开始，默认回车
+回车
+# sector 起始扇区 (2048-4294967295, 默认 2048)：默认回车
+回车
+# + 多少扇区 或多大空间，不会计算的话 可以 写 +1G 或者 选择默认回车
+回车
+# 最后保存w
+w
+# 分区格式化（ext4、xfs）
+mkfs.ext4 /dev/vdb1
+# 挂载分区到目录下
+mkdir -p /mnt/home
+mount /dev/vdb1 /mnt/home
+# 查看
+df -h
+
+##### 转移之前的挂载目录
+#把home下的东西拷到挂载的目录下，备份
+cp -a /home/* /mnt/home/
+# 删除home下所有东西
+rm -rf /home/*
+# 卸载分区
+umount /dev/vdb1
+# 设置开机挂载
+vi /etc/fstab
+# 末尾增加一行
+/dev/vdb1  /home  ext4  defaults  1  2
+# 查看 /home是否被挂载
+df -h
+# 挂载/etc/fstab 中未挂载的分区
+mount -a
+# 查看确实转移成功
+df -h
+
+
+#### 卸载
+# -a:卸载文件/etc/mtab中记录的所有的文件系统；
+# -v:显示命令执行的过程；
+# -h:显示帮助；
+# -n:卸载时不要将信息存入/etc/mtab文件中；
+umount -v /dev/cdrom
+```
 ## 查看系统进程及占用资源情况
 
 ```bash
@@ -273,7 +352,7 @@ echo 3 > /proc/sys/vm/drop_caches
 ```
 ## 查看进程执行目录
 
-```
+```bash
 ll /proc/<pid>
 
 cwd 符号链接的是进程运行目录；
@@ -285,22 +364,6 @@ cmdline 就是程序运行时输入的命令行命令；
 environ 记录了进程运行时的环境变量；
 
 fd 目录下是进程打开或使用的文件的符号连接 
-```
-
-## 查看磁盘信息
-
-```bash
-# 查看所有物理磁盘
-fdisk -l
-
-# 查看系统剩余空间
-df -h
-
-# 查看当前目录下各个文件及目录占用空间大小
-du -sh *
-
-# 查看/home 下的所有的一级目录文件大小
-du -h --max-depth=1 /home
 ```
 
 ## 端口使用情况

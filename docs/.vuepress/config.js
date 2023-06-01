@@ -87,7 +87,8 @@ module.exports = {
                 text: 'AI',
                 items: [
                     { text: 'AI部署资料', link: '/ai/deploy/' },
-                    { text: 'Paddle系列', link: '/ai/paddle/' }
+                    { text: 'Paddle系列', link: '/ai/paddle/' },
+                    { text: '学习资料', link: '/ai/docs/' }
                 ]
             },
             {
@@ -170,7 +171,8 @@ module.exports = {
                 'context',
                 'generic',
                 'error',
-                'tags'
+                'tags',
+                'sync'
             ],
             '/code/go/other/': [
                 'install',
@@ -203,7 +205,10 @@ module.exports = {
                 'taskschedule',
                 'execCmd',
                 'terminal',
-                'websocket'
+                'websocket',
+                'sse',
+                'goweb',
+                'file'
             ],
             '/code/web/npm/': [
                 'base',
@@ -324,7 +329,7 @@ module.exports = {
                 'yml'
             ],
             '/devops/nginx/': [
-                'nginx-docker',
+                'base',
                 'nginx',
                 'nginxhotreload',
                 'problem',
@@ -389,7 +394,8 @@ module.exports = {
                 'minio',
                 'nextterminal',
                 'jumpserver',
-                'zentao'
+                'zentao',
+                'shells'
             ],
             '/sql/mssql/': [
                 'usesul',
@@ -492,6 +498,9 @@ module.exports = {
                 'paddleocr',
                 'paddlespeech',
                 'paddleserving'
+            ],
+            '/ai/docs/': [
+                'tensor'
             ]
         },
         sidebarDepth: 2

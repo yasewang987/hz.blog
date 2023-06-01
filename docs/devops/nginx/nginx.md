@@ -73,7 +73,12 @@ server {
         proxy_pass http://IP:8080/projectName/;
         # 这条是设置cookie
         proxy_cookie_path /projectName /;
-        proxy_set_header   Host    $host;
+        proxy_cookie_domain {backend-domain} {request-domain};
+
+        proxy_http_version 1.1;                               # 指明版本（1.1默认为keep-alive长连接，1.0默认为短连接）
+        proxy_ignore_client_abort on;                         # 客户端断网时，是否中断对后端的请求
+
+        proxy_set_header   Host    $host;   # 保持原来的请求域名
         proxy_set_header   X-Real-IP   $remote_addr;
         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
     }
@@ -426,7 +431,19 @@ server {
 
 `ngx_http_map_module` 模块
 
-* Nginx根据请求头转发到不同版本服务
+其中，`$variable` 是要映射的变量，可以是任何有效的 Nginx 变量，如 `$uri、$args、$http_host` 等；`$new_variable` 是映射后的新变量名，可以自定义；key 是映射的键，可以是字符串、正则表达式或者变量；value 是映射的值，可以是字符串、变量或者表达式；`default` 是默认值，当没有匹配到任何键时使用。
+```conf
+# map 指令的语法如下：
+map $variable $new_variable {
+    key value;
+    key value;
+    ...
+    default value;
+}
+```
+`map` 指令可以用于许多场景，例如根据请求的路径生成重写规则、根据请求头判断是否启用缓存、根据查询参数配置不同的后端服务等。它为 Nginx 提供了更加灵活和动态的配置选项。下面看几个经典使用场景。
+
+### Nginx根据请求头转发到不同版本服务
 
 转发规则配置，使用`$http_xxx`，来获取header指定的值，`$http_`为固定格式,`xxx`为自定义header字段名。
 
@@ -468,7 +485,7 @@ curl -H 'apiversion: v2' a.test.com/api
 curl --cookie "apiversion=v2" a.test.com/api
 ```
 
-* 多域名跨域访问：
+### 多域名跨域访问：
 
 ```conf
 map $http_origin $allow_origin {
@@ -487,6 +504,212 @@ server {
     }
 }
 ```
+
+### 巧用map实现Nginx stream基于源IP做路由负载
+
+业务方新加了一个业务网关，上线前需要做个验证，把来源ip为27.38.x.255和116.30.x.170访问用户路由到新new_gateway做验证，其他的继续走old_gateway。
+
+```conf
+stream {
+    
+   log_format  basic   '$time_iso8601 $remote_addr '
+                        '$protocol $status $bytes_sent $bytes_received '
+                        '$session_time $upstream_addr '
+                        '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+
+    access_log   /var/log/nginx/stream.log  basic buffer=1k flush=5s; 
+
+    upstream old_gateway {
+        server 10.6.11.86:8080;
+    }
+    upstream new_gateway {
+        server 10.6.11.86:80;
+    }
+
+    map $remote_addr $backend_svr {
+        "27.38.x.255" "new_gateway";
+        "116.30.x.170" "new_gateway";
+        default "old_gateway";
+    }
+    
+    server {
+        listen 8080;
+        proxy_connect_timeout 2s;
+        #ssl_preread on;
+        #proxy_protocol on;
+        proxy_pass $backend_svr;
+    }
+}
+```
+
+### 要基于Nginx变量($cookie_uin)限制请求数
+
+```conf
+# 限制每个uin 2s一个请求，如果$cookie_uin 为空，则给一个默认的uin
+http {
+    include       mime.types;
+    ...
+
+    map $cookie_uin $my_cookie_uin {
+        default $cookie_uin;
+        '-' 10010;
+        '' 10010;
+    }
+
+    limit_req_zone $my_cookie_uin zone=limit_per_uin:10m rate=30r/m;
+ 
+    ...
+ 
+ }
+# uri 接口配置文档
+location ~ ^/v3/aggregate/broker/trade/NewIpoFinancing {
+    limit_req zone=limit_per_uin burst=3 nodelay;
+    include /etc/nginx/vhost/common/cors.conf;
+    proxy_pass http://access_trade3;
+}
+
+### 限制每个uin 2s一个请求，如果$cookie_uin 为空，返回403
+http {
+    include       mime.types;
+    ...
+
+    map $cookie_uin $limit_key {
+        default 0;
+        '-' 1;
+        '' 1;
+    }
+
+    limit_req_zone $cookie_uin zone=limit_per_uin:10m rate=30r/m;
+ 
+    ...
+ 
+ }
+# uri 接口配置文档
+location ~ ^/v3/aggregate/broker/trade/NewIpoFinancing {
+    if ($limit_key = 1) {
+        return 403;
+    }
+    limit_req zone=limit_per_uin burst=3 nodelay;
+    include /etc/nginx/vhost/common/cors.conf;
+    proxy_pass http://access_trade3;
+}
+
+### 限制每个uin 2s一个请求，如果$cookie_uin 为空，返回403, 如果是vip uin不做限制
+http {
+    include       mime.types;
+    ...
+
+    map $cookie_uin $limit_key {
+        default 0;
+        '-' 1;
+        '' 1;
+        '666666' 10;
+        '666667' 10;
+        '666668' 10;
+    }
+
+    limit_req_zone $cookie_uin zone=limit_per_uin:10m rate=30r/m;
+    ...
+ 
+ }
+# uri 接口配置文档
+location ~ ^/v3/aggregate/broker/trade/NewIpoFinancing {
+    if ($limit_key = 1) {
+        return 403;
+    }
+    #vip uin
+    error_page 410 = @nolimit;
+    if ($limit_key = 10) {
+        return 410;
+    }
+    limit_req zone=limit_per_uin burst=3 nodelay;
+    include /etc/nginx/vhost/common/cors.conf;
+    proxy_pass http://access_trade3;
+}
+
+location @nolimit {
+    include /etc/nginx/vhost/common/cors.conf;
+    proxy_pass http://access_trade3;
+}
+```
+
+### 利用Nginx Map实现正向代理动态切换
+
+```conf
+map $host $idc {
+        default lg;
+   }
+   
+    map $idc $backend_4430_svr {
+        default   https://$host$request_uri;
+        lg        https://$host$request_uri;
+        kx        http://10.0.x.136:4430;
+    }
+    
+    map $idc $backend_8880_svr {
+        default   http://$host$request_uri;
+        lg        http://$host$request_uri;
+        kx        http://10.0.x.13:8880;
+    }
+    
+    map $idc $backend_4480_svr {
+        default   $http_PROT://$http_DN:$http_Port;
+        lg        $http_PROT://$http_DN:$http_Port;
+        kx        http://10.0.x.13:4480;
+    }
+    
+    server {
+        listen       8880;
+        location / {
+            resolver 127.0.0.1;
+            proxy_pass  $backend_8880_svr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP  $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       }
+    }
+   
+    server {
+        listen       4480;
+        location / {
+            resolver 127.0.0.1;
+            proxy_pass  $backend_4480_svr;
+            proxy_set_header Host $http_DN;
+            proxy_connect_timeout 10s;
+            proxy_read_timeout 20s;
+       }
+    }
+
+    server {
+        listen       4430;
+        location / {
+            resolver 127.0.0.1;
+            proxy_pass  $backend_4430_svr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       }
+    }
+```
+
+根据请求头中的PROT、DN和Port字段的值，将请求转发到不同的后端服务器。其中，PROT字段表示请求的协议（http或https），DN字段表示请求的域名，Port字段表示请求的端口号。
+
+根据配置文件中的map指令，将`$host`（请求头中的域名）映射为`$idc`，然后根据`$idc`的值将请求转发到相应的后端服务器。
+
+当`$idc`的值为`ns`时，将请求转发到`$backend_4430_svr`，并将请求头中的Host字段和X-Forwarded-For字段传递给后端服务器。
+
+当$idc的值为ft时，将请求转发到$backend_8880_svr，并将请求头中的Host字段、X-Real-IP字段和X-Forwarded-For字段传递给后端服务器。
+
+当$idc的值为其他值时，将请求转发到$backend_4480_svr，并将请求头中的Host字段、PROT字段、DN字段和Port字段传递给后端服务器。
+
+请求的具体转发地址是根据配置文件中的map指令和后端服务器的配置进行拼接的，例如https://$host$request_uri表示将请求转发到https协议下的当前域名，并保留原始请求的URI路径。
+
+因此，当使用以下命令发送请求时
+
+```bash
+curl -v -H 'content-type: aplication/json' -H 'PROT: https' -H 'DN: www.test.com' -H 'Port: 8899' -d '{"data": "xxxx", "body":"1"}'  http://nginx_ip:4480/test/uri
+```
+请求将被转发到$backend_4480_svr，并根据请求头中的PROT、DN和Port字段的值拼接成后端服务器的地址，同时将请求头中的Host字段、PROT字段、DN字段和Port字段传递给后端服务器。具体的转发地址会根据配置文件中的map指令和后端服务器的配置进行动态生成。
+
 ## mirror流量复制
 
 `ngx_http_mirror_module` 模块，mirror 指令提供的核心功能就是流量复制
@@ -938,6 +1161,11 @@ location / {
     allow 2001:0db8::/32;
     deny  all;   # 拒绝所有
     include /soft/nginx/ip/blockip.conf
+}
+
+###### 指定文件拒绝所有访问
+location ~ ^/(\.user.ini|\.ht|\.git|\.svn|\.project|LICENSE|README.md){
+    deny all;
 }
 ```
 

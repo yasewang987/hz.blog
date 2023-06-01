@@ -111,3 +111,129 @@ func (s *ServiceInfo) checkServiceStatus(port string) error {
 	return nil
 }
 ```
+
+## bufio
+
+`bufio` 顾名思义，就是在缓冲区读写数据，比直接读写文件或网络中的数据，性能更好些。
+
+它的数据类型主要有 `bufio.Reader`、`bufio.Writer`、`bufio.ReadWriter` 和 `bufio.Scanner`。
+
+`bufio.Reader` 的数据结构：
+
+```go
+type Reader struct {
+ // 缓冲区
+ buf          []byte
+ // 缓冲区的数据源
+ rd           io.Reader
+ // 缓冲区读写索引位置
+ r, w         int
+ err          error
+ // 未读字节的上一个字节
+ lastByte     int
+ // 未读字符的上一个字符的大小
+ lastRuneSize int
+}
+```
+
+使用 `bufio.Reader` 时，需要先初始化，`bufio` 包提供了两个初始化的函数，分别是 `NewReaderSize` 和 `NewReader`。
+
+```go
+// 两个函数的返回值都是 *bufio.Reader 类型。
+func NewReaderSize(rd io.Reader, size int) *Reader {
+ // Is it already a Reader?
+ b, ok := rd.(*Reader)
+ if ok && len(b.buf) >= size {
+  return b
+ }
+ if size < minReadBufferSize {
+  size = minReadBufferSize
+ }
+ r := new(Reader)
+ r.reset(make([]byte, size), rd)
+ return r
+}
+
+func NewReader(rd io.Reader) *Reader {
+ // 默认值 4096
+ return NewReaderSize(rd, defaultBufSize)
+}
+```
+
+`bufio.Reader` 提供了 15 个方法，我们介绍两个比较常用的方法，分别是 `Read` 和 `ReadBytes`。
+
+```go
+// 将缓冲区中的数据，读取到 p 中，并返回读取的字节大小和错误。
+func (b *Reader) Read(p []byte) (n int, err error) {
+ // 省略代码 ...
+ if b.r == b.w {
+  if b.err != nil {
+   return 0, b.readErr()
+  }
+  if len(p) >= len(b.buf) {
+   // Large read, empty buffer.
+   // Read directly into p to avoid copy.
+   n, b.err = b.rd.Read(p)
+   if n < 0 {
+    panic(errNegativeRead)
+   }
+   if n > 0 {
+    b.lastByte = int(p[n-1])
+    b.lastRuneSize = -1
+   }
+   return n, b.readErr()
+  }
+  // 省略代码 ...
+  b.w += n
+ }
+
+ // copy as much as we can
+ // Note: if the slice panics here, it is probably because
+ // the underlying reader returned a bad count. See issue 49795.
+ n = copy(p, b.buf[b.r:b.w])
+ b.r += n
+ b.lastByte = int(b.buf[b.r-1])
+ b.lastRuneSize = -1
+ return n, nil
+}
+
+
+// 读取缓冲区中的数据截止到分隔符 delim 的位置，并返回数据和错误。
+func (b *Reader) ReadBytes(delim byte) ([]byte, error) {
+ full, frag, n, err := b.collectFragments(delim)
+ // Allocate new buffer to hold the full pieces and the fragment.
+ buf := make([]byte, n)
+ n = 0
+ // Copy full pieces and fragment in.
+ for i := range full {
+  n += copy(buf[n:], full[i])
+ }
+ copy(buf[n:], frag)
+ return buf, err
+}
+```
+
+`Read、ReadBytes` 方法使用示例:
+
+```go
+// p 字节切片的长度，一个中文字符是 3 个字节，一个英文字符是 1 个字节。
+func main() {
+ f, _ := os.Open("/Users/frank/GolandProjects/go-package/lesson14/file.txt")
+ defer f.Close()
+ r := bufio.NewReader(f)
+ p := make([]byte, 12)
+ index, _ := r.Read(p)
+ fmt.Println(index)
+ fmt.Println(string(p[:index]))
+}
+
+// 分隔符参数是 byte 类型，使用单引号。
+func main() {
+ f, _ := os.Open("/Users/frank/GolandProjects/go-package/lesson14/file.txt")
+ defer f.Close()
+ r := bufio.NewReader(f)
+  bs, _ := r.ReadBytes('\n')
+ fmt.Println(string(bs))
+}
+```
+
