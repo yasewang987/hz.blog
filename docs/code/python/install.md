@@ -175,9 +175,15 @@ rm -rf ~/.cache
 1. 创建任意 `test.py` 文件，写上测试代码
 1. `ctrl + shift + p` 之后输入python，选择 `python:select interpreter` 选择对应的python环境
 
-## torch包安装验证
+## torch安装验证
 
 1. 到 [pytorch官网](https://pytorch.org/get-started/locally/#windows-prerequisites) 找到对应的版本安装命令。
+
+    ```bash
+    # cpu版本
+    pip3 install -i https://pypi.douban.com/simple torch torchvision torchaudio
+    ```
+
 1. 安装完之后验证
     ```bash
     ### GPU
