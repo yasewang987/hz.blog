@@ -10,5 +10,6 @@
 * [python](./python.md)
 * [redis](./redis.md)
 * [openssh](./openssh.md)
+* [达梦数据库](./dm.md)
 * [其他资料](./other.md)
 * [源码编译问题汇总](./problem.md)

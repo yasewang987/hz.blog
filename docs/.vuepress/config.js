@@ -485,6 +485,7 @@ module.exports = {
                 'python',
                 'redis',
                 'openssh',
+                'dm',
                 'other',
                 'problem'
             ],
