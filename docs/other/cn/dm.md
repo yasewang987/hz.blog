@@ -14,6 +14,9 @@
 * python打包参考资料：https://eco.dameng.com/document/dm/zh-cn/app-dev/develop-environment-prepare-python.html
 
 ```bash
+# 上面步骤生成的/dm8或者生成在默认目录 /home/dmdba/dmdbms 整个文件夹拷贝到容器里面，在对应的环境生成也可以
+# 也是按照下面步骤执行即可
+
 # 设置环境变量（如果是其他目录自行切换）
 export DM_HOME="/dm8"
 

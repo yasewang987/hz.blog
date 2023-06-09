@@ -119,7 +119,7 @@ uname -sr
 
 查询真实IP
 
-在https://www.ipaddress.com/查询raw.githubusercontent.com的真实IP。
+在`https://ip.cn/`查询`raw.githubusercontent.com`的真实IP。
 
 通过修改hosts解决此问题
 

@@ -12,3 +12,15 @@ Windows、Office激活工具：https://github.com/massgravel/Microsoft-Activatio
 
 PowerToys : https://github.com/microsoft/PowerToys
 gcc: https://www.cnblogs.com/feipeng8848/p/15227688.html
+
+## 下载慢问题
+
+* git下载慢
+
+用这个地址下载：https://registry.npmmirror.com/binary.html?path=git-for-windows/
+
+* vscode下载慢
+
+复制下载链接，将`https://`和 `/stable` 之间的网址替换为`vscode.cdn.azure.cn`，替换之后类似下面地址：
+
+https://vscode.cdn.azure.cn/stable/b3e4e68a0bc097f0ae7907b217c1119af9e03435/VSCodeUserSetup-x64-1.78.2.exe

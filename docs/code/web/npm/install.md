@@ -1,5 +1,7 @@
 # web开发环境安装
 
+* 如果是debian系列的系统，可以直接使用 `apt install nodejs npm -y` 安装
+
 ## 安装nvm
 
 先到github查看最新的版本号：https://github.com/nvm-sh/nvm#installing-and-updating

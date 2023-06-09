@@ -101,40 +101,6 @@ AMD64版 intel版
 * python信息：3.6.8，/usr/bin/python3
 * 其他：自带了mariadb
 
-## 其他specs
-
-* 通用打包（数据/代码）
-
-```text
-%global mcompany funcun
-%global mname data
-%global mpath %{mcompany}/%{mname}
-Name: %{mcompany}-%{mname}
-Version: 2022.07
-Release:        1
-Summary:        %{mcompany} %{mname}
-
-Group:          %{mcompany}
-License:        GPLv3+
-BuildArch: noarch
-
-%description
-%{mcompany} %{mname}
-
-%prep
-
-
-%build
-
-%install
-rm -rf %{buildroot}/opt/%{mpath}
-mkdir -p %{buildroot}/opt/%{mpath}
-cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
-
-%files
-/opt/%{mpath}
-```
-
 ## 清理make源码编译
 
 ```bash
@@ -178,4 +144,70 @@ cp -rf %{_builddir}/funcun/fcwy/* %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/
 
 
 %changelog
+```
+
+### so库打包
+
+```conf
+%define __os_install_post %{nil}
+%define debug_package %{nil}
+%global mname funcun-libs
+Name: %{mname}
+Version: 2023.6
+Summary: %{mname}
+Release: 1
+License: GPLv3+
+Group: System Enviroment/Base
+AutoReqProv: no
+
+%description
+funcun %{mname}
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/lib
+cp -rf %{_builddir}/funcun/libs/* %{buildroot}/usr/lib
+
+%post
+
+%clean
+
+%files
+/usr/lib
+```
+
+### 通用打包（数据/代码）
+
+```text
+%global mcompany funcun
+%global mname data
+%global mpath %{mcompany}/%{mname}
+Name: %{mcompany}-%{mname}
+Version: 2022.07
+Release:        1
+Summary:        %{mcompany} %{mname}
+
+Group:          %{mcompany}
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+%{mcompany} %{mname}
+
+%prep
+
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/%{mpath}
+mkdir -p %{buildroot}/opt/%{mpath}
+cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
+
+%files
+/opt/%{mpath}
 ```

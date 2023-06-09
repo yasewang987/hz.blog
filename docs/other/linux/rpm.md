@@ -250,4 +250,7 @@ apt install -y alien
 alien -d xxx.rpm
 # -r #转为rpm
 alien -r xxx.deb
+
+# 安装rpm包
+alien -i xxxx.rpm
 ```
