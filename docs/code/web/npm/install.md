@@ -82,3 +82,20 @@ vim ~/.zshrc
 
 PATH=$HOME/.yarn/bin:$PATH
 ```
+
+## 升级node，npm
+
+```bash
+npm install -g n
+# 安装最新稳定版
+n stable
+# 安装指定版本
+n 0.10.26
+# 升级到最新版本
+n latest
+
+# 升级npm
+npm install npm -g
+# 升级到指定版本
+npm install npm@6.14.13 -g
+```
