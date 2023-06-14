@@ -45,12 +45,14 @@ docker node promote node02
 ## 常用命令
 
 ```bash
-### 初始化
-docker swarm init --advertise-addr 192.168.33.11
+### 初始化（限制历史任务数量为2，service服务只会保留一个回滚副本和一个正在运行服务）
+docker swarm init --advertise-addr 192.168.33.11 --task-history-limit 2
 # 退出swarm集群 - 工作节点
 docker swarm leave
 # 退出swarm集群 - 主节点
 docker swarm leave -f
+# 限制历史任务数量为2（建议最少是2，不然无法回滚）
+docker swarm update --task-history-limit 2
 
 
 ### node
