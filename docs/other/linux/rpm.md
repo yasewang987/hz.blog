@@ -32,6 +32,9 @@ mkdir -pv  ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS,BUILDROOT}
 ```bash
 # 安装本地包
 sudo rpm -ivh xxxx.rpm
+# 强制安装（已经安装过的会重新安装）
+rpm -ivh --force xxxx.rpm
+# 批量安装
 rpm -Uvh *.rpm --nodeps --force
 # 或者
 yum localinstall xxxx.rpm
@@ -45,7 +48,7 @@ rpm -e xxx
 # 查看包中的内容
 rpm -qpl xxxx.rpm
 
-# 查看包中的执行脚本
+# 查看包中的执行脚本（反编译）
 rpm -qp --scripts nginx-1.8.1-1.el7.ngx.x86_64.rpm
 ```
 
@@ -246,10 +249,10 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 ```bash
 # 安装alien
 apt install -y alien
-# -d #转为deb
-alien -d xxx.rpm
+# -d #转为deb（一定要加上--scripts不然无法将post、postun等脚本转换过来）
+alien -d --scripts xxx.rpm
 # -r #转为rpm
-alien -r xxx.deb
+alien -r --scripts xxx.deb
 
 # 安装rpm包
 alien -i xxxx.rpm

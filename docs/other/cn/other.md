@@ -146,6 +146,78 @@ cp -rf %{_builddir}/funcun/fcwy/* %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/
 %changelog
 ```
 
+### wps插件打包
+
+```conf
+%define _binaries_in_noarch_packages_terminate_build 0
+Name: funcun-wpsplugin-uos
+Version: 2023.6
+Release:        1
+Summary:        funcun wpsplugin
+
+Group:          funcun
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+funcun wpsplugin
+
+%prep
+
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/funcun/wps/wpsplugin
+mkdir -p %{buildroot}/opt/funcun/wps/wpsplugin
+cp -rf %{_builddir}/funcun/wpsplugin/* %{buildroot}/opt/funcun/wps/wpsplugin
+cp -f %{_builddir}/funcun/wpsinstall.sh %{buildroot}/opt/funcun/wps
+
+%post
+/bin/bash /opt/funcun/wps/wpsinstall.sh
+
+%files
+/opt/funcun/wps
+
+
+
+%changelog
+```
+
+`wpsinstall.sh`内容如下：
+
+```sh
+#!/bin/bash
+
+VERSION=1.0.0
+touch /opt/funcun/wps/test.log
+
+for HOMEDIR in /home/*; do
+  if [ ! -d $HOMEDIR ]; then
+          continue
+  fi
+  jsXmlDir=$HOMEDIR/.local/share/Kingsoft/wps/jsaddons
+  echo $jsXmlDir >> /opt/funcun/wps/test.log
+  mkdir -p ${jsXmlDir}
+  chmod -R 777 ${jsXmlDir}
+  /bin/cp -rf /opt/funcun/wps/wpsplugin ${jsXmlDir}
+  rm -rf ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
+  mv ${jsXmlDir}/wpsplugin ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
+  jsXmlFile=${jsXmlDir}/jsplugins.xml
+  echo $jsXmlFile >> /opt/funcun/wps/test.log
+  if [ ! -f $jsXmlFile ]; then
+    touch -f $jsXmlFile
+    echo -e "<jsplugins>\n</jsplugins>" > $jsXmlFile
+  fi
+  columnStr=$(cat $jsXmlFile | grep ifuncun-wps-jsaddons-project)
+  echo $columnStr >> /opt/funcun/wps/test.log
+  if [[ -n $columnStr ]]; then
+    sed -i '/ifuncun-wps-jsaddons-project/d' $jsXmlFile
+  fi
+  sed -i '/<jsplugins>/a\    <jsplugin url="空" name="ifuncun-wps-jsaddons-project" version="'${VERSION}'" type="wps"/>' $jsXmlFile
+done
+```
+
 ### so库打包
 
 ```conf
