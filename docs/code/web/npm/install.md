@@ -1,5 +1,7 @@
 # web开发环境安装
 
+* 如果是debian系列的系统，可以直接使用 `apt install nodejs npm -y` 安装
+
 ## 安装nvm
 
 先到github查看最新的版本号：https://github.com/nvm-sh/nvm#installing-and-updating
@@ -79,4 +81,21 @@ yarn global bin
 vim ~/.zshrc
 
 PATH=$HOME/.yarn/bin:$PATH
+```
+
+## 升级node，npm
+
+```bash
+npm install -g n
+# 安装最新稳定版
+n stable
+# 安装指定版本
+n 0.10.26
+# 升级到最新版本
+n latest
+
+# 升级npm
+npm install npm -g
+# 升级到指定版本
+npm install npm@6.14.13 -g
 ```

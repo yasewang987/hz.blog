@@ -4,6 +4,19 @@
 
     https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
 
+## 显卡型号查看
+
+显卡型号查询网站：http://pci-ids.ucw.cz/mods/PC/10de?action=help?help=pci
+
+```bash
+# 查看硬件
+lspci | grep NVIDIA
+af:00.0 VGA compatible controller: NVIDIA Corporation Device 2684 (rev a1)
+af:00.1 Audio device: NVIDIA Corporation Device 22ba (rev a1)
+
+# 上面的 2684 到【显卡型号查询网站】查询即可
+```
+
 ## Nvidia显卡驱动和Cudab版本关系
 
 * `Nvidia`：英伟达显卡驱动。

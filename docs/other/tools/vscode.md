@@ -83,3 +83,9 @@ export MSBuildSDKsPath=$HOME/dotnet/sdk/$(dotnet --version)/Sdks
 
 setting "omnisharp.path": "latest" in VS Code's setting.json.
 
+## 设置gitbash默认terminal
+
+1. 打开设置
+1. 搜索 `shell windows`
+1. 将默认terminal设置为gitbash
+

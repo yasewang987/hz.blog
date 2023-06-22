@@ -912,3 +912,25 @@ $ grep -C 10 ERROR app.log
 ```bash
 sh -c 'curl -sS http://localhost:18350/check | grep serviceStatus\":\ 0,\ \"serviceItems || exit 1'
 ```
+
+## iso挂载卸载
+
+```bash
+# 挂载
+mount -o loop /home/test/xxxxxx.iso /mnt/test/
+
+# 卸载
+umount /mnt/test
+```
+
+## zsh安装
+
+```bash
+sudo apt install zsh
+sudo apt install  git
+chsh -s /bin/zsh
+
+# 安装oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# 第一次安装完之后需要选择，可以直接选择2
+```

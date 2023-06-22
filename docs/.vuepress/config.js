@@ -253,7 +253,8 @@ module.exports = {
                 'source',
                 'devops',
                 'problem',
-                'install'
+                'install',
+                'ai1'
             ],
             '/microservices/register_config/': [
                 'consul',
@@ -484,6 +485,7 @@ module.exports = {
                 'python',
                 'redis',
                 'openssh',
+                'dm',
                 'other',
                 'problem'
             ],

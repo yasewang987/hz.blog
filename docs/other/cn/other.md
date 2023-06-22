@@ -101,40 +101,6 @@ AMD64版 intel版
 * python信息：3.6.8，/usr/bin/python3
 * 其他：自带了mariadb
 
-## 其他specs
-
-* 通用打包（数据/代码）
-
-```text
-%global mcompany funcun
-%global mname data
-%global mpath %{mcompany}/%{mname}
-Name: %{mcompany}-%{mname}
-Version: 2022.07
-Release:        1
-Summary:        %{mcompany} %{mname}
-
-Group:          %{mcompany}
-License:        GPLv3+
-BuildArch: noarch
-
-%description
-%{mcompany} %{mname}
-
-%prep
-
-
-%build
-
-%install
-rm -rf %{buildroot}/opt/%{mpath}
-mkdir -p %{buildroot}/opt/%{mpath}
-cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
-
-%files
-/opt/%{mpath}
-```
-
 ## 清理make源码编译
 
 ```bash
@@ -178,4 +144,271 @@ cp -rf %{_builddir}/funcun/fcwy/* %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/
 
 
 %changelog
+```
+
+### wps插件打包
+
+```conf
+%define _binaries_in_noarch_packages_terminate_build 0
+Name: funcun-wpsplugin-uos
+Version: 2023.6
+Release:        1
+Summary:        funcun wpsplugin
+
+Group:          funcun
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+funcun wpsplugin
+
+%prep
+
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/funcun/wps/wpsplugin
+mkdir -p %{buildroot}/opt/funcun/wps/wpsplugin
+cp -rf %{_builddir}/funcun/wpsplugin/* %{buildroot}/opt/funcun/wps/wpsplugin
+cp -f %{_builddir}/funcun/wpsinstall.sh %{buildroot}/opt/funcun/wps
+
+%post
+/bin/bash /opt/funcun/wps/wpsinstall.sh
+
+%files
+/opt/funcun/wps
+
+
+
+%changelog
+```
+
+`wpsinstall.sh`内容如下：
+
+```sh
+#!/bin/bash
+
+VERSION=1.0.0
+touch /opt/funcun/wps/test.log
+
+for HOMEDIR in /home/*; do
+  if [ ! -d $HOMEDIR ]; then
+          continue
+  fi
+  jsXmlDir=$HOMEDIR/.local/share/Kingsoft/wps/jsaddons
+  echo $jsXmlDir >> /opt/funcun/wps/test.log
+  mkdir -p ${jsXmlDir}
+  chmod -R 777 ${jsXmlDir}
+  /bin/cp -rf /opt/funcun/wps/wpsplugin ${jsXmlDir}
+  rm -rf ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
+  mv ${jsXmlDir}/wpsplugin ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
+  jsXmlFile=${jsXmlDir}/jsplugins.xml
+  echo $jsXmlFile >> /opt/funcun/wps/test.log
+  if [ ! -f $jsXmlFile ]; then
+    touch -f $jsXmlFile
+    echo -e "<jsplugins>\n</jsplugins>" > $jsXmlFile
+  fi
+  columnStr=$(cat $jsXmlFile | grep ifuncun-wps-jsaddons-project)
+  echo $columnStr >> /opt/funcun/wps/test.log
+  if [[ -n $columnStr ]]; then
+    sed -i '/ifuncun-wps-jsaddons-project/d' $jsXmlFile
+  fi
+  sed -i '/<jsplugins>/a\    <jsplugin url="空" name="ifuncun-wps-jsaddons-project" version="'${VERSION}'" type="wps"/>' $jsXmlFile
+done
+```
+
+### 黑马wps安装示例
+
+```bash
+
+postinstall scriptlet (using /bin/sh):
+
+function isInstallXml() {
+  findRow=`sed -e p $1 | grep hmwpscheck`
+  if [[ $findRow =~ "hmwpscheck" ]]
+  then
+    return 1
+  else
+    return 0
+  fi
+}
+
+function insertXmlInfo(){
+  isInstallXml $1
+  status=$?
+  if [[ "$status" == 0 ]]
+  then
+    sed -i '/<jsplugins>/a\    <jsplugin url="http://127.0.0.1:3889/hmwpscheck_1.0.0.7z" name="hmwpscheck" version="1.0.0" type="wps"/>' $1
+  fi
+}
+
+function installJsXml(){
+  for HOMEDIR in /home/*; do
+    if [ ! -d $HOMEDIR ];then
+        continue
+    fi
+    jsXmlDir=$HOMEDIR/.local/share/Kingsoft/wps/jsaddons
+    if [[ ! -d $jsXmlDir ]]
+    then
+      mkdir -p $HOMEDIR/.local/share/Kingsoft/wps/jsaddons
+    fi
+    jsXmlFile=$jsXmlDir/jsplugins.xml
+    if [ ! -f $jsXmlFile ];then
+      touch -f $jsXmlFile
+      echo -e "<jsplugins>\n</jsplugins>" > $jsXmlFile
+    fi
+    insertXmlInfo $jsXmlFile
+  done
+}
+
+installJsXml
+for HOMEDIR in /home/*; do
+    if [ ! -d $HOMEDIR ];then
+        continue
+    fi
+    if [ -d $HOMEDIR/.local/share ];then
+        rm -rf $HOMEDIR/.local/share/Kingsoft/wps/jsaddons/hmwpscheck_1.0.0
+        rm -rf $HOMEDIR/.local/share/Kingsoft/hmcheck
+        if [ ! -d $HOMEDIR/.local/share/Kingsoft/wps/jsaddons ];then
+            mkdir -p $HOMEDIR/.local/share/Kingsoft/wps/jsaddons
+        fi        
+        mkdir -p $HOMEDIR/.local/share/Kingsoft/hmcheck/
+        cp -a /opt/apps/cn.wps.hmcheck/files/inst/hmwpscheck_1.0.0 $HOMEDIR/.local/share/Kingsoft/wps/jsaddons/
+        cp /opt/apps/cn.wps.hmcheck/files/inst/hmcheck_wps.ini $HOMEDIR/.local/share/Kingsoft/hmcheck/
+        cp /opt/apps/cn.wps.hmcheck/files/findlib.txt $HOMEDIR/.local/share/Kingsoft/hmcheck/
+        touch $HOMEDIR/.local/share/Kingsoft/hmcheck/hmcheck.dat
+        echo "[Install]" >> $HOMEDIR/.local/share/Kingsoft/hmcheck/hmcheck.dat
+        echo "InstallDir=/opt/apps/cn.wps.hmcheck" >> $HOMEDIR/.local/share/Kingsoft/hmcheck/hmcheck.dat
+        chmod -R 777 $HOMEDIR/.local/share/Kingsoft/hmcheck
+        chmod -R 777 $HOMEDIR/.local/share/Kingsoft/wps/jsaddons
+    fi
+    HMAGENT_DESKTOP_FILE=/opt/apps/cn.wps.hmcheck/files/inst/hmcheck.desktop
+    if [ -f $HMAGENT_DESKTOP_FILE ];then
+        cp -f $HMAGENT_DESKTOP_FILE /usr/share/applications
+        update-desktop-database
+    fi
+    if [ -d $HOMEDIR/桌面 ];then
+        ln -sf /opt/apps/cn.wps.hmcheck/files/样本.doc $HOMEDIR/桌面/黑马校对样本.doc
+    fi
+done
+chmod -R 777 /opt/apps/cn.wps.hmcheck
+if [ -d "/opt/kingsoft/wps-office/office6/cfgs" ];then
+    line=$(grep -n Support] /opt/kingsoft/wps-office/office6/cfgs/oem.ini)
+    sline=$(echo "${line}" | cut -c1-2)
+    sed -i ''$sline' aJsApiPlugin=true' /opt/kingsoft/wps-office/office6/cfgs/oem.ini
+    #sed -i ''$sline' aJsApiShowWebDebugger=true' /opt/kingsoft/wps-office/office6/cfgs/oem.ini
+fi
+if [ -d "/opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/office6/cfgs" ];then
+    line=$(grep -n Support] /opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/office6/cfgs/oem.ini)
+    sline=$(echo "${line}" | cut -c1-2)
+    sed -i ''$sline' aJsApiPlugin=true' /opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/office6/cfgs/oem.ini
+    #sed -i ''$sline' aJsApiShowWebDebugger=true' /opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/office6/cfgs/oem.ini
+fi
+echo "安装结束，请重启电脑后使用！"
+postuninstall scriptlet (using /bin/sh):
+
+function removeXmlInfo(){
+  row=`grep -n "hmwpscheck" $1`
+  num=${row%:*}
+  if [[ "$num" != "" ]]
+  then
+    sed -i ''${num}'d' $1
+  fi
+}
+
+function uninstallJsXml(){
+  for HOMEDIR in /home/*; do
+    if [ ! -d $HOMEDIR ];then
+        continue
+    fi
+    jsXmlFile=$HOMEDIR/.local/share/Kingsoft/wps/jsaddons/jsplugins.xml
+    removeXmlInfo $jsXmlFile
+  done
+}
+
+for HOMEDIR in /home/*; do
+    if [ ! -d $HOMEDIR ];then
+        continue
+    fi
+    if [ -d $HOMEDIR/.local/share/Kingsoft/hmcheck ];then
+        rm -rf $HOMEDIR/.local/share/Kingsoft/wps/jsaddons/hmwpscheck_1.0.0  >/dev/null 2>&1
+        uninstallJsXml
+        rm -rf $HOMEDIR/.local/share/Kingsoft/hmcheck  >/dev/null 2>&1
+    fi
+    HMAGENT_DESKTOP_FILE=/usr/share/applications/hmcheck.desktop
+    if [ -f $HMAGENT_DESKTOP_FILE ];then
+        rm -f $HMAGENT_DESKTOP_FILE
+        update-desktop-database
+    fi
+    if [ -L $HOMEDIR/桌面/黑马校对样本.doc ];then
+        rm -f $HOMEDIR/桌面/黑马校对样本.doc
+    fi
+done
+```
+
+### so库打包
+
+```conf
+%define __os_install_post %{nil}
+%define debug_package %{nil}
+%global mname funcun-libs
+Name: %{mname}
+Version: 2023.6
+Summary: %{mname}
+Release: 1
+License: GPLv3+
+Group: System Enviroment/Base
+AutoReqProv: no
+
+%description
+funcun %{mname}
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/lib
+cp -rf %{_builddir}/funcun/libs/* %{buildroot}/usr/lib
+
+%post
+
+%clean
+
+%files
+/usr/lib
+```
+
+### 通用打包（数据/代码）
+
+```text
+%global mcompany funcun
+%global mname data
+%global mpath %{mcompany}/%{mname}
+Name: %{mcompany}-%{mname}
+Version: 2022.07
+Release:        1
+Summary:        %{mcompany} %{mname}
+
+Group:          %{mcompany}
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+%{mcompany} %{mname}
+
+%prep
+
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/%{mpath}
+mkdir -p %{buildroot}/opt/%{mpath}
+cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
+
+%files
+/opt/%{mpath}
 ```
