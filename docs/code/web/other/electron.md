@@ -352,6 +352,47 @@ app.on('ready', initApp)
 * 采用 asar 打包：会加快启动速度
 * 增加视觉过渡：loading + 骨架屏
 
+* 窗口池代替每次新建窗口
+
+提前创建几个隐藏的窗口（不要太多，会占用一定的内存），在需要的时候去加载页面再渲染出来，速度会快很多。
+
+`window.open`：打开一个子窗口，不会创建新的线程，内存也会减少比较多。
+
+在实际的开发中，`窗口池`和`window.open`是可以搭配起来使用的，打开窗口`url同源`的情况下尽量采用`window.open`可以减少内存的开销。
+
+* 设置partition共享或者隔离缓存
+
+通过设置相同的partition名称，可以共享cookies、缓存以及本地存储
+
+```js
+const mainWindow = new BrowserWindow({ webPreferences: { partition: 'myapp' } });
+```
+
+* 使用`Web Workers`
+
+当碰到复杂的计算函数时，在主进程或者渲染进程中实现都可能引起页面的卡顿，可以将其放置到worker中
+
+```js
+const worker = new Worker('./worker.js')
+
+worker.addEventListener('message', event => {
+  console.log(`Received from worker: ${event.data}`)
+})
+
+worker.postMessage('Hello from the main thread!')
+```
+
+* 数据本地缓存
+
+如果你的应用程序涉及到网络请求，那么缓存请求结果会减少网络延迟并减少请求次数。考虑将使用的数据存储在本地，并向服务器发送请求来更新数据。
+
+当软件业务复杂度足够高的时候，可以考虑在本地引入数据库（sqlite）
+
+当引入本地数据库后，数据传输耗时极短，可以考虑将部分业务接口拆分成颗粒度更小的接口，接口返回速度可小于30ms，感受客户端级别的丝滑体验。
+
+与数据库相关的操作尽量放到一个进程中，避免多进程操作数据库带来不可控的影响。
+
+
 ## 报错处理
 
 * 安装electron报错 `RequestError: socket hang up`
