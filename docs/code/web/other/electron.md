@@ -240,6 +240,8 @@ mounted() {
 
 ## 构建
 
+推荐使用electron-builder
+
 * 图标生成：https://tool.520101.com/diannao/ico/
 
 * 二进制文件构建（基于`electron-forge`）：
