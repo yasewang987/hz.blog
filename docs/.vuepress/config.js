@@ -463,7 +463,8 @@ module.exports = {
                 'resource',
                 'devtools',
                 'plantuml',
-                'vnc'
+                'vnc',
+                'vpn'
             ],
             '/other/cloud/': [
                 'proxmox',
