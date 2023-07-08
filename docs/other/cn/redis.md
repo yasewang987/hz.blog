@@ -65,3 +65,45 @@ cp -rf %{_builddir}/funcun/%{mpath}/* %{buildroot}/opt/funcun/%{mpath}
 ```
 
 ## deb包制作
+
+通过`alien`命令直接将`rpm`包转换即可。
+
+## redis官方源码编译龙芯cpu
+
+源码地址：https://redis.io/download/#redis-downloads 
+
+最新版本是7.2，这里用redis5测试，最后一个版本是5.0.14
+
+`redis` 用到了`jemalloc`库，如果不更新`redis 7`源码自带的`config.guess`和`config.sub`文件，会在编译`redis` 源码的过程中提示`include jemalloc`的头文件失败(`zmalloc.h:50:31: fatal error: jemalloc/jemalloc.h: No such file or directory`)
+
+```bash
+wget https://download.redis.io/releases/redis-5.0.14.tar.gz
+tar -zxvf redis-5.0.14.tar.gz 
+cd redis-5.0.14/
+
+#### 修改源码
+cd /redis-5.0.14/deps/jemalloc/build-aux
+vi config.sub
+# 然后在以下地方新增以下内容：
+# 145行修改为：
+-mips* | -loongarch* 
+# 275行修改为：
+| mips64 | mips64el | loongarch64 \
+# 402行修改为：
+| mips64-* | mips64el-* | loongarch64-* \
+# 1632行新增：
+ loongarch*-*)
+       os=-elf
+        ;;
+
+vi config.guess
+# 1006行新增以下内容：
+loongarch64:Linux:*:*)
+            echo ${UNAME_MACHINE}-unknown-linux-${LIBC}
+            exit ;;
+
+#### 编译
+cd /opt/redis-5.0.14/
+make
+# 编译完成后，可执行文件在源码的/src目录下
+```

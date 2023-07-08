@@ -503,7 +503,8 @@ module.exports = {
                 'paddleserving'
             ],
             '/ai/docs/': [
-                'tensor'
+                'tensor',
+                'nlp'
             ]
         },
         sidebarDepth: 2
