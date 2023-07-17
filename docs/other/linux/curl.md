@@ -363,3 +363,11 @@ curl -x james:cats@myproxy.com:8080 https://www.example.com
 ```
 
 上面命令中，请求的代理使用 HTTP 协议。
+
+
+# Wget
+
+```bash
+# 后台下载-b、断点续传-c
+wget -b -c http://place.your.url/here
+```
