@@ -254,7 +254,8 @@ module.exports = {
                 'devops',
                 'problem',
                 'install',
-                'ai1'
+                'ai1',
+                'ai2'
             ],
             '/microservices/register_config/': [
                 'consul',
