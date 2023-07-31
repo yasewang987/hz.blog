@@ -81,22 +81,28 @@ python run_generation.py \
     --model_name_or_path=/dfsdata2/yucc1_data/models/huggingface/gpt2
 ```
 
-### chatglm-6b样例
+### chatglm2-6b样例
 
-下载模型：https://huggingface.co/THUDM/chatglm-6b-int4/tree/main
+* python版本一定要`3.11`最新版本及以上
+
+下载模型：https://huggingface.co/THUDM/chatglm2-6b-int4/tree/main ，也可以到这个地址一个一个下载所有文件。
 
 ```bash
-git clone https://huggingface.co/THUDM/chatglm-6b-int4 /yourpath/chatglm-6b
+# 安装git lfs
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+apt install git-lfs
+# 下载模型
+git clone git@hf.co:THUDM/chatglm2-6b-int4
 ```
 
-安装依赖：`pip install protobuf transformers==4.27.1 cpm_kernels`
+安装依赖：`pip install protobuf transformers==4.30.2 cpm_kernels torch>=2.0 gradio mdtex2html sentencepiece accelerate`
 
-注意需要将 `THUDM/chatglm-6b-int4` 替换成本地下载保存模型的目录地址
+注意需要将 `THUDM/chatglm2-6b` 替换成本地下载保存模型的目录地址
 
 ```py
 >>> from transformers import AutoTokenizer, AutoModel
->>> tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm-6b-int4", trust_remote_code=True)
->>> model = AutoModel.from_pretrained("THUDM/chatglm-6b-int4", trust_remote_code=True).half().cuda()
+>>> tokenizer = AutoTokenizer.from_pretrained("/root/chattest", trust_remote_code=True)
+>>> model = AutoModel.from_pretrained("/root/chattest", trust_remote_code=True).half().cuda()
 >>> response, history = model.chat(tokenizer, "你好", history=[])
 >>> print(response)
 你好👋!我是人工智能助手 ChatGLM-6B,很高兴见到你,欢迎问我任何问题。
@@ -114,11 +120,11 @@ git clone https://huggingface.co/THUDM/chatglm-6b-int4 /yourpath/chatglm-6b
 如果这些方法无法帮助你入睡,你可以考虑咨询医生或睡眠专家,寻求进一步的建议。
 ```
 
-下载官方demo：git clone https://github.com/THUDM/ChatGLM-6B.git ，如果不需要官方demo也可以自己写
+* **官方demo测试**
 
-进入克隆的仓库目录，创建一个文件夹 `chatglm-6b-int4`，将上面下载的模型全部转移到该目录下
+下载官方demo：`git clone https://github.com/THUDM/ChatGLM2-6B.git` ，如果不需要官方demo也可以自己写
 
-安装依赖：`pip install -r requirements.txt`，下面所有demo中的 `from_pretrained` 方法第一个参数目录要改成本地模型保存的目录地址 `chatglm-6b-int4`
+安装依赖：`pip install -r requirements.txt`，下面所有demo中的 `from_pretrained` 方法第一个参数目录要改成本地模型保存的目录地址
 
 ```bash
 # web_demo.py 是基于gradio开发的，带了前端交互页面，可以指定ip和port，便于远程访问
@@ -140,8 +146,8 @@ curl -X POST "http://127.0.0.1:8000"
 如果需要在 cpu 上运行量化后的模型，还需要安装 `gcc` 与 `openmp`。多数 Linux 发行版默认已安装。
 
 ```py
-# cpu版本运行
-model = AutoModel.from_pretrained("THUDM/chatglm-6b-int4", trust_remote_code=True).float()
+# cpu版本运行 - 就是将后面的改成 float()
+model = AutoModel.from_pretrained("/root/chattest", trust_remote_code=True).float()
 ```
 
 多卡部署：首先安装 `pip install accelerate`，然后通过如下方法加载模型
@@ -149,6 +155,6 @@ model = AutoModel.from_pretrained("THUDM/chatglm-6b-int4", trust_remote_code=Tru
 ```py
 # 将模型部署到两张 GPU 上进行推理。可以将 num_gpus 改为你希望使用的 GPU 数。默认是均匀切分的，也可以传入 device_map 参数来自己指定。
 from utils import load_model_on_gpus
-model = load_model_on_gpus("THUDM/chatglm-6b", num_gpus=2)
+model = load_model_on_gpus("/root/chattest", num_gpus=2)
 ```
 

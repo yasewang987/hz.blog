@@ -12,6 +12,16 @@ Termux官网：https://termux.com/
 
 国内镜像源地址：https://mirrors.tuna.tsinghua.edu.cn/help/termux/
 
+```bash
+# 安装必要工具
+pkg install openssl
+pkg install openssh
+pkg install vim
+
+# 执行ssh命令时报错CANNOT LINK EXECUTABLE “ssh“ library “libcrypto.so.1.1“ not found，需要先卸载openssh，然后先安装ssl，再安装ssh
+pkg uninstall openssh
+```
+
 ## 数据库管理工具
 
 * Dbeaver：https://github.com/dbeaver/dbeaver/releases
