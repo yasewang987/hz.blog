@@ -378,7 +378,8 @@ BrandingText /TRIMLEFT "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 WPS插件示例，使用了xml文件操作，参考：http://wiz0u.free.fr/prog/nsisXML/ ，下载好之后直接解压即可，将`.nsi`文件放到解压后的根目录即可
 
 ```ini
-!define VERSION "1.0.2"
+!define VERSION "2023.07.22"
+!define PROENV "pro"
 !define PROJECT_NAME "myproject"
 
 !ifndef TARGETDIR
@@ -391,8 +392,8 @@ WPS插件示例，使用了xml文件操作，参考：http://wiz0u.free.fr/prog/
 
 !addplugindir "${TARGETDIR}"
 
-Name "${PROJECT_NAME}-wps ${VERSION}"
-OutFile "${PROJECT_NAME}-wps_${VERSION}.exe"
+Name "${PROJECT_NAME}-wps-${PROENV} ${VERSION}"
+OutFile "${PROJECT_NAME}-wps-${PROENV}_${VERSION}.exe"
 Icon "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 Unicode true
 ; ShowInstDetails show	

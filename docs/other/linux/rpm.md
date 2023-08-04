@@ -260,4 +260,7 @@ alien -r --scripts xxx.deb
 
 # 安装rpm包
 alien -i xxxx.rpm
+
+# 查看deb包详细脚本内容
+dpkg -e somefile.deb somefolder
 ```
