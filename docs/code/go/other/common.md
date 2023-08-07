@@ -60,6 +60,10 @@ github地址：https://github.com/spf13/cobra
 
 结构更佳的 Go 并发库。
 
+## wire
+
+依赖注入
+
 
 
 

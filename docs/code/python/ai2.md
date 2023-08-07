@@ -178,7 +178,7 @@ wget https://cloud.tsinghua.edu.cn/seafhttp/files/61fb5d40-0eb9-475f-9672-cd5aaf
 # 开始训练
 bash train.sh
 
-# 推理：修改 evaluate.sh
+# 推理评测：在 P-tuning v2 训练时模型只保存 PrefixEncoder 部分的参数，所以在推理时需要同时加载原 ChatGLM2-6B 模型以及 PrefixEncoder 的权重，因此需要指定 evaluate.sh 中的参数
 --model_name_or_path /root/chattest   # $CHECKPOINT_PATH
 --ptuning_checkpoint $CHECKPOINT_PATH
 
@@ -195,6 +195,8 @@ Output[微调前]: 类型#裙版型#显瘦风格#文艺风格#简约图案#印�
 Output[微调后]: 这是一款文艺范的连衣裙,以印花为元素,采用简约的印花,既能够突出文艺气质,又能够展现简约风。在印花的同时又有领子和裙摆的压褶设计,更加凸显文艺气质。简约而不会过于单调,搭配出街,穿着十分舒适。
 
 # 模型部署（需要将模型地址改为训练后的名称）
+# 注意你可能需要将 pre_seq_len 改成你训练时的实际值
+# 注意需要映射端口，也可以直接使用官方文档的代码例子直接在python环境内运行测试
 bash web_demo.sh
 ```
 
