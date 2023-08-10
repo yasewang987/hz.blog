@@ -112,6 +112,16 @@ docker image inspect xxxxx:11
 
 # 修改镜像名称
 docker tag souceImage:[tag] targetImage:[tag]
+
+
+# 持续刷新查看容器状态
+docker stats
+# 只显示当前状态
+docker stats --no-stream
+# 格式化输出当前状态（.Container，.Name，.ID，.CPUPerc，.MemUsage，.NetIO，.BlockIO，.MemPerc，.PIDs）
+docker stats --format "{{.Container}}: {{.CPUPerc}}"
+# 以表格的方式输出当前状态
+docker stats --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 ```
 
 ## docker容器中使用docker命令
