@@ -203,7 +203,7 @@ for HOMEDIR in /home/*; do
   /bin/cp -rf /opt/funcun/wps/wpsplugin ${jsXmlDir}
   rm -rf ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
   mv ${jsXmlDir}/wpsplugin ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
-  jsXmlFile=${jsXmlDir}/jsplugins.xml
+  jsXmlFile=${jsXmlDir}/publish.xml
   echo $jsXmlFile >> /opt/funcun/wps/test.log
   if [ ! -f $jsXmlFile ]; then
     touch -f $jsXmlFile

@@ -411,12 +411,12 @@ Section "Main program"
   File /r ".\wpsplugin\*.*"
   Sleep 500
 	nsisXML::create
-  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
   IntCmp $0 0 noFile
 	nsisXML::select '/jsplugins/jsplugin[@name="${PROJECT_NAME}-addons"]'
 	IntCmp $2 0 noProject
 	nsisXML::setAttribute "version" "${VERSION}"
-	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
 	nsisXML::release $0
 	Goto end
 noFile:
@@ -433,12 +433,12 @@ noFile:
   nsisXML::setAttribute "version" "${VERSION}"
   nsisXML::setAttribute "type" "wps"
 	nsisXML::appendChild
-	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
   Goto end
 noProject:
   ; MessageBox MB_OK "nofuncun"
   nsisXML::create
-  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
   nsisXML::select '/jsplugins'
   nsisXML::createElement "jsplugin"
 	nsisXML::setAttribute "url" "null"
@@ -446,7 +446,7 @@ noProject:
   nsisXML::setAttribute "version" "${VERSION}"
   nsisXML::setAttribute "type" "wps"
 	nsisXML::appendChild
-	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
 end:
   MessageBox MB_OK "安装完成，请重启wps后使用！"
   ; 安装完成之后自动关闭

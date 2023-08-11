@@ -100,17 +100,6 @@ uos操作系统: /opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/offic
 developuseribbon=true
 ```
 
-### chrome浏览器不显示安装界面
-
-在浏览器访问：`chrome://flags/#block-insecure-private-network-requests`，将Default设置为`Disable`，然后重新加载浏览器
-
-### Dialog不显示界面
-
-```js
-// 在对应的vue页面中 mounted 之后执行 window.close() 关闭
-wps.ShowDialog(Util.GetUrlPath()+"actiontemp","",1,1,false,false,0)
-```
-
 ### 按钮控制可用
 
 调用的是 `ribbon.js` 的 `OnGetEnabled` 方法
@@ -149,4 +138,30 @@ wps.ribbonUI.Invalidate()
 ```bash
 wpsjs build
 # 选择离线部署
+```
+
+## 问题列表
+
+### chrome浏览器不显示安装界面
+
+在浏览器访问：`chrome://flags/#block-insecure-private-network-requests`，将Default设置为`Disable`，然后重新加载浏览器
+
+### Dialog不显示界面
+
+```js
+// 在对应的vue页面中 mounted 之后执行 window.close() 关闭
+wps.ShowDialog(Util.GetUrlPath()+"actiontemp","",1,1,false,false,0)
+```
+
+### 离线模式不显示加载项
+
+1. 建议将插件的配置写到 `publish.xml` 里
+1. 如果插件一定要写到`jsplugins.xml`里的，查看 `oem.ini` 文件中是否设置了如下配置
+
+```ini
+[Support] 
+  JsApiPlugin=true
+# jsaddons目录下的jsplugins.xml 就是由这个配置自动生成的，也可以不加这个配置，手动创建jsplugins.xml
+[Server] 
+  JSPluginsServer=jsplugins.xml文件地址
 ```
