@@ -963,3 +963,19 @@ cat my-split* > mytest.rpm
 # 可以一次性查看多个
 md5sum file1 file2
 ```
+
+## 查看so文件位数
+
+```bash
+od -h -N 10 xxx.so
+# 32位第四段是0101
+00000000 457f 464c 0101 0001 0000
+# 64位第四段是0102
+00000000 457f 464c 0102 0001 0000
+```
+
+## 查看pagesize
+
+```bash
+getconf PAGESIZE
+```
