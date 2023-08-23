@@ -172,6 +172,11 @@ curl -F 'file=@photo.png;filename=me.png' https://google.com/profile
 
 上面命令中，原始文件名为`photo.png`，但是服务器接收到的文件名为`me.png`。
 
+```bash
+# 上传文件，带参数
+curl -X POST -H  "Accept:*/*" -H  "Content-Type:multipart/form-data" -F  "file=@111.docx" -F  "ukey=username" -F  "user_code=pwd" "http://10.10.10.10/api/v1/officialDocument/test"
+```
+
 ## -G
 
 `-G`参数用来构造 URL 的查询字符串。
@@ -358,3 +363,11 @@ curl -x james:cats@myproxy.com:8080 https://www.example.com
 ```
 
 上面命令中，请求的代理使用 HTTP 协议。
+
+
+# Wget
+
+```bash
+# 后台下载-b、断点续传-c
+wget -b -c http://place.your.url/here
+```

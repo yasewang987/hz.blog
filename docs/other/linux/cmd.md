@@ -934,3 +934,48 @@ chsh -s /bin/zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 # 第一次安装完之后需要选择，可以直接选择2
 ```
+
+## 大文件拆分/合并
+
+```bash
+# 以 my-split 开头拆分
+split mytest.rpm my-split
+# -l：按照每2行拆分，默认是1000行
+split -l 2 my.txt
+# -b：按照指定大小拆分(k,m,g)
+split -b 100m mytest.rpm
+# -n：按照文件数拆分（拆成3个文件）
+split -n 3 mytest.rpm
+# -d：使用数字标记文件（x00，x01，x02）
+split -l 2 -d my.txt
+# -a：设置后缀长度(x0,x1,x2)
+split -l 2 -d -a 1 my.txt
+# 简单示例，拆分成4个文件，开头指定为my-split，后缀使用1位数字
+split -n 4 -d -a 1 mytest.rpm my-split
+
+### 合并文件
+cat my-split* > mytest.rpm
+```
+
+## 查看文件md5
+
+```bash
+# 可以一次性查看多个
+md5sum file1 file2
+```
+
+## 查看so文件位数
+
+```bash
+od -h -N 10 xxx.so
+# 32位第四段是0101
+00000000 457f 464c 0101 0001 0000
+# 64位第四段是0102
+00000000 457f 464c 0102 0001 0000
+```
+
+## 查看pagesize
+
+```bash
+getconf PAGESIZE
+```

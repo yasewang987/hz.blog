@@ -378,7 +378,8 @@ BrandingText /TRIMLEFT "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 WPS插件示例，使用了xml文件操作，参考：http://wiz0u.free.fr/prog/nsisXML/ ，下载好之后直接解压即可，将`.nsi`文件放到解压后的根目录即可
 
 ```ini
-!define VERSION "1.0.2"
+!define VERSION "2023.07.22"
+!define PROENV "pro"
 !define PROJECT_NAME "myproject"
 
 !ifndef TARGETDIR
@@ -391,8 +392,8 @@ WPS插件示例，使用了xml文件操作，参考：http://wiz0u.free.fr/prog/
 
 !addplugindir "${TARGETDIR}"
 
-Name "${PROJECT_NAME}-wps ${VERSION}"
-OutFile "${PROJECT_NAME}-wps_${VERSION}.exe"
+Name "${PROJECT_NAME}-wps-${PROENV} ${VERSION}"
+OutFile "${PROJECT_NAME}-wps-${PROENV}_${VERSION}.exe"
 Icon "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 Unicode true
 ; ShowInstDetails show	
@@ -410,12 +411,12 @@ Section "Main program"
   File /r ".\wpsplugin\*.*"
   Sleep 500
 	nsisXML::create
-  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
   IntCmp $0 0 noFile
 	nsisXML::select '/jsplugins/jsplugin[@name="${PROJECT_NAME}-addons"]'
 	IntCmp $2 0 noProject
 	nsisXML::setAttribute "version" "${VERSION}"
-	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
 	nsisXML::release $0
 	Goto end
 noFile:
@@ -432,12 +433,12 @@ noFile:
   nsisXML::setAttribute "version" "${VERSION}"
   nsisXML::setAttribute "type" "wps"
 	nsisXML::appendChild
-	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
   Goto end
 noProject:
   ; MessageBox MB_OK "nofuncun"
   nsisXML::create
-  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+  nsisXML::load "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
   nsisXML::select '/jsplugins'
   nsisXML::createElement "jsplugin"
 	nsisXML::setAttribute "url" "null"
@@ -445,7 +446,7 @@ noProject:
   nsisXML::setAttribute "version" "${VERSION}"
   nsisXML::setAttribute "type" "wps"
 	nsisXML::appendChild
-	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\jsplugins.xml"
+	nsisXML::save "$APPDATA\kingsoft\wps\jsaddons\publish.xml"
 end:
   MessageBox MB_OK "安装完成，请重启wps后使用！"
   ; 安装完成之后自动关闭

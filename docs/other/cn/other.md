@@ -203,7 +203,7 @@ for HOMEDIR in /home/*; do
   /bin/cp -rf /opt/funcun/wps/wpsplugin ${jsXmlDir}
   rm -rf ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
   mv ${jsXmlDir}/wpsplugin ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
-  jsXmlFile=${jsXmlDir}/jsplugins.xml
+  jsXmlFile=${jsXmlDir}/publish.xml
   echo $jsXmlFile >> /opt/funcun/wps/test.log
   if [ ! -f $jsXmlFile ]; then
     touch -f $jsXmlFile
@@ -349,6 +349,8 @@ done
 
 ### so库打包
 
+* 多个so库分开解压不要整个文件夹覆盖
+
 ```conf
 %define __os_install_post %{nil}
 %define debug_package %{nil}
@@ -378,7 +380,8 @@ cp -rf %{_builddir}/funcun/libs/* %{buildroot}/usr/lib
 %clean
 
 %files
-/usr/lib
+/usr/lib/libdmdpi.so
+/usr/lib/libdmdpi.so.1.0
 ```
 
 ### 通用打包（数据/代码）

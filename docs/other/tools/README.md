@@ -8,3 +8,4 @@
 * [开发辅助工具](./devtools.md)
 * [PlantUML](./plantuml.md)
 * [VNC](./vnc.md)
+* [VPN部署](./vpn.md)

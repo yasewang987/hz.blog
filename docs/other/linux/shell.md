@@ -391,3 +391,82 @@ interact
 
 [root@localhost shell]# ./login2.exp  192.168.123.218 22 #多个参数直接以空格间隔，第一个参数：192.168.123.218 第二个参数22
 ```
+
+## Shell脚本退出
+
+```shell
+#!/bin/bash
+
+### 脚本使用“-f”测试运算符检查一个名为“myfile.txt”的文件是否存在。如果文件存在，脚本会向控制台打印一条消息，并使用“exit”命令以成功代码0退出。如果文件不存在，脚本会打印不同的消息，并使用错误代码1退出
+
+# 检查一个文件是否存在
+if [ -f "myfile.txt" ]; then
+  echo "The file exists"
+  exit 0 # 成功的退出
+else
+  echo "The file does not exist"
+  exit 1 # 异常的退出并附带说明
+fi
+
+### 脚本尝试使用“mysql”命令行客户端连接到MySQL数据库。如果连接失败，脚本会向控制台打印一个错误消息，并使用错误代码1退出。如果连接成功，脚本会对数据库执行一些操作，然后使用“QUIT”命令断开连接。
+
+# 连接数据库
+if ! mysql -h localhost -u root -psecret mydatabase -e "SELECT 1"; then
+  echo "Error: Could not connect to database"
+  exit 1
+fi
+# 断开连接
+mysql -h localhost -u root -psecret mydatabase -e "QUIT"
+
+
+### 在函数中使用return语句退出
+# 定义一个函数并返回数字之和
+function add_numbers {
+  local num1=$1
+  local num2=$2
+  local sum=$((num1 + num2))
+  return $sum
+}
+
+# 调用函数并打印结果
+add_numbers 3 71
+# 上一个执行命令的退出状态的“$?”变量将“add_numbers”函数的结果
+result=$?
+echo "3 + 71 = $result" 
+
+### “return”命令也可以用于处理函数内部的错误或意外情况
+### 脚本定义了一个名为“read_file”的函数，它以文件名为参数，并使用“cat”命令读取文件的内容。在函数内部，脚本使用“-f”测试运算符检查文件是否存在。如果文件不存在，函数会向控制台打印一个错误消息，并使用“return”命令以错误代码1退出。
+
+# 定义一个函数读取文件
+function read_file {
+  local file=$1
+  if [ ! -f "$file" ]; then
+    echo "Error: File $file not found"
+    return 1
+  fi
+  cat $file
+}
+
+# 调用函数并打印结果
+read_file "myfile.txt"
+
+
+### trap
+### 脚本使用“trap”命令来捕获“EXIT”信号，该信号在脚本即将退出时发送。当信号被捕获时，脚本调用“cleanup”函数执行任何必要的清理操作，然后优雅地退出。
+### “trap”命令还可以捕获其他信号，例如通过按Ctrl+C发送的“INT”信号，或者由想要终止脚本的进程发送的“TERM”信号。
+
+# 定义一个函数执行清理动作
+function cleanup {
+  echo "Cleaning up..."
+  # 删除临时文件，清理遗留服务等
+}
+
+# 捕获信号并执行清理动作（EXIT、INT、TERM）
+trap cleanup EXIT
+
+# 执行一些操作，但是可能会被中断
+# ...
+
+# 成功的退出
+exit 0
+```

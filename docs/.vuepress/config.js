@@ -254,7 +254,8 @@ module.exports = {
                 'devops',
                 'problem',
                 'install',
-                'ai1'
+                'ai1',
+                'ai2'
             ],
             '/microservices/register_config/': [
                 'consul',
@@ -429,7 +430,8 @@ module.exports = {
                 'git-hook',
                 'gl-hook',
                 'problem',
-                'submodule'
+                'submodule',
+                'restore'
             ],
             '/other/linux/': [
                 'cmd',
@@ -462,7 +464,8 @@ module.exports = {
                 'resource',
                 'devtools',
                 'plantuml',
-                'vnc'
+                'vnc',
+                'vpn'
             ],
             '/other/cloud/': [
                 'proxmox',
@@ -502,7 +505,8 @@ module.exports = {
                 'paddleserving'
             ],
             '/ai/docs/': [
-                'tensor'
+                'tensor',
+                'nlp'
             ]
         },
         sidebarDepth: 2
