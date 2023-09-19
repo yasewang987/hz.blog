@@ -246,7 +246,8 @@ module.exports = {
                 'config',
                 'chromeextensions',
                 'element',
-                'wps'
+                'wps',
+                'demos'
             ],
             '/code/python/': [
                 'base',

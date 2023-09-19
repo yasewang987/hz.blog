@@ -977,5 +977,8 @@ od -h -N 10 xxx.so
 ## 查看pagesize
 
 ```bash
+# 查看系统pagesize
 getconf PAGESIZE
+# 修改so文件pagesize（参考paddle文档）
+patchelf --page-size 65536 core_noavx.so
 ```
