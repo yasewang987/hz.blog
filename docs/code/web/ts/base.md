@@ -701,5 +701,10 @@ let myIdentity: Person<string> = {
         return name
     }
 };
-
 ```
+
+## 问题列表
+
+* `Type 'void' has no call signatures`
+
+问题主要原因是左右类型或者本身类型有问题，需要在后面做强制类型转换 `as any` 类似的。例如：`document.body.appendChild(iframe) as any`
