@@ -192,19 +192,21 @@ rpm -aq | grep kernel-devel
 
 ## nvidia运行docker容器选择
 
-* 开发镜像：
+### 开发镜像：
+
+如果上面没有找到符合要求的镜像，也可以到 dockerhub 里面找 【nvidia/cuda】（可以找develop版本）
+
+如果拉取镜像失败，再到Nvidia官方的容器镜像仓库下载：`https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cuda/tags`
 
 如果是`Tensorflow`的，到帮助目录先确认要下载的镜像版本号：https://docs.nvidia.com/deeplearning/frameworks/tensorflow-release-notes/running.html#running
 
 如果是`Pytorch`的，到这个地址确认：https://docs.nvidia.com/deeplearning/frameworks/pytorch-release-notes/index.html
 
-如果上面没有找到符合要求的镜像，也可以到 dockerhub 里面找 【nvidia/cuda】
+### 运行镜像：
 
-再到Nvidia官方的容器镜像仓库下载：https://ngc.nvidia.com/catalog/containers
+直接到 `hub.docker.com` 找 `nvidia/cuda` 的对应版本（可以找runtime版本）
 
-* 运行镜像：
-
-直接到 `hub.docker.com` 找 `nvidia/cuda` 的对应版本
+如果拉取镜像失败，可以到nvidia的网站拉取 `https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cuda/tags`
 
 ## 常见错误处理
 
