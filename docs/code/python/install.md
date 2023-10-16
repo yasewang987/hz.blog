@@ -182,6 +182,8 @@ rm -rf ~/.cache
     ```bash
     # cpu版本
     pip3 install -i https://pypi.douban.com/simple torch torchvision torchaudio
+    # 清华源
+    pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch torchvision torchaudio
     ```
 
 1. 安装完之后验证

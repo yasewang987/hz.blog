@@ -208,6 +208,8 @@ rpm -aq | grep kernel-devel
 
 如果拉取镜像失败，可以到nvidia的网站拉取 `https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cuda/tags`
 
+通过nvidia官网拉取镜像时，会碰到拉取镜像 `ngc.download.nvidia.cn`报错，需要到 `https://sites.ipaddress.com/` 查询ip地址，然后在修改 `/etc/hosts`，增加如下配置 `23.205.107.10 ngc.download.nvidia.cn` 然后重新拉取即可。
+
 ## 常见错误处理
 
 * 运行容器时提示：`Failed to initialize NVML: Unknown Error`，一般都是运行参数有问题，正常命令如下
