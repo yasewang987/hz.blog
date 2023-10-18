@@ -5,6 +5,7 @@
 ```bash
 # 豆瓣的源比清华的块很多
 pip install -i https://pypi.douban.com/simple xxx
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple xxx
 
 # 安装本地whl
 pip install xxxx.whl
@@ -24,14 +25,17 @@ pip download shapely==2.0.1 -d /tmp
 ## miniconda安装管理
 
 ```bash
-# 下载最新安装脚本：https://mirrors.bfsu.edu.cn/anaconda/miniconda
-wget https://mirrors.bfsu.edu.cn/anaconda/miniconda/Miniconda3-py38_22.11.1-1-Linux-x86_64.sh
+# 下载最新安装脚本：https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/
+wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py38_22.11.1-1-Linux-x86_64.sh
 
 # 安装(默认会在安装在用户目录下 $HOME/miniconda3)
 sh Miniconda3-py38_22.11.1-1-Linux-x86_64.sh
 
-# 添加环境变量（WSL中不会自动添加）
+# 添加环境变量-bashrc/profile（WSL中不会自动添加）
 export PATH=$HOME/miniconda3/bin:$PATH
+
+# 生效
+source .bashrc
 
 # 环境列表查看
 conda env list
@@ -43,6 +47,32 @@ conda create -n myvenv --clone base
 conda activate base
 # 退出环境
 conda deactivate
+```
+
+* 卸载
+
+```bash
+# 删除整个文件夹
+rm -rf ~/miniconda3
+# 删除配置文件
+rm -rf ~/.conda ~/.condarc ~/.continum
+
+# 删除环境变量 ~/.bashrc 里面conda部分
+export PATH=$HOME/miniconda3/bin:$PATH
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/root/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/root/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/root/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/root/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
 ```
 
 ## virtualenv安装

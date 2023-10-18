@@ -982,3 +982,13 @@ getconf PAGESIZE
 # 修改so文件pagesize（参考paddle文档）
 patchelf --page-size 65536 core_noavx.so
 ```
+
+## 批量修改文件内容
+
+```bash
+# 批量查找某个目下文件的包含的内容
+grep -rn "查找的内容" ./
+
+# 批量替换某个目下所有包含的文件的内容
+sed -i "s/查找的内容/替换后的内容/g" `grep -rl "查找的内容" ./`
+```
