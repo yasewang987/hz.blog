@@ -4,11 +4,32 @@
 
 ## 下载与训练模型、词典等
 
+使用git下载离线模型
+
+```bash
+### 安装git lfs
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+apt install git-lfs
+
+### huggingface模型下载
+git clone git@hf.co:THUDM/chatglm2-6b-int4
+
+### modelscope模型下载
+git lfs install
+git clone https://www.modelscope.cn/<namespace>/<model-name>.git
+# 例如: git clone https://www.modelscope.cn/qwen/Qwen-7B-Chat.git
+# 私有模型下载，前提是您有响应模型权限 方法1
+git lfs install
+git clone http://oauth2:your_git_token@www.modelscope.cn/<namespace>/<model-name>.git
+# 方法2
+git clone http://your_user_name@www.modelscope.cn/<namespace>/<model-name>.git
+# Password for 'http://your_user_name@modelscope.cn':
+# input git token
+```
+
 如果不确定哪些需要下，哪些不需要的话，可以把文件全部下载下来。
 
-打开模型网站：https://huggingface.co/models ，搜索需要的模型，然后进入文件页面，下载对应的文件，如下图
-
-![1](todo)
+打开模型网站：https://huggingface.co/models ，搜索需要的模型，然后进入文件页面，下载对应的文件
 
 通常我们需要保存的是三个文件及一些额外的文件，第一个是配置文件`config.json`。第二个是词典文件`vocab.json`。第三个是预训练模型文件，如果你使用`pytorch`则保存`pytorch_model.bin`文件，如果你使用`tensorflow2`，则保存`tf_model.h5`。
 
@@ -156,6 +177,34 @@ model = AutoModel.from_pretrained("/root/chattest", trust_remote_code=True).floa
 # 将模型部署到两张 GPU 上进行推理。可以将 num_gpus 改为你希望使用的 GPU 数。默认是均匀切分的，也可以传入 device_map 参数来自己指定。
 from utils import load_model_on_gpus
 model = load_model_on_gpus("/root/chattest", num_gpus=2)
+```
+
+## Qwen
+
+```bash
+# 环境依赖
+python 3.8及以上版本
+pytorch 1.12及以上版本，推荐2.0及以上版本
+建议使用CUDA 11.4及以上（GPU用户、flash-attention用户等需考虑此选项）
+
+# 推荐安装 flash-attention 库，以实现更高的效率和更低的显存占用。
+git clone -b v1.0.8 https://github.com/Dao-AILab/flash-attention
+cd flash-attention && pip install .
+# 下方安装可选，安装可能比较缓慢。
+# Below are optional. Installing them might be slow.
+# pip install csrc/layer_norm
+# pip install csrc/rotary
+
+# 模型下载
+git clone https://www.modelscope.cn/qwen/Qwen-7B-Chat.git
+
+# demo代码下载
+https://github.com/QwenLM/Qwen.git
+# 修改demo里的模型地址为本地模型的路径
+# 安装web-demo依赖
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_web_demo.txt
+# 启动webdemo，直接访问启动后的地址即可
+python web_demo.py
 ```
 
 # 模型微调
