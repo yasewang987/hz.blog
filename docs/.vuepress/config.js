@@ -398,7 +398,8 @@ module.exports = {
                 'nextterminal',
                 'jumpserver',
                 'zentao',
-                'shells'
+                'shells',
+                'frp'
             ],
             '/sql/mssql/': [
                 'usesul',

@@ -200,11 +200,16 @@ git clone https://www.modelscope.cn/qwen/Qwen-7B-Chat.git
 
 # demo代码下载
 https://github.com/QwenLM/Qwen.git
-# 修改demo里的模型地址为本地模型的路径
+# 修改demo里的web_demo.py模型地址为本地模型的路径
+DEFAULT_CKPT_PATH = '/root/Qwen-7B-Chat'
+# 对外暴露服务
+"--share", action="store_true", default=True
+"--server-name", type=str, default="0.0.0.0"
+
 # 安装web-demo依赖
 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements_web_demo.txt
 # 启动webdemo，直接访问启动后的地址即可
-python web_demo.py
+python web_demo.py --server-port 9000
 ```
 
 # 模型微调
