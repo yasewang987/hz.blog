@@ -5,34 +5,91 @@
 * go官方推荐
 
 ```bash
-demo
-├── cmd # 可执行文件目录，如果一个项目有多个可执行文件，可以放在不同的子目录中，如例子中的app1和app2目录。如果是当项目，直接不需要cmd文件夹，直接把main.go文件放在这里即可。
-│   ├── app1
-│   │   └── main.go
-│   └── app2
-│       └── main.go
+### basic command
+project-root-directory/
 ├── go.mod
-├── go.sum
-├── internal # 项目内部私有代码，其他项目引入时会报错。
-│   ├── pkga
-│   │   └── pkg_a.go
-│   └── pkgb
-│       └── pkg_b.go
-├── pkg1 # 存放项目的依赖代码,可以被其项目引入。注意，这里并不是说一定要pkg为前缀来命名，你可以对取任意符合包命名规范的名称，比如service,model等
-│   └── pkg1.go
-├── pkg2
-│   └── pkg2.go
-└── vendor # 存储项目的依赖包，但由于现今Go项目都是使用go module进行依赖管理，因此这个目录是可省略的。
-└── docs # 说明文档
-└── deploy # 部署文档
+└── main.go
 
+或
+
+project-root-directory/
+├── go.mod
+├── main.go
+├── auth.go
+├── auth_test.go
+├── hash.go
+└── hash_test.go
+
+# 使用方式如下
+go install github.com/someuser/modname@latest
+
+
+### command with supporting packages
+project-root-directory/
+├── go.mod
+├── main.go # 这里和库文件不同，必须是main.go才能编译为command
+└── internal/
+    ├── auth/
+    │   ├── auth.go
+    │   └── auth_test.go
+    └── hash/
+        ├── hash.go
+        └── hash_test.go
+
+### multiple commands
+project-root-directory/
+├── go.mod
+├── prog1/
+│   └── main.go
+├── prog2/
+│   └── main.go
+└── internal/
+    └── trace/
+        ├── trace.go
+        └── trace_test.go
+# 编译命令如下
+$go build github.com/someuser/modname/prog1
+$go build github.com/someuser/modname/prog2
+# 安装命令如下
+$go install github.com/someuser/modname/prog1@latest
+$go install github.com/someuser/modname/prog2@latest
+
+### multiple packages and commands
+project-root-directory/
+├── go.mod
+├── modname.go
+├── modname_test.go
+├── auth/
+│   ├── auth.go
+│   ├── auth_test.go
+│   └── token/
+│       ├── token.go
+│       └── token_test.go
+├── hash/
+│   ├── hash.go
+│   └── hash_test.go
+├── internal/
+│       └── trace/
+│           ├── trace.go
+│           └── trace_test.go
+└── cmd/
+    ├── prog1/
+    │   └── main.go
+    └── prog2/
+        └── main.go
+# 上面结构的项目导出如下包
+github.com/user/modname
+github.com/user/modname/auth
+github.com/user/modname/hash
+# 还包含两个命令
+$go install github.com/someuser/modname/cmd/prog1@latest
+$go install github.com/someuser/modname/cmd/prog2@latest
 ```
 
 * 常规项目
 
-app 目录下有 api、cmd、configs、internal 目录。一般还会放置 README、CHANGELOG、OWNERS。项目的依赖路径为：model -> dao -> service -> api，model struct 串联各个层，直到 api 做 DTO 对象转换。
-
 ```bash
+### app 目录下有 api、cmd、configs、internal 目录。一般还会放置 README、CHANGELOG、OWNERS。项目的依赖路径为：model -> dao -> service -> api，model struct 串联各个层，直到 api 做 DTO 对象转换。
 |-- service
     |-- api             API 定义（protobuf 等）以及对应生成的 client 代码，基于 pb 生成的 swagger.json。
     |-- cmd
@@ -45,96 +102,66 @@ app 目录下有 api、cmd、configs、internal 目录。一般还会放置 READ
 |-- web
 ```
 
-* 常规项目2
-
-```bash
-|-- service
-    |-- api             API 定义（protobuf 等）以及对应生成的 client 代码，基于 pb 生成的 swagger.json。
-    |-- cmd
-    |-- configs         服务配置文件，比如 database.yaml、redis.yaml、application.yaml。
-    |-- internal        避免有同业务下被跨目录引用了内部的 model、dao 等内部 struct。
-        |-- router      路由定义
-        |-- controller  业务逻辑实现层（主要实现gin的HandleFunc，只依赖领域层，不依赖仓储实现，便于替换不同数据库仓储实现）
-        |-- repository  仓储实现，主要操作数据库
-        |-- domain      领域层（定义了仓库接口，数据库实体等）
-        |-- server      依赖 proto 定义的服务作为入参，提供快捷的启动服务全局方法。
-|-- web
-```
-
-* DDD项目
-
-```bash
-.
-|-- CHANGELOG
-|-- OWNERS
-|-- README
-|-- api
-|-- cmd
-    |-- myapp1-admin
-    |-- myapp1-interface
-    |-- myapp1-job
-    |-- myapp1-service
-    +-- myapp1-task
-|-- go.mod
-|-- internal        避免有同业务下被跨目录引用了内部的 model、dao 等内部 struct。
-    |-- biz         业务逻辑组装层，类似 DDD domain（repo 接口再次定义，依赖倒置）。
-    |-- data        业务数据访问，包含 cache、db 等封装，实现 biz 的 repo 接口。
-    |-- pkg
-    +-- service     实现了 api 定义的服务层，类似 DDD application
-    处理 DTO 到 biz 领域实体的转换（DTO->DO），同时协同各类 biz 交互，不处理复杂逻辑。
-```
-
 ## 库项目结构
 
 * go官方推荐
 
 ```bash
-demo
+### basic package
+project-root-directory/
 ├── go.mod
-├── go.sum
-├── internal
-│   ├── pkga
-│   │   └── pkg_a.go
-│   └── pkgb
-│       └── pkg_b.go
-├── pkg1
-│   └── pkg1.go
-└── pkg2
-    └── pkg2.go
-│___examples # 示例
-```
+├── modname.go
+└── modname_test.go
 
-* 一般一个公司的所有基础库都应该归到一个仓库中，通过文件夹来区分不同的基础功能
+或
 
-```bash
-|-- cache
-    |-- memcache
-    |   +-- test
-    +-- redis
-        +-- test
-|-- conf
-    |-- dsn 
-    |-- env
-    |-- flagvar
-    +-- paladin
-        +-- apollo
-            +-- internal
-                +-- mockserver
-|-- container
-    |-- group
-    |-- pool
-    +-- queue
-        +-- apm
-|-- database
-    |-- hbase
-    |-- sql
-    +-- tidb
-|-- ecode
-    +-- types
-|-- log
-    +-- internal
-        |-- core
-        +-- filewriter
+project-root-directory/
+├── go.mod
+├── modname.go
+├── modname_test.go
+├── auth.go
+├── auth_test.go
+├── hash.go
+└── hash_test.go
+# 导入包的方式如下
+import "github.com/someuser/modname"
+
+### supporting packages
+project-root-directory/
+├── go.mod
+├── modname.go
+├── modname_test.go
+└── internal/  # internal中的包是local的，不能导出到module之外，但module下的某些内部代码可以导入internal下的包。
+    ├── auth/
+    │   ├── auth.go
+    │   └── auth_test.go
+    └── hash/
+        ├── hash.go
+        └── hash_test.go
+
+### multiple packages
+project-root-directory/
+├── go.mod
+├── modname.go
+├── modname_test.go
+├── auth/
+│   ├── auth.go
+│   ├── auth_test.go
+│   └── token/
+│       ├── token.go
+│       └── token_test.go
+├── hash/
+│   ├── hash.go
+│   └── hash_test.go
+└── internal/
+    └── trace/
+        ├── trace.go
+        └── trace_test.go
+# 可以导入如下包
+github.com/user/modname
+github.com/user/modname/auth
+github.com/user/modname/hash
+github.com/user/modname/auth/token
 ```
 
 ## 命名规范

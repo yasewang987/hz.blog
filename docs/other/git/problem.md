@@ -1,5 +1,18 @@
 # Git问题汇总
 
+* github访问很慢
+
+```bash
+# ipaddress.com 查询 github 对应的IP
+# 修改 hosts
+140.82.114.4 github.com
+
+# windows刷新dns（win+R）
+ipconfig /flushdns
+# linux刷新dns
+sudo /etc/init.d/nscd restart
+```
+
 * `error: copy-fd: write returned Permission denied`
 `fatal: cannot copy '/usr/share/git-core/templates/description' to '/mnt/wk01/xxx/.git/description': Permission denied`
 
