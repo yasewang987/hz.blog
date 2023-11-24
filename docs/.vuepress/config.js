@@ -491,6 +491,7 @@ module.exports = {
                 'redis',
                 'openssh',
                 'dm',
+                'milvus',
                 'other',
                 'problem'
             ],

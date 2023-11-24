@@ -46,3 +46,42 @@ location /foo/ {
 }
 ```
 
+## nginx-dns缓存问题
+
+```conf
+### http例子
+# resolver 可以在http、server、location，set 可以写在server和location中。
+#注意：当resolver 后面跟多个DNS服务器时，一定要保证这些DNS服务器都是有效的，因为这种是负载均衡模式的，当DNS记录失效了(超过valid时间)，首先由第一个DNS服务器(114.114.114.114)去解析，下一次继续失效时由第二个DNS服务器(223.5.5.5)去解析，亲自测试的，如有任何一个DNS服务器是坏的，那么这一次的解析会一直持续到resolver_timeout ，然后解析失败，且日志报错解析不了域名，通过页面抛出502错误。
+server {
+       listen      8080;
+       server_name localhost;
+       # resolver 后面指定DNS服务器，可以指定多个，空格隔开
+       # valid设置DNS缓存失效时间，自己根据情况判断，建议600以上
+       resolver 114.114.114.114 223.5.5.5 valid=3600s;
+       # resolver_timeout 指定解析域名时，DNS服务器的超时时间，建议3秒左右
+       resolver_timeout 3s;
+       # 在代理到后端域名api111.test.cn时，千万不要直接写在proxy_pass中，因为server中使用了resolver，所以必须先把域名定义到一个变量里面，然后在 proxy_pass http://$变量名，否则nginx语法检测一直会报错，提示解析不了域名
+       set $your_domain "api111.test.cn";
+       location / {
+          proxy_pass http://$your_domain;
+       }
+   }
+
+
+### stream例子
+# resolver 可以在stream、server
+stream {
+    resolver 114.114.114.114 valid=10s;
+​
+    map $remote_addr $backend {
+        default  test.razeen.cn;
+    }
+​
+    server {
+        listen 8080;
+        # resolver 114.114.114.114 valid=10s;  # 也可以写在这里
+        proxy_pass $backend:80;
+    }
+}
+```
+

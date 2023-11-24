@@ -4,7 +4,7 @@
 * 将lib装到目标机器任意位置,通过添加目标机器lib的路径到`LD_LIBRARY_PATH`或到`ld.so.confg`来运行时加载.
 * 要么在目标机器中额外运行脚本进行`rpath`修改.要么`cmake`写好`install_rpath`通过安装到源码机器来修改`rpath`,然后拷贝给目标用户.
 
-## 编译
+## 其他库编译
 
 * 源码编译时，如果目标机器的gcc版本比较低，会出现找不到 `GLIB_xxx` 找不到的问题，一般建议在对应的低版本gcc环境直接编译。
 
@@ -92,4 +92,27 @@ LD_DEBUG=libs /opt/mypackage/python
 15452:       trying file=./cmake-build-debug/tls/haswell/x86_64/libb.so
           ............................................
 15452:       trying file=lib/libb.so
+```
+
+## gcc源码编译
+
+```bash
+# 下载gcc指定版本源码（选择需要的版本）
+https://mirrors.bfsu.edu.cn/gnu/gcc
+
+# 这里下载7.5版本
+cul -O https://mirrors.bfsu.edu.cn/gnu/gcc/gcc-7.5.0/gcc-7.5.0.tar.gz
+
+# 解压
+tar -zxvf gcc-7.5.0.tar.gz
+
+cd gcc-7.5.0
+# 下载依赖
+./contrib/download_prerequisites
+# 编译
+./configure --prefix=/opt/gcc-7.5.0 --enable-checking=release --enable-languages=c,c++ --disable-multilib
+make
+make install
+# check
+gcc --version
 ```
