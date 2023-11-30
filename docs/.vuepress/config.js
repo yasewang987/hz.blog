@@ -399,7 +399,8 @@ module.exports = {
                 'jumpserver',
                 'zentao',
                 'shells',
-                'frp'
+                'frp',
+                'webfirewall'
             ],
             '/sql/mssql/': [
                 'usesul',

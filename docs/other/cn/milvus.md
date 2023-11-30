@@ -32,22 +32,51 @@ git branch --set-upstream-to=origin/master master
 git fetch && git pull origin master
 
 ### 源码编译
-
+# Install third-party dependencies.
+cd milvus/
+./scripts/install_deps.sh
+# Compile Milvus.
+make
 ```
 
 ## 问题汇总
 
 ```bash
-# Invalid setting 7.5.0 is not a valid settings.compiler.version value
+### Invalid setting 7.5.0 is not a valid settings.compiler.version value
 vim ~/.conan/settings.yml # 找到7.5，在后面增加7.5.0
 
-# /usr/local/bin/g++: No such file or directory
+### /usr/local/bin/g++: No such file or directory
 whereis g++
 ln -s /usr/bin/g++ /usr/local/bin/g++
 
-# CMake Error: Could not find CMAKE_ROOT
+### CMake Error: Could not find CMAKE_ROOT
 cp -r share /usr/local/share/
 
-# CMake Error at CMakeLists.txt:1040 (target_link_libraries)
+### CMake Error at CMakeLists.txt:1040 (target_link_libraries) zstd::zstd
+# 将 rocksdb/6.29.5 改成 rocksdb/6.29.5@milvus/dev
+vim internal/core/conanfile.py
 
+### s2n报 tls_aes_256 相关错误
+vim /root/.conan/data/s2n/1.3.55/_/_/source/src/crypto/s2n_ktls_crypto.h
+# 将 tls12_crypto_info_aes_gcm_256 修改为 tls12_crypto_info_aes_gcm_128
+typedef struct tls12_crypto_info_aes_gcm_128 s2n_ktls_crypto_info_tls12_aes_gcm_256;
+vim /root/.conan/data/s2n/1.3.55/_/_/source/src/crypto/s2n_aead_cipher_aes_gcm.c
+# 将s2n_aead_cipher_aes256_gcm_set_ktls_info函数中的TLS_CIPHER_AES_GCM_256改为TLS_CIPHER_AES_GCM_128
+crypto_info->info.cipher_type = TLS_CIPHER_AES_GCM_128;
+
+### gettid was not declared in this scope，需要在对应文件增加如下两行
+#include <sys/syscall.h>
+#define gettid() syscall(__NR_gettid)
+
+
+### libmilvus_segcore.so undefined reference to `std::filesystem::__cxx11::path::has_filename() const
+vim internal/core/src/segcore/CMakeLists.txt
+# 按照下面的方式修改
+target_link_libraries(milvus_segcore
+  milvus_query
+  ${PLATFORM_LIBS}
+  ${TBB}
+  ${OpenMP_CXX_FLAGS}
+  stdc++fs # 增加这一行
+  )
 ```

@@ -8,3 +8,9 @@
 
 查看对应源码中的CMakeLists.txt，然后对应的位置输出库信息 `message("cmake_module_path: " ${CMAKE_MODULE_PATH})` 
 
+* `gettid was not declared in this scope`，需要在对应文件增加如下两行
+
+```c
+#include <sys/syscall.h>
+#define gettid() syscall(__NR_gettid)
+```
