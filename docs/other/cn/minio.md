@@ -11,7 +11,7 @@
 
 ```bash
 # 指定账号密码
-MINIO_ROOT_USER=admin MINIO_ROOT_PASSWORD=password ./minio server /mnt/data --console-address ":9001" --adress ":28004"
+MINIO_ROOT_USER=admin MINIO_ROOT_PASSWORD=password ./minio server /mnt/data --console-address ":9001" --address ":28004"
 
 # 后台
 nohup ./minio server /mnt/data --console-address :9001 --address :28004 > /mnt/data/minio.log 2>&1 &

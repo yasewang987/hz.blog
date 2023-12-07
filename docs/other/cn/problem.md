@@ -14,3 +14,14 @@
 #include <sys/syscall.h>
 #define gettid() syscall(__NR_gettid)
 ```
+* `undefined reference to std::filesystem::__cxx11::path::has_filename() const`,需要修改`CMakeLists.txt`文件
+
+```bash
+target_link_libraries(milvus_segcore
+  milvus_query
+  ${PLATFORM_LIBS}
+  ${TBB}
+  ${OpenMP_CXX_FLAGS}
+  stdc++fs # 增加这一行
+  )
+```

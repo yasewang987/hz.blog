@@ -37,6 +37,38 @@ cd milvus/
 ./scripts/install_deps.sh
 # Compile Milvus.
 make
+
+
+### 其他依赖组件安装
+# etcd - 直接到github上下载对应版本
+https://github.com/etcd-io/etcd/releases
+# 启动etcd
+- ETCD_AUTO_COMPACTION_MODE=revision
+- ETCD_AUTO_COMPACTION_RETENTION=1000
+- ETCD_QUOTA_BACKEND_BYTES=4294967296
+- ETCD_SNAPSHOT_COUNT=50000
+./etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+# etcd 健康检查
+./etcdctl endpoint health
+
+# minio - 到minio官网下载
+https://min.io/download#/linux
+# 启动minio
+MINIO_ACCESS_KEY: minioadmin
+MINIO_SECRET_KEY: minioadmin
+./minio server /minio_data --console-address ":9001" --address ":9000"
+
+# 启动milvus检查
+ETCD_ENDPOINTS: etcd:2379
+MINIO_ADDRESS: minio:9000
+./milvus run standalone
+# milvs健康检查
+curl -f http://localhost:9091/healthz
+
+# 编译完之后，如果要转移到其他服务器，需要拷贝如下文件
+bin/milvus
+configs
+internel/core/output/lib
 ```
 
 ## 问题汇总
