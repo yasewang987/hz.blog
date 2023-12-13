@@ -45,16 +45,16 @@ CGO_ENABLED=0 GOOS=linux GOARCH=mips64le go build
 ```text
 %global mname minio
 %global mpath base/%{mname}
-Name: funcun-%{mname}
+Name: soft-%{mname}
 Version: 2022.11
-Summary: funcun %{mname}
+Summary: soft %{mname}
 Release: 1
 License: GPLv3+
 Group: System Enviroment/Base
 AutoReqProv:no
 
 %description
-funcun %{mname}
+soft %{mname}
 
 %prep
 
@@ -62,8 +62,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/funcun/%{mpath}
-cp -rf %{_builddir}/funcun/%{mpath}/* %{buildroot}/opt/funcun/%{mpath}
+mkdir -p %{buildroot}/opt/soft/%{mpath}
+cp -rf %{_builddir}/soft/%{mpath}/* %{buildroot}/opt/soft/%{mpath}
 
 %post
 
@@ -71,7 +71,7 @@ cp -rf %{_builddir}/funcun/%{mpath}/* %{buildroot}/opt/funcun/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/funcun/%{mpath}
+/opt/soft/%{mpath}
 ```
 
 ## deb包制作

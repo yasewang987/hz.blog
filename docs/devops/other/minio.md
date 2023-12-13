@@ -12,10 +12,14 @@
 sudo docker run -d --restart=always -p 9000:9000 \
 -v $PWD/data:/data \
 -v $PWD/config::/root/.minio \
--e MINIO_ACCESS_KEY=minio \
--e MINIO_SECRET_KEY=minio@123 \
+-e MINIO_ROOT_USER=minio \
+-e MINIO_ROOT_PASSWORD=minio@123 \
 --name minio \
 minio/minio server /data
+
+# 读取配置文件
+-v /etc/default/minio:/etc/config.env
+-e "MINIO_CONFIG_ENV_FILE=/etc/config.env"
 ```
 
 ## 直接安装运行
@@ -45,6 +49,24 @@ nohup /opt/minio/minio server /opt/minio > /opt/minio/minio.log 2>&1 &
 http://IP:9000
 
 默认账号 `minioadmin:minioadmin`
+
+## minio配置项
+
+完整配置参考：https://min.io/docs/minio/linux/reference/minio-server/settings/core.html
+
+```bash
+# 数据磁盘位置（只支持环境变量，不能在配置文件中）
+MINIO_VOLUMES="/mnt/data"
+# 配置文件位置（只支持环境变量，不能在配置文件中）
+MINIO_CONFIG_ENV_FILE=/etc/config.env
+# root用户名（minioadmin）
+MINIO_ROOT_USER=myminioadmin
+# root用户密码（minioadmin）
+MINIO_ROOT_PASSWORD=minio-secret-key-change-me
+
+# cors设置
+MINIO_API_CORS_ALLOW_ORIGIN="http://aaaa.com,http://bbbb.com"
+```
 
 ## nginx 反向代理配置
 

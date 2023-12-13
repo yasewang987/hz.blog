@@ -354,7 +354,7 @@ done
 ```conf
 %define __os_install_post %{nil}
 %define debug_package %{nil}
-%global mname funcun-libs
+%global mname baselibs
 Name: %{mname}
 Version: 2023.6
 Summary: %{mname}
@@ -364,7 +364,7 @@ Group: System Enviroment/Base
 AutoReqProv: no
 
 %description
-funcun %{mname}
+%{mname}
 
 %prep
 
@@ -373,7 +373,7 @@ funcun %{mname}
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/lib
-cp -rf %{_builddir}/funcun/libs/* %{buildroot}/usr/lib
+cp -rf %{_builddir}/baselibs/libs/* %{buildroot}/usr/lib
 
 %post
 
@@ -387,11 +387,11 @@ cp -rf %{_builddir}/funcun/libs/* %{buildroot}/usr/lib
 ### 通用打包（数据/代码）
 
 ```text
-%global mcompany funcun
+%global mcompany service
 %global mname data
 %global mpath %{mcompany}/%{mname}
 Name: %{mcompany}-%{mname}
-Version: 2022.07
+Version: 2023.11
 Release:        1
 Summary:        %{mcompany} %{mname}
 

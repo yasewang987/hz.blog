@@ -31,9 +31,9 @@ bin/python3
 ```text
 %define __os_install_post %{nil}
 %define debug_package %{nil}
-%global mname funcun-py
+%global mname soft-py
 Name: %{mname}
-Version: 2022.11
+Version: 2023.11
 Summary: %{mname}
 Release: 1
 License: GPLv3+
@@ -41,7 +41,7 @@ Group: System Enviroment/Base
 AutoReqProv: no
 
 %description
-funcun %{mname}
+soft %{mname}
 
 %prep
 
@@ -49,8 +49,8 @@ funcun %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/funcun/base/python
-cp -rf %{_builddir}/funcun/base/python/* %{buildroot}/opt/funcun/base/python
+mkdir -p %{buildroot}/opt/soft/base/python
+cp -rf %{_builddir}/soft/base/python/* %{buildroot}/opt/soft/base/python
 
 %post
 
@@ -58,36 +58,36 @@ cp -rf %{_builddir}/funcun/base/python/* %{buildroot}/opt/funcun/base/python
 
 %files
 %defattr(-,root,root,0775)
-/opt/funcun/base/python
+/opt/soft/base/python
 ```
 
 * `python业务代码打包`
 
 ```text
 %define _binaries_in_noarch_packages_terminate_build 0
-Name: funcun-code
+Name: service-code
 Version: 2022.07
 Release:        1
-Summary:        funcun code
+Summary:        service code
 
-Group:          funcun
+Group:          service
 License:        GPLv3+
 BuildArch: noarch
 
 %description
-funcun code
+service code
 
 %prep
 
 %build
 
 %install
-rm -rf %{buildroot}/opt/funcun/code
-mkdir -p %{buildroot}/opt/funcun/code
-cp -rf %{_builddir}/funcun/code/* %{buildroot}/opt/funcun/code
+rm -rf %{buildroot}/opt/service/code
+mkdir -p %{buildroot}/opt/service/code
+cp -rf %{_builddir}/service/code/* %{buildroot}/opt/service/code
 
 %files
-/opt/funcun/code
+/opt/service/code
 
 %changelog
 ```
