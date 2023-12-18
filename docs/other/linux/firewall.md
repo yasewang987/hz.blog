@@ -106,6 +106,13 @@ firewall-cmd --permanent --add-port=8080-8085/tcp
 firewall-cmd --permanent --remove-port=8080-8085/tcp
 firewall-cmd --permanent --remove-port=8080/tcp
 
+#开放IP为192.168.0.0的地址允许访问9001端口
+firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.0.0" port protocol="tcp" port="9001" accept"
+#限制IP为192.168.0.0的地址禁止访问9001端口即禁止访问机器
+firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.0.0" port protocol="tcp" port="9001" reject"
+#删除已设置规则
+firewall-cmd --permanent --remove-rich-rule="rule family="ipv4" source address=" 192.168.0.0" port protocol="tcp" port="9001" accept"
+
 # 重启防火墙（修改配置后需要重启才能生效）
 firewall-cmd --reload
 
