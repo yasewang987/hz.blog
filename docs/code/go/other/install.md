@@ -12,11 +12,11 @@
     
     # mac版本的最好到这边下载对应的版本安装会快很多
     # 由于某些原因无法下载使用下面地址
-    wget https://studygolang.com/dl/golang/go1.15.6.linux-amd64.tar.gz
+    wget https://studygolang.com/dl/golang/go1.18.10.linux-amd64.tar.gz
     ```
 1. 解压压缩包：
     ```bash
-    tar -C /usr/local -zxvf go1.13.linux-amd64.tar.gz
+    tar -C /usr/local -zxvf go1.18.10.linux-amd64.tar.gz
     ```
 1. 添加环境变量（选择一种即可）
     ```bash

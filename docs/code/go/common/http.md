@@ -41,7 +41,9 @@ func main(){
 
 // GET请求添加请求头
 func main() {
-    client := &http.Client{}
+    client := &http.Client{
+        Timeout: 5 * time.Second, //超时时间
+    }
     req,_ := http.NewRequest("GET","http://httpbin.org/get",nil)
     req.Header.Add("name","zhaofan")
     req.Header.Add("age","3")
@@ -117,5 +119,43 @@ func ValidateToken(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+```
+
+## Context设置超时时间
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "net/http"
+    "time"
+)
+
+func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    req, err := http.NewRequestWithContext(ctx, "GET", "https://jsonplaceholder.typicode.com/posts/1", nil)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return
+    }
+
+    client := http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode == http.StatusOK {
+        fmt.Println("Request successful")
+    } else {
+        fmt.Println("Request failed with status:", resp.Status)
+    }
 }
 ```

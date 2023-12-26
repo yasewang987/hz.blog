@@ -52,7 +52,14 @@ module.exports = {
                             { text: 'Other', link: '/code/web/other/' }
                         ]
                     },
-                    { text: 'Python', link: '/code/python/' }
+                    { text: 'Python', link: '/code/python/',
+                      items: [
+                        { text: '基础资料', link: '/code/python/base/'},
+                        { text: 'AI部署资料', link: '/code/python/deploy/' },
+                        { text: 'Paddle系列', link: '/code/python/paddle/' },
+                        { text: '学习资料', link: '/code/python/docs/' }
+                      ]
+                    }
                 ]
             },
             {
@@ -81,14 +88,6 @@ module.exports = {
                     { text: 'Ansible', link: '/devops/ansible/' },
                     { text: 'Redis', link: '/devops/redis/' },
                     { text: '其他', link: '/devops/other/' }
-                ]
-            },
-            {
-                text: 'AI',
-                items: [
-                    { text: 'AI部署资料', link: '/ai/deploy/' },
-                    { text: 'Paddle系列', link: '/ai/paddle/' },
-                    { text: '学习资料', link: '/ai/docs/' }
                 ]
             },
             {
@@ -246,9 +245,10 @@ module.exports = {
                 'config',
                 'chromeextensions',
                 'element',
-                'wps'
+                'wps',
+                'demos'
             ],
-            '/code/python/': [
+            '/code/python/base/': [
                 'base',
                 'source',
                 'devops',
@@ -256,6 +256,23 @@ module.exports = {
                 'install',
                 'ai1',
                 'ai2'
+            ],
+            '/code/python/deploy/': [
+                'nvidia',
+                'torchserve',
+                'tfx',
+                'tf'
+            ],
+            '/code/python/paddle/': [
+                'paddle',
+                'paddleocr',
+                'paddlespeech',
+                'paddleserving'
+            ],
+            '/code/python/docs/': [
+                'tensor',
+                'nlp',
+                'temp'
             ],
             '/microservices/register_config/': [
                 'consul',
@@ -397,7 +414,9 @@ module.exports = {
                 'nextterminal',
                 'jumpserver',
                 'zentao',
-                'shells'
+                'shells',
+                'frp',
+                'webfirewall'
             ],
             '/sql/mssql/': [
                 'usesul',
@@ -489,25 +508,10 @@ module.exports = {
                 'redis',
                 'openssh',
                 'dm',
+                'milvus',
                 'other',
                 'problem'
             ],
-            '/ai/deploy/': [
-                'nvidia',
-                'torchserve',
-                'tfx',
-                'tf'
-            ],
-            '/ai/paddle/': [
-                'paddle',
-                'paddleocr',
-                'paddlespeech',
-                'paddleserving'
-            ],
-            '/ai/docs/': [
-                'tensor',
-                'nlp'
-            ]
         },
         sidebarDepth: 2
     }

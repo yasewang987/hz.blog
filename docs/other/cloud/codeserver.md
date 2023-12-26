@@ -13,6 +13,19 @@ docker run -itd --name code-server -p 18083:8080 \
 -e "DOCKER_USER=$USER" \
 -e PASSWORD='123456'
 codercom/code-server:latest
+
+
+# 切换 root 用户
+sudo su
+# 更新源
+sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list && apt update
+# 安装 python
+apt install -y python
+# 安装 nodejs，自行调整版本
+curl -sL https://deb.nodesource.com/setup_14.x | sudo bash
+apt install -y nodejs
+# 安装 jdk
+apt install -y openjdk-8-jdk
 ```
 
 ## 基于镜像打包对应环境的镜像包
