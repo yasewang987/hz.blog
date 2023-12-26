@@ -112,3 +112,15 @@ target_link_libraries(milvus_segcore
   stdc++fs # 增加这一行
   )
 ```
+
+## arm-temp
+
+```
+ERROR: crc32c/1.1.1: Error in build() method, line 65
+cmake.build()
+ConanException: Error 2 while executing cmake --build "/root/.conan/data/crc32c/1.1.1///build/49d158b35c19cd946979f79e616d8bde8849deeb/build/Release" '--' '-j64'
+conan install failed
+make: *** [Makefile:145: build-3rdparty] Error 1
+```
+
+这个问题我知道该如何解决，在`/milvus/internal/core/conanfile.py`中 添加 `crc32c/1.1.2` 会采用`1.1.2`，`1.1.2`没有这个bug

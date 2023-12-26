@@ -1,39 +1,52 @@
 # Mac软件安装
 
+## Oh-My-Zsh 安装
+
+* 需要先安装`git`,直接在终端输入git会自动提示安装。
+* 安装完之后会自动生成 `~/.zshrc` 文件
+
+```bash
+# 如果安装失败，应该是网络原因，可以多尝试几次
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+```
+
 ## Homebrew安装
 
-由于国内网络的原因，需要先把安装的脚本先下载到本地，再修改安装源。
-
 安装参考：https://mirrors.tuna.tsinghua.edu.cn/help/homebrew/
-
-1. 安装 `xcode-select`: `xcode-select --install`
 
 1. 设置环境变量：
 
     ```bash
-    if [[ "$(uname -s)" == "Linux" ]]; then BREW_TYPE="linuxbrew"; else BREW_TYPE="homebrew"; fi
+    export HOMEBREW_INSTALL_FROM_API=1
+    export HOMEBREW_API_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/api"
+    export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
     export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
-    export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/${BREW_TYPE}-core.git"
-    export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/${BREW_TYPE}-bottles"
     ```
 
 1. 下载脚本并安装：
 
     ```bash
+    # 从本镜像下载安装脚本并安装 Homebrew / Linuxbrew
     git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/install.git brew-install
     /bin/bash brew-install/install.sh
     rm -rf brew-install
     ```
     * 安装成功后需将 brew 程序的相关路径加入到环境变量中
 
-1. 根据提示创建`.zprofile`文件
+1. 根据提示创建`.zshrc`文件
+
     ```bash
-    touch ~/.zprofile
-    test -r ~/.zprofile && echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-    # 后面的源也要修改，提示中有
+    # 如果没有则创建
+    touch ~/.zshrc
+    test -r ~/.zshrc && echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
     
     # 生效文件
-    source ~/.zprofile
+    source ~/.zshrc
+
+    # 替换镜像源
+    export HOMEBREW_API_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/api"
+    export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+    brew update
     ```
     
 1. 安装 cask
@@ -72,35 +85,32 @@
     ```bash
     brew update-reset
     ```
-## Oh-My-Zsh 安装
-
-    ```bash
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-    ```
 ## nvm 安装
 
-    ```bash
-    brew install nvm
+```bash
+brew install nvm
 
-    # 完成之后执行如下操作
-    mkdir ～/.nvm
+# 完成之后执行如下操作
+mkdir ～/.nvm
 
-    # 在～/.zshrc中添加如下内容
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-    [ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
-    ```
+# 在～/.zshrc中添加如下内容
+export NVM_DIR="$HOME/.nvm"
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
+```
+
 ## node 安装
 
-    ```bash
-    nvm install --lts
-    ```
+```bash
+nvm install --lts
+```
 
 ## Docker 安装
 
-    ```bash
-    brew cask install docker
-    ```
+```bash
+brew install docker
+brew services start docker
+```
 
 ## redisClient
 
