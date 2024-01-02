@@ -107,9 +107,10 @@ nvm install --lts
 
 ## Docker 安装
 
+使用orbstack使用docker，下载地址： https://orbstack.dev/download ，或者使用`brew`安装
+
 ```bash
-brew install docker
-brew services start docker
+brew install orbstack
 ```
 
 ## redisClient
