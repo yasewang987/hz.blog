@@ -71,6 +71,44 @@ func main() {
 }
 ```
 
+### Context设置超时时间
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "net/http"
+    "time"
+)
+
+func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    req, err := http.NewRequestWithContext(ctx, "GET", "https://jsonplaceholder.typicode.com/posts/1", nil)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return
+    }
+
+    client := http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        fmt.Println("Error:", err)
+        return
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode == http.StatusOK {
+        fmt.Println("Request successful")
+    } else {
+        fmt.Println("Request failed with status:", resp.Status)
+    }
+}
+```
+
 ## Http服务端
 
 ```go
@@ -122,40 +160,97 @@ func ValidateToken(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-## Context设置超时时间
+### server优雅关闭
+
+`kill`向进程发送了`SIGTERM`信号，只需要捕获这个信号并进行处理即可。
 
 ```go
-package main
+// 服务注册
+func registerService(ctx context.Context) {
+ tc := time.NewTicker(5 * time.Second)
+ for {
+  select {
+  case <-tc.C:
+   // 上报状态
+   log.Println("status update success")
+  case <-ctx.Done():
+   tc.Stop()
+   log.Println("stop update success")
+   return
+  }
+ }
+}
 
-import (
-    "context"
-    "fmt"
-    "net/http"
-    "time"
-)
+// 服务销毁
+func destroyService() {
+ log.Println("destroy success")
+}
 
-func main() {
-    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-    defer cancel()
+// 优雅关闭
+func gracefulShutdown() {
+ mainCtx, mainCancel := context.WithCancel(context.Background())
+ // 用ctx初始化资源，mysql，redis等
+ // ...
 
-    req, err := http.NewRequestWithContext(ctx, "GET", "https://jsonplaceholder.typicode.com/posts/1", nil)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return
-    }
+ // 释放资源
+ defer func() {
+  mainCancel()
+  // 主动注销服务
+  destroyService()
 
-    client := http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return
-    }
-    defer resp.Body.Close()
+  // 清理资源，mysql，redis等
+  // ...
+ }()
 
-    if resp.StatusCode == http.StatusOK {
-        fmt.Println("Request successful")
-    } else {
-        fmt.Println("Request failed with status:", resp.Status)
-    }
+ mx := http.NewServeMux()
+ mx.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
+  time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+  w.Write([]byte("Receive path foo\n"))
+ })
+
+ srv := http.Server{
+  Addr:    ":8009",
+  Handler: mx,
+ }
+
+ // ListenAndServe也会阻塞，需要把它放到一个goroutine中
+ go func() {
+  // 当Shutdown被调用时ListenAndServe会立刻返回http.ErrServerClosed的错误，抛出了panic
+  // 因而也导致main goroutine被退出，并没有达到运行Shutdown()预期，需要忽略http.ErrServerClosed错误
+  if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+   panic(err)
+  }
+ }()
+
+ // 需要在服务启动后才在注册中心注册
+ go registerService(mainCtx)
+ 
+ // 定义channel阻塞进程
+ signalCh := make(chan os.Signal, 1)
+ // 设置我们要监听的信号，一旦有程序设定的信号发生时，信号会被写入channel中
+ signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
+
+ // 等待信号
+ sig := <-signalCh
+ log.Printf("Received signal: %v\n", sig)
+
+ // 设定一个关闭的上限时间
+ ctxTimeout, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+ defer cancelTimeout()
+
+ if err := srv.Shutdown(ctxTimeout); err != nil {
+  select {
+  case <-ctxTimeout.Done():
+   // 由于达到超时时间服务器关闭，未完成优雅关闭
+   log.Println("timeout of 5 seconds.")
+  default:
+   // 其他原因导致的服务关闭异常，未完成优雅关闭
+   log.Fatalf("Server shutdown failed: %v\n", err)
+  }
+  return
+ }
+
+ // 正确执行优雅关闭服务器
+ log.Println("Server shutdown gracefully")
 }
 ```
