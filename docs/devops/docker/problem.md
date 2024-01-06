@@ -412,3 +412,50 @@ mount /dev/mapper/centos-home
 # 查看挂载情况
 df -h
 ```
+
+## 磁盘满（overlay2 的配置或迁移）
+
+```bash
+# 查看overlay2挂在路径，默认：/var/lib/docker
+docker info
+# 输出
+ ...
+ ...
+ ...
+ ID: 39cd9cc5-6457-44c4-968c-ef9996a294ba
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Live Restore Enabled: false
+
+# 停止服务
+systemctl stop docker
+# 创建自定义目录（选择磁盘大的）
+mkdir -p /data/docker-data
+# 拷贝默认的配置至自定义目录中，拷贝过程中使用'-p'，同时拷贝相关权限
+cd /data/docker-data
+cp -p -R /var/lib/docker/* ./
+# 编辑 daemon.json配置文件，该文件存在于 /etc/docker目录下，如果不存在，请自己建立这个文件名，并添加如下命令：
+{
+    "data-root": "/data/docker-data"
+}
+# 重启docker-daemon
+systemctl daemon-reload
+# 重启docker
+systemctl start docker
+systemctl enable docker
+# 确认配置是否生效
+docker info
+# 输出
+...
+...
+...
+Docker Root Dir: /data/docker-data
+ Debug Mode: false
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Live Restore Enabled: false
+```
