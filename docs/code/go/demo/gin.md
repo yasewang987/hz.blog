@@ -407,41 +407,217 @@ func main() {
 
 ## 中间件
 
+多个全局中间件，它们将按照注册的顺序依次执行（类似管道）。
+
 ```go
 func main() {
-    // 创建一个默认的没有任何中间件的路由
+    // gin.Default()默认使用了 Logger 和 Recovery 中间件
+    // New会创建一个默认的没有任何中间件的路由
     r := gin.New()
-​
-    // 全局中间件
-    // Logger 中间件将写日志到 gin.DefaultWriter 即使你设置 GIN_MODE=release.
-    // 默认设置 gin.DefaultWriter = os.Stdout
-    r.Use(gin.Logger())
-​
-    // Recovery 中间件从任何 panic 恢复，如果出现 panic，它会写一个 500 错误。
-    r.Use(gin.Recovery())
+
+    // 自定义全局中间件
+    r.Use(LoggerMiddleware)
 ​
     // 对于每个路由中间件，您可以根据需要添加任意数量
     r.GET("/benchmark", MyBenchLogger(), benchEndpoint)
 ​
-    // 授权组
-    // authorized := r.Group("/", AuthRequired())
-    // 也可以这样
-    authorized := r.Group("/")
-    // 每个组的中间件！ 在这个实例中，我们只需要在 "authorized" 组中
-    // 使用自定义创建的 AuthRequired() 中间件
-    authorized.Use(AuthRequired())
-    {
-        authorized.POST("/login", loginEndpoint)
-        authorized.POST("/submit", submitEndpoint)
-        authorized.POST("/read", readEndpoint)
-​
-        // 嵌套组
-        testing := authorized.Group("testing")
-        testing.GET("/analytics", analyticsEndpoint)
-    }
+    // 创建一个路由分组，并将中间件应用于该分组中的所有路由
+    apiGroup := r.Group("/api", LoggerMiddleware, AuthMiddleware)
+    
+    apiGroup.GET("/users", func(c *gin.Context) {
+        c.String(http.StatusOK, "List of Users")
+    })
+    
+    apiGroup.GET("/products", func(c *gin.Context) {
+        c.String(http.StatusOK, "List of Products")
+    })
 ​
     // 监听并服务于 0.0.0.0:8080
     r.Run(":8080")
+}
+
+func LoggerMiddleware(c *gin.Context) {
+	// 在请求处理之前执行的逻辑
+	fmt.Println("Start Logging")
+
+	// 将请求传递给下一个处理程序
+	c.Next()
+
+	// 在请求处理之后执行的逻辑
+	fmt.Println("End Logging")
+}
+
+func AuthMiddleware(c *gin.Context) {
+	// 检查是否有有效的 Authorization 头
+	if authorizationHeader := c.GetHeader("Authorization"); authorizationHeader == "" {
+		// 如果 Authorization 头缺失，返回未授权状态
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// 检查使用你的自定义逻辑提供的身份验证是否有效
+	if !isValidAuth(c.GetHeader("Authorization")) {
+		// 如果身份验证失败，返回未授权状态
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// 如果身份验证成功，继续执行下一个中间件或路由处理程序
+	c.Next()
+}
+
+//// 中间件设置共享数据
+func CustomMiddleware(c *gin.Context) {
+	// 在中间件中设置数据
+	c.Set("userID", 123)
+
+	// 继续执行下一个中间件或路由处理程序
+	c.Next()
+}
+//// 函数提取共享数据
+func ProtectedRouteHandler(c *gin.Context) {
+	// 从上一个中间件中获取数据
+	userID, exists := c.Get("userID")
+	if !exists {
+		// 如果数据不存在，返回错误响应
+		c.String(http.StatusInternalServerError, "无法获取用户信息")
+		return
+	}
+
+	// 数据存在，继续处理
+	c.String(http.StatusOK, fmt.Sprintf("用户ID：%v，你有权访问受保护的路由！", userID))
+}
+```
+
+gin中间件中使用 goroutine，不能使用原始的上下文(`c *gin.Context`)， 必须使用其只读副本(`c.Copy()`)
+
+```go
+r.GET("/", func(c *gin.Context) {
+		cCp := c.Copy()
+		go func() {
+			// simulate a long task with time.Sleep(). 5 seconds time.Sleep(5 * time.Second)
+			// 这里使用你创建的副本
+			fmt.Println("Done! in path " + cCp.Request.URL.Path)
+		}()
+		c.String(200, "首页")
+
+	})
+```
+
+## 跨域设置
+
+```go
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+func main() {
+	r := gin.Default()
+
+	// 使用中间件处理跨域问题
+	r.Use(CORSMiddleware())
+
+	// 其他路由注册
+	r.GET("/hello", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Hello, CORS is enabled!"})
+	})
+
+	// 启动 Gin 服务器
+	r.Run(":8080")
+}
+
+// CORSMiddleware 中间件处理跨域问题
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
+```
+
+也可以使用`gin-contrib/cors`
+
+```go
+package main
+
+import (
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"strings"
+	"time"
+)
+
+func main() {
+	// 创建一个默认的 Gin 实例
+	server := gin.Default()
+
+	// 使用 CORS 中间件处理跨域问题，配置 CORS 参数
+	server.Use(cors.New(cors.Config{
+		// 允许的源地址（CORS中的Access-Control-Allow-Origin）
+		// AllowOrigins: []string{"https://foo.com"},
+		// 允许的 HTTP 方法（CORS中的Access-Control-Allow-Methods）
+		AllowMethods: []string{"PUT", "PATCH"},
+		// 允许的 HTTP 头部（CORS中的Access-Control-Allow-Headers）
+		AllowHeaders: []string{"Origin"},
+		// 暴露的 HTTP 头部（CORS中的Access-Control-Expose-Headers）
+		ExposeHeaders: []string{"Content-Length"},
+		// 是否允许携带身份凭证（CORS中的Access-Control-Allow-Credentials）
+		AllowCredentials: true,
+		// 允许源的自定义判断函数，返回true表示允许，false表示不允许
+		AllowOriginFunc: func(origin string) bool {
+			if strings.HasPrefix(origin, "http://localhost") {
+				// 允许你的开发环境
+				return true
+			}
+			// 允许包含 "yourcompany.com" 的源
+			return strings.Contains(origin, "yourcompany.com")
+		},
+		// 用于缓存预检请求结果的最大时间（CORS中的Access-Control-Max-Age）
+		MaxAge: 12 * time.Hour,
+	}))
+
+	// 启动 Gin 服务器，监听在 0.0.0.0:8080 上
+	server.Run(":8080")
+}
+
+//// Default（）允许所有来源
+// 使用所有来源会禁用 Gin 为客户端设置 cookie 的能力。处理凭据时，不要允许所有来源。
+func main() {
+  router := gin.Default()
+  // same as
+  // config := cors.DefaultConfig()
+  // config.AllowAllOrigins = true
+  // router.Use(cors.New(config))
+  router.Use(cors.Default())
+  router.Run()
+}
+
+//// 使用DefaultConfig作为起点
+func main() {
+  router := gin.Default()
+  // - No origin allowed by default
+  // - GET,POST, PUT, HEAD methods
+  // - Credentials share disabled
+  // - Preflight requests cached for 12 hours
+  config := cors.DefaultConfig()
+  config.AllowOrigins = []string{"http://google.com"}
+  // config.AllowOrigins = []string{"http://google.com", "http://facebook.com"}
+  // config.AllowAllOrigins = true
+
+  router.Use(cors.New(config))
+  router.Run()
 }
 ```
 

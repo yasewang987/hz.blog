@@ -5,6 +5,8 @@
 * 官方文档：https://cangdu.org/micro-app/docs.html#/
 * demo地址：https://github.com/hz-microservices/demo.microapp
 
+wujie的微服务框架和这个类似，参考资料：https://wujie-micro.github.io/doc/guide/
+
 ## 简单示例创建
 
 
