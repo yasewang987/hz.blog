@@ -8,6 +8,22 @@
 ```bash
 # 如果安装失败，应该是网络原因，可以多尝试几次
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+# 国内安装
+sh -c "$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)"
+```
+
+* 安装重要插件
+
+```bash
+# 进入插件目录
+cd ~/.oh-my-zsh/custom/plugins/
+
+# 命令补全 zsh-autosuggestion
+git clone https://github.com/zsh-users/zsh-autosuggestions
+
+# 语法高亮：zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
 ```
 
 ## Homebrew安装
