@@ -1,5 +1,7 @@
 # 大模型基本概念
 
+fastchat、TensorRT-LLM、vLLM
+
 * `batch size`：每批训练数据的数量。
 * `epoch`：一个完整的迭代过程，即一次完整的训练。
 * `batch`：一组训练数据

@@ -237,3 +237,51 @@ func main() {
 }
 ```
 
+## 实现 `io.Closer` 接口的自定义服务平滑关闭
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+    "os/signal"
+    "sync"
+    "time"
+)
+
+type MyService struct {
+    mu sync.Mutex
+    // 其他服务相关的字段
+}
+
+func (s *MyService) Close() error {
+    s.mu.Lock()
+    defer s.mu.Unlock()
+
+    // 执行关闭服务的操作
+    fmt.Println("Closing MyService...")
+    return nil
+}
+
+func main() {
+    service := &MyService{}
+
+    // 等待中断信号来优雅地关闭服务
+    stop := make(chan os.Signal, 1)
+    signal.Notify(stop, os.Interrupt)
+
+    <-stop // 等待中断信号
+    fmt.Println("Shutting down...")
+
+    // 调用Close方法进行平滑关闭
+    if closer, ok := service.(interface{ Close() error }); ok {
+        if err := closer.Close(); err != nil {
+            fmt.Println("Error closing service:", err)
+        }
+    }
+    fmt.Println("Shutdown complete")
+}
+
+```
+

@@ -171,7 +171,8 @@ module.exports = {
                 'generic',
                 'error',
                 'tags',
-                'sync'
+                'sync',
+                'goroutine'
             ],
             '/code/go/other/': [
                 'install',
