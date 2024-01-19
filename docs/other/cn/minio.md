@@ -44,17 +44,17 @@ CGO_ENABLED=0 GOOS=linux GOARCH=mips64le go build
 
 ```text
 %global mname minio
-%global mpath base/%{mname}
-Name: soft-%{mname}
-Version: 2022.11
-Summary: soft %{mname}
-Release: 1
+%global mpath basesoft/%{mname}
+Name: basesoft-%{mname}
+Version: 2023.12
+Summary: basesoft %{mname}
+Release: 15
 License: GPLv3+
 Group: System Enviroment/Base
 AutoReqProv:no
 
 %description
-soft %{mname}
+base %{mname}
 
 %prep
 
@@ -62,8 +62,8 @@ soft %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/soft/%{mpath}
-cp -rf %{_builddir}/soft/%{mpath}/* %{buildroot}/opt/soft/%{mpath}
+mkdir -p %{buildroot}/opt/%{mpath}
+cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
 
 %post
 
@@ -71,7 +71,7 @@ cp -rf %{_builddir}/soft/%{mpath}/* %{buildroot}/opt/soft/%{mpath}
 
 %files
 %defattr(-,root,root,0775)
-/opt/soft/%{mpath}
+/opt/%{mpath}
 ```
 
 ## deb包制作
