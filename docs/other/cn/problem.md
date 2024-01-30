@@ -25,3 +25,19 @@ target_link_libraries(milvus_segcore
   stdc++fs # 增加这一行
   )
 ```
+
+* SM机器在运行程序时报错 `cannot allocate memory`，确认包没问题的前提下
+
+```bash
+# 修改 /etc/sysctl.conf
+vm.overcommit_memory=1
+kernel.pid_max # 这个值可以设置大一些
+
+# 保存之后生效
+sysctl -p
+
+# 查看设置后的值
+cat /proc/sys/kernel/pid_max
+```
+
+* 如果SM包在其他服务器正常，通过堡垒机或者其他ssh管理系统连接到服务器时，执行报错 `permission denied`，一般是管理系统限制的问题。可以直接到物理机器上执行看看是否可以正常运行。

@@ -173,3 +173,29 @@ rm -f /var/lib/rpm/__db.00*
 # 重新创建rpm数据文件
 rpm --rebuilddb
 ```
+
+## 服务器磁盘只读无法写入
+
+```bash
+# 确认是否是只读问题
+mount | grep '/ .*ro'
+# 输出如下，说明只读
+/dev/sda1 on / type ext4 (ro,relatime,...)
+
+# 修改可读写，如果不成功，参考下面（大概率不成功）
+sudo mount -o remount,rw /
+# 不成功会输出如下信息
+mount point not mounted or bad option
+
+# 可以使用 dmesg 命令来查看内核消息缓冲区的内容。如果在启动过程中文件系统有自动进行过检查和修复，相关的消息通常会出现在这里。
+dmesg | grep fsck
+# 报错如下（说明出现了26次错误）：
+error count since last fsck: 26
+# 查看分区（确认待修复的分区）
+fdisk -l
+# 手动修复，将 /dev/sda1 替换为你的实际修复分区设备名
+sudo fsck /dev/sda1
+
+# 修复完重启系统
+reboot
+```

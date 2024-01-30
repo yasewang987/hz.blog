@@ -13,4 +13,5 @@
 * [达梦数据库](./dm.md)
 * [其他资料](./other.md)
 * [milvus](./milvus.md)
+* [昇腾适配](./shengteng.md)
 * [源码编译问题汇总](./problem.md)
