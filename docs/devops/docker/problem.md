@@ -184,6 +184,18 @@ getenforce
 setenforce 0
 ```
 
+## `failed to create shim task: OCI runtime create failed: container_linux.go:318: starting container process caused permission denied: unknown`
+
+如果修改selinux没有效果，很有可能是内核能力（`capabilities`）限制，按照如下方式运行容器
+
+```bash
+# --cap-add=ALL
+docker run --cap-add=SYS_ADMIN -it <image-name> <command>
+
+# 运行一个临时容器并检查其当前能力
+docker run -it --rm ubuntu capsh --print
+```
+
 ## Docker运行shell脚本之后直接就退出
 
 这个是因为docker运行的时候pid是1的进程是调用shell脚本的，在脚本执行完毕之后终端会自动退出。
