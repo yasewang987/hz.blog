@@ -1,5 +1,15 @@
 # Go常用命令
 
+```bash
+# （开发、调试）编译并运行 Go 程序，不会在文件系统中留下编译后的可执行文件
+go run main.go
+# （发布）只编译 Go 程序，会在当前目录下生成一个可执行文件，但不会执行它
+go build .
+# （安装go工具和库）编译 Go 程序，并将编译后的二进制文件放在 $GOPATH/bin 目录下，还会安装任何由源代码导入的依赖包。
+# 也可以安装你自己的 Go 程序
+go install golang.org/x/lint/golint
+```
+
 ## 编译build
 
 ```bash

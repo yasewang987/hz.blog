@@ -15,3 +15,5 @@
 * [milvus](./milvus.md)
 * [昇腾适配](./shengteng.md)
 * [源码编译问题汇总](./problem.md)
+
+* [国密算法介绍](./guomi.md)

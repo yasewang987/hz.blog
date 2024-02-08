@@ -512,7 +512,8 @@ module.exports = {
                 'milvus',
                 'shengteng',
                 'other',
-                'problem'
+                'problem',
+                'guomi'
             ],
         },
         sidebarDepth: 2
