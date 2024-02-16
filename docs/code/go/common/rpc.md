@@ -1137,3 +1137,57 @@ func orderStreamClientInterceptor(ctx context.Context, desc *grpc.StreamDesc,
 
 * `cs ClientStream`：客户端视角的流。类比服务端的`ss ServerStream`，无论是哪一种流式RPC对于客户端来说发送（SendMsg）就代表着请求数据，接收（RecvMsg）就代表着响应数据（正好和服务端是反过来的）
 * `streamer Streamer`：完成RPC请求的调用
+
+
+### grpc优雅推出
+gRPC服务器的平滑关闭可以通过 `GracefulStop` 方法实现。
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "net"
+    "os"
+    "os/signal"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/reflection"
+)
+
+type Greeter struct{}
+
+func (s *Greeter) SayHello(ctx context.Context, in *HelloRequest) (*HelloReply, error) {
+    return &HelloReply{Message: "Hello " + in.Name}, nil
+}
+
+func main() {
+    listener, err := net.Listen("tcp", ":50051")
+    if err != nil {
+        // 处理监听失败的错误
+    }
+
+    server := grpc.NewServer()
+    RegisterGreeterServer(server, &Greeter{})
+
+    // 在gRPC服务上启用反射服务
+    reflection.Register(server)
+
+    go func() {
+        if err := server.Serve(listener); err != nil {
+            // 处理gRPC服务启动错误
+        }
+    }()
+
+    // 等待中断信号来优雅地关闭gRPC服务器
+    stop := make(chan os.Signal, 1)
+    signal.Notify(stop, os.Interrupt)
+
+    <-stop // 等待中断信号
+    fmt.Println("Shutting down gRPC server...")
+
+    server.GracefulStop()
+    fmt.Println("gRPC server gracefully stopped")
+}
+```

@@ -184,6 +184,18 @@ getenforce
 setenforce 0
 ```
 
+## `failed to create shim task: OCI runtime create failed: container_linux.go:318: starting container process caused permission denied: unknown`
+
+如果修改selinux没有效果，很有可能是内核能力（`capabilities`）限制，按照如下方式运行容器
+
+```bash
+# --cap-add=ALL
+docker run --cap-add=SYS_ADMIN -it <image-name> <command>
+
+# 运行一个临时容器并检查其当前能力
+docker run -it --rm ubuntu capsh --print
+```
+
 ## Docker运行shell脚本之后直接就退出
 
 这个是因为docker运行的时候pid是1的进程是调用shell脚本的，在脚本执行完毕之后终端会自动退出。
@@ -411,4 +423,51 @@ mkfs.xfs -n ftype=1 /dev/mapper/centos-home -f
 mount /dev/mapper/centos-home
 # 查看挂载情况
 df -h
+```
+
+## 磁盘满（overlay2 的配置或迁移）
+
+```bash
+# 查看overlay2挂在路径，默认：/var/lib/docker
+docker info
+# 输出
+ ...
+ ...
+ ...
+ ID: 39cd9cc5-6457-44c4-968c-ef9996a294ba
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Live Restore Enabled: false
+
+# 停止服务
+systemctl stop docker
+# 创建自定义目录（选择磁盘大的）
+mkdir -p /data/docker-data
+# 拷贝默认的配置至自定义目录中，拷贝过程中使用'-p'，同时拷贝相关权限
+cd /data/docker-data
+cp -p -R /var/lib/docker/* ./
+# 编辑 daemon.json配置文件，该文件存在于 /etc/docker目录下，如果不存在，请自己建立这个文件名，并添加如下命令：
+{
+    "data-root": "/data/docker-data"
+}
+# 重启docker-daemon
+systemctl daemon-reload
+# 重启docker
+systemctl start docker
+systemctl enable docker
+# 确认配置是否生效
+docker info
+# 输出
+...
+...
+...
+Docker Root Dir: /data/docker-data
+ Debug Mode: false
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Live Restore Enabled: false
 ```

@@ -124,6 +124,19 @@ docker stats --format "{{.Container}}: {{.CPUPerc}}"
 docker stats --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 ```
 
+## docker参数说明
+
+```bash
+# 获取宿主机器root用户权限（权限全开，不利于宿主机安全）
+--privileged
+# 细粒度权限设置，需要什么开什么
+--cap-add/--cap-drop
+# 能看到宿主机上的所有进程
+--pid=host
+# 共享内存设置32g
+--shm-size=32g
+```
+
 ## docker容器中使用docker命令
 
 ```bash

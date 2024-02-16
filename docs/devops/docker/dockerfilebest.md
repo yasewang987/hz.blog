@@ -135,6 +135,30 @@ Docker提供了多阶段构建（multistag-builds）的功能，但是一般在�
 
 在Dockerfile中使用`ENV`指令定义环境变量并可设置缺省值，通过`docker run -e`指定运行时环境变量。
 
+## 远程缓存
+
+```bash
+### 普通构建
+docker pull someImage:latest || true
+docker build --platform linux/amd64 . \
+-t someImage:someVersion \
+-f Dockerfile \
+--cache-from someImage:latest
+
+### 使用Buildx，可以将缓存信息存储在远程位置
+# 模式“max”表示为每个层存储构建信息，甚至包括在生成的镜像中未使用的层（例如在使用多阶段构建时）。默认情况下使用“min”模式，它仅存储关于最终镜像中存在的层的构建信息。
+docker buildx build --platform linux/amd64 . \
+-t someImage:someVersion --push \
+--cache-to type=registry,ref=someCachedImage:someVersion,mode=max
+--cache-from type=registry,ref=someCachedImage:someVersion
+# 将缓存数据“内联”存储的命令如下所示
+docker buildx build --platform linux/amd64 . \
+-t someImage:someVersion --push \
+--cache-to type=inline,mode=max \
+--cache-from someImage:somePreviousVersion
+```
+
+
 ## 使用专门的user和group
 
 如果不以root用户来运行应用，则可以使用专门的user和group。

@@ -116,17 +116,17 @@ make distclean
 
 ```conf
 %define _binaries_in_noarch_packages_terminate_build 0
-Name: funcun-yozo
+Name: test-yozo
 Version: 2023.05
 Release:        1
-Summary:        funcun yozo
+Summary:        test yozo
 
-Group:          funcun
+Group:          test
 License:        GPLv3+
 BuildArch: noarch
 
 %description
-funcun yozo
+test yozo
 
 %prep
 
@@ -150,17 +150,17 @@ cp -rf %{_builddir}/funcun/fcwy/* %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/
 
 ```conf
 %define _binaries_in_noarch_packages_terminate_build 0
-Name: funcun-wpsplugin-uos
+Name: test-wpsplugin-uos
 Version: 2023.6
 Release:        1
-Summary:        funcun wpsplugin
+Summary:        test wpsplugin
 
-Group:          funcun
+Group:          test
 License:        GPLv3+
 BuildArch: noarch
 
 %description
-funcun wpsplugin
+test wpsplugin
 
 %prep
 
@@ -168,17 +168,16 @@ funcun wpsplugin
 %build
 
 %install
-rm -rf %{buildroot}/opt/funcun/wps/wpsplugin
-mkdir -p %{buildroot}/opt/funcun/wps/wpsplugin
-cp -rf %{_builddir}/funcun/wpsplugin/* %{buildroot}/opt/funcun/wps/wpsplugin
-cp -f %{_builddir}/funcun/wpsinstall.sh %{buildroot}/opt/funcun/wps
+rm -rf %{buildroot}/opt/test/wps/wpsplugin
+mkdir -p %{buildroot}/opt/test/wps/wpsplugin
+cp -rf %{_builddir}/test/wpsplugin/* %{buildroot}/opt/test/wps/wpsplugin
+cp -f %{_builddir}/test/wpsinstall.sh %{buildroot}/opt/test/wps
 
 %post
-/bin/bash /opt/funcun/wps/wpsinstall.sh
+/bin/bash /opt/test/wps/wpsinstall.sh
 
 %files
-/opt/funcun/wps
-
+/opt/test/wps
 
 
 %changelog
@@ -386,13 +385,48 @@ cp -rf %{_builddir}/baselibs/libs/* %{buildroot}/usr/lib
 
 ### 通用打包（数据/代码）
 
-```text
+```bash
+#### 普通
+%define __os_install_post %{nil}
+%define debug_package %{nil}
 %global mcompany service
 %global mname data
 %global mpath %{mcompany}/%{mname}
 Name: %{mcompany}-%{mname}
 Version: 2023.11
 Release:        1
+Summary:        %{mcompany} %{mname}
+
+Group:          %{mcompany}
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+%{mcompany} %{mname}
+
+%prep
+
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/%{mpath}
+mkdir -p %{buildroot}/opt/%{mpath}
+cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
+
+%files
+/opt/%{mpath}
+
+
+### 定制
+%define __os_install_post %{nil}
+%define debug_package %{nil}
+%global mcompany service
+%global mname ynsw
+%global mpath %{mcompany}/dingzhi/%{mname}/integration
+Name: %{mcompany}-%{mname}
+Version: 2023.1
+Release:        20
 Summary:        %{mcompany} %{mname}
 
 Group:          %{mcompany}

@@ -89,17 +89,56 @@ $go install github.com/someuser/modname/cmd/prog2@latest
 * 常规项目
 
 ```bash
-### app 目录下有 api、cmd、configs、internal 目录。一般还会放置 README、CHANGELOG、OWNERS。项目的依赖路径为：model -> dao -> service -> api，model struct 串联各个层，直到 api 做 DTO 对象转换。
-|-- service
-    |-- api             API 定义（protobuf 等）以及对应生成的 client 代码，基于 pb 生成的 swagger.json。
-    |-- cmd
-    |-- configs         服务配置文件，比如 database.yaml、redis.yaml、application.yaml。
-    |-- internal        避免有同业务下被跨目录引用了内部的 model、dao 等内部 struct。
-        |-- model       对应“存储层”的结构体，是对存储的一一映射。
-        |-- dao         数据读写层，统一处理数据库和缓存（cache miss 等问题）。
-        |-- service     组合各种数据访问来构建业务逻辑，包括 api 中生成的接口实现。
-        |-- server      依赖 proto 定义的服务作为入参，提供快捷的启动服务全局方法。
-|-- web
+/
+├── cmd
+│   └── myapp
+│       └── main.go
+├── pkg   # pkg目录包含项目中可以被外部应用使用的库代码
+│   ├── api
+│   │   └── handler.go
+│   ├── config
+│   │   └── config.go
+│   └── service
+│       └── service.go
+├── internal # internal目录包含应用程序私有的代码
+│   └── repository
+│       └── repo.go
+├── vendor # 当您使用模块以及包依赖度管理工具如go mod vendor时，所有的包依赖都会被复制到vendor目录中。这能保证在没有互联网的环境下也能构建项目。
+├── go.mod
+├── go.sum
+└── README.md
+```
+
+* 大型项目
+
+```bash
+├── api  # 此目录包含定义API接口的文件，如Protocol Buffers定义文件或OpenAPI/Swagger规范
+│   ├── proto
+│   │   └── myapp.proto
+│   └── swagger
+│       └── myapp.yaml
+├── cmd
+│   └── myapp
+│       └── main.go
+├── configs # configs目录包含配置文件模板或默认配置
+│   └── config.yaml
+├── deployments # 包含部署相关的文件，如Docker、Kubernetes配置文件
+│   └── docker-compose.yaml
+├── internal
+│   ├── handler
+│   ├── service
+│   └── repository
+├── pkg
+│   ├── util
+│   └── logger
+├── scripts # 用于存储为项目编写的实用脚本，比如数据库初始化脚本
+│   └── initdb.sql
+├── web # 用于存放前端相关的文件
+│   ├── static
+│   └── templates
+├── go.mod
+├── go.sum
+└── README.md
 ```
 
 ## 库项目结构

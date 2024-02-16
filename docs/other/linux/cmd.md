@@ -2,7 +2,7 @@
 
 ## 下载源修改
 
-参考：https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
+参考：https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/ ,需要注意，如果是`arm`等的，需要使用ports的源，注意切换之后修改
 
 ```bash
 #### Ubuntu
@@ -15,6 +15,12 @@ sudo vim /etc/apt/sources.list
 # 更新
 sudo apt-get update
 sudo apt-get upgrade
+
+# 如果上面的执行报错 `does not have a Release file`，则需要加上trusted
+sed -i 's/deb/deb [trusted=yes]/g' /etc/apt/sources.list
+
+# 如果上面的执行报错 `URL redirect target contains control characters, rejecting`
+# 那一般是网络限制问题，可以通过手机热点试试
 ```
 
 ## 修改IP，DNS
@@ -874,7 +880,7 @@ dpkg --list | grep linux-modules
 apt-mark hold linux-image-5.4.0-105-generic
 apt-mark hold linux-headers-5.4.0-105-generic
 apt-mark hold linux-modules-extra-5.4.0-105-generic
-apt-mark hold linux-image-generic linux-headers-generic
+apt-mark hold linux-image-generic linux-headers-generic linux-image-extra
 # 查看是否禁用
 dpkg --get-selections |grep linux-image
 

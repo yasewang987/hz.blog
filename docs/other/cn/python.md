@@ -26,22 +26,22 @@ bin/python3
 
 `%define __os_install_post %{nil}` 这个对于python和java不需要编译的项目特别重要，不需要解压、压缩、自动编译python和jar包这些操作。
 
-* 虚拟环境`virtualenv`安装之后一起打包（`建议`）
+* 用python源码编译之后创建虚拟环境然后所有依赖包一起打包
 
 ```text
 %define __os_install_post %{nil}
 %define debug_package %{nil}
-%global mname soft-py
+%global mname basesoft-py
 Name: %{mname}
-Version: 2023.11
+Version: 2023.12
 Summary: %{mname}
-Release: 1
+Release: 15
 License: GPLv3+
 Group: System Enviroment/Base
 AutoReqProv: no
 
 %description
-soft %{mname}
+base %{mname}
 
 %prep
 
@@ -49,8 +49,8 @@ soft %{mname}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/opt/soft/base/python
-cp -rf %{_builddir}/soft/base/python/* %{buildroot}/opt/soft/base/python
+mkdir -p %{buildroot}/opt/basesoft/python
+cp -rf %{_builddir}/basesoft/python/* %{buildroot}/opt/basesoft/python
 
 %post
 
@@ -58,7 +58,7 @@ cp -rf %{_builddir}/soft/base/python/* %{buildroot}/opt/soft/base/python
 
 %files
 %defattr(-,root,root,0775)
-/opt/soft/base/python
+/opt/basesoft/python
 ```
 
 * `python业务代码打包`

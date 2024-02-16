@@ -171,7 +171,8 @@ module.exports = {
                 'generic',
                 'error',
                 'tags',
-                'sync'
+                'sync',
+                'goroutine'
             ],
             '/code/go/other/': [
                 'install',
@@ -509,8 +510,10 @@ module.exports = {
                 'openssh',
                 'dm',
                 'milvus',
+                'shengteng',
                 'other',
-                'problem'
+                'problem',
+                'guomi'
             ],
         },
         sidebarDepth: 2

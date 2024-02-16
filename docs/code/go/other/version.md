@@ -2,6 +2,19 @@
 
 ## 官方多版本管理
 
+### go get方式
+
+```bash
+# 项目初始化
+go mod init <module-name>
+# go 版本安装/版本切换,安装不同版本的 Go
+go get golang.org/dl/go<x.y>
+go<x.y> download
+go<x.y> version
+# 切换全局 Go 版本：
+go<x.y> use
+```
+
 ### 方式一：
 
 `go`版本参考地址：https://github.com/golang/dl

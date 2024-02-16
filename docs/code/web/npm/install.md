@@ -8,11 +8,19 @@
 
 使用如下命令安装
 ```bash
+# 修改/etc/hosts
+199.232.68.133 raw.githubusercontent.com
 # 下载nvm，并加入到 .zshrc
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+# 国内下载安装nvm
+curl -o- https://gitee.com/mirrors/nvm/raw/master/install.sh | bash
+wget -qO- https://gitee.com/mirrors/nvm/raw/master/install.sh | bash
 
 # 生效nvm
 source ~/.zshrc
+
+command -v nvm # 检查 nvm 是否可用
+nvm --version  # 查看 nvm 的版本
 
 # 列出已经安装的node版本
 nvm ls

@@ -6,8 +6,33 @@
 git checkout -b branchname tagname
 
 # 从commit签分支,commitid取前8位
-git checkou -b branchname commid_id 
+git checkout -b branchname commid_id 
 ```
+## Git代码合并
+
+###  merge
+
+公共远程分支统一使用merge
+
+每次合并会产生一个新的提交，历史提交记录看起来不太友好
+
+```bash
+git merge xxx
+
+```
+### rebase
+
+**永远不要在公共分支上使用rebase，只在本地分支使用，提交pr之后不允许使用rebase。**
+
+会把当前分支（feature）的起始历史放到主分支（main）的最后一次记录上，最大的好处是让提交历史变得干净整洁，不会有merge一样的合并记录。
+
+但是这个在多人协作的公共分支上使用rebase操作会修改分支的提交记录，每次推送都需要强制push，如果其他开发者已经拉取了你的分支，那么下次pull时会冲突。
+
+```bash
+git checkout feature
+git rebase -i main
+```
+
 ## Git删除分支
 
 * 删除本地分支  
