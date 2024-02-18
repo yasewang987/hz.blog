@@ -48,6 +48,8 @@ location /foo/ {
 
 ## nginx-dns缓存问题
 
+最直接的处理方式 `docker exec -it mynginx nginx -s reload` 重启一下nginx
+
 ```conf
 ### http例子
 # resolver 可以在http、server、location，set 可以写在server和location中。
