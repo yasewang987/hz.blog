@@ -149,7 +149,7 @@ rm -rf ~/.cache
 ### 生成镜像
 docker commit test111 llm:310p
 ### 导出导入镜像
-docker save -0 llm.tar llm:310p
+docker save -o llm.tar llm:310p
 docker load -i llm.tar
 ```
 
@@ -263,13 +263,201 @@ torchrun --nproc_per_node 2 --master_port 2000 main.py --mode cli_demo --model_p
 只需要修改程序运行的入口文件，增加如下代码
 
 ```py
+import transformers
 import torch_npu
 from torch_npu.contrib import transfer_to_npu
-torch.npu.set_device(torch.device("npu:2"))
 
+#### 原始文件中的关于model的加载的内容全部删除
 
+def get_is_format_nz():
+    soc_version = torch_npu._C._npu_get_soc_version()
+    if soc_version in [200, 201, 202, 203]:
+        return True
+    elif soc_version in [220, 221, 222, 223, 224]:
+        return False
+    else:
+        raise NotImplementedError
+    soc_version = soc_version_map[torch_npu._C._npu_get_soc_version()]
+    return soc_version
+
+def get_model():
+    transformers.generation.TopKLogitsWarper.filter_value = torch.finfo(torch.float32).min
+    torch.npu.set_device(torch.device("npu:0"))
+    torch.manual_seed(1)
+    tokenizer = AutoTokenizer.from_pretrained("/data/code/models", trust_remote_code=True)
+    model = AutoModel.from_pretrained("/data/code/models", trust_remote_code=True).half().npu()
+    torch.npu.set_compile_mode(jit_compile=False)
+    model = model.eval()
+    is_format_nz = get_is_format_nz()
+    if is_format_nz:
+        for name, module in model.named_modules():
+            if isinstance(module, torch.nn.Linear):
+                module.weight.data = torch_npu.npu_format_cast(module.weight.data, 29)
+    model.set_weight()
+    return tokenizer, model
+.....
+.....
+# 一定要在全局加载模型
+tokenizer, model = get_model()
+# 这个如果是cli_demo不需要
+context,ret = acl.rt.get_context()
+
+def predict(input, chatbot, max_length, top_p, temperature, history, past_key_values):
+    chatbot.append((parse_text(input), ""))
+    # 这个如果是cli_demo不需要
+    acl.rt.set_context(context)
+    for response, history, past_key_values in model.stream_chat(tokenizer, input, history, past_key_values=past_key_values,
+                                                                return_past_key_values=True,
+                                                                max_length=max_length, top_p=top_p,
+                                                                temperature=temperature):
+        chatbot[-1] = (parse_text(input), parse_text(response))
+
+        yield chatbot, history, past_key_values
+
+....
+....
 # 如果是要调整web_demo.py的运行端口号，按照如下修改
 demo.queue().launch(share=False, inbrowser=True, port=8000)
+```
+
+* GLM2官方`web_demo.py`改造后的完整内容如下
+
+```py
+from transformers import AutoModel, AutoTokenizer
+import transformers
+import gradio as gr
+import mdtex2html
+from utils import load_model_on_gpus
+import acl
+import torch
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+"""Override Chatbot.postprocess"""
+
+def get_is_format_nz():
+    soc_version = torch_npu._C._npu_get_soc_version()
+    if soc_version in [200, 201, 202, 203]:
+        return True
+    elif soc_version in [220, 221, 222, 223, 224]:
+        return False
+    else:
+        raise NotImplementedError
+    soc_version = soc_version_map[torch_npu._C._npu_get_soc_version()]
+    return soc_version
+
+def get_model():
+    transformers.generation.TopKLogitsWarper.filter_value = torch.finfo(torch.float32).min
+    torch.npu.set_device(torch.device("npu:0"))
+    torch.manual_seed(1)
+    tokenizer = AutoTokenizer.from_pretrained("/data/code/models", trust_remote_code=True)
+    model = AutoModel.from_pretrained("/data/code/models", trust_remote_code=True).half().npu()
+    torch.npu.set_compile_mode(jit_compile=False)
+    model = model.eval()
+    is_format_nz = get_is_format_nz()
+    if is_format_nz:
+        for name, module in model.named_modules():
+            if isinstance(module, torch.nn.Linear):
+                module.weight.data = torch_npu.npu_format_cast(module.weight.data, 29)
+    model.set_weight()
+    return tokenizer, model
+
+def postprocess(self, y):
+    if y is None:
+        return []
+    for i, (message, response) in enumerate(y):
+        y[i] = (
+            None if message is None else mdtex2html.convert((message)),
+            None if response is None else mdtex2html.convert(response),
+        )
+    return y
+
+
+gr.Chatbot.postprocess = postprocess
+
+
+def parse_text(text):
+    """copy from https://github.com/GaiZhenbiao/ChuanhuChatGPT/"""
+    lines = text.split("\n")
+    lines = [line for line in lines if line != ""]
+    count = 0
+    for i, line in enumerate(lines):
+        if "```" in line:
+            count += 1
+            items = line.split('`')
+            if count % 2 == 1:
+                lines[i] = f'<pre><code class="language-{items[-1]}">'
+            else:
+                lines[i] = f'<br></code></pre>'
+        else:
+            if i > 0:
+                if count % 2 == 1:
+                    line = line.replace("`", "\`")
+                    line = line.replace("<", "&lt;")
+                    line = line.replace(">", "&gt;")
+                    line = line.replace(" ", "&nbsp;")
+                    line = line.replace("*", "&ast;")
+                    line = line.replace("_", "&lowbar;")
+                    line = line.replace("-", "&#45;")
+                    line = line.replace(".", "&#46;")
+                    line = line.replace("!", "&#33;")
+                    line = line.replace("(", "&#40;")
+                    line = line.replace(")", "&#41;")
+                    line = line.replace("$", "&#36;")
+                lines[i] = "<br>"+line
+    text = "".join(lines)
+    return text
+
+tokenizer, model = get_model()
+context,ret = acl.rt.get_context()
+
+def predict(input, chatbot, max_length, top_p, temperature, history, past_key_values):
+    chatbot.append((parse_text(input), ""))
+    acl.rt.set_context(context)
+    for response, history, past_key_values in model.stream_chat(tokenizer, input, history, past_key_values=past_key_values,
+                                                                return_past_key_values=True,
+                                                                max_length=max_length, top_p=top_p,
+                                                                temperature=temperature):
+        chatbot[-1] = (parse_text(input), parse_text(response))
+
+        yield chatbot, history, past_key_values
+
+
+def reset_user_input():
+    return gr.update(value='')
+
+
+def reset_state():
+    return [], [], None
+
+
+with gr.Blocks() as demo:
+    gr.HTML("""<h1 align="center">ChatGLM2-6B</h1>""")
+
+    chatbot = gr.Chatbot()
+    with gr.Row():
+        with gr.Column(scale=4):
+            with gr.Column(scale=12):
+                user_input = gr.Textbox(show_label=False, placeholder="Input...", lines=10).style(
+                    container=False)
+            with gr.Column(min_width=32, scale=1):
+                submitBtn = gr.Button("Submit", variant="primary")
+        with gr.Column(scale=1):
+            emptyBtn = gr.Button("Clear History")
+            max_length = gr.Slider(0, 32768, value=8192, step=1.0, label="Maximum length", interactive=True)
+            top_p = gr.Slider(0, 1, value=0.8, step=0.01, label="Top P", interactive=True)
+            temperature = gr.Slider(0, 1, value=0.95, step=0.01, label="Temperature", interactive=True)
+
+    history = gr.State([])
+    past_key_values = gr.State(None)
+
+    submitBtn.click(predict, [user_input, chatbot, max_length, top_p, temperature, history, past_key_values],
+                    [chatbot, history, past_key_values], show_progress=True)
+    submitBtn.click(reset_user_input, [], [user_input])
+
+    emptyBtn.click(reset_state, outputs=[chatbot, history, past_key_values], show_progress=True)
+
+demo.queue().launch(share=False, inbrowser=True, server_name='0.0.0.0', server_port=8000)
 ```
 
 # 昇腾适配问题列表
