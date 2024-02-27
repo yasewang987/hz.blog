@@ -255,3 +255,18 @@ redis-cli --cluster del-node 192.168.3.100:7001 1d708c5042d53b6bc1e855ea41755782
 # 关闭7007服务
 reids-cli -p 7007 shutdown
 ```
+
+
+# redis-stack安装
+
+[参考资料](https://hub.docker.com/r/redis/redis-stack-server)
+
+```bash
+# 拉取镜像
+docker pull redis/redis-stack-server:latest
+# 启动容器，8001是RedisInsight端口
+docker run -p 10001:6379 -p 13333:8001 -v /local-data/:/data -e REDIS_ARGS="--requirepass mypassword" redis/redis-stack-server:latest
+docker run -d -p 6399:6379 -v $PWD/data:/data -e REDIS_ARGS="--requirepass ifuncun888" --name fc-stack ifuncun/redis-stack:7.2.0
+# 使用配置文件
+docker run -v `pwd`/local-redis-stack.conf:/redis-stack.conf -p 6379:6379 redis/redis-stack-server:latest
+```

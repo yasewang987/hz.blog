@@ -256,7 +256,8 @@ module.exports = {
                 'problem',
                 'install',
                 'ai1',
-                'ai2'
+                'ai2',
+                'ai-vector'
             ],
             '/code/python/deploy/': [
                 'nvidia',

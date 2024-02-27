@@ -39,14 +39,18 @@ sudo nginx -V
 ```conf
 # 前端示例
 location / {
-        root   /data/html/;
-        index  index.html index.html;
-        # vue history
-        try_files $uri $uri/ /index.html;
+    root   /data/html/;
+    index  index.html index.html;
+    # vue history
+    try_files $uri $uri/ /index.html;
 }
 location /train/ {
-     alias  /data/trainning/;
-     index  index.html index.html;
+    alias  /data/trainning/;
+    index  index.html index.html;
+}
+# 前端反向代理到其他服务
+location /wps {
+    proxy_pass http://aa.bb.com/;
 }
 
 # 跳转示例
