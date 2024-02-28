@@ -72,7 +72,7 @@ docker exec -it test111 bash
 apt update
 apt install --no-install-recommends pciutils -y
 mkdir /lib64 && ln -sf /lib/ld-linux-aarch64.so.1 /lib64/ld-linux-aarch64.so.1
-# 安装python环境（参考python资料）
+# 安装python环境（参考python资料）,生产环境推荐直接安装python不要conda
 miniconda3
 # 退出重新进容器即可生效miniconda的python环境
 
@@ -113,7 +113,7 @@ chmod +x Ascend-cann-atb_7.0.0_linux-aarch64_abi0.run
 # 生效环境变量
 source /usr/local/Ascend/atb/set_env.sh
 
-#### 下载transformer-llm包
+#### 下载transformer-llm包（昇腾官方的下载可能比较老，可以找昇腾的技术要新版本）
 # 平台大语言模型推理参考实例（这个操作在容器外面解压）
 Ascend-cann-llm_7.0.0_linux-aarch64_torch2.0.1-abi0.tar.gz
 Ascend-cann-llm_7.0.0_linux-aarch64_torch2.0.1-abi1.tar.gz
@@ -205,10 +205,13 @@ export DATASET=/data/code/models/CEval
 # 可开启CPU Performance模式以提高模型推理性能（物理机器）
 cpupower frequency-set -g performance
 
-# 服务器上启动容器，再去里面运行服务
+#### 启动容器
+# NPU_NUM是设置使用那块显卡，和代码要配合使用
+# 启动空容器，主要测试阶段用
 docker run -itd \
 --cap-add=ALL \
---device=/dev/davinci0 \
+-e NPU_NUM=3 \
+--device=/dev/davinci0 \   # 这个测试下来发现可以不要
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
@@ -223,6 +226,26 @@ docker run -itd \
 --name fc-llm llm:310p \
 /bin/bash
 
+# 做完启动脚本start.sh之后生产环境执行如下
+docker run -d \
+--cap-add=ALL \
+-e NPU_NUM=3 \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
+-v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
+-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+-v /etc/ascend_install.info:/etc/ascend_install.info \
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /data:/data \
+--name fc-llm llm:310p \
+/bin/bash /data/code/glm2/start.sh
+
+##### 下面的启动项可以整理成 start.sh 脚本去启动，可以参考下面chatglm2-6b的示例脚本
+##### 要注意 /data/code/set_env.sh 里面会用到python，如果使用conda，要修改一下python的路径
 # 启动环境变量
 source ~/.profile
 
@@ -260,9 +283,13 @@ torchrun --nproc_per_node 2 --master_port 2000 main.py --mode cli_demo --model_p
 
 ## chatglm2官方代码适配修改
 
+下载官方的代码之后将代码放到 `/data/code/glm2` 目录下
+
 只需要修改程序运行的入口文件，增加如下代码
 
 ```py
+import os
+import acl
 import transformers
 import torch_npu
 from torch_npu.contrib import transfer_to_npu
@@ -282,7 +309,9 @@ def get_is_format_nz():
 
 def get_model():
     transformers.generation.TopKLogitsWarper.filter_value = torch.finfo(torch.float32).min
-    torch.npu.set_device(torch.device("npu:0"))
+    # 这里可以设置使用那块NPU卡（建议使用环境变量NPU_NUM控制）
+    npu_num = os.environ.get("NPU_NUM", 0)
+    torch.npu.set_device(torch.device(f"npu:{npu_num}"))
     torch.manual_seed(1)
     tokenizer = AutoTokenizer.from_pretrained("/data/code/models", trust_remote_code=True)
     model = AutoModel.from_pretrained("/data/code/models", trust_remote_code=True).half().npu()
@@ -320,7 +349,7 @@ def predict(input, chatbot, max_length, top_p, temperature, history, past_key_va
 demo.queue().launch(share=False, inbrowser=True, port=8000)
 ```
 
-* GLM2官方`web_demo.py`改造后的完整内容如下
+### GLM2官方`web_demo.py`示例
 
 ```py
 from transformers import AutoModel, AutoTokenizer
@@ -328,6 +357,7 @@ import transformers
 import gradio as gr
 import mdtex2html
 from utils import load_model_on_gpus
+import os
 import acl
 import torch
 import torch_npu
@@ -348,7 +378,8 @@ def get_is_format_nz():
 
 def get_model():
     transformers.generation.TopKLogitsWarper.filter_value = torch.finfo(torch.float32).min
-    torch.npu.set_device(torch.device("npu:0"))
+    npu_num = os.environ.get("NPU_NUM", 0)
+    torch.npu.set_device(torch.device(f"npu:{npu_num}"))
     torch.manual_seed(1)
     tokenizer = AutoTokenizer.from_pretrained("/data/code/models", trust_remote_code=True)
     model = AutoModel.from_pretrained("/data/code/models", trust_remote_code=True).half().npu()
@@ -459,6 +490,236 @@ with gr.Blocks() as demo:
 
 demo.queue().launch(share=False, inbrowser=True, server_name='0.0.0.0', server_port=8000)
 ```
+
+### GLM2官方`openai_api.py`示例
+
+```py
+# coding=utf-8
+
+import time
+import torch
+import uvicorn
+from pydantic import BaseModel, Field
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from typing import Any, Dict, List, Literal, Optional, Union
+from transformers import AutoTokenizer, AutoModel
+from sse_starlette.sse import ServerSentEvent, EventSourceResponse
+import os
+import transformers
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+def get_is_format_nz():
+    soc_version = torch_npu._C._npu_get_soc_version()
+    if soc_version in [200, 201, 202, 203]:
+        return True
+    elif soc_version in [220, 221, 222, 223, 224]:
+        return False
+    else:
+        raise NotImplementedError
+    soc_version = soc_version_map[torch_npu._C._npu_get_soc_version()]
+    return soc_version
+
+def get_model():
+    transformers.generation.TopKLogitsWarper.filter_value = torch.finfo(torch.float32).min
+    # 这里可以设置使用那块NPU卡（建议使用环境变量NPU_NUM控制）
+    npu_num = os.environ.get("NPU_NUM", 0)
+    torch.npu.set_device(torch.device(f"npu:{npu_num}"))
+    torch.manual_seed(1)
+    tokenizer = AutoTokenizer.from_pretrained("/data/code/models", trust_remote_code=True)
+    model = AutoModel.from_pretrained("/data/code/models", trust_remote_code=True).half().npu()
+    torch.npu.set_compile_mode(jit_compile=False)
+    model = model.eval()
+    is_format_nz = get_is_format_nz()
+    if is_format_nz:
+        for name, module in model.named_modules():
+            if isinstance(module, torch.nn.Linear):
+                module.weight.data = torch_npu.npu_format_cast(module.weight.data, 29)
+    model.set_weight()
+    return tokenizer, model
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI): # collects GPU memory
+    yield
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
+
+
+app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class ModelCard(BaseModel):
+    id: str
+    object: str = "model"
+    created: int = Field(default_factory=lambda: int(time.time()))
+    owned_by: str = "owner"
+    root: Optional[str] = None
+    parent: Optional[str] = None
+    permission: Optional[list] = None
+
+
+class ModelList(BaseModel):
+    object: str = "list"
+    data: List[ModelCard] = []
+
+
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant", "system"]
+    content: str
+
+
+class DeltaMessage(BaseModel):
+    role: Optional[Literal["user", "assistant", "system"]] = None
+    content: Optional[str] = None
+
+
+class ChatCompletionRequest(BaseModel):
+    model: str
+    messages: List[ChatMessage]
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
+    max_length: Optional[int] = None
+    stream: Optional[bool] = False
+
+
+class ChatCompletionResponseChoice(BaseModel):
+    index: int
+    message: ChatMessage
+    finish_reason: Literal["stop", "length"]
+
+
+class ChatCompletionResponseStreamChoice(BaseModel):
+    index: int
+    delta: DeltaMessage
+    finish_reason: Optional[Literal["stop", "length"]]
+
+
+class ChatCompletionResponse(BaseModel):
+    model: str
+    object: Literal["chat.completion", "chat.completion.chunk"]
+    choices: List[Union[ChatCompletionResponseChoice, ChatCompletionResponseStreamChoice]]
+    created: Optional[int] = Field(default_factory=lambda: int(time.time()))
+
+
+@app.get("/v1/models", response_model=ModelList)
+async def list_models():
+    global model_args
+    model_card = ModelCard(id="gpt-3.5-turbo")
+    return ModelList(data=[model_card])
+
+
+@app.post("/v1/chat/completions", response_model=ChatCompletionResponse)
+async def create_chat_completion(request: ChatCompletionRequest):
+    global model, tokenizer
+
+    if request.messages[-1].role != "user":
+        raise HTTPException(status_code=400, detail="Invalid request")
+    query = request.messages[-1].content
+
+    prev_messages = request.messages[:-1]
+    if len(prev_messages) > 0 and prev_messages[0].role == "system":
+        query = prev_messages.pop(0).content + query
+
+    history = []
+    if len(prev_messages) % 2 == 0:
+        for i in range(0, len(prev_messages), 2):
+            if prev_messages[i].role == "user" and prev_messages[i+1].role == "assistant":
+                history.append([prev_messages[i].content, prev_messages[i+1].content])
+
+    if request.stream:
+        generate = predict(query, history, request.model)
+        return EventSourceResponse(generate, media_type="text/event-stream")
+
+    response, _ = model.chat(tokenizer, query, history=history)
+    choice_data = ChatCompletionResponseChoice(
+        index=0,
+        message=ChatMessage(role="assistant", content=response),
+        finish_reason="stop"
+    )
+
+    return ChatCompletionResponse(model=request.model, choices=[choice_data], object="chat.completion")
+
+
+async def predict(query: str, history: List[List[str]], model_id: str):
+    global model, tokenizer
+
+    choice_data = ChatCompletionResponseStreamChoice(
+        index=0,
+        delta=DeltaMessage(role="assistant"),
+        finish_reason=None
+    )
+    chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
+    yield "{}".format(chunk.model_dump_json(exclude_unset=True))
+
+    current_length = 0
+
+    for new_response, _ in model.stream_chat(tokenizer, query, history):
+        if len(new_response) == current_length:
+            continue
+
+        new_text = new_response[current_length:]
+        current_length = len(new_response)
+
+        choice_data = ChatCompletionResponseStreamChoice(
+            index=0,
+            delta=DeltaMessage(content=new_text),
+            finish_reason=None
+        )
+        chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
+        yield "{}".format(chunk.model_dump_json(exclude_unset=True))
+
+
+    choice_data = ChatCompletionResponseStreamChoice(
+        index=0,
+        delta=DeltaMessage(),
+        finish_reason="stop"
+    )
+    chunk = ChatCompletionResponse(model=model_id, choices=[choice_data], object="chat.completion.chunk")
+    yield "{}".format(chunk.model_dump_json(exclude_unset=True))
+    yield '[DONE]'
+
+
+
+if __name__ == "__main__":
+    tokenizer, model = get_model()
+    uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)
+```
+
+### 容器运行启动脚本
+
+```sh
+#!/bin/bash
+source ~/.profile
+# 设置环境变量
+export CHECKPOINT=/data/code/models
+export QUANT_WEIGHT_PATH=/data/code/models/quant_weight
+export DATASET=/data/code/models/CEval
+export HCCL_BUFFSIZE=110
+export HCCL_OP_BASE_FFTS_MODE_ENABLE=1
+export TASK_QUEUE_ENABLE=1
+export ATB_OPERATION_EXECUTE_ASYNC=1
+export ATB_LAYER_INTERNAL_TENSOR_REUSE=1
+# 300 Ipro 和 300 IDuo 上使能多 stream 可提升性能
+export ATB_USE_TILING_COPY_STREAM=1
+# 启动服务
+cd /data/code/glm2
+/root/miniconda3/bin/python web_demo.py
+```
+
+### 模型替换
+
+直接将微调之后的`pytorch*`带头的几个模型覆盖官方的模型即可。其他文件不用替换（目前测试其他文件替换会出问题）。
 
 # 昇腾适配问题列表
 

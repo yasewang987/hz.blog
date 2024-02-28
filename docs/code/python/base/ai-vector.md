@@ -2,7 +2,16 @@
 
 ## redis-stack示例
 
+[参考资料](https://redis.io/docs/get-started/vector-database/)
+[bikes数据下载](https://raw.githubusercontent.com/bsbodden/redis_vss_getting_started/main/data/bikes.json)
+
 需要先部署 `redis-stack`，依赖里面的 `RedisJSON`和`RedisSearch`实现
+
+主要步骤：
+
+1. 原始文件内容以json格式存入RedisJson
+1. 使用模型将需要向量化的数据处理之后，将处理的内容存入附加字段
+1. 通过RedisSearch的向量化搜索查询出最符合的结果
 
 ```py
 import json
@@ -131,13 +140,20 @@ def create_query_table(query, queries, encoded_queries, extra_params={}):
   print(queries_table)
 
 def main(): 
-  # 先执行数据插入
+  # 先执行数据插入（需要执行创建索引操作）
   #bikes = get_data()
   #inert_data(bikes)
   #insert_embedding_data()
+
   # 再执行查询
   query_demo()
 
 if __name__ == '__main__':
   main()
+```
+
+创建索引：
+
+```bash
+FT.CREATE idx:bikes_vss ON JSON PREFIX 1 bikes: SCORE 1.0 SCHEMA $.model TEXT WEIGHT 1.0 NOSTEM $.brand TEXT WEIGHT 1.0 NOSTEM  $.price NUMERIC $.type TAG SEPARATOR "," $.description AS description TEXT WEIGHT 1.0 $.description_embeddings AS vector VECTOR FLAT 6 TYPE FLOAT32 DIM 768 DISTANCE_METRIC COSINE
 ```
