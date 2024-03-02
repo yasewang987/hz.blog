@@ -4,6 +4,12 @@
 * `epoch`：一个完整的迭代过程，即一次完整的训练。
 * `batch`：一组训练数据
 
+* `Pre-Training`：二次预训练(增量预训练)，可以在原来的预训练模型的基础上，对于之前没学过的知识进行再学习，是处于预训练和微调之间的过渡阶段。可以利用`小规模、高质量的领域数据`（GB级别），可以通过`lora`方式训练
+* `Supervised Fine-Tuning	`：指令监督微调
+* `Reward Modeling`：奖励模型训练
+* `PPO Training`：近端策略优化 (`Proximal Policy Optimization，PPO`) 微调初始 LM 的部分或全部参数，一定需要配合 `RM奖励模型` 和 `SFT` 去强化学习
+* `DPO Training`：替代`PPO`的，去掉了`RM model`，只需要 `SFT model`，提高速度，降低显存
+
 16 位浮点精度（`FP16`）的模型，推理所需`显存`（以 `GB` 为单位）约为`模型参数量`（以 `10 亿`为单位）的两倍，Llama 2 7B（70 亿）对应需要约 14GB 显存以进行推理
 
 **模型答案评估：**
@@ -11,6 +17,32 @@
 * 一致性：在给定上下文的情况下，比较实际情况与预测之间的一致性。
 * 相关性：衡量答案在上下文中如何有效地回答问题的主要方面。
 * 真实性：定义了答案是否逻辑上符合上下文中包含的信息，并提供一个整数分数来确定答案的真实性。
+
+## 学习率设置
+
+![1](http://cdn.go99.top/docs/code/python/ai1.webp)
+
+* 当学习率设置的较小，训练收敛较慢，需要更多的epoch才能到达一个较好的局部最小值；
+* 当学习率设置的较大，训练可能会在接近局部最优的附件震荡，无法更新到局部最优处；
+* 当学习率设置的非常大，正如上一篇文章提到可能直接飞掉，权重变为NaN;
+
+### 人工调整
+学习率一般是根据我们的经验值进行尝试，首先在整个训练过程中学习率肯定不会设为一个固定的值，原因如上图描述的设置大了得不到局部最优值，设置小了收敛太慢也容易过拟合。通常我们会尝试性的将初始学习率设为：`0.1，0.01，0.001，0.0001`等来观察网络初始阶段`epoch的loss`情况：
+
+* 如果训练`初期loss出现梯度爆炸或NaN`这样的情况（暂时排除其他原因引起的loss异常），说明`初始学习率偏大`，可以将初始学习率`降低10倍`再次尝试；
+* 如果训练`初期loss下降缓慢`，说明`初始学习率偏小`，可以将初始学习率`增加5倍或10倍`再次尝试；
+* 如果训练`一段时间后loss下降缓慢或者出现震荡`现象，可能训练进入到一个局部最小值或者鞍点附近。如果在`局部最小值`附近，需要`降低学习率`使训练朝更精细的位置移动；如果处于`鞍点附近`，需要适当`增加学习率`使步长更大跳出鞍点。
+* 如果网络权重采用随机初始化方式从头学习，有时会因为`任务复杂`，`初始学习率需要设置的比较小`，否则很容易梯度飞掉带来模型的不稳定(振荡)。这种思想也叫做Warmup，在预热的小学习率下，模型可以慢慢趋于稳定,等模型相对稳定后再选择预先设置的学习率进行训练,使得模型收敛速度变得更快，模型效果更佳。形状如下：
+
+![2](http://cdn.go99.top/docs/code/python/ai2.webp)
+
+* 如果网络基于预训练权重做的`finetune`，由于模型在原数据集上以及收敛，有一个较好的起点，可以将`初始学习率设置的小一些进行微调`，比如`0.0001`。
+
+这里只说了如果设置学习率，至于学习率降低到什么程序可以停止训练，理论上训练loss和验证loss都达到最小的时候就可以了。
+
+### 策略调整学习率
+
+策略调整学习率包括固定策略的学习率衰减和自适应学习率衰减，由于学习率如果连续衰减，不同的训练数据就会有不同的学习率。当学习率衰减时，在相似的训练数据下参数更新的速度也会放慢，就相当于减小了训练数据对模型训练结果的影响。为了使训练数据集中的所有数据对模型训练有相等的作用，通常是以epoch为单位衰减学习率。
 
 # LORA微调
 
@@ -121,10 +153,51 @@ QLoRA提出了一种折中方案：在GPU内存受限的情况下，它能够在
 
 # 常用模型及工具记录
 
-## Ollama
+## Ollama（简化部署、不支持openai格式-目前不太推荐）
 * `ollama`：大模型简化部署，没有推理加速。可以通过命令行简单运行大模型（默认使用4bit量化的，如果要用原始的可以指定`tag`），对外提供api服务。支持的纯语言模型包括`llama系列、Yi系列、Qwen、DeepSeek 系列、MoE 模型 Mixtral-8x7B、Phi-2`
 
-## vLLM
+## FastChat（主部署、加速-目前不太推荐）
+
+* `fastchat`：【部署模型居多，可整合vllm】一个用于训练、部署和评估基于大型语言模型的聊天机器人的开放平台
+```bash
+# 安装
+pip3 install fschat
+# 或
+pip install "fschat[model_worker,webui]"
+pip install vllm
+##### 部署openai形式的服务
+# 启动controller，默认端口为 21001，可通过 --port 指定
+python3 -m fastchat.serve.controller
+# 启动vLLM Worker
+# 默认端口为 21002，可通过 --port 指定。FastChat 的 Worker 会向 Controller 注册自身，并通过心跳机制保持连接。
+python3 -m fastchat.serve.vllm_worker meta-llama/Llama-2-7b-chat-hf --num-gpus 2
+# 启动 Gradio Web Server，提供了可视化交互聊天界面，默认端口为 7860，可通过 --port 指定
+python3 -m fastchat.serve.gradio_web_server
+# 启动 OpenAI API Server，默认端口为 8000，可通过 --port 指定
+python3 -m fastchat.serve.openai_api_server
+# 使用 OpenAI SDK
+pip install openai
+# py代码
+from openai import OpenAI
+client = OpenAI(base_url="http://localhost:8000/v1", api_key="na")
+model = "meta-llama/Llama-2-7b-chat-hf"
+
+
+#### 其他
+# 单gpu
+python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3
+# 多gpu
+python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --num-gpus 2
+# 使用CPU
+python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --device cpu
+# Metal后端（Apple Silicon或AMD GPU的Mac电脑）
+python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --device mps --load-8bit
+# Intel XPU（Intel Data Center和Arc A-Series GPU），安装Intel Extension for PyTorch[27]。设置OneAPI环境变量
+source /opt/intel/oneapi/setvars.sh
+python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --device xpu
+```
+
+## vLLM（推理加速-推荐）
 
 * `vLLM`：推理加速的引擎，提高整体吞吐量，单batch效果不明显，预先分配大量显存，提高推理速度，实现了`Rolling Batch`批处理以及`PagedAttention`的全新的注意力算法，相对于静态`batch`，vLLM 提供了高达`数十倍`的吞吐量，而无需进行任何模型架构更改，支持Huggingface常见的模型`llama系列、qwen系列、baichuan`
     
@@ -235,53 +308,19 @@ torchrun --nproc_per_node=4 --master_port=20001 fastchat/train/train_mem.py \
     --lazy_preprocess True
 ```
 
-## FastLLM
+## FastLLM（推理加速）
 
 * `fastllm`：也是一个推理加速引擎（国产），支持android，有时候会出现问题。
 
-## FastChat
+## Llama-Factory（主训练-推荐）
 
-* `fastchat`：【部署模型居多，可整合vllm】一个用于训练、部署和评估基于大型语言模型的聊天机器人的开放平台
-```bash
-# 安装
-pip3 install fschat
-# 或
-pip install "fschat[model_worker,webui]"
-pip install vllm
-##### 部署openai形式的服务
-# 启动controller，默认端口为 21001，可通过 --port 指定
-python3 -m fastchat.serve.controller
-# 启动vLLM Worker
-# 默认端口为 21002，可通过 --port 指定。FastChat 的 Worker 会向 Controller 注册自身，并通过心跳机制保持连接。
-python3 -m fastchat.serve.vllm_worker meta-llama/Llama-2-7b-chat-hf --num-gpus 2
-# 启动 Gradio Web Server，提供了可视化交互聊天界面，默认端口为 7860，可通过 --port 指定
-python3 -m fastchat.serve.gradio_web_server
-# 启动 OpenAI API Server，默认端口为 8000，可通过 --port 指定
-python3 -m fastchat.serve.openai_api_server
-# 使用 OpenAI SDK
-pip install openai
-# py代码
-from openai import OpenAI
-client = OpenAI(base_url="http://localhost:8000/v1", api_key="na")
-model = "meta-llama/Llama-2-7b-chat-hf"
+[参考资料](https://github.com/hiyouga/LLaMA-Factory)
 
+* `llama-factory`：高效的大语言模型训练和推理框架，带有webui，简化训练门槛，支持常见模型`Baichuan2、ChatGLM3、Gemma、LLaMA系列、Qwen系列、Yi系列`。
 
-#### 其他
-# 单gpu
-python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3
-# 多gpu
-python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --num-gpus 2
-# 使用CPU
-python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --device cpu
-# Metal后端（Apple Silicon或AMD GPU的Mac电脑）
-python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --device mps --load-8bit
-# Intel XPU（Intel Data Center和Arc A-Series GPU），安装Intel Extension for PyTorch[27]。设置OneAPI环境变量
-source /opt/intel/oneapi/setvars.sh
-python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --device xpu
-```
+## LangChain(RAG框架)
 
-## Llama-Factory
-* `llama-factory`：高效的大语言模型训练和推理框架，带有webui，简化训练门槛。
+## LlamaIndex(RAG框架)
 
 ## 其他
 * `语音转文字`：`PaddleSpeech、FunAsr`

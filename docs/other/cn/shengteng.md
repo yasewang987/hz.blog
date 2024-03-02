@@ -493,6 +493,13 @@ demo.queue().launch(share=False, inbrowser=True, server_name='0.0.0.0', server_p
 
 ### GLM2官方`openai_api.py`示例
 
+```bash
+# openapi curl测试
+curl -X POST -H 'Content-Type: application/json' -d '{"model":"chatglm2-6b", "messages":[{"role":"user", "content":"你好"}], "stream":true}' http://127.0.0.1:8000/v1/chat/completions
+```
+
+* 修改代码的时候需要注意一下将 `yield "{}".format(chunk.json(exclude_unset=True, ensure_ascii=False))` 改成 `yield "{}".format(chunk.model_dump_json(exclude_unset=True))`
+
 ```py
 # coding=utf-8
 
