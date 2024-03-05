@@ -213,6 +213,10 @@ sudo apt-get update
 apt install nvidia-container-toolkit --download-only
 apt-get download package_name
 
+
+# 拷贝下载目录下的所有deb包，然后复制到离线机器，执行如下命令
+dpkg -i ./*.deb
+
 #### 如果遇到如下报错
 GPG error: https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu1804/x86_64 InRelease: The following signatures couldnt be verified because the public key is not available: NO_PUBKEY A4B469963BF863CC
 # 则执行后面的，需要将命令中的密钥替换为出现在错误消息中的实际密钥

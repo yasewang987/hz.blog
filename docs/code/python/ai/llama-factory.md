@@ -51,6 +51,27 @@ python src/train_bash.py \
     --plot_loss \
     --bf16 True
 
+# 如果只有自我认知的数据集，测试设置较高的学习率效果好一些
+python src/train_bash.py \
+    --stage sft \
+    --do_train \
+    --model_name_or_path /root/Qwen1.5-4B-Chat \
+    --dataset self_cognition \
+    --template default \
+    --finetuning_type lora \
+    --lora_target q_proj,v_proj \
+    --output_dir /root/sft/checkpoint \
+    --overwrite_cache \
+    --per_device_train_batch_size 4 \
+    --gradient_accumulation_steps 4 \
+    --lr_scheduler_type cosine \
+    --logging_steps 10 \
+    --save_steps 2000 \
+    --learning_rate 1e-3 \
+    --num_train_epochs 10.0 \
+    --plot_loss \
+    --bf16 True
+
 # 模型测试（这里使用cli_demo，其他的参考github）
 python src/cli_demo.py \
     --model_name_or_path /root/Qwen1.5-4B-Chat \
@@ -76,5 +97,5 @@ python src/api_demo.py \
 # 测试stream输出
 curl -X POST -H 'Content-Type: application/json' -d '{"model":"qwen1.5-4b-chat", "messages":[{"role":"user", "content":"你好"}], "stream":true}' http://127.0.0.1:8000/v1/chat/completions
 # 测试完整输出
-curl -X POST -H 'Content-Type: application/json' -d '{"model":"qwen1.5-4b-chat", "messages":[{"role":"user", "content":"你是谁，你能做什么？"}]}' http://127.0.0.1:8000/v1/chat/completions
+curl -X POST -H 'Content-Type: application/json' -d '{"model":"haiou", "messages":[{"role":"user", "content":"用python写一个贪吃蛇的游戏"}]}' http://127.0.0.1:8000/v1/chat/completions
 ```

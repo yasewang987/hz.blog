@@ -496,7 +496,8 @@ module.exports = {
             ],
             '/other/book/': [
                 'classical1',
-                'regular'
+                'regular',
+                'child'
             ],
             '/other/cn/': [
                 'gcc',
