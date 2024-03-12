@@ -322,7 +322,9 @@ torchrun --nproc_per_node=4 --master_port=20001 fastchat/train/train_mem.py \
 
 ## LlamaIndex(RAG框架)
 
-## 其他
+## 常用模型
+
+* `AI编程模型`：`Stable Code 3B`
 * `语音转文字`：`PaddleSpeech、FunAsr`
 
 

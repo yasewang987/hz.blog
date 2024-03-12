@@ -222,6 +222,7 @@ module.exports = {
                 'promise'
             ],
             '/code/web/vue/': [
+                'vueui',
                 'vscode',
                 'vue3',
                 'vitevue',

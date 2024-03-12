@@ -1,5 +1,24 @@
 # AI-向量检索
 
+## 向量化模型推荐
+
+及时关注huaggingface的`embedding`模型榜单
+
+需要关注几个列选项:
+
+* modelsize：选择适合大小的模型，如果没有值，则只是开放了api，没有模型可以下载
+* max token：模型输入的token限制
+* embedding dimensions：模型的输出的vector的长度
+* model :选择相应的模型，点击即可跳转到相应页面下载调用。
+
+https://huggingface.co/spaces/mteb/leaderboard
+
+```bash
+bge-m3
+BAAI/bge-large-zh-v1.5
+
+```
+
 ## redis-stack示例
 
 [参考资料](https://redis.io/docs/get-started/vector-database/)
