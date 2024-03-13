@@ -275,7 +275,8 @@ module.exports = {
                 'ai1',
                 'ai2',
                 'ai-vector',
-                'llama-factory'
+                'llama-factory',
+                'prompt'
             ],
             '/microservices/register_config/': [
                 'consul',

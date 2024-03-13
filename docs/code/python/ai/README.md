@@ -9,3 +9,5 @@
 
 * [AI-向量检索](./ai-vector.md)
 * [llama-factory](./llama-factory.md)
+
+* [Prompt资料](./prompt.md)

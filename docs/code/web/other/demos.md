@@ -1,4 +1,9 @@
 # 常用Demos
+## 富文本编辑器
+
+编辑器：https://github.com/Hufe921/canvas-editor
+
+插件（支持文件导入导出docx）：https://github.com/Hufe921/canvas-editor-plugin
 
 ## JS打印
 
