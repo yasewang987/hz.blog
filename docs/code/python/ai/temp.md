@@ -119,6 +119,22 @@ QLoRA提出了一种折中方案：在GPU内存受限的情况下，它能够在
 
 # RAG
 
+## 主要步骤
+
+1. 索引 — 将文档库分割成较短的 Chunk，并通过编码器构建向量索引。
+2. 检索 — 根据问题和 chunks 的相似度检索相关文档片段。
+3. 生成 — 以检索到的上下文为条件，生成问题的回答。
+
+```
+请基于```内的内容回答问题。
+```
+检索片段1
+检索片段2
+```
+我的问题是：
+{content}
+```
+
 ## 向量库选择
 
 * milvus
@@ -156,8 +172,113 @@ QLoRA提出了一种折中方案：在GPU内存受限的情况下，它能够在
 
 # 常用模型及工具记录
 
-## Ollama（简化部署、不支持openai格式-目前不太推荐）
+## llama.cpp（支持cpu）
+
+[参考资料](https://github.com/ggerganov/llama.cpp)
+
+* 支持常见的 `Qwen系列、Baichuan系列、Gemma系列等`
+
+## Ollama（支持cpu）
+
+支持多平台部署
+
+调用了 llama.cpp 的底层能力，并且增加了一些其他能力，[linux手动安装参考](https://github.com/ollama/ollama/blob/main/docs/linux.md)
+
+模型仓库地址：https://ollama.com/library
+
 * `ollama`：大模型简化部署，没有推理加速。可以通过命令行简单运行大模型（默认使用4bit量化的，如果要用原始的可以指定`tag`），对外提供api服务。支持的纯语言模型包括`llama系列、Yi系列、Qwen、DeepSeek 系列、MoE 模型 Mixtral-8x7B、Phi-2`
+
+```bash
+# 下载安装（选择对应版本，arm的下载ollama-linux-arm64）
+wget https://ollama.com/download/ollama-linux-amd64
+
+#### 一般运行，直接到ollama仓库拉取模型
+# 启动服务
+./ollama-linux-amd64 serve
+
+# 创建模型
+ollama create choose-a-model-name -f Modelfile
+
+#### 常见环境变量
+# 默认127.0.0.1 port 11434 
+OLLAMA_HOST=0.0.0.0
+# 跨域
+OLLAMA_ORIGINS=true
+# 模型保存位置
+# macOS: ~/.ollama/models
+# Linux: ~/.ollama/models
+# Windows: C:\Users\<username>\.ollama\models
+OLLAMA_MODELS=/data/models
+# 代理
+HTTPS_PROXY=https://proxy.example.com
+
+### 下面创建运行模型也可以通过api调用（）
+# 下载模型
+ollama pull llama2
+# 运行模型
+ollama run llama2
+# 删除模型
+ollama rm llama2
+
+# 预加载模型，提升响应速度
+curl http://localhost:11434/api/generate -d '{"model": "qwen:4b"}'
+curl http://localhost:11434/api/chat -d '{"model": "qwen:4b"}'
+
+# 模型长期加载到内存/卸载
+# 加载
+curl http://localhost:11434/api/generate -d '{"model": "qwen:4b", "keep_alive": -1}'
+# 卸载
+curl http://localhost:11434/api/generate -d '{"model": "qwen:4b", "keep_alive": 0}'
+
+
+#### 如果是PyTorch & Safetensors模型，需要做一下转换
+git clone git@github.com:ollama/ollama.git ollama
+cd ollama
+git submodule init
+# 下载llama.cpp
+git submodule update llm/llama.cpp
+python3 -m venv llm/llama.cpp/.venv
+source llm/llama.cpp/.venv/bin/activate
+pip install -r llm/llama.cpp/requirements.txt
+# 安装量化工具
+make -C llm/llama.cpp quantize
+# 下载原始模型
+git lfs install
+git clone https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1 model
+# 转换模型（For example, Qwen models require running convert-hf-to-gguf.py instead of convert.py）
+python llm/llama.cpp/convert.py ./model --outtype f16 --outfile converted.bin
+# 量化模型
+llm/llama.cpp/quantize converted.bin quantized.bin q4_0
+# 编写modelfile
+FROM quantized.bin
+TEMPLATE "[INST] {{ .Prompt }} [/INST]"
+# 创建ollama模型
+ollama create mymodel -f Modelfile
+# 运行模型
+ollama run mymodel "What is your favourite condiment?"
+
+#### 上传模型（先注册ollama账号）
+ollama cp mymodel <your username>/mymodel
+ollama push <your username>/mymodel
+
+
+#### openapi方式调用
+curl http://localhost:11434/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "qwen:4b",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant."
+            },
+            {
+                "role": "user",
+                "content": "方寸无忧的电话是多少!"
+            }
+        ]
+    }'
+```
 
 ## FastChat（主部署、加速-目前不太推荐）
 
@@ -200,7 +321,7 @@ source /opt/intel/oneapi/setvars.sh
 python3 -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.3 --device xpu
 ```
 
-## vLLM（推理加速-推荐）
+## vLLM（推理加速-gpu推荐）
 
 * `vLLM`：推理加速的引擎，提高整体吞吐量，单batch效果不明显，预先分配大量显存，提高推理速度，实现了`Rolling Batch`批处理以及`PagedAttention`的全新的注意力算法，相对于静态`batch`，vLLM 提供了高达`数十倍`的吞吐量，而无需进行任何模型架构更改，支持Huggingface常见的模型`llama系列、qwen系列、baichuan`
     
@@ -311,7 +432,7 @@ torchrun --nproc_per_node=4 --master_port=20001 fastchat/train/train_mem.py \
     --lazy_preprocess True
 ```
 
-## FastLLM（推理加速）
+## FastLLM（推理加速-目前不推荐）
 
 * `fastllm`：也是一个推理加速引擎（国产），支持android，有时候会出现问题。
 
@@ -322,6 +443,40 @@ torchrun --nproc_per_node=4 --master_port=20001 fastchat/train/train_mem.py \
 * `llama-factory`：高效的大语言模型训练和推理框架，带有webui，简化训练门槛，支持常见模型`Baichuan2、ChatGLM3、Gemma、LLaMA系列、Qwen系列、Yi系列`。
 
 ## LangChain(RAG框架)
+
+* langchain+ollama 简单demo
+
+```py
+# 加载模型
+from langchain.llms import Ollama
+ollama = Ollama(base_url='http://localhost:11434', model="qwen:4b")
+
+# 外部数据
+from langchain.document_loaders import WebBaseLoader
+loader = WebBaseLoader("http://www.ifuncun.cn/NewsStd_528.html")
+data = loader.load()
+
+# 数据切分
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+text_splitter=RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+all_splits = text_splitter.split_documents(data)
+
+# 数据向量化（如果有报错sqlite3，参考python问题列表处理）
+from langchain.embeddings import OllamaEmbeddings
+from langchain.vectorstores import Chroma
+oembed = OllamaEmbeddings(base_url="http://localhost:11434", model="nomic-embed-text")
+vectorstore = Chroma.from_documents(documents=all_splits, embedding=oembed)
+
+# 相关问题查询（从外部数据检索）
+question="方寸无忧公司的电话是多少？"
+docs = vectorstore.similarity_search(question)
+print(docs)
+
+# 合并发送给大模型处理
+from langchain.chains import RetrievalQA
+qachain=RetrievalQA.from_chain_type(ollama, retriever=vectorstore.as_retriever())
+qachain.invoke({"query": question})
+```
 
 ## LlamaIndex(RAG框架)
 
