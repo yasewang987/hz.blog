@@ -141,3 +141,21 @@ vim .zshrc
 # 添加如下内容
 alias code='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code'
 ```
+
+## U盘NTFS格式读写工具
+
+Omi NTFS 磁盘专家
+
+参考地址：https://blog.luoaicheng.cn/content/140/
+
+```bash
+# 彻底删除
+sudo rm -rf /Library/Filesystems/omni_ntfs.fs
+sudo rm -rf /Library/Extensions/omni_ntfs.kext
+sudo rm -f /Library/PrivilegedHelperTools/NTFS-Pro-by-Omi-Helper
+sudo rm -f /Library/LaunchDaemons/HelperTool-Launchd.plist
+sudo rm -rf /Applications/xNTFS Pro.app
+```
+
+
+

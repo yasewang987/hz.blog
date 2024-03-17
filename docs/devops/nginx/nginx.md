@@ -39,14 +39,18 @@ sudo nginx -V
 ```conf
 # 前端示例
 location / {
-        root   /data/html/;
-        index  index.html index.html;
-        # vue history
-        try_files $uri $uri/ /index.html;
+    root   /data/html/;
+    index  index.html index.html;
+    # vue history
+    try_files $uri $uri/ /index.html;
 }
 location /train/ {
-     alias  /data/trainning/;
-     index  index.html index.html;
+    alias  /data/trainning/;
+    index  index.html index.html;
+}
+# 前端反向代理到其他服务
+location /wps {
+    proxy_pass http://aa.bb.com/;
 }
 
 # 跳转示例
@@ -1186,10 +1190,16 @@ Context:http,server,location,limit_except
 示例
 
 ```conf
+# 生成认证文件
+printf "test:$(openssl passwd -crypt 123456)\n" >>/home/htpasswd
+cat /home/htpasswd 
+test:xyJkVhXGAZ8tM
+
 # 官网示例
 location / {
-    auth_basic           "closed site";
+    auth_basic           "Please enter your username and password";
     auth_basic_user_file conf/htpasswd;
+    autoindex on;
 }
 ```
 

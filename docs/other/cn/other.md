@@ -387,22 +387,24 @@ cp -rf %{_builddir}/baselibs/libs/* %{buildroot}/usr/lib
 
 ```bash
 #### 普通
+%define _binaries_in_noarch_packages_terminate_build 0
 %define __os_install_post %{nil}
 %define debug_package %{nil}
 %global mcompany service
-%global mname data
-%global mpath %{mcompany}/%{mname}
-Name: %{mcompany}-%{mname}
-Version: 2023.11
-Release:        1
-Summary:        %{mcompany} %{mname}
+%global mtype code
+%global mname officialsearch
+%global mpath %{mcompany}/%{mtype}/%{mname}
+Name: %{mcompany}-%{mtype}-%{mname}
+Version: 2024.02
+Release:        29
+Summary:        %{mcompany} %{mtype} %{mname}
 
 Group:          %{mcompany}
 License:        GPLv3+
 BuildArch: noarch
 
 %description
-%{mcompany} %{mname}
+%{mcompany} %{mtype} %{mname}
 
 %prep
 
@@ -418,23 +420,25 @@ cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
 /opt/%{mpath}
 
 
-### 定制
+### 定制(多了一级目录，把定制模块手动拼到mpath最后面)
+%define _binaries_in_noarch_packages_terminate_build 0
 %define __os_install_post %{nil}
 %define debug_package %{nil}
 %global mcompany service
+%global mtype dingzhi
 %global mname ynsw
-%global mpath %{mcompany}/dingzhi/%{mname}/integration
-Name: %{mcompany}-%{mname}
-Version: 2023.1
+%global mpath %{mcompany}/%{mtype}/%{mname}/integration
+Name: %{mcompany}-%{mtype}-%{mname}
+Version: 2023.02
 Release:        20
-Summary:        %{mcompany} %{mname}
+Summary:        %{mcompany} %{mtype} %{mname}
 
 Group:          %{mcompany}
 License:        GPLv3+
 BuildArch: noarch
 
 %description
-%{mcompany} %{mname}
+%{mcompany} %{mtype} %{mname}
 
 %prep
 

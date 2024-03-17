@@ -50,6 +50,21 @@ docker run -d --name fc-jms --restart=always \
     jumpserver/jms_all:latest
 ```
 
+## 终端连接jumpserver
+
+```bash
+# 使用ssh连接jumpserver所在服务器，端口为堡垒机的终端端口，默认2222
+ssh -p 2222 account@1.1.1.1
+
+# 如果报错：No matching host key type found. Their offer: ssh-rsa
+vim ~/.ssh/config
+# 增加如下内容，然后重新连接即可
+# 第一行说明对所有主机生效, 第二行是将ssh-rsa加会允许使用的范围, 第三行是指定所有主机使用的都是ssh-rsa算法的key
+Host *
+PubkeyAcceptedKeyTypes +ssh-rsa
+HostKeyAlgorithms +ssh-rsa
+```
+
 ## nginx反向代理配置
 
 ```conf

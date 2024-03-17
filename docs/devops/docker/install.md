@@ -144,7 +144,7 @@ vim /etc/selinux/config
 
 * 安装 [nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
 
-    dockeer19.03版本之后只需要安装 `nvidia-container-runtime` 即可
+    dockeer19.03版本之后只需要安装 `nvidia-container-toolkit` 即可
     
     ```bash
     #### ubuntu
@@ -194,6 +194,73 @@ sudo rpm -ivh ./* --nodeps
 systemctl restart docker
 # 验证
 sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
+```
+
+## ubuntu离线安装nvidia-container-toolkit
+
+参考：https://nvidia.github.io/nvidia-container-runtime/
+
+```bash
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | \
+  sudo apt-key add -
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+sudo apt-get update
+
+# 下载nvidia-container-toolkit安装包
+# 默认下载目录：/var/cache/apt/archives/
+apt install nvidia-container-toolkit --download-only
+apt-get download package_name
+
+
+# 拷贝下载目录下的所有deb包，然后复制到离线机器，执行如下命令
+dpkg -i ./*.deb
+
+#### 如果遇到如下报错
+GPG error: https://developer.download.nvidia.cn/compute/cuda/repos/ubuntu1804/x86_64 InRelease: The following signatures couldnt be verified because the public key is not available: NO_PUBKEY A4B469963BF863CC
+# 则执行后面的，需要将命令中的密钥替换为出现在错误消息中的实际密钥
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+apt-get update
+# 如果上面提示 gnupg 没有安装 gnupg1或2
+apt install gnupg1
+```
+
+* 递归下载所有依赖包
+
+```bash
+#!/bin/bash
+
+logfile=$PWD/log
+
+ret=""
+
+function getDepends() {
+    echo "fileName is" $1 >>$logfile
+    # use tr to del < >
+    ret=$(apt-cache depends $1 | grep Depends | cut -d: -f2 | tr -d "<>")
+    echo $ret | tee -a $logfile
+}
+
+# 需要获取其所依赖包的包
+libs="docker-ce" # 或者用$1，从命令行输入库名字
+
+# download libs dependen. deep in 3
+
+i=0
+
+while [ $i -lt 3 ]; do
+    let i++
+    echo $i
+    # download libs
+    newlist=" "
+    for j in $libs; do
+        added="$(getDepends $j)"
+        newlist="$newlist $added"
+        apt install $added --reinstall -d -y
+    done
+    libs=$newlist
+done
 ```
 
 ## 私有镜像仓库

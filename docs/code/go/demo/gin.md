@@ -229,7 +229,6 @@ func main() {
  router.Run(":8080")
 }
 ```
-
 ## 参数验证
 
 常用验证规则：
@@ -317,7 +316,6 @@ func main() {
   ...
   route.Run(":8080")
 }
-
 ```
 ## 上传文件
 
@@ -377,6 +375,212 @@ curl -X POST http://localhost:8080/upload \
   -F "upload[]=@/Users/appleboy/test1.zip" \
   -F "upload[]=@/Users/appleboy/test2.zip" \
   -H "Content-Type: multipart/form-data"
+```
+## 多种数据响应格式（返回值）
+
+```go
+//// JSON
+package main
+import (
+ "net/http"
+
+ "github.com/gin-gonic/gin"
+)
+type User struct {
+ Id     int
+ Name   string
+ Habits []string
+}
+func main() {
+ engine := gin.New()
+
+ u := User{Id: 1, Name: "小明", Habits: []string{"看书", "看电影"}}
+
+ engine.GET("/JSON", func(ctx *gin.Context) {
+  ctx.JSON(http.StatusOK, u)
+ })
+ // JSONP：与script标签配合使用，可以不受浏览器跨域限制
+ engine.GET("/JSONP?callback=test", func(ctx *gin.Context) {
+  ctx.JSONP(http.StatusOK, u)
+ })
+ // AsciiJSON：将JSON数据中非ASCII转化为ASCII码
+ engine.GET("/AsciiJSON", func(ctx *gin.Context) {
+  ctx.AsciiJSON(http.StatusOK, u)
+ })
+ // IndentedJSON：对齐输出
+ engine.GET("/IndentedJSON", func(ctx *gin.Context) {
+  ctx.IndentedJSON(http.StatusOK, u)
+ })
+ // PureJSON：不转换HTML标签
+ engine.GET("/PureJSON", func(ctx *gin.Context) {
+  ctx.PureJSON(http.StatusOK, u)
+ })
+ // SecureJSON：预防JSON数组劫持
+ engine.GET("/SecureJSON", func(ctx *gin.Context) {
+  data := []int{1, 2, 3, 4}
+  ctx.SecureJSON(http.StatusOK, data)
+ })
+
+ engine.Run()
+}
+
+
+//// XML
+// 请求的Content-Type要设置为application/xml
+package main
+
+import (
+ "encoding/xml"
+
+ "github.com/gin-gonic/gin"
+)
+
+type User struct {
+ XMLName xml.Name `xml:"user"`
+ Id      int      `xml:"id"`
+ Name    string   `xml:"name"`
+ Habits  []string `xml:"habits"`
+}
+
+func main() {
+
+ engine := gin.New()
+
+ engine.GET("/xml", func(ctx *gin.Context) {
+  user := &User{Id: 1, Name: "小明", Habits: []string{"看书", "看电影"}}
+  ctx.XML(http.StatusOK, user)
+ })
+
+ engine.Run()
+}
+
+
+//// TOML
+// 请求的Content-Type设置为application/toml
+package main
+
+import (
+ "net/http"
+
+ "github.com/gin-gonic/gin"
+)
+
+type User struct {
+ Id     int
+ Name   string
+ Habits []string
+}
+
+func main() {
+
+ engine := gin.New()
+
+ engine.GET("/toml", func(ctx *gin.Context) {
+  user := &User{Id: 1, Name: "小明", Habits: []string{"看书", "看电影"}}
+  ctx.TOML(http.StatusOK, user)
+ })
+
+ engine.Run()
+}
+
+
+//// YAML
+// 请求Content-Type设置为application/yaml
+package main
+
+import (
+ "net/http"
+
+ "github.com/gin-gonic/gin"
+)
+
+type User struct {
+ Id     int
+ Name   string
+ Habits []string
+}
+
+func main() {
+
+ engine := gin.New()
+
+ engine.GET("/yaml", func(ctx *gin.Context) {
+  user := &User{Id: 1, Name: "小明", Habits: []string{"看书", "看电影"}}
+  ctx.YAML(http.StatusOK, user)
+ })
+
+ engine.Run()
+}
+
+
+//// ProtoBuf
+// 定义proto文件
+syntax = "proto3";
+
+option go_package = "./user";
+
+message User {
+    int64  Id = 1;
+    string Name = 2;
+    string Email = 3;
+}
+// 调用protoc生成pb文件
+protoc --proto_path=./ --go_out=./ ./user.proto
+// 目录结构如下
+├── main.go
+├── user
+│   └── user.pb.go
+└── user.proto
+// go代码
+package main
+
+import (
+ "user"
+ "github.com/gin-gonic/gin"
+)
+
+func main() {
+ router := gin.New()
+ router.GET("/protoBuf", func(ctx *gin.Context) {
+  u := user.User{Id: 1, Name: "protoBuf", Email: "test@163.com"}
+  ctx.ProtoBuf(http.StatusOK, &u)
+ })
+ router.Run()
+}
+
+//// HTML模板
+// 假设我们有一个模板名称为templates/index.tmpl
+<html>
+ <h1>
+  {{ .title }}
+ </h1>
+</html>
+// LoadHTMLFiles()可以加载一个或多个HTML模板
+package main 
+
+func main() {
+ engine := gin.Default()
+ engine.LoadHTMLFiles("templates/index.tmpl")
+ engine.GET("/index", func(c *gin.Context) {
+  c.HTML(http.StatusOK, "index.tmpl", gin.H{
+   "title": "主页",
+  })
+ })
+ engine.Run()
+}
+// LoadHTMLGlob()加载整个目录的HTML模板
+package main 
+
+func main() {
+ engine := gin.Default()
+ engine.LoadHTMLGlob("templates/**/*")
+ engine.GET("/index", func(ctx *gin.Context) {
+  ctx.HTML(http.StatusOK, "index.tmpl", gin.H{
+   "title": "主页",
+  })
+ })
+ engine.Run()
+}
 ```
 
 ## 路由分组
@@ -653,6 +857,31 @@ func main() {
     })
 ​
     router.Run(":8080")
+}
+```
+## 静态文件
+
+```go
+// 文件目录如下
+├── main.go
+└── static
+    ├── js
+    │   └── index.js
+    └── pages
+        └── index.html
+
+// go代码
+package main
+
+import (
+ "github.com/gin-gonic/gin"
+)
+
+func main() {
+ engine := gin.New()
+ engine.Static("static/pages", "./static/pages")
+ engine.StaticFile("/static/js/index.js", "./static/js/index.js")
+ engine.Run()
 }
 ```
 

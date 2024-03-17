@@ -55,9 +55,9 @@ module.exports = {
                     { text: 'Python', link: '/code/python/',
                       items: [
                         { text: '基础资料', link: '/code/python/base/'},
-                        { text: 'AI部署资料', link: '/code/python/deploy/' },
                         { text: 'Paddle系列', link: '/code/python/paddle/' },
-                        { text: '学习资料', link: '/code/python/docs/' }
+                        { text: 'AI部署资料', link: '/code/python/deploy/' },
+                        { text: 'AI资料', link: '/code/python/ai/' }
                       ]
                     }
                 ]
@@ -222,6 +222,7 @@ module.exports = {
                 'promise'
             ],
             '/code/web/vue/': [
+                'vueui',
                 'vscode',
                 'vue3',
                 'vitevue',
@@ -254,14 +255,11 @@ module.exports = {
                 'source',
                 'devops',
                 'problem',
-                'install',
-                'ai1',
-                'ai2'
+                'install'
             ],
             '/code/python/deploy/': [
                 'nvidia',
                 'torchserve',
-                'tfx',
                 'tf'
             ],
             '/code/python/paddle/': [
@@ -270,10 +268,15 @@ module.exports = {
                 'paddlespeech',
                 'paddleserving'
             ],
-            '/code/python/docs/': [
+            '/code/python/ai/': [
                 'tensor',
                 'nlp',
-                'temp'
+                'temp',
+                'ai1',
+                'ai2',
+                'ai-vector',
+                'llama-factory',
+                'prompt'
             ],
             '/microservices/register_config/': [
                 'consul',
@@ -495,7 +498,8 @@ module.exports = {
             ],
             '/other/book/': [
                 'classical1',
-                'regular'
+                'regular',
+                'child'
             ],
             '/other/cn/': [
                 'gcc',

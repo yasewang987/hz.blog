@@ -107,3 +107,69 @@ cd /opt/redis-5.0.14/
 make
 # 编译完成后，可执行文件在源码的/src目录下
 ```
+
+# redis-stack
+
+## 下载编译调整配置
+
+[redis-stack下载地址](https://redis.io/download/)，往下翻到redis-stack的下载地址，选择最新的下载。
+
+```bash
+# 推荐下载ubuntu的bionic版本
+# x86
+wget https://packages.redis.io/redis-stack/redis-stack-server-7.2.0-v8.bionic.x86_64.tar.gz
+# arm
+wget https://packages.redis.io/redis-stack/redis-stack-server-7.2.0-v8.bionic.arm64.tar.gz
+
+
+# 解压
+tar zxf redis-stack-server-7.2.0-v8.bionic.arm64.tar.gz -C /opt/basesoft/
+cd /opt/basesoft/
+mv redis-stack-server-7.2.0-v8 redis-stack
+
+# 修改配置
+vim redis-stack/etc/redis-stack.conf
+# 常用配置如下
+port 112233
+daemonize yes
+requirepass mypassword
+
+# 启动redis-stack
+./redis-stack/bin/redis-stack-server
+```
+
+## rpm包制作
+
+```yml
+%global mname redis-stack
+%global mpath basesoft/%{mname}
+Name: basesoft-%{mname}
+Version: 2023.12
+Summary: basesoft %{mname}
+Release: 15
+License: GPLv3+
+Group: System Enviroment/Base
+AutoReqProv:no
+
+%description
+base %{mname}
+
+%prep
+
+%build
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/opt/%{mpath}
+cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
+
+%post
+
+%clean
+
+%files
+%defattr(-,root,root,0775)
+/opt/%{mpath}
+```
+
+

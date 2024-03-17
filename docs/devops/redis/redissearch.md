@@ -1,5 +1,7 @@
 # RedisSearch
 
+[参考文档](https://redis.io/docs/data-types/json/)
+
 `RedisSearch` 属于 `RedisMod` 增强模块中的其中一个模块。通过RediSearch模块，Redis可以变成一个功能强大的全文搜索引擎，并且原生支持中文搜索.
 
 下面操作都是使用 `RedisInsight` 操作，其他redis客户端也可以操作。
@@ -19,6 +21,7 @@ JSON.SET product:3 $ '{"id":3,"productSn":"7437799","name":"Apple iPhone 8 Plus"
 数据插入成功后，在RedisInsight中查看信息
 
 ```bash
+#### 获取数据
 # 获取整个json对象
 JSON.GET product:1
 # 获取部分信息（name，subTitle）
@@ -26,6 +29,24 @@ JSON.GET product:1 .name .subTitle
 # 获取JSON对象类型
 JSON.TYPE product:1 .
 "object"
+
+#### 删除数据
+JSON.DEL product:1
+```
+
+* 常见例子参考
+
+```bash
+> JSON.SET example $ '[ true, { "answer": 42 }, null ]'
+OK
+> JSON.GET example $
+"[[true,{\"answer\":42},null]]"
+> JSON.GET example $[1].answer
+"[42]"
+> JSON.DEL example $[-1]
+(integer) 1
+> JSON.GET example $
+"[[true,{\"answer\":42}]]"
 ```
 
 ## RedisSearch使用
