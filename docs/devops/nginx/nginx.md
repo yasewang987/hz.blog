@@ -1190,10 +1190,16 @@ Context:http,server,location,limit_except
 示例
 
 ```conf
+# 生成认证文件
+printf "test:$(openssl passwd -crypt 123456)\n" >>/home/htpasswd
+cat /home/htpasswd 
+test:xyJkVhXGAZ8tM
+
 # 官网示例
 location / {
-    auth_basic           "closed site";
+    auth_basic           "Please enter your username and password";
     auth_basic_user_file conf/htpasswd;
+    autoindex on;
 }
 ```
 
