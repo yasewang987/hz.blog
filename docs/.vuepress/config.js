@@ -517,7 +517,8 @@ module.exports = {
                 'shengteng',
                 'other',
                 'problem',
-                'guomi'
+                'guomi',
+                'dengbao'
             ],
         },
         sidebarDepth: 2

@@ -139,6 +139,7 @@ QLoRA提出了一种折中方案：在GPU内存受限的情况下，它能够在
 
 * milvus
 * redis-stack
+* postgresql+pgvector
 * elasticsearch
 * mongo
 
@@ -444,6 +445,8 @@ torchrun --nproc_per_node=4 --master_port=20001 fastchat/train/train_mem.py \
 
 ## LangChain(RAG框架)
 
+LangChain更加注重在大型语言模型的基础上开发应用程序。它支持各种自然语言处理任务，包括Creative Generation（创意生成）等领域。LangChain的灵活性和多样性使其在创造性应用方面具有独特优势。
+
 * langchain+ollama 简单demo
 
 ```py
@@ -479,6 +482,8 @@ qachain.invoke({"query": question})
 ```
 
 ## LlamaIndex(RAG框架)
+
+专门用于构建RAG系统的框架，其主要用途是处理检索、摘要和生成任务。在RAG系统中，检索（Retrieve）、摘要（Answer）和生成（Generate）是三个关键步骤，LLamaIndex通过构建高效的索引和查询系统，为用户提供了强大的检索和生成能力。
 
 ## 常用模型
 
