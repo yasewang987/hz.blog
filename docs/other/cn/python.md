@@ -164,7 +164,7 @@ sqlite-devel openssl-devel xz xz-devel libffi-devel findutils
 * 编译安装 Python，打开 `https://www.python.org/ftp/python` 自选版本
 
 ```bash
-# 下载源码
+# 下载源码（华为源：https://mirrors.huaweicloud.com/python/）
 curl -O https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tar.xz
 
 # 解压

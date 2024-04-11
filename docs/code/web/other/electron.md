@@ -5,7 +5,7 @@
 ## 技术选型
 
 * 语言：TypeScript
-* 构建工具：Electron-Forge
+* 构建工具：Electron-Builder
 * Web方案：Vue3+Vite
 * 数据库：lowdb
 
