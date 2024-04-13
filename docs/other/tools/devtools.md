@@ -13,6 +13,9 @@ Termux官网：https://termux.com/
 国内镜像源地址：https://mirrors.tuna.tsinghua.edu.cn/help/termux/
 
 ```bash
+# 更换清华源(第一步选中所有main、x11，第二步选择清华源)
+termux-change-repo
+
 # 安装必要工具
 pkg install openssl
 pkg install openssh
@@ -20,6 +23,41 @@ pkg install vim
 
 # 执行ssh命令时报错CANNOT LINK EXECUTABLE “ssh“ library “libcrypto.so.1.1“ not found，需要先卸载openssh，然后先安装ssl，再安装ssh
 pkg uninstall openssh
+
+# 安装proot，proot-distro
+pkg install proot proot-distro -y
+# 查看支持的系统
+proot-distro list
+# 安装debian
+proot-distro install debian
+# 启动debian
+proot-distro login debian
+# 修改debian镜像源
+https://mirrors.tuna.tsinghua.edu.cn/help/debian/
+mv /etc/apt/sources.list /etc/apt/sources.list.bak
+cat <<EOF > /etc/apt/sources.list
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb https://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+EOF
+# 更新软件包列表
+apt update
+# 退出debian
+exit
+
+# 安装vscode：https://code.visualstudio.com/docs/setup/linux
+apt-get install wget gpg
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+rm -f packages.microsoft.gpg
+apt install apt-transport-https
+apt update
+apt install code
+# 启动vscode（会给出启动的地址和token）
+code --no-sandbox --user-data-dir="/root/code" serve-web --host 127.0.0.1
+# 然后通过安卓浏览器去打开（推荐via浏览器）
 ```
 
 ## 数据库管理工具
@@ -57,3 +95,9 @@ github地址：https://github.com/barry-ran/QtScrcpy
 * 下载地址：https://github.com/NaiboWang/EasySpider/releases
 * GitHub地址：https://github.com/NaiboWang/EasySpider
 * 详细实用教程：https://blog.csdn.net/ihero/article/details/130805504
+
+## 项目管理和团队协作工具
+
+github地址：https://github.com/mattermost/focalboard
+
+focalboard：这是一款开源、多语言、自托管的项目管理工具，兼容了 Trello 和 Notion 的特点。它支持看板、表格和日历等视图管理任务，并提供评论同步、文件共享、用户权限等功能。该工具还提供了适用于 Windows、macOS、Linux 系统的客户端。

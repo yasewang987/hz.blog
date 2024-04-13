@@ -1,3 +1,11 @@
+# 昇腾官方资源
+
+* 注意：先到资源中心选择对应的服务器型号（一般是加速卡），然后到固件驱动中心选择对应的服务器型号和CANN版本（和资源下载中心的一致）
+* （toolkit、torch、kernels等）资源下载中心：https://www.hiascend.com/developer/download
+* 固件驱动选择中心：https://www.hiascend.com/hardware/firmware-drivers/community
+* cann安装指南：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC1alpha003/quickstart/quickstart/quickstart_18_0004.html
+* pytorch算子优化：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC1alpha003/devguide/moddevg/ptmigr/AImpug_0074.html
+
 # 昇腾硬件适配-310P3（300I DUO）
 
 本示例以`Atlas800型号3000`服务器为例
@@ -6,7 +14,7 @@
 
 主要是`7.0.0`版本的`固件、驱动、CANN-Toolkit、CANN-kernels、Ascend Docker`等，[参考资料](https://www.hiascend.com/document/detail/zh/quick-installation/23.0.0/quickinstg/800_3000/quickinstg_800_3000_0005.html)，可以下载社区版的驱动
 
-第一次安装或者已经卸载老的固件驱动，需按照“驱动 > 固件”的顺序安装驱动固件。
+第一次安装或者已经卸载老的固件驱动，需按照`驱动 > 固件`的顺序安装驱动固件。
 
 ```bash
 # root登陆用户之后，创建普通用户
@@ -49,11 +57,9 @@ systemctl restart docker
 
 ```bash
 # 固件
-./Ascend-hdk-310p-npu-firmware_7.1.0.4.220.run --full
-
+./Ascend-hdk-910-npu-firmware_7.1.0.4.220.run --full
 # 驱动
-./Ascend-hdk-310p-npu-driver_23.0.1_linux-aarch64.run --full  --install-for-all
-
+./Ascend-hdk-910-npu-driver_23.0.2_linux-aarch64.run --full  --install-for-all
 # 重启
 reboot
 ```
@@ -728,6 +734,497 @@ cd /data/code/glm2
 
 直接将微调之后的`pytorch*`带头的几个模型覆盖官方的模型即可。其他文件不用替换（目前测试其他文件替换会出问题）。
 
+# 昇腾910A适配
+
+## 固件驱动安装
+
+本示例以`atlas 300T Pro`服务器为例（npu-smi看到如果显卡型号是910B后面没有其他数字说明是910A系列的，真*910B都是B几）
+
+固件驱动、docker-runtime安装方式参考上面310P3，只有版本的差异
+
+下载地址：https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.alpha003&driver=1.0.22.alpha
+
+```bash
+# 驱动
+./Ascend-hdk-910-npu-driver_23.0.2_linux-aarch64.run --full --install-for-all
+# 固件
+./Ascend-hdk-910-npu-firmware_7.1.0.4.220.run --full
+# 重启服务器
+reboot
+### 先安装docker再安装ascend-docker
+./Ascend-docker-runtime_5.0.0_linux-aarch64.run --install
+# 重启docker
+systemctl restart docker
+```
+
+## 制作基础docker镜像
+
+主流程和310P3一样，对应的toolkit和kernels替换成910b支持的版本
+
+下载地址：https://www.hiascend.com/developer/download/community/result?module=pt+cann&pt=6.0.RC1.alpha003&cann=8.0.RC1.alpha003&product=2&model=19
+
+```bash
+# 拉取基础镜像
+docker pull ubuntu:18.04
+# 运行安装环境的空容器
+docker run -itd --name test111 ubuntu:18.04 /bin/bash
+
+docker exec -it test111 bash
+# 初始化操作（速度慢可以改成清华源，注意选择arm版本）
+apt update
+# 安装python（如果python安装到其他目录，需要设置PATH环境变量到python的bin目录下）
+apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
+wget https://mirrors.huaweicloud.com/python/3.10.14/Python-3.10.14.tgz
+tar zxf Python-3.10.14.tgz && cd Python-3.10.14
+./configure --prefix=/usr/local --enable-optimizations
+make
+make install
+# 安装python依赖
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch==2.1.0 pyyaml setuptools numpy torch-npu==2.1.0 decorator attrs sse_starlette fastapi uvicorn
+
+# 安装昇腾cann套件（这里有个坑，不要用最新版本的cann套件，容易出问题）
+./Ascend-cann-toolkit_8.0.RC1.alpha001_linux-aarch64.run --install --install-for-all --quiet
+./Ascend-cann-kernels-910_8.0.RC1.alpha001_linux.run --install --install-for-all --quiet
+
+### 调整环境变量（放到.bashrc业务容器启动的时候source执行会不生效）
+vim ~/.profile
+# 增加如下配置
+export ASCEND_BASE=/usr/local/Ascend
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
+source $ASCEND_BASE/ascend-toolkit/set_env.sh
+
+### 安装qwen依赖（查看github上官方demo的requirements.txt）
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+
+### 清理容器内的所有run包和其他数据
+rm -f *.run
+rm -rf ~/.cache
+history -c
+### 生成镜像
+docker commit test111 llm:910a
+### 导出导入镜像
+docker save -o llm.tar llm:910a
+docker load -i llm.tar
+```
+
+## qwen模型适配及运行
+
+```bash
+# 启动调试容器
+docker run -itd \
+--cap-add=ALL \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
+-v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
+-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+-v /etc/ascend_install.info:/etc/ascend_install.info \
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /data:/data \
+--name fc-llm-test llm:910a \
+/bin/bash
+# 验证npu是否可以使用（需要返回一个true，后一个不要报错）
+python3 -c "import torch;import torch_npu;print(torch_npu.npu.is_available());print(torch.npu.is_bf16_supported())"
+
+# 下载模型
+docker exec -it fc-llm-test bash
+cd /data
+vim download.py
+------download.py
+from modelscope.hub.snapshot_download import snapshot_download
+model_dir = snapshot_download('qwen/Qwen-7B-Chat', cache_dir='/data/models', revision='v1.1.9')
+------download.py
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple modelscope
+nohup python3 download.py &
+# 下载之后把模型转移到/data/models目录下，方便替换
+mv /data/models/qwen/Qwen-7B-Chat/* /data/models
+rm -rf /data/models/temp /data/models/qwen
+# 下载官方代码（或者浏览器直接下载Qwen-main.zip）
+git clone https://github.com/QwenLM/Qwen.git
+mv Qwen /data/llm
+```
+
+* 适配，代码调整
+
+```py
+#### 模型代码修改（模型下载的目录中的modeling_qwen.py）
+SUPPORT_CUDA = torch.npu.is_available()
+#SUPPORT_BF16 = SUPPORT_CUDA and torch.cuda.is_bf16_supported()
+SUPPORT_BF16 = torch.npu.is_bf16_supported()
+#SUPPORT_FP16 = SUPPORT_CUDA and torch.cuda.get_device_capability(0)[0] >= 7
+SUPPORT_FP16 = True
+
+#### 业务代码修改（hf上的demo）
+import torch
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+npu_num = os.environ.get("NPU_NUM", 0)
+torch.npu.set_device(torch.device(f"npu:{npu_num}"))
+tokenizer = AutoTokenizer.from_pretrained("/data/models", trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained("/data/models", trust_remote_code=True).half().npu()
+torch.npu.set_compile_mode(jit_compile=False)
+model.eval()
+
+#### 业务代码修改（qwen官方github代码）-要删除resume_download=True和device_map
+# open_api.py（只需要修改 __name__ 里面的代码）
+import transformers
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+...
+...
+def _get_args():
+    parser = ArgumentParser()
+    parser.add_argument(
+        '-c',
+        '--checkpoint-path',
+        type=str,
+        default='/data/models', # 这里
+        help='Checkpoint name or path, default to %(default)r',
+    )
+    ...
+    ...
+    parser.add_argument(
+        '--server-name',
+        type=str,
+        default='0.0.0.0', # 这里
+        help=
+        'Demo server name. Default: 127.0.0.1, which is only visible from the local computer.'
+        ' If you want other computers to access your server, use 0.0.0.0 instead.',
+    )
+    ...
+    ...
+    return args
+...
+...
+if __name__ == '__main__':
+    args = _get_args()
+    npu_num = os.environ.get("NPU_NUM", 0) # here
+    torch.npu.set_device(torch.device(f"npu:{npu_num}")) #here
+    tokenizer = AutoTokenizer.from_pretrained(
+        args.checkpoint_path,
+        trust_remote_code=True,
+    ) # here
+
+    if args.api_auth:
+        app.add_middleware(BasicAuthMiddleware,
+                           username=args.api_auth.split(':')[0],
+                           password=args.api_auth.split(':')[1])
+
+    if args.cpu_only:
+        device_map = 'cpu'
+    else:
+        device_map = 'auto'
+
+    model = AutoModelForCausalLM.from_pretrained(
+        args.checkpoint_path,
+        trust_remote_code=True,
+    ).half().npu() # here
+    torch.npu.set_compile_mode(jit_compile=False) # here
+    model.eval() # here
+
+    model.generation_config = GenerationConfig.from_pretrained(
+        args.checkpoint_path,
+        trust_remote_code=True,
+    ) # here
+    uvicorn.run(app, host=args.server_name, port=args.server_port, workers=1)
+```
+
+* 最后启动业务容器
+
+```bash
+### start.sh----
+#!/bin/bash
+source /root/.profile
+cd /data/llm
+python3 openai_api.py
+#--------------
+
+### 启动容器
+docker run -d \
+-e NPU_NUM=2 \
+--cap-add=ALL \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
+-v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
+-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+-v /etc/ascend_install.info:/etc/ascend_install.info \
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /data:/data \
+-p 8002:8000 \
+--name fc-llm-2 ifuncun/llm:910a-3 \
+bash /data/llm/start.sh
+
+# 测试
+curl -X POST -H 'Content-Type: application/json' -d '{"model":"glm3", "messages":[{"role":"user", "content":"你好"}], "stream":true}' http://127.0.0.1:8002/v1/chat/completions
+```
+
+# 昇腾910B适配
+
+服务器型号：`altlas 800t A2`
+
+## 固件驱动
+
+参考910A的方式去安装
+
+```bash
+# 驱动
+./Ascend-hdk-910b-npu-driver_23.0.3_linux-aarch64.run --full --install-for-all
+# 固件
+./Ascend-hdk-910b-npu-firmware_7.1.0.5.220.run --full
+# 重启服务器
+reboot
+### 先安装docker再安装ascend-docker
+./Ascend-docker-runtime_5.0.0_linux-aarch64.run --install
+# 重启docker
+systemctl restart docker
+```
+
+## 制作基础docker镜像
+
+* 注意如果是mindspore的话，需要确认和cann的对应关系：https://www.mindspore.cn/versions#ascend%E9%85%8D%E5%A5%97%E8%BD%AF%E4%BB%B6%E5%8C%85
+
+```bash
+# 拉取基础镜像
+docker pull ubuntu:18.04
+# 运行安装环境的空容器
+docker run -itd --name test111 ubuntu:18.04 /bin/bash
+
+docker exec -it test111 bash
+# 初始化操作（速度慢可以改成清华源，注意选择arm版本）
+apt update
+# 安装python（如果python安装到其他目录，需要设置PATH环境变量到python的bin目录下）
+apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
+wget https://mirrors.huaweicloud.com/python/3.9.18/Python-3.9.18.tgz
+tar zxf Python-3.9.18.tgz && cd Python-3.9.18
+./configure --prefix=/usr/local --enable-optimizations
+make
+make install
+
+# 安装昇腾cann套件（这里有个坑，不要用最新版本的cann套件，容易出问题）
+./Ascend-cann-toolkit_7.0.0_linux-aarch64.run --install --install-for-all --quiet
+./Ascend-cann-kernels-910b_7.0.0_linux.run --install --install-for-all --quiet
+
+### 调整环境变量（放到.bashrc业务容器启动的时候source执行会不生效）
+vim ~/.profile
+# 增加如下配置
+export ASCEND_BASE=/usr/local/Ascend
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
+source $ASCEND_BASE/ascend-toolkit/set_env.sh
+
+### 清理容器内的所有run包和其他数据
+rm -f *.run
+rm -rf ~/.cache
+history -c
+### 生成镜像
+docker commit test111 llm:temp
+```
+
+## glm3模型适配
+
+**mindspore方式：**
+
+参考资料：https://www.mindspore.cn/install
+mindspore和cann对应关系：https://www.mindspore.cn/versions#ascend%E9%85%8D%E5%A5%97%E8%BD%AF%E4%BB%B6%E5%8C%85
+
+```bash
+# 启动调试容器(将模型和代码都放到data目录下)
+docker run -itd \
+--cap-add=ALL \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
+-v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
+-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+-v /etc/ascend_install.info:/etc/ascend_install.info \
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /data:/data \
+--name test222 llm:temp \
+/bin/bash
+# 安装ai套件
+pip3 uninstall te topi hccl -y
+pip3 install sympy
+pip3 install /usr/local/Ascend/ascend-toolkit/latest/lib64/te-*-py3-none-any.whl
+pip3 install /usr/local/Ascend/ascend-toolkit/latest/lib64/hccl-*-py3-none-any.whl
+# 执行如下代码，如果未报错且输出了mindspore版本，证明mindspore安装成功
+python3 -c "import mindspore;mindspore.set_context(device_target='Ascend');mindspore.run_check()"
+
+# 安装mindformers-注意修改sh脚本中的python和pip版本(https://gitee.com/mindspore/mindformers)
+git clone -b dev https://gitee.com/mindspore/mindformers.git
+cd mindformers
+bash build.sh
+# 如果有问题则需要安装低版本的mindformers
+wget https://gitee.com/mindspore/mindformers/releases/download/v1.0.0/mindformers-1.0.0-py3-none-any.whl
+pip3 install mindformers-1.0.0-py3-none-any.whl
+
+### 安装依赖（查看github上官方demo的requirements.txt）
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+```
+
+**torch方式:**
+
+```bash
+# 安装python依赖
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch==2.1.0 pyyaml setuptools numpy decorator attrs sse_starlette fastapi uvicorn
+# 安装torch-npu
+wget https://gitee.com/ascend/pytorch/releases/download/v5.0.0-pytorch2.1.0/torch_npu-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch_npu-2.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+# 验证npu是否可以使用（需要返回一个true，后一个不要报错）
+python3 -c "import torch;import torch_npu;print(torch_npu.npu.is_available());print(torch.npu.is_bf16_supported())"
+
+# 下载模型
+cd /data
+vim download.py
+------download.py
+from modelscope.hub.snapshot_download import snapshot_download
+model_dir = snapshot_download('qwen/Qwen-7B-Chat', cache_dir='/data/models')
+------download.py
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple modelscope
+nohup python3 download.py &
+# 下载之后把模型转移到/data/models目录下，方便替换
+mv /data/models/qwen/Qwen-7B-Chat/* /data/models
+rm -rf /data/models/temp /data/models/qwen
+# 下载官方代码（或者浏览器直接下载Qwen-main.zip）
+git clone https://github.com/QwenLM/Qwen.git
+mv Qwen /data/llm
+
+#### 模型代码修改（模型下载的目录中的modeling_qwen.py）
+SUPPORT_CUDA = torch.npu.is_available()
+SUPPORT_BF16 = SUPPORT_CUDA and torch.npu.is_bf16_supported()
+SUPPORT_FP16 = True
+
+#### 业务代码修改（hf上的demo）
+import torch
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+npu_num = os.environ.get("NPU_NUM", 0)
+torch.npu.set_device(torch.device(f"npu:{npu_num}"))
+torch.npu.set_compile_mode(jit_compile=False)
+
+tokenizer = AutoTokenizer.from_pretrained("/data/models", trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained("/data/models", trust_remote_code=True).npu().eval()
+
+#### 业务代码修改（qwen官方github代码）-要删除resume_download=True和device_map
+# open_api.py
+import transformers
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+npu_num = os.environ.get("NPU_NUM", 0)
+torch.npu.set_device(torch.device(f"npu:{npu_num}"))
+torch.npu.set_compile_mode(jit_compile=False)
+
+...
+...
+def _get_args():
+    parser = ArgumentParser()
+    parser.add_argument(
+        '-c',
+        '--checkpoint-path',
+        type=str,
+        default='/data/models', # 这里
+        help='Checkpoint name or path, default to %(default)r',
+    )
+    ...
+    ...
+    parser.add_argument(
+        '--server-name',
+        type=str,
+        default='0.0.0.0', # 这里
+        help=
+        'Demo server name. Default: 127.0.0.1, which is only visible from the local computer.'
+        ' If you want other computers to access your server, use 0.0.0.0 instead.',
+    )
+    ...
+    ...
+    return args
+...
+...
+if __name__ == '__main__':
+    args = _get_args()
+    tokenizer = AutoTokenizer.from_pretrained(
+        args.checkpoint_path,
+        trust_remote_code=True,
+    ) # here
+
+    if args.api_auth:
+        app.add_middleware(BasicAuthMiddleware,
+                           username=args.api_auth.split(':')[0],
+                           password=args.api_auth.split(':')[1])
+
+    if args.cpu_only:
+        device_map = 'cpu'
+    else:
+        device_map = 'auto'
+
+    model = AutoModelForCausalLM.from_pretrained(
+        args.checkpoint_path,
+        trust_remote_code=True,
+    ).half().npu().eval() # here
+
+    model.generation_config = GenerationConfig.from_pretrained(
+        args.checkpoint_path,
+        trust_remote_code=True,
+    ) # here
+    uvicorn.run(app, host=args.server_name, port=args.server_port, workers=1)
+```
+
+## glm3运行
+
+```bash
+### 清理容器内的所有run包和其他数据
+rm -f *.run
+rm -rf ~/.cache
+history -c
+### 生成镜像
+docker commit test222 llm:910b
+### start_glm3.sh----
+#!/bin/bash
+source /root/.profile
+cd /data/code/script
+python3 ../model/glm3/run_chat_server.py
+#--------------
+### 启动容器
+docker run -d \
+-e NPU_NUM=2 \
+--cap-add=ALL \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
+-v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
+-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+-v /etc/ascend_install.info:/etc/ascend_install.info \
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /data:/data \
+-p 8002:8000 \
+--name fc-llm-2 ifuncun/llm:910b \
+
+# 测试
+curl -X POST -H 'Content-Type: application/json' -d '{"model":"glm3", "messages":[{"role":"user", "content":"写一篇《关于春节放假的通知》,字数500以内。"}], "stream":true}' http://127.0.0.1:8002/v1/chat/completions
+### 导出导入镜像
+docker save -o llm.tar ifuncun/llm:910b
+docker load -i llm.tar
+```
+
 # 昇腾适配问题列表
 
 * 碰到报错 `No module named _sqlite3`
@@ -757,4 +1254,22 @@ export LD_PRELOAD=/usr/local/gcc7.3.0/lib64/libgomp.so.1
 ```bash
 cd /data/code/pytorch/examples/atb_speed_sdk
 pip install .
+```
+
+* `RuntimeError: Failed to set compile option ACL_OP_COMPILER_CACHE_MODE, result = 500001, set value enable`，应该是固件驱动和对应的cann和pytorch的版本不对应（CANN版本太新，可以降低版本试试）
+
+* 报错信息中出现：`ASCEND_LAUNCH_BLOCKING=1`，则设置环境变量`export ASCEND_LAUNCH_BLOCKING=1`，然后重新运行，会提示详细报错信息，一般是python依赖库，直接根据提示安装对应的库即可。
+
+* `torch.npu.mem_get_info`报错找不到，是因为cann官方没有适配mem_get_info,可以打开`/usr/local/lib/python3.10/site-packages/accelerate/utils/modeling.py`文件, 注释掉`798`行代码，然后改成如下
+
+```py
+#max_memory = {i: torch.npu.mem_get_info(i)[0] for i in range(torch.npu.device_count())}
+max_memory = {0: 33554432000,
+                        1: 33554432000,
+                        2: 33554432000,
+                        3: 33554432000,
+                        4: 33554432000,
+                        5: 33554432000,
+                        6: 33554432000,
+                        7: 33554432000}
 ```

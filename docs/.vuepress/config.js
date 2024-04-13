@@ -276,7 +276,8 @@ module.exports = {
                 'ai2',
                 'ai-vector',
                 'llama-factory',
-                'prompt'
+                'prompt',
+                'langchain'
             ],
             '/microservices/register_config/': [
                 'consul',
@@ -517,7 +518,8 @@ module.exports = {
                 'shengteng',
                 'other',
                 'problem',
-                'guomi'
+                'guomi',
+                'dengbao'
             ],
         },
         sidebarDepth: 2

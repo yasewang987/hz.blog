@@ -11,3 +11,4 @@
 * [llama-factory](./llama-factory.md)
 
 * [Prompt资料](./prompt.md)
+* [langchain示例](./langchain.md)
