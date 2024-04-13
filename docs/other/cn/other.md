@@ -427,8 +427,9 @@ cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
 %global mcompany service
 %global mtype dingzhi
 %global mname ynsw
-%global mpath %{mcompany}/%{mtype}/%{mname}/integration
-Name: %{mcompany}-%{mtype}-%{mname}
+%global mmodel import
+%global mpath %{mcompany}/%{mtype}/%{mname}/%{mmodel}
+Name: %{mcompany}-%{mtype}-%{mname}-%{mmodel}
 Version: 2023.02
 Release:        20
 Summary:        %{mcompany} %{mtype} %{mname}
