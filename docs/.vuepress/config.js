@@ -269,6 +269,7 @@ module.exports = {
                 'paddleserving'
             ],
             '/code/python/ai/': [
+                'install',
                 'tensor',
                 'nlp',
                 'temp',
@@ -421,7 +422,8 @@ module.exports = {
                 'zentao',
                 'shells',
                 'frp',
-                'webfirewall'
+                'webfirewall',
+                'ssl'
             ],
             '/sql/mssql/': [
                 'usesul',

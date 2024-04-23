@@ -1,5 +1,6 @@
 # AI资料列表
 
+* [AI相关软件安装](./install.md)
 * [张量运算](./tensor.md)
 * [十大NLP技术](./nlp.md)
 * [临时资料记录](./temp.md)
