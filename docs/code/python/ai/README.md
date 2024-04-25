@@ -13,3 +13,5 @@
 
 * [Prompt资料](./prompt.md)
 * [langchain示例](./langchain.md)
+
+* [AIAgent](./agent.md)

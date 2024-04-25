@@ -67,6 +67,10 @@ wire
 
 Colly
 
+## 数据库操作
+
+GORM：github地址：https://github.com/go-gorm/gorm，可以参考demo中的内容
+
 
 
 

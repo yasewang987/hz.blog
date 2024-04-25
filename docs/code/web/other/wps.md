@@ -125,6 +125,18 @@ wps.ribbonUI.InvalidateControl("btnIsEnbable")
 wps.ribbonUI.Invalidate()
 ```
 
+### https配置
+
+参考资料：https://p.wpseco.cn/wiki/doc/63337df9d7c60f8bf1fd868f
+
+```ini
+# 检查oem.ini文件[support]栏下，是否有以下配置项
+[support]
+IgnoreSslErrors=true
+JsapiUseHttpsServer=true
+HttpsSecurityBypass=true
+```
+
 ## wps离线部署
 
 `wpsjs publish`命令中选择`离线部署`不会生效，需要用`build`

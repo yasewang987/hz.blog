@@ -57,8 +57,6 @@ server {
     ssl_stapling               on;
     ssl_session_tickets        on;
 
-    add_header                 Strict-Transport-Security "max-age=31536000; preload; includeSubDomains" always;
-    add_header                 X-Frame-Options SAMEORIGIN;
     gzip on;
     gzip_comp_level     6;
     gzip_min_length     1000;
@@ -90,4 +88,27 @@ rm -rf ~/.acme.sh/example.com
 
 #### 升级acme.sh
 acme.sh --upgrade
+```
+
+## ohttps.com
+
+申请链接：https://ohttps.com
+
+ohttps.com提供了类似于acme.sh的功能，不过提供了友好的管理界面，可申请Let's Encrypt免费通配符类型证书，还提供了证书吊销、到期前提醒、自动更新、自动部署功能。另外比acme.sh增加了一些非常实用的功能，主要包括可自动部署至阿里云、腾讯云、七牛云的负载均衡、内容分发CDN、SSL证书列表等，并可自动部署至多个nginx容器中。如果你有在证书更新后自动部署至多个不同节点的需求，使用ohttps.com就对了，在这里强烈推荐大家使用ohttps.com申请和管理Let's Encrypt颁发的免费HTTPS证书。
+
+## 问题处理
+
+* 如果碰到了“HSTS”问题，一般报错`Response to preflight request doesn't pass access control check: Redirect is not allowed for a preflight request`
+
+```bash
+# 修改nginx配置，在nginx.conf的http下添加
+# 这个add_header指令告诉Nginx添加一个HSTS头到HTTP响应中。"max-age=0"指定了一个零秒的时间，这意味着浏览器将不会再缓存HSTS设置，而"includeSubDomains"指示浏览器应该将这个HSTS设置应用于所有子域名。
+add_header Strict-Transport-Security "max-age=0; includeSubDomains" always;
+
+# 重新加载nginx
+nginx -s reload
+
+# 如果浏览器已经缓存了HSTS，需要先清除缓存，再访问
+# 不能直接输入根域名，要输入详细的二级域名
+chrome://net-internals/#hsts
 ```
