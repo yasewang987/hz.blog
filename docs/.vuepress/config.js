@@ -518,6 +518,7 @@ module.exports = {
                 'openssh',
                 'dm',
                 'milvus',
+                'hanwuji',
                 'shengteng',
                 'other',
                 'problem',

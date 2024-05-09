@@ -6,6 +6,12 @@
 * cann安装指南：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC1alpha003/quickstart/quickstart/quickstart_18_0004.html
 * pytorch算子优化：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC1alpha003/devguide/moddevg/ptmigr/AImpug_0074.html
 
+* 注意2:mindspore的方式安装一定要cann、mindspore、mindformers版本匹配，参考下面的对应关系
+* mindspore官网：https://www.mindspore.cn/install/
+* mindspore和固件驱动对应关系：https://www.mindspore.cn/versions
+* mindformers对应关系：https://mindformers.readthedocs.io/zh-cn/latest/Version_Match.html
+* mindformers-glm3适配教程：https://mindformers.readthedocs.io/zh-cn/latest/docs/model_cards/glm3.html
+
 # 昇腾硬件适配-310P3（300I DUO）
 
 本示例以`Atlas800型号3000`服务器为例
@@ -776,13 +782,11 @@ apt update
 apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
-wget https://mirrors.huaweicloud.com/python/3.10.14/Python-3.10.14.tgz
-tar zxf Python-3.10.14.tgz && cd Python-3.10.14
+wget https://mirrors.huaweicloud.com/python/3.9.19/Python-3.9.19.tgz
+tar zxf Python-3.9.19.tgz && cd Python-3.9.19
 ./configure --prefix=/usr/local --enable-optimizations
 make
 make install
-# 安装python依赖
-pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch==2.1.0 pyyaml setuptools numpy torch-npu==2.1.0 decorator attrs sse_starlette fastapi uvicorn
 
 # 安装昇腾cann套件（这里有个坑，不要用最新版本的cann套件，容易出问题）
 ./Ascend-cann-toolkit_8.0.RC1.alpha001_linux-aarch64.run --install --install-for-all --quiet
@@ -796,21 +800,14 @@ export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
 export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
 source $ASCEND_BASE/ascend-toolkit/set_env.sh
 
-### 安装qwen依赖（查看github上官方demo的requirements.txt）
-pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
-
 ### 清理容器内的所有run包和其他数据
-rm -f *.run
-rm -rf ~/.cache
+rm -rf *.run Python-3.9.19* ~/.cache
 history -c
-### 生成镜像
-docker commit test111 llm:910a
-### 导出导入镜像
-docker save -o llm.tar llm:910a
-docker load -i llm.tar
+### 生成过渡镜像
+docker commit test111 llm:temp
 ```
 
-## qwen模型适配及运行
+## qwen模型适配及运行（trochnpu）
 
 ```bash
 # 启动调试容器
@@ -827,8 +824,11 @@ docker run -itd \
 -v /etc/ascend_install.info:/etc/ascend_install.info \
 -v /etc/vnpu.cfg:/etc/vnpu.cfg \
 -v /data:/data \
---name fc-llm-test llm:910a \
+--name fc-llm-test llm:temp \
 /bin/bash
+
+# 安装python依赖
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch==2.1.0 pyyaml setuptools numpy torch-npu==2.1.0 decorator attrs sse_starlette fastapi uvicorn
 # 验证npu是否可以使用（需要返回一个true，后一个不要报错）
 python3 -c "import torch;import torch_npu;print(torch_npu.npu.is_available());print(torch.npu.is_bf16_supported())"
 
@@ -848,6 +848,8 @@ rm -rf /data/models/temp /data/models/qwen
 # 下载官方代码（或者浏览器直接下载Qwen-main.zip）
 git clone https://github.com/QwenLM/Qwen.git
 mv Qwen /data/llm
+### 安装qwen依赖（查看github上官方demo的requirements.txt）
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 ```
 
 * 适配，代码调整
@@ -934,6 +936,29 @@ if __name__ == '__main__':
         trust_remote_code=True,
     ) # here
     uvicorn.run(app, host=args.server_name, port=args.server_port, workers=1)
+
+
+#### embedding模型
+import acl
+import torch
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+torch.npu.set_device(torch.device("npu:0"))
+torch.npu.set_compile_mode(jit_compile=False)
+npucontext,ret = acl.rt.get_context()
+...
+...
+current_path = os.path.abspath(__file__)
+father_path = os.path.dirname(os.path.dirname(os.path.dirname(current_path)))
+model_name = father_path+"/models/embedding_models/gte-base-zh"
+model_kwargs = {'device': 'npu'}
+embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
+...
+...
+@app.route('/aiwriter_docQA', methods=['POST'])
+    def get_doc_answer():
+        acl.rt.set_context(npucontext)
 ```
 
 * 最后启动业务容器
@@ -962,16 +987,88 @@ docker run -d \
 -v /etc/vnpu.cfg:/etc/vnpu.cfg \
 -v /data:/data \
 -p 8002:8000 \
---name fc-llm-2 ifuncun/llm:910a-3 \
+--name fc-llm-2 llm:910a-3 \
 bash /data/llm/start.sh
 
 # 测试
 curl -X POST -H 'Content-Type: application/json' -d '{"model":"glm3", "messages":[{"role":"user", "content":"你好"}], "stream":true}' http://127.0.0.1:8002/v1/chat/completions
 ```
 
+## glm2模型适配及运行（mindspore）
+
+```bash
+# 启动调试容器(将模型和代码都放到data目录下)
+docker run -itd \
+--cap-add=ALL \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
+-v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
+-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+-v /etc/ascend_install.info:/etc/ascend_install.info \
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /data2:/data \
+--name test222 llm:temp \
+/bin/bash
+# 安装ai套件
+pip3 uninstall te topi hccl -y
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple sympy
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple /usr/local/Ascend/ascend-toolkit/latest/lib64/te-*-py3-none-any.whl
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple /usr/local/Ascend/ascend-toolkit/latest/lib64/hccl-*-py3-none-any.whl
+
+# 正常安装，到这里选择对应版本的whl包（包含mindformers）：https://www.mindspore.cn/versions#2214
+wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindSpore/unified/aarch64/mindspore-2.2.14-cp39-cp39-linux_aarch64.whl
+wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindFormers/any/mindformers-1.0.2-py3-none-any.whl
+pip3 install  -i https://pypi.tuna.tsinghua.edu.cn/simple mindspore-2.2.14-cp39-cp39-linux_aarch64.whl mindformers-1.0.0-py3-none-any.whl 
+# 执行如下代码，如果未报错且输出了mindspore版本，证明mindspore安装成功
+# 注意需确认显卡上没有运行其他程序再执行
+python3 -c "import mindspore;mindspore.set_context(device_id=0,device_target='Ascend');mindspore.run_check()"
+# 【注意】如果程序运行的时候有问题则需要安装低版本的mindformers
+wget https://gitee.com/mindspore/mindformers/releases/download/v1.0.0/mindformers-1.0.0-py3-none-any.whl
+pip3 install mindformers-1.0.0-py3-none-any.whl
+# 【不推荐】源码安装mindformers-注意修改sh脚本中的python和pip版本(https://gitee.com/mindspore/mindformers)
+git clone -b r1.0 https://gitee.com/mindspore/mindformers.git
+cd mindformers
+bash build.sh
+
+### 安装依赖(根据项目定)
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+
+# 保存镜像
+docker commit test222 llm:910a-ms
+
+### 启动容器
+docker run -d \
+-e NPU_NUM=5 \
+--cap-add=ALL \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
+-v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
+-v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+-v /etc/ascend_install.info:/etc/ascend_install.info \
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /data2:/data \
+-p 8005:8999 \
+--name fc-llm-5 llm:910a-ms \
+bash /data/glm2_infer_ascend/start.sh
+
+# 测试
+curl -X POST -H 'Content-Type: application/json' -d '{"model":"chat-glm2", "messages":[{"role":"user", "content":"写一篇《关于春节放假的通知》,字数500以内。"}], "stream":true}' http://127.0.0.1:8005/v1/chat/completions
+### 导出导入镜像
+docker save -o llm.tar llm:910a-ms
+docker load -i llm.ta
+```
+
 # 昇腾910B适配
 
-服务器型号：`altlas 800t A2`
+服务器型号：`Altlas 800T A2`
 
 ## 固件驱动
 
@@ -1007,8 +1104,8 @@ apt update
 apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
-wget https://mirrors.huaweicloud.com/python/3.9.18/Python-3.9.18.tgz
-tar zxf Python-3.9.18.tgz && cd Python-3.9.18
+wget https://mirrors.huaweicloud.com/python/3.9.19/Python-3.9.19.tgz
+tar zxf Python-3.9.19.tgz && cd Python-3.9.19
 ./configure --prefix=/usr/local --enable-optimizations
 make
 make install
@@ -1028,6 +1125,7 @@ source $ASCEND_BASE/ascend-toolkit/set_env.sh
 ### 清理容器内的所有run包和其他数据
 rm -f *.run
 rm -rf ~/.cache
+rm -rf Python-3.9.19*
 history -c
 ### 生成镜像
 docker commit test111 llm:temp
@@ -1036,9 +1134,6 @@ docker commit test111 llm:temp
 ## glm3模型适配
 
 **mindspore方式：**
-
-参考资料：https://www.mindspore.cn/install
-mindspore和cann对应关系：https://www.mindspore.cn/versions#ascend%E9%85%8D%E5%A5%97%E8%BD%AF%E4%BB%B6%E5%8C%85
 
 ```bash
 # 启动调试容器(将模型和代码都放到data目录下)
@@ -1059,19 +1154,25 @@ docker run -itd \
 /bin/bash
 # 安装ai套件
 pip3 uninstall te topi hccl -y
-pip3 install sympy
-pip3 install /usr/local/Ascend/ascend-toolkit/latest/lib64/te-*-py3-none-any.whl
-pip3 install /usr/local/Ascend/ascend-toolkit/latest/lib64/hccl-*-py3-none-any.whl
-# 执行如下代码，如果未报错且输出了mindspore版本，证明mindspore安装成功
-python3 -c "import mindspore;mindspore.set_context(device_target='Ascend');mindspore.run_check()"
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple sympy
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple /usr/local/Ascend/ascend-toolkit/latest/lib64/te-*-py3-none-any.whl
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple /usr/local/Ascend/ascend-toolkit/latest/lib64/hccl-*-py3-none-any.whl
 
-# 安装mindformers-注意修改sh脚本中的python和pip版本(https://gitee.com/mindspore/mindformers)
-git clone -b dev https://gitee.com/mindspore/mindformers.git
-cd mindformers
-bash build.sh
-# 如果有问题则需要安装低版本的mindformers
+
+# 正常安装，到这里选择对应版本的whl包（包含mindformers）：https://www.mindspore.cn/versions#2214
+wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindSpore/unified/aarch64/mindspore-2.2.14-cp39-cp39-linux_aarch64.whl
+wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindFormers/any/mindformers-1.0.2-py3-none-any.whl
+pip3 install  -i https://pypi.tuna.tsinghua.edu.cn/simple mindspore-2.2.14-cp39-cp39-linux_aarch64.whl mindformers-1.0.0-py3-none-any.whl 
+# 执行如下代码，如果未报错且输出了mindspore版本，证明mindspore安装成功
+# 注意需确认显卡上没有运行其他程序再执行
+python3 -c "import mindspore;mindspore.set_context(device_id=0,device_target='Ascend');mindspore.run_check()"
+# 【注意】如果程序运行的时候有问题则需要安装低版本的mindformers
 wget https://gitee.com/mindspore/mindformers/releases/download/v1.0.0/mindformers-1.0.0-py3-none-any.whl
 pip3 install mindformers-1.0.0-py3-none-any.whl
+# 【不推荐】源码安装mindformers-注意修改sh脚本中的python和pip版本(https://gitee.com/mindspore/mindformers)
+git clone -b r1.0 https://gitee.com/mindspore/mindformers.git
+cd mindformers
+bash build.sh
 
 ### 安装依赖（查看github上官方demo的requirements.txt）
 pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
@@ -1216,16 +1317,22 @@ docker run -d \
 -v /etc/vnpu.cfg:/etc/vnpu.cfg \
 -v /data:/data \
 -p 8002:8000 \
---name fc-llm-2 ifuncun/llm:910b \
+--name fc-llm-2 llm:910b \
 
 # 测试
 curl -X POST -H 'Content-Type: application/json' -d '{"model":"glm3", "messages":[{"role":"user", "content":"写一篇《关于春节放假的通知》,字数500以内。"}], "stream":true}' http://127.0.0.1:8002/v1/chat/completions
 ### 导出导入镜像
-docker save -o llm.tar ifuncun/llm:910b
+docker save -o llm.tar llm:910b
 docker load -i llm.tar
 ```
 
 # 昇腾适配问题列表
+
+* 碰到`生成内容重复`或者`生成内容异常`，通常需要调整配置文件中的推理超参数解决，配置文件一般是`config.yaml`或者`run_chat_glm2_6b.yaml`
+
+```bash
+
+```
 
 * 碰到报错 `No module named _sqlite3`
 
@@ -1240,13 +1347,15 @@ sys.path
 cp /usr/lib/python3.6/lib-dynload/_sqlite3.cpython-36m-aarch64-linux-gnu.so /usr/local/python3.9.2/lib/python3.9/lib-dynload/_sqlite3.so
 ```
 
-* `ImportError: /usr/local/gcc7.3.0/lib64/libgomp.so.1: cannot allocate memory in static TLS block`
+* `ImportError: /usr/local/gcc7.3.0/lib64/libgomp.so.1: cannot allocate memory in static TLS block`，其他路径的提示也一样的方式处理
 
 ```bash
 # 查看gomp库
 find / -name 'libgomp.so.1'
 # 替换成系统自带的gomp库
 export LD_PRELOAD=/usr/local/gcc7.3.0/lib64/libgomp.so.1
+# 还有其他的gomp库
+export LD_PRELOAD=/usr/local/gcc7.3.0/lib64/libgomp.so.1:/usr/local/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0:/usr/local/lib/python3.9/site-packages/torch.libs/libgomp-6e1a1d1b.so.1.0.0
 ```
 
 * `ImportError: This modeling file requires the following packages that were not found in your environment: atb_speed. Run "pip install atb_speed"`

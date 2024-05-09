@@ -62,12 +62,6 @@ code --no-sandbox --user-data-dir="/root/code" serve-web --host 127.0.0.1
 # 然后通过安卓浏览器去打开（推荐via浏览器）
 ```
 
-### winlator
-
-github地址：https://github.com/brunodev85/winlator
-
-在 Android 上运行 Windows 游戏的模拟器。这是一个 Android 应用，可以让你使用 Wine 和 Box86/Box64 来运行 Windows 应用和游戏，实现在手机上畅玩各种经典的 PC 游戏。
-
 ## 数据库管理工具
 
 * Dbeaver：https://github.com/dbeaver/dbeaver/releases
@@ -130,3 +124,33 @@ func main() {
  }
 }
 ```
+
+## 在线共享屏幕
+
+项目开源地址：https://github.com/screego/server
+
+它允许用户在网络上共享其屏幕，并允许其他用户通过浏览器访问和查看共享的屏幕。这个工具非常有用，特别是在需要进行远程协作、远程支持或在线培训的情况下。用户的屏幕分享服务。它可以快速启动一个在线共享屏幕的服务，让用户无需安装任何软件，仅使用浏览器就能分享自己的屏幕画面。项目基于网页实时通信(WebRTC) 实现，由 STUN/TURN 协议完成内网穿透和浏览器端对端的连接，既实用又有源码可以学习。
+
+```bash
+# docker部署
+docker run --net=host -e SCREEGO_EXTERNAL_IP=127.0.0.1 -e SCREEGO_SECRET=test123456 ghcr.io/screego/server:1.10.3
+```
+
+## 数据清洗工具
+
+### OpenRefine
+
+地址：http://www.gitpp.com/robotos/openrefine
+
+主要功能和特点
+* 数据清洗：OpenRefine提供了多种数据清洗功能，包括去除重复项、填补缺失值、转换数据类型等。
+* 数据转换：用户可以轻松地对数据进行各种转换，如大小写转换、日期格式转换、文本替换等。
+* 数据筛选和排序：OpenRefine允许用户根据特定条件筛选数据，并按照某一列或多列进行排序。
+* 数据合并与拆分：用户可以轻松地合并或拆分数据列，以满足特定的数据分析需求。
+* 数据重构：通过强大的GREL（Google Refine Expression Language）表达式，用户可以对数据进行复杂的重构和计算。
+* 数据预览和导出：OpenRefine提供了数据预览功能，以便用户在处理过程中随时查看数据状态。处理完成后，数据可以导出为多种格式，如CSV、TSV、Excel等。
+* 协作与分享：OpenRefine支持多人协作处理同一个数据集，并允许用户将处理步骤保存为JSON格式的文件，方便与他人分享和交流。
+
+## android开发环境
+
+* docker-android: https://github.com/budtmo/docker-android
