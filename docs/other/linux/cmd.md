@@ -32,6 +32,11 @@ DNS=114.114.114.114 233.5.5.5 8.8.8.8
 # 重启生效
 systemctl restart systemd-resolved
 
+# 银河麒麟如果没有生效，直接修改 /etc/resolv.conf 文件
+vim /etc/resolv.conf
+# 增加这行（不需要重启直接可以使用）
+nameserver 114.114.114.114
+
 vim /etc/netplan/xx-netcfg.yaml
 # DNS修改(修改文件中的nameservers)
 nameservices:
@@ -480,10 +485,14 @@ unpigz [ -cfhikKlLmMnNqrRtz ] [ -b blocksize ] [ -p threads ] [ -S suffix ] [ na
 # 加上-k选项保留原始文件，会在当前工作目录获得压缩后的your_file_name.gz 文件
 pigz -k your_file_name
 ## 压缩文件夹
-
+tar -cvf - dir1 dir2 dir3 | pigz > output.tgz
+# 或者
+tar --use-compress-program=pigz -cvpf package.tgz ./package
 
 # 解压（需要保留.gz文件，记得加上-k选项）
 unpigz -d your_file_name.gz
+# 或者
+tar -xvf --use-compress-program=pigz package.tgz -C .
 # 查看压缩文件后的压缩率
 pigz -l your_file_name.gz
 ```

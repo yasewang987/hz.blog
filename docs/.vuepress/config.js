@@ -95,7 +95,8 @@ module.exports = {
                 items: [
                     { text: 'MSSQL', link: '/sql/mssql/' },
                     { text: 'MYSQL', link: '/sql/mysql/' },
-                    { text: 'MongoDB', link: '/sql/mongo/'}
+                    { text: 'MongoDB', link: '/sql/mongo/'},
+                    { text: 'Postgresql', link: '/sql/postgresql/' }
                 ]
             },
             { 
@@ -441,6 +442,10 @@ module.exports = {
             ],
             '/sql/mongo/': [
                 'install'
+            ],
+            '/sql/postgresql': [
+                'install',
+                'best'
             ],
             '/other/designpattern/': [
                 'factory',

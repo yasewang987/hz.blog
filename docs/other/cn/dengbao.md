@@ -26,7 +26,8 @@ set global general_log=1;
 
 ```conf
 [mysqld]
-general_log = on                                          // on为开启；off为关闭
+general_log = on        // on为开启；off为关闭
+general_log = 1                                          
 general_log_file = /var/log/generalLog.log         // 审计信息存储位置
 ```
 
