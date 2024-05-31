@@ -1,5 +1,7 @@
 # Kubernetes - 集群部署Kubeadm
 
+官方参考地址：https://kubernetes.io/zh-cn/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
 搭建K8S环境有几种常见的方式如下：
 
 （1）Minikube
@@ -21,6 +23,12 @@ K8s官网安装参考：https://kubernetes.io/docs/setup/production-environment/
 
 本次学习实践我们主要借助Kubeadm工具搭建K8S集群，以便后续实践部署ASP.NET Core应用集群。
 
+## 常用命令
+
+```bash
+crictl image
+```
+
 ## 一、环境准备
 
 我这边使用的是vmware，服务器版本用的是`ubuntu 18.04 server`，一共准备3台虚拟机，2核2G最基础的配置
@@ -31,135 +39,76 @@ xb-master|2G|99.99.99.100|docker,kubeadm,kubelet,kubectl
 xb-node1|2G|99.99.99.101|docker,kubeadm,kubelet
 xb-node2|2G|99.99.99.102|docker,kubeadm,kubelet
 
-### 安装Docker
-
-K8S 支持多种容器运行时环境，这里选择 docker 作为运行时环境，首先为所有节点服务器安装 docker，目前 kubernetes 最新版(v1.15.2) 可以完全兼容支持的 docker 最高版本为 v18.09，所以这里安装 v18.09 这个版本。
-
-[版本对应关系查看官网的Release Notes](https://kubernetes.io/docs/home/)
-
-安装步骤可以参考K8s官网，只需要注意关键步骤即可（https://kubernetes.io/docs/setup/production-environment/container-runtimes/）
+### 安装Containerd
 
 ```bash
-# 删除旧版本docker
-sudo apt-get remove docker docker-engine docker.io containerd runc
+# 可以通过安装docker自动安装containerd
 
-# 更新 apt 
-sudo apt-get update
+# (如果已经安装docker)删除docker
+apt-get remove docker docker-engine docker.io
+systemctl disable docker.service --now
 
-# 安装工具包
-sudo apt-get install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
+# 安装：https://github.com/containerd/containerd/blob/main/docs/getting-started.md
 
-# 添加Docker官方 GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+# 安装完之后
+mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+# 修改配置（cgroups-systemd）
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+    SystemdCgroup = true
+# 重载沙箱（pause）镜像
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.9"
 
-# 添加 stable apt 源
-sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-
-# 查看docker版本列表
-apt-cache madison docker-ce
-
-# 安装 Docker CE
-sudo apt-get update
-sudo apt-get install docker-ce=5:18.09.8~3-0~ubuntu-bionic docker-ce-cli=5:18.09.8~3-0~ubuntu-bionic containerd.io
+systemctl start containerd
 ```
-
-* 有时候因为网络原因无法拉取docker镜像，可以使用阿里云镜像仓库：
-
-    ```bash
-    # step 1: 安装必要的一些系统工具
-    sudo apt-get update
-    sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-
-    # step 2: 安装GPG证书
-    curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
-
-    # Step 3: 写入软件源信息
-    sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
-
-    # Step 4: 更新并安装 Docker-CE
-    sudo apt-get -y update
-
-    # 选择安装版本，这里选择 5:18.09.8~3-0~ubuntu-bionic
-    apt-cache madison docker-ce
-
-    # sudo apt-get -y install docker-ce=[version]
-    sudo apt-get -y install docker-ce=5:18.09.8~3-0~ubuntu-bionic
-    ```
 
 ### 其他准备工作（也可以参考k8s官网安装步骤）
 
-* 当前用户加入`docker`用户组
+```bash
+#### 手动启用 IPv4 数据包转发
+# 验证ipv4转发是否开启（1:已开启），没有开启的话按照如下步骤操作
+sysctl net.ipv4.ip_forward
+# 设置所需的 sysctl 参数，参数在重新启动后保持不变
+cat <<EOF | tee /etc/sysctl.d/k8s.conf
+net.ipv4.ip_forward = 1
+EOF
+# 应用 sysctl 参数而不重新启动
+sysctl --system
 
-  ```bash
-  sudo usermod -aG docker $USER
-  ```
-
-* 配置 cgroup 驱动为 `systemd`(这个如果不改，在初始化kubeadm的时候有可能报错)
-
-  ```bash
-  #  创建文件 /etc/docker/daemon.json ，内容如下：
-  {
-    "exec-opts": ["native.cgroupdriver=systemd"]
-  }
-  ```
-* 重启服务生效配置
-
-  ```bash
-  sudo systemctl daemon-reload
-  sudo systemctl restart docker.service
-  ```
-* 检查配置是否生效
-
-  ```bash
-  docker info | grep Cgroup
-
-  # ECHO ------
-  Cgroup Driver: systemd
-  ```
-* 关闭 swap（k8s不支持swap）
-
-  ```bash
-  sudo swapoff -a && sudo sed -i 's/^.*swap/#&/g' /etc/fstab
-  ```
+#### 关闭 swap（k8s不支持swap）
+swapoff -a && sed -i 's/^.*swap/#&/g' /etc/fstab
+```
 
 ### 安装 kubelet kubeadm kubectl
 
-* 由于国内网络原因，直接安装可能安装不了，需要配置一下阿里云镜像仓库
+版本：v1.30(如果需要的话可以配置一下阿里云镜像仓库)
 
-  ```bash
-  sudo apt-get update && sudo apt-get install -y apt-transport-https
+```bash
+apt-get update && apt-get install -y apt-transport-https ca-certificates curl gpg
+# 下载用于 Kubernetes 软件包仓库的公共签名密钥。
+mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# 添加 Kubernetes apt 仓库
+# 此操作会覆盖 /etc/apt/sources.list.d/kubernetes.list 中现存的所有配置。
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+# 更新 apt 包索引，安装 kubelet、kubeadm 和 kubectl
+apt-get update
+apt-get install -y kubelet kubeadm kubectl
+# 锁定其版本
+apt-mark hold kubelet kubeadm kubectl
+# 设置kubelet开机启动
+sudo systemctl enable kubelet
 
-  curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | sudo apt-key add -
-  ```
-* 创建文件 `/etc/apt/sources.list.d/kubernetes.list` 添加如下内容：
-
-  ```bash
-  # /etc/apt/sources.list.d/kubernetes.list
-  deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
-  ```
-* 安装 kubelet kubectl kubeadm
-
-  ```bash
-  sudo apt-get update
-  sudo apt-get install -y kubelet kubeadm kubectl
-  ```
-* 设置kubelet开机启动
-
-  ```bash
-  sudo systemctl enable kubelet
-  ```
+### 阿里云配置（待更新）
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | sudo apt-key add -
+# 创建文件 `/etc/apt/sources.list.d/kubernetes.list` 添加如下内容：
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+```
 
 ## 二、部署控制平面Master
 
-过程中会用到一些列 docker 镜像文件，这些文件在 Google 的镜像仓库，可以通过 `kubeadm config images pull` 命令验证网络是否能够正常拉取镜像。国内环境，十有八九无法直接连接，可从其他镜像仓库下载，然后再修改镜像标签，以便启动相关 pod。
+过程中会用到一些列镜像文件，这些文件在 Google 的镜像仓库，可以通过 `kubeadm config images pull` 命令验证网络是否能够正常拉取镜像。国内环境，十有八九无法直接连接，可从其他镜像仓库下载，然后再修改镜像标签，以便启动相关 pod。
 
 ### 初始化控制平面节点
 
@@ -169,110 +118,101 @@ sudo apt-get install docker-ce=5:18.09.8~3-0~ubuntu-bionic docker-ce-cli=5:18.09
 
 另外，请注意，Pod网络不得与任何主机网络重叠，因为这可能会导致问题。如果发现网络插件的首选Pod网络与某些主机网络之间发生冲突，应为 `kubeadm init` 指定 `--pod-network-cidr` 参数配置网络网络，并在网络插件的YAML中修改相应信息。
 
-这里选择 `calico` 网络，根据 calico 文档说明，我们需为 kubeadm init 指定 `--pod-network-cidr=192.168.0.0/16` 参数。现在运行 `kubeadm init <args>`
+这里选择 `calico` 网络，根据 calico 文档说明，我们需为 kubeadm init 指定 `--pod-network-cidr=192.192.0.0/16` 参数。现在运行 `kubeadm init <args>`
 
-* 直接使用阿里云镜像
+```bash
+#### 初始化 或 重置（--kubernetes-version不设置默认用最新的）
+kubeadm init --kubernetes-version v1.30.1 --apiserver-advertise-address=99.99.99.100 --pod-network-cidr=192.192.0.0/16 --image-repository registry.aliyuncs.com/google_containers
+# 如果一切正常，安装成功，将输入类似下面的结果信息
+Your Kubernetes control-plane has initialized successfully!
 
-  1. 初始化`kubeadm`:
+To start using your cluster, you need to run the following as a regular user:
 
-    ```bash
-    # 查看kubernetes版本
-    kubelet --version
-    
-    # 初始化 或 重置
-    kubeadm init --kubernetes-version v1.17.4 --apiserver-advertise-address=99.99.99.100 --pod-network-cidr=192.192.0.0/16 --image-repository registry.aliyuncs.com/google_containers
-    ```
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-  1. 如果一切正常，安装成功，将输入类似下面的结果信息
+Alternatively, if you are the root user, you can run:
 
-    ```bash
-    Your Kubernetes control-plane has initialized successfully!
+  export KUBECONFIG=/etc/kubernetes/admin.conf
 
-    To start using your cluster, you need to run the following as a regular user:
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
 
-      mkdir -p $HOME/.kube
-      sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-      sudo chown $(id -u):$(id -g) $HOME/.kube/config
+Then you can join any number of worker nodes by running the following on each as root:
 
-    You should now deploy a pod network to the cluster.
-    Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
-      https://kubernetes.io/docs/concepts/cluster-administration/addons/
+kubeadm join 99.99.99.100:6443 --token xxxx.xxxxxx --discovery-token-ca-cert-hash sha256:xxxxxxxxxx
+# 根据提示消息，依次执行以下命令：
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# 注意记录输出结果中的 kubeadm join *** 信息，随后在添加工作节点到集群时需要用到，可以复制后暂存在某个地方。
 
-    Then you can join any number of worker nodes by running the following on each as root:
+# 稍微等几分钟之后就可以查看服务运行情况了
+kubectl get services -n kube-system
 
-    kubeadm join 99.99.99.100:6443 --token xxxx.xxxxxx \
-        --discovery-token-ca-cert-hash sha256:xxxxxxxxxx
-    ```
-  1. 根据提示消息，依次执行以下命令：
-
-    ```bash
-    mkdir -p $HOME/.kube
-    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-    sudo chown $(id -u):$(id -g) $HOME/.kube/config
-    ```
-  1. 注意记录输出结果中的 kubeadm join *** 信息，随后在添加工作节点到集群时需要用到，可以复制后暂存在某个地方。
-
-* 如果不适用阿里云镜像也可以自己拉取镜像的修改tag的方式运行
-
-  使用 `kubeadm config images list` 查看需要的镜像
-
-  ```bash
-  kubeadm config images list
-
-  # list
-  k8s.gcr.io/kube-apiserver:v1.15.2
-  k8s.gcr.io/kube-controller-manager:v1.15.2
-  k8s.gcr.io/kube-scheduler:v1.15.2
-  k8s.gcr.io/kube-proxy:v1.15.2
-  k8s.gcr.io/pause:3.1
-  k8s.gcr.io/etcd:3.3.10
-  k8s.gcr.io/coredns:1.3.1
-  ```
-  新建`pullk8s.sh`文件，添加如下内容，并且执行拉取需要的镜像
-
-  ```bash
-  for  i  in  `kubeadm config images list`;  do
-    imageName=${i#k8s.gcr.io/}
-    docker pull registry.aliyuncs.com/google_containers/$imageName
-    docker tag registry.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
-    docker rmi registry.aliyuncs.com/google_containers/$imageName
-  done;
-  ```
-  
-  ```bash
-  chmod +x pullk8s.sh
-
-  sh pullk8s.sh
-
-  # 稍微等几分钟之后就可以查看服务运行情况了
-  kubectl get svc -n kube-system
+#### 手动下载依赖的镜像包（直接用kubeadm会超时）
+# 查看kubernetes版本
+kubelet --version
+# 使用 `kubeadm config images list` 查看需要的镜像
+kubeadm config images list
+# list
+registry.k8s.io/kube-apiserver:v1.30.1
+registry.k8s.io/kube-controller-manager:v1.30.1
+registry.k8s.io/kube-scheduler:v1.30.1
+registry.k8s.io/kube-proxy:v1.30.1
+registry.k8s.io/coredns/coredns:v1.11.1
+registry.k8s.io/pause:3.9
+registry.k8s.io/etcd:3.5.12-0
+# 新建`pullk8s.sh`文件，添加如下内容，并且执行拉取需要的镜像
+for  i  in  `kubeadm config images list`;  do
+  imageName=${i#registry.k8s.io/}
+  docker pull registry.aliyuncs.com/google_containers/$imageName
+  docker tag registry.aliyuncs.com/google_containers/$imageName registry.k8s.io/$imageName
+  docker rmi registry.aliyuncs.com/google_containers/$imageName
+done;
+# 拉取镜像
+chmod +x pullk8s.sh
+sh pullk8s.sh
+#----------------------------------
   ```
 
 ### 安装网络
 
 1. 通过 `kubectl get pods --all-namespaces` 命令，应该可以看到 `CoreDNS pod` 处于 pending 状态，安装网网络以后，它才能处于 running 状态。我们选择 calico 为 pod 提供网络，pod 网络组件本身以 k8s 应用的形式运行，执行下面命令进行安装
 
-  ```bash
-  sudo kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
-  ```
+```bash
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/tigera-operator.yaml
+# 这里需要注意一下需要把yaml文件下载下来，然后修改网路192.192.0.0/16，要与kubeadm init 中设置的一致。
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/custom-resources.yaml
+# 查看网络运行状态（确保所有的pod都是running状态）
+kubectl get pods -n calico-system
+# 删除管理节点不允许调度的限制
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+# 查看节点状态是否能看到
+kubectl get nodes -o wide
+NAME              STATUS   ROLES    AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION    CONTAINER-RUNTIME
+<your-hostname>   Ready    master   52m   v1.12.2   10.128.0.28   <none>        Ubuntu 18.04.1 LTS   4.15.0-1023-gcp   docker://18.6.1
+```
 1. 安装了pod网络后，可以通过`kubectl get pods --all-namespaces`检查 CoreDNS pod 是否在输出中运行来确认它是否正常工作(这里需要等几分钟)
 
-  ```bash
-  NAME                                       READY   STATUS    RESTARTS   AGE
-  calico-kube-controllers-65b8787765-gqxxg   1/1     Running   0          157m
-  calico-node-dwr6k                          1/1     Running   0          157m
-  coredns-bccdc95cf-hxqb6                    1/1     Running   0          163m
-  coredns-bccdc95cf-w5w45                    1/1     Running   0          163m
-  etcd-xb-master                             1/1     Running   0          162m
-  kube-apiserver-xb-master                   1/1     Running   0          162m
-  kube-controller-manager-xb-master          1/1     Running   0          162m
-  kube-proxy-kzvn4                           1/1     Running   0          163m
-  kube-scheduler-xb-master                   1/1     Running   0          162m
-  ```
+```bash
+NAME                                       READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-65b8787765-gqxxg   1/1     Running   0          157m
+calico-node-dwr6k                          1/1     Running   0          157m
+coredns-bccdc95cf-hxqb6                    1/1     Running   0          163m
+coredns-bccdc95cf-w5w45                    1/1     Running   0          163m
+etcd-xb-master                             1/1     Running   0          162m
+kube-apiserver-xb-master                   1/1     Running   0          162m
+kube-controller-manager-xb-master          1/1     Running   0          162m
+kube-proxy-kzvn4                           1/1     Running   0          163m
+kube-scheduler-xb-master                   1/1     Running   0          162m
+```
 
 ## 三、加入工作节点Node
 
-CoreDNS pod 启动并运行后，我们可以为集群添加工作节点。工作节点服务器需安装 `docker 、kubeadm 、kubelet`，安装过程请参考 master 节点部署流程
+CoreDNS pod 启动并运行后，我们可以为集群添加工作节点。工作节点服务器需安装 `containerd 、kubeadm 、kubelet`，安装过程请参考 master 节点部署流程
 
 ### 拉取镜像
 
@@ -289,28 +229,22 @@ done;
 
 ### 加入集群
 
-```bash
-kubeadm join --token <token> <master-ip>:<master-port> --discovery-token-ca-cert-hash sha256:<hash>
-```
-
-命令中的 `--token` 和 `--discovery-token-ca-cert-hash` 在集群master节点部署完成后的结果信息中有体现，直接复制出来即可使用。
-
-节点执行完 join 命令后，可以在控制平面节点检查 pod 启动进度 `watch kubectl get pods --all-namespaces -o wide`，观察新节点服务器上的 pod 状态，正常启动则加入成功且节点状态为 Ready。
-
-* 如果忘记 token 和 discovery-token-ca-cert-hash 可以通过如下方法查看
-
-  1. `token`: 在控制平面执行如下命令
-    
-    ```bash
-    kubeadm token list
-    ```
-  1. `discovery-token-ca-cert-hash`: 控制平面执行如下命令
-
-    ```bash
-    openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | \
-   openssl dgst -sha256 -hex | sed 's/^.* //'
-    ```
 * 注意，如果需要重新执行 `kubeadm join` ，需在控制平面节点删除该节点 `kubectl delete node node-name`，并在工作节点上执行 `kubeadm reset` 进行清理工作。
+
+```bash
+kubeadm join <master-ip>:<master-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+# 在控制平面节点检查查看pod状态
+watch kubectl get pods --all-namespaces -o wide
+
+# 如果忘记 token 和 discovery-token-ca-cert-hash 可以通过如下方法查看
+# 默认情况下，令牌会在 24 小时后过期。
+kubeadm token list
+openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | \
+openssl dgst -sha256 -hex | sed 's/^.* //'
+
+# 重新生成token
+kubeadm token create
+```
 
 ### 检查工作节点
 
@@ -394,6 +328,52 @@ Dashboard的版本与k8s要匹配，具体的版本对应关系查看dashboard�
 ## 五、重置配置，重新部署集群
 
 参考官方reset资料：https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-reset/
+
+## 六、使用私有镜像仓库
+
+这里使用docker官方的`registry`仓库，部署仓库参考docker安装教程里的镜像仓库部署。
+
+```bash
+#### containerd
+
+# 修改 /etc/containerd/config.toml
+vim /etc/containerd/config.toml
+# 找到registry部分，修改如下
+...
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = ""
+
+      [plugins."io.containerd.grpc.v1.cri".registry.auths]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.configs]
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."10.3.5.23:5000".tls]  # here
+          insecure_skip_verify = true # here
+
+      [plugins."io.containerd.grpc.v1.cri".registry.headers]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."10.3.5.23:5000"] # here
+          endpoint = ["http://10.3.5.23:5000"] # here
+...
+# 重启
+systemctl restart containerd
+# 然后使用k8s自带的镜像管理命令验证
+crictl pull 10.3.5.23:5000/<image>:<tag>
+
+#### docker
+vim /etc/docker/daemon.json
+{
+  "insecure-registries": [
+    "10.3.5.23:5000"
+  ]
+}
+systemctl restart docker
+
+#### cri-o
+vim /etc/crio/crio.conf 
+insecure_registries = ["test.registry.com"]
+systemctl restart crio
+```
 
 # K8s高可用集群部署-KubeAdm
 

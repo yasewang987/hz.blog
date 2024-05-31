@@ -273,14 +273,24 @@ while [ $i -lt 3 ]; do
 done
 ```
 
-## 私有镜像仓库
+## 私有镜像仓库-registry
 
 ```bash
 # 安装
-docker run --restart=always -d -p 5000:5000 -v /opt/fc/registry:/var/lib/registry --name fc-registry registry
+docker run --restart=always -d -p 5000:5000 -v /opt/fc/registry:/var/lib/registry --name myregistry registry
 
 # 查看镜像仓库中的镜像列表
 curl http://localhost:5000/v2/_catalog
 # 列出指定镜像的所有标签
-curl http://localhost:5000/v2/es/tags/list
+curl http://localhost:5000/v2/<imagename>/tags/list
+
+# 设置docker使用私有仓库
+cat <<EOF > /etc/docker/daemon.json
+{
+  "insecure-registries": ["10.10.10.10:5000"]
+}
+
+# 要将镜像推送到私有仓库，需要修改镜像名称
+docker tag <image>:<tag> 10.10.10.10:5000/<image>:<tag>
+docker push 10.10.10.10:5000/<image>:<tag>
 ```

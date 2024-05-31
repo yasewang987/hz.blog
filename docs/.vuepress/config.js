@@ -432,6 +432,7 @@ module.exports = {
                 'sqlite'
             ],
             '/sql/mysql/': [
+                'cmd',
                 'install',
                 'gh-ost',
                 'announcements',
