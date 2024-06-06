@@ -13,19 +13,41 @@ Windows、Office激活工具：https://github.com/massgravel/Microsoft-Activatio
 PowerToys : https://github.com/microsoft/PowerToys
 gcc: https://www.cnblogs.com/feipeng8848/p/15227688.html
 
-## 下载慢问题
+# Windows系统软件安装
 
-* git下载慢
+## wsl安装
+
+1. 先查 `raw.githubusercontent.com` 域名对应的ip，一般选ping低的 `185.199.110.133`
+1. 修改windows系统的`hosts`文件：`C:\Windows\System32\drivers\etc` 。添加 `185.199.110.133 raw.githubusercontent.com`
+1. 记得打开windows功能里的【`适用于linux的windows子系统`】
+1. 打开powershell执行：`wsl --install -d Debian` 安装，也可以选择默认的`Ubuntu`
+1. 如果有报错x08xxx的错误码，执行`wsl --update`。过一会儿再打开debian即可。
+1. wsl设置默认root账号：打开`powershell`，执行`Debian config --default-user root`
+1. wsl设置默认root密码：上面设置完账号之后，打开debian，然后执行 `passwd` 设置新密码
+1. 设置清华源
+1. 安装zsh
+
+```bash
+apt install zsh git -y
+chsh -s /bin/zsh
+sh -c "$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)"
+```
+
+## docker、wps安装
+
+直接官网下载安装包
+
+## git安装
 
 用这个地址下载：https://registry.npmmirror.com/binary.html?path=git-for-windows/
 
-* vscode下载慢
+## vscode安装
 
 复制下载链接，将`https://`和 `/stable` 之间的网址替换为`vscode.cdn.azure.cn`，替换之后类似下面地址：
 
 https://vscode.cdn.azure.cn/stable/b3e4e68a0bc097f0ae7907b217c1119af9e03435/VSCodeUserSetup-x64-1.78.2.exe
 
-## NSIS安装包教程
+# NSIS安装包教程
 
 * 下载地址：https://nsis.sourceforge.io/Download
 * 中文使用手册：https://www.nsisfans.com/help/index.html

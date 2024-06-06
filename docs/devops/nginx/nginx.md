@@ -48,11 +48,16 @@ location /train/ {
     alias  /data/trainning/;
     index  index.html index.html;
 }
+location /lily {
+  alias /usr/local/nginx/html/lily/;    # 把匹配到的路径重写, 注意要以/结尾
+  try_files $uri $uri/ /lily/index.html; # 特定目录，匹配不到文件的话，增加/lily/index.html配置
+  index index.html index.htm;
+}
+
 # 前端反向代理到其他服务
 location /wps {
     proxy_pass http://aa.bb.com/;
 }
-
 # 跳转示例
 location / {
     rewrite / http://www.baidu.com permanent;

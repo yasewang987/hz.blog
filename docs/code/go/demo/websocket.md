@@ -242,15 +242,26 @@ func main() {
   <div id="result"></div>
   <script>
     const socket = new WebSocket('ws://localhost:12345/ws?id=abc123')
+		// socket.onopen = function() {}
     socket.addEventListener('open', function(event) {
       socket.send('我是abc123-已建立连接')
     })
+		// socket.onmessage = function(event) {}
     socket.addEventListener('message', function(event) {
       let el = document.getElementById('result')
       el.innerHTML = `${el.innerHTML} <br /> ${event.data}`
     })
+		// socket.onerror = function(event) {}
+		socket.addEventListener('error', function(event) {
+			console.error(event)
+		})
+		// socket.onclose = function(event) {}
+		socket.addEventListener('close', function(event) {
+			console.log('ws连接关闭')
+		})
     document.getElementById('send').onclick = function() {
       let msg = document.getElementById('msg').value
+			// ws发送消息
       socket.send(msg)
     }
   </script>

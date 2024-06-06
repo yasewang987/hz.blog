@@ -1,5 +1,7 @@
 # AI-向量检索
 
+构建检索系统推荐：倒排+向量（语义）
+
 ## 基础概念
 
 * **向量：**在数学中，向量是有大小和方向的量，可以使用带箭头的线段表示，箭头指向即为向量的方向，线段的长度表示向量的大小。两个向量的距离或者相似性可以通过欧式距离、余弦距离等得到。
@@ -49,12 +51,84 @@
 * embedding dimensions：模型的输出的vector的长度
 * model :选择相应的模型，点击即可跳转到相应页面下载调用。
 
-https://huggingface.co/spaces/mteb/leaderboard
+MTEB 排行榜：https://huggingface.co/spaces/mteb/leaderboard
+
+MTEB 包含以下任务类别，每个类别对应不同的评估指标和数据集：
+
+1. 文本分类（Classification）：如情感分析、意图分类等。
+2. 聚类（Clustering）：如将相似文本分为同一类。
+3. 成对分类（Pair Classification）：判断两个文本是否重复或具有相似含义。
+4. 重排序（Reranking）：根据查询重新排序相关和不相关的参考文本。
+5. 检索（Retrieval）：从大量文档中找到与查询相关的文档。
+6. 语义文本相似性（STS）：评估句子对之间的相似性。
+7. 摘要（Summarization）：评估机器生成摘要的质量。
 
 ```bash
-bge-m3
+# 8k长度，1024维度【推荐】
+BAAI/bge-m3
+# 512长度，1024维度
 BAAI/bge-large-zh-v1.5
+# 8k长度，768维度
+jina-embeddings-v2-base-zh
+```
 
+## finetune向量模型
+
+以 BAAI/bge-large-zh-v1.5 为例
+
+```bash
+#### 安装依赖库
+pip install -U FlagEmbedding
+
+#### 数据准备
+# query 是问题，pos 是正样本列表，neg 是负样本列表，如果没有现成的负样本，可以考虑从整个语料库中随机抽取一些文本作为 neg
+# finetune_data.jsonl
+{"query": "如何提高机器学习模型的准确性？", "pos": ["通过交叉验证和调参可以提高模型准确性。"], "neg": ["机器学习是人工智能的一个分支。"]}
+{"query": "什么是深度学习？", "pos": ["深度学习是机器学习的一个子领域，涉及多层神经网络。"], "neg": ["数据科学是一门交叉学科。"]}
+
+#### Hard Negatives 挖掘（可选）
+# 在向量空间中与查询较为接近但实际上并不相关的样本。挖掘这些样本可以提高模型的辨别能力，提供 Embedding 质量。
+# range_for_sampling 表示从哪些文档采样，例如 2-200 表示从 top2-top200 文档中采样 negative_number 个负样本
+python -m FlagEmbedding.baai_general_embedding.finetune.hn_mine \
+--model_name_or_path BAAI/bge-large-zh-v1.5 \
+--input_file finetune_data.jsonl \
+--output_file finetune_data_minedHN.jsonl \
+--range_for_sampling 2-200 \
+--negative_number 15
+
+#### 训练
+# 训练参数，包括学习率、批次大小、训练轮次等，需要根据实际情况进行调整
+torchrun --nproc_per_node {number of gpus} \
+-m FlagEmbedding.baai_general_embedding.finetune.run \
+--output_dir {path to save model} \
+--model_name_or_path BAAI/bge-large-zh-v1.5 \
+--train_data ./finetune_data.jsonl \
+--learning_rate 1e-5 \
+--fp16 \
+--num_train_epochs 5 \
+--per_device_train_batch_size {large batch size; set 1 for toy data} \
+--dataloader_drop_last True \
+--normlized True \
+--temperature 0.02 \
+--query_max_len 64 \
+--passage_max_len 256 \
+--train_group_size 2 \
+--negatives_cross_device \
+--logging_steps 10 \
+--save_steps 1000 \
+--query_instruction_for_retrieval "" 
+
+#### 模型合并（可选）
+# 对通用模型进行微调可以提高其在目标任务上的性能，但可能会导致模型在目标域之外的一般能力退化。通过合并微调模型和通用模型，不仅可以提高下游任务的性能，同时保持其他不相关任务的性能。
+pip install -U LM_Cocktail
+## 合并代码参考如下：
+from LM_Cocktail import mix_models, mix_models_with_data
+# Mix fine-tuned model and base model; then save it to output_path: ./mixed_model_1
+model = mix_models(
+    model_names_or_paths=["BAAI/bge-large-zh-v1.5", "your_fine-tuned_model"], 
+    model_type='encoder', 
+    weights=[0.5, 0.5],  # you can change the weights to get a better trade-off.
+    output_path='./mixed_embedding_model')
 ```
 
 ## redis-stack示例

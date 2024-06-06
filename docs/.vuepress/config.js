@@ -220,7 +220,8 @@ module.exports = {
             '/code/web/ts/': [
                 'base',
                 'install',
-                'promise'
+                'promise',
+                'websocket'
             ],
             '/code/web/vue/': [
                 'vueui',

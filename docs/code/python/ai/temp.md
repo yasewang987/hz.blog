@@ -96,7 +96,7 @@
 
 ## 重要事项
 
-* 模型加速（`vLLM`）
+* 模型加速（`vLLM`、`rtp-llm`）
 * 数据集质量很重要（需要包含我们关心的所有任务的数据）
 * 数据类型越多样化，需要设置越高的秩（`r`）【数据类型多样化可以一定程度解决遗忘问题】
 * 对于静态数据集，多个`epoch`可能导致模型性能下降，微调一般可以只设置一个·`epoch`，可以设置2个`epoch`测试一下效果【导致过拟合】。
@@ -476,6 +476,32 @@ torchrun --nproc_per_node=4 --master_port=20001 fastchat/train/train_mem.py \
     --model_max_length 2048 \
     --gradient_checkpointing True \
     --lazy_preprocess True
+```
+
+## RTP-LLM（gpu推理加速-推荐）
+
+rtp-llm 是阿里巴巴大模型预测团队开发的 LLM 推理加速引擎。
+
+* github地址：https://github.com/alibaba/rtp-llm/blob/main/README_cn.md
+* docker镜像列表：https://github.com/alibaba/rtp-llm/blob/main/docs/DockerHistory.md
+* 配置参数：https://github.com/alibaba/rtp-llm/blob/main/docs/Config.md
+
+```bash
+# 启动推理服务
+docker run -d --gpus all -v /data:/data --name my-llm /data/start.sh
+# start.sh
+export CUDA_VISIBLE_DEVICES=0
+export MODEL_TYPE=chatglm3 
+export MODEL_TEMPLATE_TYPE=chatglm3 
+export TOKENIZER_PATH=/data/models/chatglm3-6b-32k
+export CHECKPOINT_PATH=/data/models/chatglm3-6b-32k
+export START_PORT=8088
+export MAX_SEQ_LEN=10000
+export CONCURRENCY_LIMIT=100 # 最大并发
+export PY_LOG_LEVEL=INFO 
+export PY_LOG_PATH=logs/
+export FT_SERVER_TEST=1 
+nohup python -m maga_transformer.start_server > logs/chatglm3_6b_32k.log 2>&1 &
 ```
 
 ## FastLLM（推理加速-目前不推荐）

@@ -28,13 +28,13 @@ spec:
             path: /actuator/health
             port: 18501
           periodSeconds: 10
-          initialDelaySeconds: 60
+          # initialDelaySeconds: 60
         readinessProbe:
           httpGet: 
             path: /actuator/health
             port: 18501
           periodSeconds: 10
-          initialDelaySeconds: 60
+          # initialDelaySeconds: 60
         startupProbe:
           httpGet:
             path: /actuator/health
@@ -64,13 +64,14 @@ spec:
             path: /check
             port: 18350
           periodSeconds: 10
-          initialDelaySeconds: 60
+          # 有启动探针可以不指定容器启动延迟检测
+          # initialDelaySeconds: 60
         readinessProbe:
           httpGet: 
             path: /check
             port: 18350
           periodSeconds: 10
-          initialDelaySeconds: 60
+          # initialDelaySeconds: 60
         startupProbe:
           httpGet:
             path: /check
