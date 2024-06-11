@@ -209,7 +209,8 @@ module.exports = {
                 'websocket',
                 'sse',
                 'goweb',
-                'file'
+                'file',
+                'devops'
             ],
             '/code/web/npm/': [
                 'base',
@@ -236,7 +237,8 @@ module.exports = {
                 'flex',
                 'resources',
                 'animation',
-                'common'
+                'common',
+                'tailwindcss'
             ],
             '/code/web/other/': [
                 'qiankun',

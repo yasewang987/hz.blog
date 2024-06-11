@@ -154,3 +154,7 @@ docker run --net=host -e SCREEGO_EXTERNAL_IP=127.0.0.1 -e SCREEGO_SECRET=test123
 ## android开发环境
 
 * docker-android: https://github.com/budtmo/docker-android
+
+## 安全/漏洞扫描
+
+* [fscan](https://github.com/shadow1ng/fscan)：开源的内网安全扫描工具。该项目是用 Go 语言开发的内网扫描工具，提供了一键自动化全方位的漏洞扫描。它使用方便、功能全面，支持端口扫描、常见的服务器爆破、Web 应用漏洞扫描、NetBIOS 嗅探等功能。
