@@ -283,7 +283,8 @@ module.exports = {
                 'llama-factory',
                 'prompt',
                 'langchain',
-                'agent'
+                'agent',
+                'ollama'
             ],
             '/microservices/register_config/': [
                 'consul',

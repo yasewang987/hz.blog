@@ -15,3 +15,4 @@
 * [langchain示例](./langchain.md)
 
 * [AIAgent](./agent.md)
+* [ollama](./ollama.md)
