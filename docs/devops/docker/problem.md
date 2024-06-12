@@ -471,3 +471,10 @@ Docker Root Dir: /data/docker-data
   127.0.0.0/8
  Live Restore Enabled: false
 ```
+
+## docker镜像无法拉取
+
+```bash
+# 使用这种方式。参考https://github.com/DaoCloud/public-image-mirror
+docker pull m.daocloud.io/docker.io/yasewang/yhtweb
+```

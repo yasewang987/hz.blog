@@ -447,7 +447,7 @@ module.exports = {
             '/sql/mongo/': [
                 'install'
             ],
-            '/sql/postgresql': [
+            '/sql/postgresql/': [
                 'install',
                 'best'
             ],
