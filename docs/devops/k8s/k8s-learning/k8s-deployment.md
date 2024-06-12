@@ -1,5 +1,8 @@
 # Kubernetes - Deployment
 
+* 探针配置参考：https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+* 内存、cpu配置参考：https://kubernetes.io/zh-cn/docs/tasks/configure-pod-container/assign-memory-resource/
+
 K8S为我们提供的几种应用运行方式：Deployment、DaemonSet与Job，它们是Kubernetes最重要的核心功能提供者。本篇会主要介绍Deployment
 
 ## 一、Deployment资源创建
@@ -203,3 +206,19 @@ kubectl run k8s-test --image=yasewang/k8s-test:latest --replicas=2 --namespace=a
   kubectl label node xb-node1 disktype-
   ```
   注意，这里的 - 就代表删除，而且此时Pod不会重新部署，除非你删除配置文件中的配置然后再次apply
+
+  ### 调度到指定名称的节点
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  nodeName: foo-node # 调度 Pod 到特定的节点
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+
+```

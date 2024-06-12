@@ -48,11 +48,16 @@ location /train/ {
     alias  /data/trainning/;
     index  index.html index.html;
 }
+location /lily {
+  alias /usr/local/nginx/html/lily/;    # 把匹配到的路径重写, 注意要以/结尾
+  try_files $uri $uri/ /lily/index.html; # 特定目录，匹配不到文件的话，增加/lily/index.html配置
+  index index.html index.htm;
+}
+
 # 前端反向代理到其他服务
 location /wps {
     proxy_pass http://aa.bb.com/;
 }
-
 # 跳转示例
 location / {
     rewrite / http://www.baidu.com permanent;
@@ -202,6 +207,41 @@ stream {
 }
 ```
 
+## Nginx SSE配置
+
+```conf
+server {
+    listen 80;
+    server_name localhost;
+    access_log  /data/logs/api/access.log  main;
+    error_log  /data/logs/api/error.log;
+    proxy_connect_timeout 180s;
+    proxy_read_timeout 180s;
+    proxy_send_timeout 180s;
+    proxy_set_header   Host             $host;
+    proxy_set_header   X-Real-IP        $remote_addr;
+    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+
+    location ^~ /intelligent/document/writing {
+        proxy_pass  http://apigwc/intelligent/document/writing;
+        proxy_cache off;  # 关闭缓存
+        proxy_buffering off;  # 关闭代理缓冲
+        chunked_transfer_encoding on;  # 开启分块传输编码
+        tcp_nopush on;  # 开启TCP NOPUSH选项，禁止Nagle算法
+        tcp_nodelay on;  # 开启TCP NODELAY选项，禁止延迟ACK算法
+        keepalive_timeout 300;  # 设定keep-alive超时时间为65秒
+        # 跨域
+        add_header 'Access-Control-Allow-Origin' *;
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        add_header 'Access-Control-Allow-Methods' *;
+        add_header 'Access-Control-Allow-Headers' *;
+        if ( $request_method = 'OPTIONS' ) {
+            return 200;
+        }
+    }
+}
+```
+
 ## Nginx WebSocket配置
 
 客户端发起请求时是和反响代理服务器建立请求， 此时客户端携带的 Upgrade、Connection头是不会被反向代理服务器直接转发到后端服务的(这就是逐跳标头)， 后端服务获取不到这两个头信息自然也不会主动去切换协议。
@@ -224,6 +264,7 @@ location / {
     proxy_set_header Connection "upgrade";
 }
 ```
+
 ## proxy_pass 相对/绝对 路径
 
 ### 绝对路径

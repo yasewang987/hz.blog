@@ -75,27 +75,21 @@ linux:
 【特别注意】国产化/Linux环境下，部分版本加载项菜单中，无"打开js调试器"按钮，需要手动按alt+f12唤出调试窗口
 ```
 
-### NPAPI方式嵌入wps
+### NPAPI方式嵌入wps（皮肤切换）
 
 wps版本要求：专业版（企业版）：10953之后的都支持
 
 修改`oem.ini`配置
 
-```
-windows:
-
-有这个是2019界面，不是则是2016
+```bash
+### windows:
+# 有这个是2019界面，不是则是2016
 [feature]
-`iiZ07s39XJwKSU9I2xbCu5_o10=jiZ07s39XJwk99gTmjC7T-ZA10`
-```
+iiZ07s39XJwKSU9I2xbCu5_o10=jiZ07s39XJwk99gTmjC7T-ZA10
 
-```
-linux
-
-普通linux操作系统： /opt/kingsoft/wps-office/office6/cfgs/oem.ini
-
-uos操作系统: /opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/office6/cfgs/oem.ini
-
+### linux:
+# 普通linux操作系统： /opt/kingsoft/wps-office/office6/cfgs/oem.ini
+# uos操作系统: /opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/office6/cfgs/oem.ini
 [Support]
 developuseribbon=true
 ```
@@ -129,6 +123,18 @@ function OnGetEnabled(control) {
 wps.ribbonUI.InvalidateControl("btnIsEnbable")
 // 刷新所有按钮
 wps.ribbonUI.Invalidate()
+```
+
+### https配置
+
+参考资料：https://p.wpseco.cn/wiki/doc/63337df9d7c60f8bf1fd868f
+
+```ini
+# 检查oem.ini文件[support]栏下，是否有以下配置项
+[support]
+IgnoreSslErrors=true
+JsapiUseHttpsServer=true
+HttpsSecurityBypass=true
 ```
 
 ## wps离线部署

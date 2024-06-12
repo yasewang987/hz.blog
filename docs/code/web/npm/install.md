@@ -69,9 +69,35 @@ yarn config get registry
 npm install -g yarn
 ```
 
-## 安装pnpm
+## 安装pnpm（推荐）
 
-todo
+pnpm还能管理node版本，代替nvm等。(nvm和pnpm选择其一)
+
+```bash
+# 安装pnpm
+npm install -g pnpm
+# 从npm、yarn切换
+pnpm import yarn.lock
+pnpm import package-lock.json
+# 之后删除node_modules与yarn.lock
+rm -rf node_modules yarn.lock
+pnpm install
+
+# pnpm安装node
+pnpm env use --global lts
+pnpm env use --global 16
+# 展示列表/查询
+pnpm env list
+pnpm env list --remote
+pnpm env list --remote 16
+# 可以在.npmrc文件中强制指定Node.js版本
+use-node-version=18.14.2
+node-mirror:release=https://npmmirror.com/mirrors/node/
+node-mirror:rc=https://npmmirror.com/mirrors/node-rc/
+node-mirror:nightly=https://npmmirror.com/mirrors/node-nightly/
+# 移除node
+pnpm env remove --global 14.0.0
+```
 
 ## 安装vue-cli
 

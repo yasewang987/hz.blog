@@ -9,6 +9,28 @@
 
 ### 银河麒麟v10
 
+查看系统版本：
+
+```bash
+cat /etc/os-release
+
+(Tercel) 版本是 银河麒麟 V10 SP1 版本
+(Sword) 版本是 银河麒麟 V10 SP2 版本
+(Lance) 版本是 银河麒麟 V10 SP3 版本
+```
+
+软件升级参考资料：https://www.kylinos.cn/support/update/537.html
+
+```bash
+### 仓库源地址： 
+# 银河麒麟高级服务器操作系统 V10 SP1
+aarch64:https://update.cs2c.com.cn/NS/V10/V10SP1.1/os/adv/lic/updates/aarch64/
+x86_64:https://update.cs2c.com.cn/NS/V10/V10SP1.1/os/adv/lic/updates/x86_64/
+# 银河麒麟高级服务器操作系统 V10 SP2
+aarch64:https://update.cs2c.com.cn/NS/V10/V10SP2/os/adv/lic/updates/aarch64/
+x86_64:https://update.cs2c.com.cn/NS/V10/V10SP2/os/adv/lic/updates/x86_64/
+```
+
 适配镜像：arm和x86用 `python:3.7.4`, mips用 `python:3.7.7`
 
 * 支持平台：arm，x86,mips64

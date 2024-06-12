@@ -95,7 +95,8 @@ module.exports = {
                 items: [
                     { text: 'MSSQL', link: '/sql/mssql/' },
                     { text: 'MYSQL', link: '/sql/mysql/' },
-                    { text: 'MongoDB', link: '/sql/mongo/'}
+                    { text: 'MongoDB', link: '/sql/mongo/'},
+                    { text: 'Postgresql', link: '/sql/postgresql/' }
                 ]
             },
             { 
@@ -208,7 +209,8 @@ module.exports = {
                 'websocket',
                 'sse',
                 'goweb',
-                'file'
+                'file',
+                'devops'
             ],
             '/code/web/npm/': [
                 'base',
@@ -219,7 +221,8 @@ module.exports = {
             '/code/web/ts/': [
                 'base',
                 'install',
-                'promise'
+                'promise',
+                'websocket'
             ],
             '/code/web/vue/': [
                 'vueui',
@@ -234,7 +237,8 @@ module.exports = {
                 'flex',
                 'resources',
                 'animation',
-                'common'
+                'common',
+                'tailwindcss'
             ],
             '/code/web/other/': [
                 'qiankun',
@@ -269,6 +273,7 @@ module.exports = {
                 'paddleserving'
             ],
             '/code/python/ai/': [
+                'install',
                 'tensor',
                 'nlp',
                 'temp',
@@ -277,7 +282,8 @@ module.exports = {
                 'ai-vector',
                 'llama-factory',
                 'prompt',
-                'langchain'
+                'langchain',
+                'agent'
             ],
             '/microservices/register_config/': [
                 'consul',
@@ -421,13 +427,15 @@ module.exports = {
                 'zentao',
                 'shells',
                 'frp',
-                'webfirewall'
+                'webfirewall',
+                'ssl'
             ],
             '/sql/mssql/': [
                 'usesul',
                 'sqlite'
             ],
             '/sql/mysql/': [
+                'cmd',
                 'install',
                 'gh-ost',
                 'announcements',
@@ -438,6 +446,10 @@ module.exports = {
             ],
             '/sql/mongo/': [
                 'install'
+            ],
+            '/sql/postgresql': [
+                'install',
+                'best'
             ],
             '/other/designpattern/': [
                 'factory',
@@ -515,6 +527,7 @@ module.exports = {
                 'openssh',
                 'dm',
                 'milvus',
+                'hanwuji',
                 'shengteng',
                 'other',
                 'problem',

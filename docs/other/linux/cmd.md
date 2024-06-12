@@ -26,11 +26,17 @@ sed -i 's/deb/deb [trusted=yes]/g' /etc/apt/sources.list
 ## 修改IP，DNS
 
 ```bash
-#### Ubuntu
+#### Ubuntu / 银河麒麟v10
 sudo vim /etc/systemd/resolved.conf
 DNS=114.114.114.114 233.5.5.5 8.8.8.8
 # 重启生效
 systemctl restart systemd-resolved
+
+# 银河麒麟如果没有生效，直接修改 /etc/resolv.conf 文件
+vim /etc/resolv.conf
+# 增加这行（不需要重启直接可以使用）
+nameserver 114.114.114.114
+
 vim /etc/netplan/xx-netcfg.yaml
 # DNS修改(修改文件中的nameservers)
 nameservices:
@@ -460,7 +466,38 @@ tcp        0      0 0.0.0.0:8000                0.0.0.0:*                   LIST
 
 ## 文件压缩解压
 
-##### 一、TAR
+### Pigz
+
+```bash
+# 安装
+apt install pigz
+yum -y install pigz
+## 语法
+# -0 ~ -9 压缩等级，数字越大压缩率越高，速度越慢，默认为6
+# -k --keep 压缩后不删除原始文件
+# -l --list 列出压缩输入的内容
+# -K --zip Compress to PKWare zip (.zip) single entry format
+# -d --decompress 解压缩输入
+# -p --processes n 使用n核处理，默认为使用所有CPU核心
+pigz [ -cdfhikKlLmMnNqrRtz0..9,11 ] [ -b blocksize ] [ -p threads ] [ -S suffix ] [ name ...  ]
+unpigz [ -cfhikKlLmMnNqrRtz ] [ -b blocksize ] [ -p threads ] [ -S suffix ] [ name ...  ]
+## 压缩单文件
+# 加上-k选项保留原始文件，会在当前工作目录获得压缩后的your_file_name.gz 文件
+pigz -k your_file_name
+## 压缩文件夹
+tar -cvf - dir1 dir2 dir3 | pigz > output.tgz
+# 或者
+tar --use-compress-program=pigz -cvpf package.tgz ./package
+
+# 解压（需要保留.gz文件，记得加上-k选项）
+unpigz -d your_file_name.gz
+# 或者
+tar -xvf --use-compress-program=pigz package.tgz -C .
+# 查看压缩文件后的压缩率
+pigz -l your_file_name.gz
+```
+
+### TAR
 
 查看tar压缩包中的内容：`tar -tf xxx.tar` 或者 `tar -tvf xxx.tar.gz`
 
@@ -491,11 +528,11 @@ tar -ztvf xxxxx.tgz
 
 * 在参数f后面的压缩文件名是自己取的，习惯上用tar来做，如果加z参数，则以tar.gz 或tgz来代表gzip压缩过的tar file文件
 
-##### 二、ZIP
+### ZIP
 
 * 解压：`unzip -d ~/test ~/Downloads/test.zip`
 
-##### 三、XZ
+### XZ
 
 ```bash
 # 压缩（-k 保留被压缩的文件）

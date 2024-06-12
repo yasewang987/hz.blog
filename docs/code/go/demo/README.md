@@ -23,3 +23,4 @@
 * [Go-SSE](./sse.md)
 * [Go静态资源使用](./goweb.md)
 * [Go文件相关操作](./file.md)
+* [go运维常用示例](./devops.md)

@@ -165,3 +165,12 @@ rule_files:
 ```
 
 * 重启prometheus容器，访问 prometheusIP:9090，跳转到【Alert】页签即可查看到所有告警规则，也可以选择具体的告警规则进行测试。
+
+
+## 问题处理
+
+* 如果上面全部流程都弄完，并且在prometheus中的alerts页签下也能看到有告警的【firing】，还是没有发送告警信息，那一般情况就是prometheus访问不到alertmanager了，可以查看prometheus的日志确认一下是否是这个问题，如果是指需要开启alertmanager端口的防火墙【容器部署容易遇到】
+
+```bash
+ufw allow 9093
+```
