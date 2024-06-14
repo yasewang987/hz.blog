@@ -37,7 +37,7 @@
 * postgres + pgvector 【推荐】
 * milvus
 * redis-stack(redissearch+redisjson)
-* elasticsearch
+* elasticsearch 【推荐】
 * mongo
 
 ## 向量化模型推荐

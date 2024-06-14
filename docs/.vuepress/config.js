@@ -495,7 +495,6 @@ module.exports = {
             ],
             '/other/tools/': [
                 'chrome',
-                'win-cmd',
                 'win-tools',
                 'vscode',
                 'resource',

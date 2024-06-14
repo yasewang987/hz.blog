@@ -1,8 +1,26 @@
 # 开发辅助工具
 
 ## Github访问加速工具
+* https://github.com/docmirror/dev-sidecar
+## 安全/漏洞扫描
+* [fscan](https://github.com/shadow1ng/fscan)：开源的内网安全扫描工具。该项目是用 Go 语言开发的内网扫描工具，提供了一键自动化全方位的漏洞扫描。它使用方便、功能全面，支持端口扫描、常见的服务器爆破、Web 应用漏洞扫描、NetBIOS 嗅探等功能。
 
-https://github.com/docmirror/dev-sidecar
+## 项目管理和团队协作工具
+
+github地址：https://github.com/mattermost/focalboard
+
+focalboard：这是一款开源、多语言、自托管的项目管理工具，兼容了 Trello 和 Notion 的特点。它支持看板、表格和日历等视图管理任务，并提供评论同步、文件共享、用户权限等功能。该工具还提供了适用于 Windows、macOS、Linux 系统的客户端。
+
+## UI库
+* [hyperui](https://github.com/markmead/hyperui)：免费的 Tailwind CSS 组件集合。这些组件支持深色模式、移动端适配和 LTR，复制代码即可使用。
+## 富文本编辑器
+* ckeditor5：https://github.com/ckeditor/ckeditor5 、Issues问题数量较多
+* Quill：https://github.com/slab/quill 、更新维护频率较低
+* tiptap：https://github.com/ueberdosis/tiptap 、更新维护频率较低，需要二次开发
+* TinyMCE：https://github.com/tinymce/tinymce 、缺点：云功能，实时协作等收费；安装包体积大
+## 原型设计工具
+
+* BootStrap Studio
 
 ## Android系统工具
 
@@ -61,25 +79,14 @@ apt install code
 code --no-sandbox --user-data-dir="/root/code" serve-web --host 127.0.0.1
 # 然后通过安卓浏览器去打开（推荐via浏览器）
 ```
+## android开发环境
+
+* docker-android: https://github.com/budtmo/docker-android
+
 
 ## 数据库管理工具
 
 * Dbeaver：https://github.com/dbeaver/dbeaver/releases
-
-
-## 原型设计工具
-
-* BootStrap Studio
-
-## 手机电脑同屏工具
-
-github地址：https://github.com/barry-ran/QtScrcpy
-
-`QtScrcpy` 是一个强大的安卓手机实时投屏到电脑的开源项目，可以将你的安卓手机屏幕投射到电脑上，并进行控制，无需 Root 权限，支持通过 USB 或 网络连接 Android 设备，并进行显示和控制，甚至是群控。支持 Windows、Mac 和 Linux 系统。
-
-第一次连接需要用USB数据线，开启手机上的USB调试。
-
-
 
 ## 免费开源可视化爬虫工具
 
@@ -88,54 +95,6 @@ github地址：https://github.com/barry-ran/QtScrcpy
 * 下载地址：https://github.com/NaiboWang/EasySpider/releases
 * GitHub地址：https://github.com/NaiboWang/EasySpider
 * 详细实用教程：https://blog.csdn.net/ihero/article/details/130805504
-
-## 项目管理和团队协作工具
-
-github地址：https://github.com/mattermost/focalboard
-
-focalboard：这是一款开源、多语言、自托管的项目管理工具，兼容了 Trello 和 Notion 的特点。它支持看板、表格和日历等视图管理任务，并提供评论同步、文件共享、用户权限等功能。该工具还提供了适用于 Windows、macOS、Linux 系统的客户端。
-
-## UI库
-
-* [hyperui](https://github.com/markmead/hyperui)：免费的 Tailwind CSS 组件集合。这些组件支持深色模式、移动端适配和 LTR，复制代码即可使用。
-
-## 图像处理
-
-* [gocv](https://github.com/hybridgroup/gocv)：基于 OpenCV 的 Go 语言计算机视觉库。OpenCV 是一个开源、跨平台的计算机视觉库，多用于做图像处理、视频采集和分析。该项目是 OpenCV 的 Go 语言封装库，让开发者可以使用 Go 语言调用 OpenCV 库，具有支持多平台、OpenCV 4+ 和 GPU 硬件加速等特性。
-
-```go
-package main
-
-import (
- "gocv.io/x/gocv"
-)
-
-func main() {
- // 打开摄像头
- webcam, _ := gocv.OpenVideoCapture(0)
- // 新建 GUI 窗口
- window := gocv.NewWindow("Hello")
- img := gocv.NewMat()
- // 显示视频
- for {
-  webcam.Read(&img)
-  window.IMShow(img)
-  window.WaitKey(1)
- }
-}
-```
-
-## 在线共享屏幕
-
-项目开源地址：https://github.com/screego/server
-
-它允许用户在网络上共享其屏幕，并允许其他用户通过浏览器访问和查看共享的屏幕。这个工具非常有用，特别是在需要进行远程协作、远程支持或在线培训的情况下。用户的屏幕分享服务。它可以快速启动一个在线共享屏幕的服务，让用户无需安装任何软件，仅使用浏览器就能分享自己的屏幕画面。项目基于网页实时通信(WebRTC) 实现，由 STUN/TURN 协议完成内网穿透和浏览器端对端的连接，既实用又有源码可以学习。
-
-```bash
-# docker部署
-docker run --net=host -e SCREEGO_EXTERNAL_IP=127.0.0.1 -e SCREEGO_SECRET=test123456 ghcr.io/screego/server:1.10.3
-```
-
 ## 数据清洗工具
 
 ### OpenRefine
@@ -151,10 +110,22 @@ docker run --net=host -e SCREEGO_EXTERNAL_IP=127.0.0.1 -e SCREEGO_SECRET=test123
 * 数据预览和导出：OpenRefine提供了数据预览功能，以便用户在处理过程中随时查看数据状态。处理完成后，数据可以导出为多种格式，如CSV、TSV、Excel等。
 * 协作与分享：OpenRefine支持多人协作处理同一个数据集，并允许用户将处理步骤保存为JSON格式的文件，方便与他人分享和交流。
 
-## android开发环境
+## 在线共享屏幕
 
-* docker-android: https://github.com/budtmo/docker-android
+项目开源地址：https://github.com/screego/server
 
-## 安全/漏洞扫描
+它允许用户在网络上共享其屏幕，并允许其他用户通过浏览器访问和查看共享的屏幕。这个工具非常有用，特别是在需要进行远程协作、远程支持或在线培训的情况下。用户的屏幕分享服务。它可以快速启动一个在线共享屏幕的服务，让用户无需安装任何软件，仅使用浏览器就能分享自己的屏幕画面。项目基于网页实时通信(WebRTC) 实现，由 STUN/TURN 协议完成内网穿透和浏览器端对端的连接，既实用又有源码可以学习。
 
-* [fscan](https://github.com/shadow1ng/fscan)：开源的内网安全扫描工具。该项目是用 Go 语言开发的内网扫描工具，提供了一键自动化全方位的漏洞扫描。它使用方便、功能全面，支持端口扫描、常见的服务器爆破、Web 应用漏洞扫描、NetBIOS 嗅探等功能。
+```bash
+# docker部署
+docker run --net=host -e SCREEGO_EXTERNAL_IP=127.0.0.1 -e SCREEGO_SECRET=test123456 ghcr.io/screego/server:1.10.3
+```
+## 手机电脑同屏工具
+
+github地址：https://github.com/barry-ran/QtScrcpy
+
+`QtScrcpy` 是一个强大的安卓手机实时投屏到电脑的开源项目，可以将你的安卓手机屏幕投射到电脑上，并进行控制，无需 Root 权限，支持通过 USB 或 网络连接 Android 设备，并进行显示和控制，甚至是群控。支持 Windows、Mac 和 Linux 系统。
+
+第一次连接需要用USB数据线，开启手机上的USB调试。
+
+

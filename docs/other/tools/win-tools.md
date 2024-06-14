@@ -1,17 +1,14 @@
 # Windows实用工具
 
-文件搜索：火萤酱  http://www.huoying666.com/  
-剪贴板：ditto https://ditto-cp.sourceforge.io/  
-鼠标手势：WGestures  http://www.yingdev.com/projects/wgestures  
-资源管理器插件 QTTabBar http://qttabbar.wikidot.com/  
-贴图 Snipaste https://zh.snipaste.com/  
-USB启动盘刻录：https://rufus.ie/zh_CN.html  或者 UltraISO(启动-写入硬盘镜像) 
-终端：https://github.com/Eugeny/terminus/releases  
-Windows子系统WSL: https://sspai.com/post/47719
-Windows、Office激活工具：https://github.com/massgravel/Microsoft-Activation-Scripts
-
-PowerToys : https://github.com/microsoft/PowerToys
-gcc: https://www.cnblogs.com/feipeng8848/p/15227688.html
+* 文件搜索：火萤酱  http://www.huoying666.com/  
+* 剪贴板：ditto https://ditto-cp.sourceforge.io/  
+* 鼠标手势：WGestures  http://www.yingdev.com/projects/wgestures  
+* 资源管理器插件 QTTabBar http://qttabbar.wikidot.com/  
+* 贴图 Snipaste https://zh.snipaste.com/  
+* USB启动盘刻录：https://rufus.ie/zh_CN.html  或者 UltraISO(启动-写入硬盘镜像) 
+* 终端terminal：https://github.com/Eugeny/terminus/releases  
+* Windows、Office激活工具：https://github.com/massgravel/Microsoft-Activation-Scripts
+* PowerToys : https://github.com/microsoft/PowerToys
 
 # Windows系统软件安装
 
@@ -33,6 +30,37 @@ chsh -s /bin/zsh
 sh -c "$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)"
 ```
 
+### Windows-添加gitbash到terminal
+
+```json
+{
+    "acrylicOpacity": 0, // 透明度
+    "closeOnExit": true, // 关闭的时候退出命令终端
+    "colorScheme": "Campbell", // 样式配置
+    "commandline": "C:\\Program Files\\Git\\bin\\bash.exe", // git-bash的命令行所在位置
+    "cursorColor": "#FFFFFF", // 光标颜色
+    "cursorShape": "bar", // 光标形状
+    "fontSize": 14, // 终端字体大小
+    "guid": "{1c4de342-38b7-51cf-b940-2309a097f589}", // 唯一的标识，改成和其他的已有终端不一样
+    "historySize": 9001, // 终端窗口记忆大小
+    "icon": "C:\\Program Files\\Git\\mingw64\\share\\git\\git-for-windows.ico", // git的图标
+    "name": "git-bash", // 标签栏的标题显示
+    "padding": "0, 0, 0, 0", // 边距
+    "snapOnInput": true,
+    "startingDirectory": "%USERPROFILE%", // gitbash 启动的位置（默认在C盘的用户里面的就是 ~ ）
+    "useAcrylic": false // 是否开启透明度
+}
+```
+
+### Windows - 设置terminal中wsl默认目录
+
+```json
+{
+    // Ubuntu 这个可以修改看你用的是哪个版本 wsl -l
+    "startingDirectory": "//wsl$/Ubuntu-20.04/home/hz"
+}
+```
+
 ## docker、wps安装
 
 直接官网下载安装包
@@ -46,6 +74,72 @@ sh -c "$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install
 复制下载链接，将`https://`和 `/stable` 之间的网址替换为`vscode.cdn.azure.cn`，替换之后类似下面地址：
 
 https://vscode.cdn.azure.cn/stable/b3e4e68a0bc097f0ae7907b217c1119af9e03435/VSCodeUserSetup-x64-1.78.2.exe
+
+## Windows服务
+
+服务注册(等号后面的空格必须)：  
+```bash
+sc create ServiceName binPath= 路径 start= auto
+
+# consul服务注册的例子
+sc create Consul-Server binPath="E:\TCSOFT\consul_1.4.4_windows_amd64\consul.exe agent -config-file E:\TCSOFT\consul_1.4.4_windows_amd64\Server\config.json start= auto"
+```
+
+删除服务：
+```bash
+sc delete ServiceName
+```
+
+其他服务不是很常用，如果需要可以通过:`sc -h`查看
+
+---
+
+## Windows-IIS操作命令
+
+```bash
+# 停止IIS站点
+C:\Windows\System32\inetsrv\appcmd.exe stop site XXXX
+# 开始IIS站点
+C:\Windows\System32\inetsrv\appcmd.exe start site XXXX
+
+# 停止IIS应用程序池
+C:\Windows\System32\inetsrv\appcmd.exe stop apppool /apppool.name:xxxx
+# 启动IIS应用程序池
+C:\Windows\System32\inetsrv\appcmd.exe start apppool /apppool.name:xxxx
+```
+
+---
+
+## Windows-文件操作
+
+```bash
+call xcopy ./out E:\test /e /y
+```
+
+## Windows打开关闭虚拟机
+
+```bash
+# 关闭
+bcdedit /set hypervisorlaunchtype off
+# 打开
+bcdedit /set hypervisorlaunchtype auto
+```
+
+## Windows安装gcc
+
+官网：https://www.mingw-w64.org/ ，这里可以下载到最新的版本
+
+参考文档：https://www.cnblogs.com/feipeng8848/p/15227688.html、https://cloud.tencent.com/developer/article/1627901
+
+下载地址【直接选择x86_64-posix-seh下载】：https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/
+
+mingw的工作是集成gcc源码与Windows API，用于把gcc移植到Windows上用原生的方式编译程序。用得到的gcc.exe编译的程序可以在Windows上原生运行。
+
+安装完mingw之后，系统变量中找到 Path 变量，在后面加入 min-gw 的安装目录如：`D:\MinGw\bin`
+
+## Windows字体增加
+
+下载字体ttf文件（阿里云盘）之后放到 `C:\Windows\Fonts` 文件夹，wps等软件能自动识别到
 
 # NSIS安装包教程
 
@@ -475,4 +569,3 @@ end:
   SetAutoClose true
 SectionEnd
 ```
-

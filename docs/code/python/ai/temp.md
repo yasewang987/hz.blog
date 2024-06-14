@@ -184,9 +184,9 @@ QLoRA提出了一种折中方案：在GPU内存受限的情况下，它能够在
 
 * milvus
 * redis-stack
-* postgresql+pgvector
-* elasticsearch
-* mongo
+* 【推荐】postgresql+pgvector
+* 【推荐】elasticsearch
+* mongo【文档存储】
 
 ## 成功要求
 
