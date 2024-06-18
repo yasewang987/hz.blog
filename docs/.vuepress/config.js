@@ -512,6 +512,7 @@ module.exports = {
             '/other/book/': [
                 'classical1',
                 'regular',
+                'version',
                 'child'
             ],
             '/other/cn/': [

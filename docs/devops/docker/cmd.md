@@ -12,6 +12,9 @@ fi
 ## docker常用命令
 
 ```bash
+#### 构建镜像
+docker build -t imagename .
+
 ####### 指定默认工作目录 /data
 docker run -d -w /data aaa
 

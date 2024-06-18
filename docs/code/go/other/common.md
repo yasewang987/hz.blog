@@ -53,9 +53,11 @@ github地址：https://github.com/spf13/cobra
 
 ## 并发库/线程池
 
-conc
-
 ants：github地址：https://github.com/panjf2000/ants
+
+```bash
+go get -u github.com/panjf2000/ants/v2
+```
 
 某些业务场景还会使用到`goroutine`池，`ants`就是一个广泛使用的`goroute`池，可以有效控制协程数量，防止协程过多影响程序性能。`ants`也是国人开发的，设计博文写的也很详细的，目前很多大厂也都在使用`ants`，经历过线上业务检验的，所以可以放心使用。
 

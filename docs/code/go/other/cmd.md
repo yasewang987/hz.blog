@@ -12,7 +12,19 @@ go install golang.org/x/lint/golint
 
 ## 编译build
 
+构建的时候会自动忽略目录及其子目录中的所有`非go结尾`的文件，`. _`开头的文件以及`testdata`文件夹内的所有文件
+
+* -o: 指定输出文件名。默认输出文件名是主软件包的名称，在 Windows 系统中会自动添加 .exe 后缀。
+* -v: 详细输出。该选项会在编译时打印软件包的名称。
+* -work: 打印临时工作目录，退出时不删除。该选项对调试很有用。
+* -x: 打印指令。该选项可打印 go build 正在执行的指令。
+* -asmflags: 传递给 go tool asm 调用的参数。
+* -buildmode: 要使用的编译模式。默认构建模式为 exe。其他可能的值包括shared、pie和plugin。
+* -buildvcs: 是否在二进制文件中加入版本控制信息。默认值为auto(自动)。
+
 ```bash
+# 获取帮助
+go help build
 # 查看支持的架构列表
 go tool dist list
 # 例子
@@ -24,6 +36,49 @@ CGO_ENABLED=0 GOOS=linux GOARCH=mips64le go build -o hello
 * `CGO_ENABLED`参数：用于标识（声明） cgo 工具是否可用，存在交叉编译的情况时，cgo 工具是不可用的。程序构建环境的目标操作系统的标识与程序运行环境的目标操作系统的标识不同。关闭 cgo 后，在构建过程中会忽略 cgo 并静态链接所有的依赖库，而开启 cgo 后，方式将转为动态链接。
 * `GOOS`参数：`linux`,`darwin`,`freebsd`,`windows`等
 * `GOARCH`参数：`amd64`,`arm`,`arm64`,`mips64le`等
+
+```go
+//// 构建标签
+
+// 只有在使用了特定 GOOS 或 GOARCH 时才能运行文件
+//go:build darwin,amd64
+package utils
+
+//// 当使用 -tags=free 时，输出将是 free，因为 free.go 文件已包含在内。而使用 -tags=pro 时，输出将是 pro。
+// main.go
+package mainimport "fmt"
+
+var version string
+func main() {
+    fmt.Println(version)
+}
+
+// pro.go
+//go:build pro
+package main
+func init() {
+    version = "pro"
+}
+free.go
+
+// free.go
+//go:build free
+package main
+func init() {
+    version = "free"
+}
+
+//// 可以像使用编程中的其他条件语句一样组合约束条件，如 AND、OR、NOT。
+
+// 只有在未启用 CGO 的情况下，才会在构建过程中包含该文件
+//go:build !cgo
+
+// 只有启用 CGO 并且 GOOS 设置为 darwin 的情况下，才会在构建过程中包含该文件
+//go:build cgo && darwin
+
+//go:build darwin || linux 
+//go:build (linux || 386) && (darwin || !cgo)
+```
 
 ## 使用 Makefile 进行交叉编译
 

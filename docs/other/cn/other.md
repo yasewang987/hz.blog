@@ -29,6 +29,10 @@ x86_64:https://update.cs2c.com.cn/NS/V10/V10SP1.1/os/adv/lic/updates/x86_64/
 # 银河麒麟高级服务器操作系统 V10 SP2
 aarch64:https://update.cs2c.com.cn/NS/V10/V10SP2/os/adv/lic/updates/aarch64/
 x86_64:https://update.cs2c.com.cn/NS/V10/V10SP2/os/adv/lic/updates/x86_64/
+# 麒麟V10 server SP3：
+https://distro-images.kylinos.cn:8802/web_pungi/download/share/vYTMm38Pkaq0KRGzg9pBsWf2c16FUwJL/
+# 麒麟V10 desktop SP1: 
+https://distro-images.kylinos.cn:8802/web_pungi/download/share/b4vmX7qEk90dyBrFfS5ANpGngaW2hZUK/
 ```
 
 适配镜像：arm和x86用 `python:3.7.4`, mips用 `python:3.7.7`
