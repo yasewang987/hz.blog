@@ -484,6 +484,7 @@ module.exports = {
                 'awk',
                 'sed',
                 'rsync',
+                'unison',
                 'rpm',
                 'shell',
                 'manjaro',

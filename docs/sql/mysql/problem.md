@@ -32,3 +32,12 @@ flush privileges;
 ```bash
 mysql_upgrade -u root -p
 ```
+
+## mysql容器停止启动失败
+
+`[ERROR] Can't init tc log`
+
+```bash
+# 到对应的data目录，删除文件
+rm -f tc.log
+```

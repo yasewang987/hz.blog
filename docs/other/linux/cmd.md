@@ -956,10 +956,16 @@ tzselect
 cp /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
 ```
 
-## 禁止内核自动更新
+## 禁止/启动内核更新
 
 ```bash
 #### Ubuntu
+# 查看是否禁用
+dpkg --get-selections |grep linux-image
+dpkg --get-selections | grep hold
+# 或者
+apt-mark showhold
+
 # 查看内核版本
 uname -r
 > 5.4.0-105-generic
@@ -972,8 +978,15 @@ apt-mark hold linux-image-5.4.0-105-generic
 apt-mark hold linux-headers-5.4.0-105-generic
 apt-mark hold linux-modules-extra-5.4.0-105-generic
 apt-mark hold linux-image-generic linux-headers-generic linux-image-extra
-# 查看是否禁用
-dpkg --get-selections |grep linux-image
+
+# 解除锁定更新
+sudo apt-mark unhold linux-generic
+sudo apt-mark unhold linux-image-generic
+sudo apt-mark unhold linux-headers-generic
+# 更新升级
+apt install linux-generic
+# 或者使用hwe
+apt install linux-generic-hwe-20.04
 
 #### Centos
 ```

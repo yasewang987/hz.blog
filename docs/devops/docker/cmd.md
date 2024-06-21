@@ -140,6 +140,13 @@ docker stats --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 --shm-size=32g
 ```
 
+## docker启动端口绑定ip
+
+```bash
+# 将容器的端口80映射到主机192.168.1.100的端口8080上
+docker run -p 192.168.1.100:8080:80 <镜像名>
+```
+
 ## docker容器中使用docker命令
 
 ```bash

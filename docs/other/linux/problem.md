@@ -1,18 +1,19 @@
 # Linux问题处理汇总
 
-## 内存溢出自动kill进程
-
-`Linux`内核有个机制叫`OOM killer(Out Of Memory killer)`，该机制会监控那些占用内存过大，尤其是瞬间占用内存很快的进程，然后防止内存耗尽而自动把该进程杀掉。内核检测到系统内存不足、挑选并杀掉某个进程的过程可以参考内核源代码`linux/mm/oom_kill.c`，当系统内存不足的时候，`out_of_memory()`被触发，然后调用`select_bad_process()`选择一个`bad`进程杀掉。如何判断和选择一个`bad`进程呢？linux选择`bad`进程是通过调用`oom_badness()`，挑选的算法和想法都很简单很朴实：最bad的那个进程就是那个最占用内存的进程。
-
-查看系统日志方法：
-
-```bash
-grep -i -r 'killed process' /var/log
-```
-
 ## 服务器重启(宕机)问题定位
 
 ```bash
+#### 内存溢出导致宕机
+# linux系统选择kill最bad的那个进程（就是那个最占用内存的进程）
+cat /var/log/syslog | grep -i "oom"
+cat /var/log/kern.log | grep -i "oom"  # 【推荐】
+grep -i 'killed process' /var/log/kern.log
+# 分析journalctl日志（显示上一次启动周期中OOM Reaper处理的事件）
+journalctl -b -1 _COMM=oom_reaper
+# dmesg命令可以用来查看内核环缓冲区中的消息
+dmesg | grep -i 'oom'
+
+#### 内核升级（一般不选择）
 dmesg | grep -i error
 # 输出
 ERST: Error Record Serialization Table (ERST) support is initialized.
