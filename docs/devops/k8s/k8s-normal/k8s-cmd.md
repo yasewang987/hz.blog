@@ -62,8 +62,10 @@ kubectl get nodes
 kubectl get nodes -o wide
 # 查看节点详细信息
 kubectl describe nodes
-# 查看节点标签
+# 查看所有节点标签
 kubectl get nodes --show-labels
+# 查看指定节点标签
+kubectl get node nodename --show-labels
 # 给节点添加标签
 kubectl label nodes node1 accelerator=example-gpu-x100
 

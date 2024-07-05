@@ -12,6 +12,12 @@ fi
 ## docker常用命令
 
 ```bash
+#### docker停止
+systemctl stop docker.socket
+systemctl stop docker
+systemctl disable docker.socket
+systemctl disable docker
+
 #### 构建镜像
 docker build -t imagename .
 

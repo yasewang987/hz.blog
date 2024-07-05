@@ -177,6 +177,8 @@ rpm --rebuilddb
 
 ## 服务器磁盘只读无法写入
 
+报错：`read-only file system`
+
 ```bash
 # 确认是否是只读问题
 mount | grep '/ .*ro'

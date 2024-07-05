@@ -23,10 +23,18 @@ K8s官网安装参考：https://kubernetes.io/docs/setup/production-environment/
 
 本次学习实践我们主要借助Kubeadm工具搭建K8S集群，以便后续实践部署ASP.NET Core应用集群。
 
-## 常用命令
+## 重启没有启动恢复
 
 ```bash
-crictl image
+# 停止docker（参考docker常用命令）
+# 关闭 swap（k8s不支持swap）
+swapoff -a && sed -i 's/^.*swap/#&/g' /etc/fstab
+
+# 查看状态（发现loaded状态没有启动成功）
+systemctl status kubelet
+
+# 重新启动
+systemctl start kubelet
 ```
 
 ## 一、环境准备

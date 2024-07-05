@@ -456,7 +456,7 @@ cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
 %global mmodel import
 %global mpath %{mcompany}/%{mtype}/%{mname}/%{mmodel}
 Name: %{mcompany}-%{mtype}-%{mname}-%{mmodel}
-Version: 2023.02
+Version: 2024.02
 Release:        20
 Summary:        %{mcompany} %{mtype} %{mname}
 

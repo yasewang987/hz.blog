@@ -26,12 +26,15 @@ pip download shapely==2.0.1 -d /tmp
 
 ```bash
 # 下载最新安装脚本：https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/
-wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py38_22.11.1-1-Linux-x86_64.sh
+wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py310_24.4.0-0-Linux-x86_64.sh
 
 # 安装(默认会在安装在用户目录下 $HOME/miniconda3)
-sh Miniconda3-py38_22.11.1-1-Linux-x86_64.sh
+sh Miniconda3-py310_24.4.0-0-Linux-x86_64.sh
 
-# 添加环境变量-bashrc/profile（WSL中不会自动添加）
+# 初始化
+conda init
+
+# 如果找不到，需要添加环境变量-bashrc/profile（WSL中不会自动添加）
 export PATH=$HOME/miniconda3/bin:$PATH
 
 # 生效
@@ -40,7 +43,7 @@ source .bashrc
 # 环境列表查看
 conda env list
 # 新建虚拟环境
-conda create -n myvenv python=3.8
+conda create -n myvenv python=3.10
 # 克隆环境
 conda create -n myvenv --clone base
 # 进入环境
@@ -206,6 +209,8 @@ rm -rf ~/.cache
 1. `ctrl + shift + p` 之后输入python，选择 `python:select interpreter` 选择对应的python环境
 
 ## torch安装验证
+
+阿里torch-cuda的whl安装包下载地址：https://mirrors.aliyun.com/pytorch-wheels/cu121/?spm=a2c6h.25603864.0.0.5bed6223hWyJvX
 
 1. 到 [pytorch官网](https://pytorch.org/get-started/locally/#windows-prerequisites) 找到对应的版本安装命令。
 

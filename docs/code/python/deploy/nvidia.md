@@ -204,7 +204,7 @@ rpm -aq | grep kernel-devel
 
 ### 运行镜像：
 
-直接到 `hub.docker.com` 找 `nvidia/cuda` 的对应版本（可以找runtime版本）
+直接到 `hub.docker.com` 找 `nvidia/cuda` 的对应版本（可以找runtime版本）, 建议 `12.2.2-cudnn8-runtime-ubuntu20.04` 这种形式的
 
 如果拉取镜像失败，可以到nvidia的网站拉取 `https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cuda/tags`
 

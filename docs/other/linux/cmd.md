@@ -76,6 +76,13 @@ sudo systemctl restart sshd
 service sshd restart
 ```
 
+## ssh使用pem文件登陆
+
+```bash
+chmod 600 key.pem
+ssh -i key.pem root@yourIP
+```
+
 ## SSH免密登录
 
 在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户
@@ -308,7 +315,31 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ----cpu----
 # 但如果swpd的值不为0，但是SI，SO的值长期为0，这种情况不会影响系统性能
 ```
 ## 挂载磁盘
+
 ```bash
+#### 新磁盘初始化挂载
+lsblk -f                               # 确认磁盘信息
+mkfs.ext4 /dev/sdb1                    # 格式化磁盘
+pvcreate /dev/sdb1 && pvdisplay        # 创建物理卷并查看
+vgcreate vg0 /dev/sdb1 && vgdisplay    # 创建卷组并查看
+lvcreate -L 100G -n lv0 vg0            # 创建100G的逻辑卷
+mkfs.ext4 /dev/vg0/lv0                 # 格式化逻辑卷
+mount /dev/vg0/lv0 /data               # 挂载逻辑卷
+df -hl                                 # 查看挂载状态
+# 如果逻辑卷空间不够，卷组还有剩余空间可以用一下方法扩容
+lvextend -l +100%FREE /dev/mapper/vg0-lv0    # 扩展逻辑卷使用100%空间
+resize2fs /dev/mapper/vg0-lv0          # 调整文件系统的大小
+df -hl                                 # 查看挂载状态
+#### 新磁盘初始化，并加入已有卷组之后做逻辑卷做扩容
+mkfs.ext4 /dev/sdb1                    # 如果是未挂载的新磁盘可以将其格式化
+pvcreate /dev/sdb1 && pvdisplay        # 创建物理卷并查看
+vgdisplay                              # 查看已有卷组
+vgextend vg0 /dev/sdb1 && vgdisplay    # 添加至已有卷组中并查看
+lvextend -l +100%FREE /dev/mapper/vg0-lv0    # 扩展逻辑卷使用100%空间
+resize2fs /dev/mapper/vg0-lv0          # 调整文件系统的大小
+df -hl                                 # 查看挂载状态
+
+
 # -a,--all:挂载/etc/fstab里面所有的文件系统；
 # -r,--read-only:以只读的权限挂载文件系统；
 # -w,--re,--read-write:以读写权限挂载文件系统；

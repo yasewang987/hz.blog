@@ -6,6 +6,13 @@
 
 github地址：https://github.com/acmesh-official/acme.sh
 
+### 常用命令
+
+```bash
+# 查看已运行证书
+acme.sh --list
+```
+
 ### 安装
 ```bash
 #### 安装
@@ -27,7 +34,7 @@ source ~/.bashrc
 # 检验（执行命令后显示提示信息）
 acme.sh --test
 
-### dns方式生成证书（阿里云）
+### dns方式生成证书（阿里云）【一定要先执行】
 # 登陆阿里云选择access key，【创建子账户】并获取对应的key和secret。记录下来。并点击用户名，给这个子账户添加DNS相关权限。
 # 前面两个export执行一次之后就会自动记住，不用放bashrc
 export Ali_Key="key值"

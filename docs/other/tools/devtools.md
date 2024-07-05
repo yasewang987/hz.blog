@@ -129,3 +129,8 @@ github地址：https://github.com/barry-ran/QtScrcpy
 第一次连接需要用USB数据线，开启手机上的USB调试。
 
 
+## 远程桌面工具
+
+todesk：
+
+* 远程连接ubuntu系统，如果卡在100%，需要修改 `/etc/gdm3/custom.conf` 将 `#WaylandEnable=false` 的注释给去掉。
