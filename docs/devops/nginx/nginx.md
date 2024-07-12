@@ -928,6 +928,19 @@ server {
 }
 ```
 
+## nginx静态文件支持在线预览
+
+```bash
+vim /etc/nginx/mime.types
+# 增加需要预览的格式
+types {
+ text/html html htm shtml;
+ #以log为扩展名的文件，如果目录下有其它类型的日志文件需要查看，可以进行增加，例如： text/log json;
+ text/log log;
+ text/css css;
+ text/xml xml;
+```
+
 ## Location配置优先级
 
 使用`Nginx Location`可以控制访问网站的路径, 但一个`server`可以有多个`location`配置

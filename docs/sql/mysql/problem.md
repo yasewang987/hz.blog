@@ -41,3 +41,15 @@ mysql_upgrade -u root -p
 # 到对应的data目录，删除文件
 rm -f tc.log
 ```
+
+## 配置文件无效
+
+一般都是配置文件映射错了目录
+
+```bash
+# 查看初始conf地址
+mysql --help
+
+# 查看读取的是哪个配置文件，配置文件中include了哪个目录。需要映射到对应的目录中
+cat /etc/mysql/mysql.cnf
+```

@@ -16,7 +16,9 @@
 
 ## mysql调整
 
-1. 开启审计日志
+如果使用mariadb建议版本 `10.4.xx` 最新版本
+
+1. 开启审计日志及密码设置
 
 ```sql
 # 查看general_log是否开启
@@ -30,9 +32,13 @@ set global general_log=1;
 
 ```conf
 [mysqld]
-general_log = on        // on为开启；off为关闭
+# 审计日志开启
 general_log = 1                                          
-general_log_file = /var/log/generalLog.log         // 审计信息存储位置
+general_log_file = /var/log/generalLog.log
+# 建议该数据库要求90天定期更换密码
+default_password_lifetime = 90
+# 登陆错误次数限制
+max_password_errors=5
 ```
 
 1. 建议该数据库安装对应模块，配置密码复杂度策略，要求密码由三种以上字符组成，长度8位以上：
@@ -45,7 +51,6 @@ validate_password_policy MEDIUM
 validate_password special_char_count 1
 ```
 
-1. 建议该数据库要求90天定期更换密码，修改参数为`default_password_lifetime 90`
 1. 配置连接超时自动退出时间15分钟，修改参数为`wait_timeout=900`
 1. 建议通过ACl或在mysql.user表配置指定白名单IP，对远程管理终端的地址接入范围进行限制（建议先测试是否影响运营）
 1. 建议对数据库配置数据、业务数据进行定期备份

@@ -57,8 +57,18 @@ collation-server=utf8mb4_unicode_ci
 运行容器命令(mysql文件夹下运行)：
 
 ```bash
+# 如果确定不了配置文件映射到哪个目录，可以跑一个空的容器，执行 mysql --help，
+# 查看读取的是哪个配置文件，配置文件中include了哪个目录。需要映射到对应的目录中。
+# mysql
 sudo docker run -d --restart=always -p 33306:3306 \
 -v "$PWD/mysqld.cnf":/etc/mysql/mysql.conf.d/mysqld.cnf \
+-v "$PWD/data":/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD="abc" \
+--name mysql mysql:5.7
+
+# mariadb
+sudo docker run -d --restart=always -p 33306:3306 \
+-v "$PWD/mysqld.cnf":/etc/mysql/conf.d/mysqld.cnf \
 -v "$PWD/data":/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD="abc" \
 --name mysql mysql:5.7
