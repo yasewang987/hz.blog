@@ -174,6 +174,12 @@ docker save -o llm.tar llm:310p
 docker load -i llm.tar
 ```
 
+## 镜像运行命令
+
+```bash
+docker run -d --ipc=host --device=/dev/davinci0 --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 18130:18130 --name langchain-0 llm-lc:910a-0710 /bin/bash /data/start.sh
+```
+
 ## 昇腾310P3适配（300I DUO）
 
 ### torch_npu
@@ -232,41 +238,18 @@ export DATASET=/data/code/models/CEval
 # 可开启CPU Performance模式以提高模型推理性能（物理机器）
 cpupower frequency-set -g performance
 
-#### 启动容器
-# NPU_NUM是设置使用那块显卡，和代码要配合使用
-# 启动空容器，主要测试阶段用
-docker run -itd \
---cap-add=ALL \
--e NPU_NUM=3 \
---device=/dev/davinci0 \   # 这个测试下来发现可以不要
---device=/dev/davinci_manager \
---device=/dev/devmm_svm \
---device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
--v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
--v /data:/data \
---name fc-llm llm:310p \
-/bin/bash
-
 # 做完启动脚本start.sh之后生产环境执行如下
 docker run -d \
---cap-add=ALL \
--e NPU_NUM=3 \
+--cap-add=ALL \   # 这个参数可以选择执行，如果有报错权限问题可以加上
+-e NPU_NUM=3 \   # 根据业务需要添加（如果是映射单卡。代码可以默认使用0卡即可，不用加这个参数）
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
+-v /usr/local/dcmi:/usr/local/dcmi \   # 可以去掉
+-v /etc/ascend_install.info:/etc/ascend_install.info \    # 可以去掉
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \      # 可以去掉
 -v /data:/data \
 --name fc-llm llm:310p \
 /bin/bash /data/code/glm2/start.sh
@@ -730,7 +713,7 @@ if __name__ == "__main__":
     uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)
 ```
 
-### 容器运行启动脚本
+### 容器运行启动脚本-start.sh
 
 ```sh
 #!/bin/bash
@@ -771,17 +754,13 @@ cd /data/code/glm2
 ```bash
 # 启动调试容器
 docker run -itd \
---cap-add=ALL \
+--ipc=host \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data:/data \
 --name fc-llm-test llm:temp \
 /bin/bash
@@ -958,17 +937,13 @@ curl -X POST -H 'Content-Type: application/json' -d '{"model":"glm3", "messages"
 ```bash
 # 启动调试容器(将模型和代码都放到data目录下)
 docker run -itd \
---cap-add=ALL \
+--ipc=host \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data2:/data \
 --name test222 llm:temp \
 /bin/bash
@@ -1001,18 +976,13 @@ docker commit test222 llm:910a-ms
 
 ### 启动容器
 docker run -d \
--e NPU_NUM=5 \
---cap-add=ALL \
+--ipc=host \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data2:/data \
 -p 8005:8999 \
 --name fc-llm-5 llm:910a-ms \
@@ -1027,7 +997,7 @@ docker load -i llm.ta
 
 ## 昇腾910B适配（800T A2）
 
-## 固件驱动
+### 固件驱动
 
 参考910A的方式去安装
 
@@ -1044,68 +1014,26 @@ reboot
 systemctl restart docker
 ```
 
-## 制作基础docker镜像
+### glm3模型适配-ms
 
-* 注意如果是mindspore的话，需要确认和cann的对应关系：https://www.mindspore.cn/versions#ascend%E9%85%8D%E5%A5%97%E8%BD%AF%E4%BB%B6%E5%8C%85
-
-```bash
-# 拉取基础镜像
-docker pull ubuntu:18.04
-# 运行安装环境的空容器
-docker run -itd --name test111 ubuntu:18.04 /bin/bash
-
-docker exec -it test111 bash
-# 初始化操作（速度慢可以改成清华源，注意选择arm版本）
-apt update
-# 安装python（如果python安装到其他目录，需要设置PATH环境变量到python的bin目录下）
-apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
-libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
-wget https://mirrors.huaweicloud.com/python/3.9.19/Python-3.9.19.tgz
-tar zxf Python-3.9.19.tgz && cd Python-3.9.19
-./configure --prefix=/usr/local --enable-optimizations
-make
-make install
-
-# 安装昇腾cann套件（这里有个坑，不要用最新版本的cann套件，容易出问题）
-./Ascend-cann-toolkit_7.0.0_linux-aarch64.run --install --install-for-all --quiet
-./Ascend-cann-kernels-910b_7.0.0_linux.run --install --install-for-all --quiet
-
-### 调整环境变量（放到.bashrc业务容器启动的时候source执行会不生效）
-vim ~/.profile
-# 增加如下配置
-export ASCEND_BASE=/usr/local/Ascend
-export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
-export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
-source $ASCEND_BASE/ascend-toolkit/set_env.sh
-
-### 清理容器内的所有run包和其他数据
-rm -f *.run
-rm -rf ~/.cache
-rm -rf Python-3.9.19*
-history -c
-### 生成镜像
-docker commit test111 llm:temp
-```
-
-## glm3模型适配
+* 固件驱动下载（1.0.23.alpha）：https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.beta1&driver=1.0.23.alpha
+* CANN套件-toolkit（8.0.RC1.beta1）：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%208.0.RC1/Ascend-cann-toolkit_8.0.RC1_linux-aarch64.run
+* CANN套件-kernel：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%208.0.RC1/Ascend-cann-kernels-910b_8.0.RC1_linux.run
+* MindFormers（1.1.0）：直接pip安装 `mindformers==1.1.0`或者 https://www.mindspore.cn/versions#2.3.0-rc2:~:text=mindformers%2D1.1.0%2Dpy3%2Dnone%2Dany.whl
+* MindSpore（2.3.0rc2）：https://www.mindspore.cn/versions#2.3.0-rc2参考下载对应版本，例如python3.9地址：https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.3.0rc2/MindSpore/unified/aarch64/mindspore-2.3.0rc2-cp39-cp39-linux_aarch64.whl
 
 **mindspore方式：**
 
 ```bash
 # 启动调试容器(将模型和代码都放到data目录下)
 docker run -itd \
---cap-add=ALL \
+--ipc=host \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data:/data \
 --name test222 llm:temp \
 /bin/bash
@@ -1117,17 +1045,12 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple /usr/local/Ascend/ascen
 
 
 # 正常安装，到这里选择对应版本的whl包（包含mindformers）：https://www.mindspore.cn/versions#2214
-wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindSpore/unified/aarch64/mindspore-2.2.14-cp39-cp39-linux_aarch64.whl
-wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindFormers/any/mindformers-1.0.2-py3-none-any.whl
-pip3 install  -i https://pypi.tuna.tsinghua.edu.cn/simple mindspore-2.2.14-cp39-cp39-linux_aarch64.whl mindformers-1.0.0-py3-none-any.whl 
+pip3 install  -i https://pypi.tuna.tsinghua.edu.cn/simple mindspore-2.3.0rc2-cp39-cp39-linux_aarch64.whl mindformers-1.1.0-py3-none-any.whl 
 # 执行如下代码，如果未报错且输出了mindspore版本，证明mindspore安装成功
 # 注意需确认显卡上没有运行其他程序再执行
 python3 -c "import mindspore;mindspore.set_context(device_id=0,device_target='Ascend');mindspore.run_check()"
-# 【注意】如果程序运行的时候有问题则需要安装低版本的mindformers
-wget https://gitee.com/mindspore/mindformers/releases/download/v1.0.0/mindformers-1.0.0-py3-none-any.whl
-pip3 install mindformers-1.0.0-py3-none-any.whl
 # 【不推荐】源码安装mindformers-注意修改sh脚本中的python和pip版本(https://gitee.com/mindspore/mindformers)
-git clone -b r1.0 https://gitee.com/mindspore/mindformers.git
+git clone https://gitee.com/mindspore/mindformers.git
 cd mindformers
 bash build.sh
 
@@ -1243,7 +1166,7 @@ if __name__ == '__main__':
     uvicorn.run(app, host=args.server_name, port=args.server_port, workers=1)
 ```
 
-## glm3运行
+### glm3运行
 
 ```bash
 ### 清理容器内的所有run包和其他数据
@@ -1260,18 +1183,13 @@ python3 ../model/glm3/run_chat_server.py
 #--------------
 ### 启动容器
 docker run -d \
--e NPU_NUM=2 \
---cap-add=ALL \
+--ipc=host \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data:/data \
 -p 8002:8000 \
 --name fc-llm-2 llm:910b \
@@ -1283,7 +1201,7 @@ docker save -o llm.tar llm:910b
 docker load -i llm.tar
 ```
 
-# 昇腾适配问题列表
+## 昇腾适配问题列表
 
 * 碰到`生成内容重复`或者`生成内容异常`，通常需要调整配置文件中的推理超参数解决，配置文件一般是`config.yaml`或者`run_chat_glm2_6b.yaml`
 
