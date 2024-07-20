@@ -2,6 +2,13 @@
 ## Git常用命令
 
 ```bash
+# git克隆远程仓库代码（不指定local_directory，默认使用仓库名创建文件夹）
+git clone <repository_url> <local_directory>
+
+# git克隆单独分支（其他所有远程分支的信息都没有，如果需要需要单独fetch其他远程分支信息）
+git clone --single-branch -b <branch_name> <repository_url> <local_directory>
+git fetch origin develop:develop
+
 # 从tag标签迁分支
 git checkout -b branchname tagname
 

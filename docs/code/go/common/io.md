@@ -285,3 +285,50 @@ func main() {
 
 ```
 
+
+
+## os
+
+### os.DirFS
+
+`os.DirFS` 函数可以将一个目录路径转换为 `fs.FS` 对象，从而可以被 `CopyFS` 函数识别和处理。
+
+```go
+//// 函数定义如下
+func DirFS(dir string) fs.FS
+```
+
+### os.CopyFS
+
+在 Go 1.23 版本中，标准库 `os` 包引入了一个名为 `CopyFS` 的新函数，它提供了一种仅使用标准库函数即可复制目录的便捷方法.
+
+`CopyFS` 函数会遍历源文件系统 `fsys` 中的所有文件和目录，并将它们复制到目标目录 `dir` 下。复制过程中会保留文件的权限信息，但`符号链接`不会被复制，而是会返回一个 `ErrInvalid` 错误。
+
+```go
+//// 函数的定义如下
+// dir：目标目录路径，复制操作将把文件系统复制到该目录下.如果目标目录不存在，CopyFS 会尝试创建它。
+// fsys：要复制的源文件系统，它是一个实现了 fs.FS 接口的对象
+func CopyFS(dir string, fsys fs.FS) error
+
+//// demo-复制目录
+package main
+
+import (
+ "fmt"
+ "os"
+)
+
+func main() {
+ srcDir := "/path/to/source/dir"
+ destDir := "/path/to/destination/dir"
+ // 将源目录转换为 fs.FS 对象
+ sourceFS := os.DirFS(srcDir)
+ // 使用 CopyFS 复制目录
+ err := os.CopyFS(destDir, sourceFS)
+ if err != nil {
+  fmt.Println("复制目录出错:", err)
+  return
+ }
+ fmt.Println("目录复制成功！")
+}
+```

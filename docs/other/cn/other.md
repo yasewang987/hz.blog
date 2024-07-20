@@ -174,19 +174,21 @@ cp -rf %{_builddir}/funcun/fcwy/* %{buildroot}/opt/Yozosoft/Yozo_Office/Plugins/
 
 ### wps插件打包
 
+把 `wpsplugin` 和 `wpsinstall.sh` 放到同一个文件夹 `wps` 下面即可。
+
 ```conf
 %define _binaries_in_noarch_packages_terminate_build 0
-Name: test-wpsplugin-uos
-Version: 2023.6
-Release:        1
-Summary:        test wpsplugin
+Name: service-wpsplugin
+Version: 2024.07
+Release:        20
+Summary:        service wpsplugin
 
-Group:          test
+Group:          service
 License:        GPLv3+
 BuildArch: noarch
 
 %description
-test wpsplugin
+service wpsplugin
 
 %prep
 
@@ -194,17 +196,15 @@ test wpsplugin
 %build
 
 %install
-rm -rf %{buildroot}/opt/test/wps/wpsplugin
-mkdir -p %{buildroot}/opt/test/wps/wpsplugin
-cp -rf %{_builddir}/test/wpsplugin/* %{buildroot}/opt/test/wps/wpsplugin
-cp -f %{_builddir}/test/wpsinstall.sh %{buildroot}/opt/test/wps
+rm -rf %{buildroot}/opt/service/wps
+mkdir -p %{buildroot}/opt/service/wps
+cp -rf %{_builddir}/service/wps/* %{buildroot}/opt/service/wps
 
 %post
-/bin/bash /opt/test/wps/wpsinstall.sh
+/bin/bash /opt/service/wps/wpsinstall.sh
 
 %files
-/opt/test/wps
-
+/opt/service/wps
 
 %changelog
 ```
@@ -215,31 +215,27 @@ cp -f %{_builddir}/test/wpsinstall.sh %{buildroot}/opt/test/wps
 #!/bin/bash
 
 VERSION=1.0.0
-touch /opt/funcun/wps/test.log
+touch /opt/service/wps/test.log
 
-for HOMEDIR in /home/*; do
-  if [ ! -d $HOMEDIR ]; then
-          continue
-  fi
-  jsXmlDir=$HOMEDIR/.local/share/Kingsoft/wps/jsaddons
-  echo $jsXmlDir >> /opt/funcun/wps/test.log
+users=$(cat /etc/passwd | grep bash | cut -d \: -f 1)
+for HOMEDIR in $users; do
+  jsXmlDir=/home/$HOMEDIR/.local/share/Kingsoft/wps/jsaddons
+  echo $jsXmlDir >> /opt/service/wps/test.log
   mkdir -p ${jsXmlDir}
-  chmod -R 777 ${jsXmlDir}
-  /bin/cp -rf /opt/funcun/wps/wpsplugin ${jsXmlDir}
-  rm -rf ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
-  mv ${jsXmlDir}/wpsplugin ${jsXmlDir}/ifuncun-wps-jsaddons-project_${VERSION}
-  jsXmlFile=${jsXmlDir}/publish.xml
-  echo $jsXmlFile >> /opt/funcun/wps/test.log
+  rm -rf ${jsXmlDir}/service-wps_${VERSION} | true
+  /bin/cp -rf /opt/service/wps/wpsplugin ${jsXmlDir}
+  mv ${jsXmlDir}/wpsplugin ${jsXmlDir}/service-wps_${VERSION}
+  jsXmlFile=${jsXmlDir}/jsplugins.xml
+  echo $jsXmlFile >> /opt/service/wps/test.log
   if [ ! -f $jsXmlFile ]; then
     touch -f $jsXmlFile
     echo -e "<jsplugins>\n</jsplugins>" > $jsXmlFile
   fi
-  columnStr=$(cat $jsXmlFile | grep ifuncun-wps-jsaddons-project)
-  echo $columnStr >> /opt/funcun/wps/test.log
-  if [[ -n $columnStr ]]; then
-    sed -i '/ifuncun-wps-jsaddons-project/d' $jsXmlFile
-  fi
-  sed -i '/<jsplugins>/a\    <jsplugin url="空" name="ifuncun-wps-jsaddons-project" version="'${VERSION}'" type="wps"/>' $jsXmlFile
+  columnStr=$(cat $jsXmlFile | grep service-wps)
+  echo $columnStr >> /opt/service/wps/test.log
+  sed -i '/service-wps/d' $jsXmlFile
+  sed -i '/<jsplugins>/a\    <jsplugin url="null" name="service-wps" version="'${VERSION}'" type="wps"/>' $jsXmlFile
+  chmod -R 777 ${jsXmlDir}
 done
 ```
 

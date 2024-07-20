@@ -54,3 +54,7 @@ sudo sed -i 's/timeoutSeconds: [0-9][0-9]/timeoutSeconds: 20/g'            /etc/
 sudo kubeadm init --v=1 --skip-phases=certs,kubeconfig,control-plane --ignore-preflight-errors=all --pod-network-cidr 10.244.0.0/16
 ```
 
+## command terminated with exit code 137
+
+这个报错就是因为内存溢（oom）出导致的，只需要设置高一点的内存就可以了。
+

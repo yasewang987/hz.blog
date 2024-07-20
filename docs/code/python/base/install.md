@@ -50,6 +50,14 @@ conda create -n myvenv --clone base
 conda activate base
 # 退出环境
 conda deactivate
+
+# 升级对应环境的python版本
+conda activate myenv
+conda install python=3.11.9
+# 还有一种方法是通过复制现有的 conda 虚拟环境，并在复制过程中指定新的 Python 版本
+conda create --name newenv --clone myenv
+conda activate newenv
+conda install python=3.11.9
 ```
 
 * 卸载

@@ -1133,3 +1133,32 @@ grep -rn "查找的内容" ./
 # 批量替换某个目下所有包含的文件的内容
 sed -i "s/查找的内容/替换后的内容/g" `grep -rl "查找的内容" ./`
 ```
+
+## 开启syslog日志服务
+
+开启syslog日志服务之后其他服务器或者硬件防火墙可以通过访问514的udp服务同步日志到指定服务器上
+
+```bash
+# 开启syslog-514的udp
+vim /etc/rsyslog.conf
+# 去掉下面两个注释
+module(load="imudp")
+input(type="imudp" port="514")
+
+# 重启服务
+systemctl restart rsyslog
+
+# 开启防火墙
+ufw allow 514/udp
+
+# 查看服务是否正常开启(如果服务运行会显示有内容)
+lsof -i :514
+
+# 跟踪日志变化
+tail -f /var/log/syslog
+
+# 其他服务器/防火墙执行测试（上面跟踪的日志会显示对应的内容记录）
+logger -n 192.168.0.85 -P 514 -t mytest "This is a test log message."
+# 或者
+echo "This is a test syslog message." | nc -u 192.168.0.85 514
+```

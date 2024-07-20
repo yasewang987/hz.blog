@@ -16,6 +16,9 @@ npu-smi看到如果显卡型号是910B后面没有其他数字说明是910A系�
 * mindformers-glm3适配教程：https://mindformers.readthedocs.io/zh-cn/latest/docs/model_cards/glm3.html
 * mindformers-mindspore对应关系（版本查看对应tag标签）：https://gitee.com/mindspore/mindformers/tree/v1.1.0/
 
+* mindie官方文档：https://www.hiascend.com/document/detail/zh/mindie/1.0.RC1/releasenote/releasenote_0001.html
+* mindie-pytorch-cann对应关系包：https://www.hiascend.com/developer/download/community/result?module=ie%2Bpt%2Bcann
+
 ## 固件驱动安装流程
 
 **注意选择版本需要参考下面具体型号。**
@@ -1266,7 +1269,11 @@ vim /usr/local/lib/python3.9/site-packages/mindformers/model_runner.py
 # 注释掉包错那行代码，以及 swap_cache 相关的代码
 ```
 
-* `module 'mindspore' has no attribute 'hal'`，出现这个问题一般是 mindformers、mindspore、cann、固件驱动的版本不匹配，可以参考mindformers的gitee仓库对应的版本去安装其他依赖项。
+* `module 'mindspore' has no attribute 'hal'`
+
+【推荐】出现这个问题一般是 mindformers、mindspore、cann、固件驱动的版本不匹配，可以参考mindformers的gitee仓库对应的版本去安装其他依赖项。
+
+【不推荐】上面问题还有一个特殊处理方式，例如 `glm3` 需要设置 `use_past=False` ，但是这个设置推理速度会变得很慢。
 
 * `Get soc name failed`或者`dcmi module initialize failed. ret is -8005`一般是容器内找不到硬件了。需要在运行的时候设置 `--device=/dev/davinci0 `
 
@@ -1282,3 +1289,5 @@ chunk.json(exclude_unset=True, ensure_ascii=False)
 # 替换为
 chunk.model_dump_json(exclude_unset=True,exclude_none=True)
 ```
+
+* 报错`max_length`不能大于`seq_length`，则需要修改模型的 `yaml` 文件，将 `seq_length` 改大。

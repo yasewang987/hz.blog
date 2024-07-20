@@ -107,6 +107,7 @@ docker save -o abc.tar image:1 image:2
 # 导入使用 docker save 命令导出的镜像,--input , -i : 指定导入的文件
 docker load [OPTIONS]
 docker load -i abc.tar
+docker load < abc.tar.gz
 
 ####### 删除所有镜像
 docker rmi $(docker images -qa)

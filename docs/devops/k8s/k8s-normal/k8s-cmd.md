@@ -1,5 +1,19 @@
 # K8s常用命令
 
+## 其他
+
+```bash
+# 查看集群信息
+kubectl cluster-info
+
+# 创建命名空间
+kubectl create namespace <namespace>
+# 删除命名空间
+kubectl delete namespace mem-example
+# 查看命名空间信息
+kubectl describe namespace <namespace-name>
+```
+
 ## crictl容器管理
 
 资料地址：https://kubernetes.io/zh-cn/docs/tasks/debug/debug-cluster/crictl/
@@ -49,13 +63,9 @@ crictl logs --tail=1 87d3992f84f74
 crictl runp pod-config.json
 ```
 
-## node节点命令
+## Node节点命令
 
 ```bash
-# 创建命名空间
-kubectl create namespace <namespace>
-# 删除命名空间
-kubectl delete namespace mem-example
 
 # 查看节点列表
 kubectl get nodes
@@ -68,6 +78,10 @@ kubectl get nodes --show-labels
 kubectl get node nodename --show-labels
 # 给节点添加标签
 kubectl label nodes node1 accelerator=example-gpu-x100
+# 取消节点标签
+kubectl label nodes <node-name> <key>-
+# 查看集群资源使用情况
+kubectl top nodes
 
 # 查看token
 kubeadm token list
@@ -97,17 +111,66 @@ clusterName: kubernetes
 ...
 ```
 
-## 创建服务
+## Service命令
 
 ```bash
-# 创建
-kubectl create xxx.yaml --validate=false
+# 创建服务（推荐使用yaml文件）
+kubectl create service clusterip my-service --tcp=80:8080
+# 编辑服务
+kubectl edit service <service-name> -n <namespace>
+# 更改服务类型
+kubectl patch service <service-name> -p '{"spec": {"type": "NodePort"}}'
 
-# 重启
-kubectl replace xxx.yaml --force --validate=false
+# 获取default命名空间下的
+kubectl get services
+kubectl get services  -o wide
+# 获取kube-system命名空间下的
+kubectl -n kube-system get services
+# 获取详情
+kubectl describe service my-service
+kubectl describe service <service-name> -n <namespace>
+# 删除service
+kubectl delete service xxxx
+kubectl -n kube-system delete service xxxx
+
+# 临时调试，端口转发（27017是服务端口，28015是本机端口）
+kubectl port-forward service/mongo 28015:27017
 ```
 
-## 获取Pod信息
+## Deployment命令
+
+```bash
+# 创建deployment（一般都是通过yaml文件创建）
+kubectl create deployment <deployment-name> --image=<container-image>
+kubectl apply -f xxx-deployment.yaml
+# 【一般不推荐，可以通过service.yaml文件去配置】自动创建Service指向Deployment的所有Pods
+kubectl expose deployment <deployment-name> --type=LoadBalancer --port=80 --target-port=8080
+# 升级
+kubectl apply -f xxxx-deloyment.yaml --record
+# 检查服务更新状态
+kubectl rollout status deployment xxxx-deployment
+# 查看升级历史记录
+kubctl rollout history deployment xxxx-deployment
+# 回滚版本1
+kubectl rollout undo deployment --to-revision=1
+# 扩大或缩小副本数量
+kubectl scale deployment <deployment-name> --replicas=5
+
+# 获取default命名空间下的
+kubectl get deployments -o wide
+# 获取kube-system命名空间下的
+kubectl -n kube-system get deployments
+# 显示该 Deployment 的相关信息
+kubectl describe deployment <deployment-name> -n <namespace>
+# 删除deployment
+kubectl delete deployment nginx-deployment
+kubectl -n kube-system delete deployment xxxx
+
+# 临时调试端口转发
+kubectl port-forward deployment/mongo 28015:27017
+```
+
+## Pod命令
 
 ```bash
 # 获取default命名空间下的pods
@@ -116,16 +179,20 @@ kubectl get pods -o wide
 kubectl get pods --all-namespaces
 # 获取kube-system命名空间下的pods
 kubectl -n kube-system get pods
+# 获取指定label的所有pod（deployment.yaml里面设置的label）
+kubectl get pods -l app=nginx
 # 查看 Pod 相关的详细信息yaml
 kubectl get pod memory-demo --output=yaml --namespace=mem-example
 # 查看关于该 Pod 历史的详细信息
 kubectl describe pod memory-demo-2 --namespace=mem-example
+# 查看pod事件
+kubectl describe pod <pod-name> -n <namespace> | grep -i events
 # 获取该 Pod 的指标数据（cpu、内存）
 kubectl top pod memory-demo --namespace=mem-example
 # 删除pod
 kubectl delete pod memory-demo --namespace=mem-example
-# 获取指定label的所有pod（deployment.yaml里面设置的label）
-kubectl get pods -l app=nginx
+# 强制删除pod
+kubectl delete pod <pod-name> -n <namespace> --force --grace-period=0
 
 # 列出pod里用到的所有镜像
 # .items[*]: 对于每个返回的值
@@ -147,70 +214,92 @@ kubectl run -i --tty --image busybox:1.28 dns-test --restart=Never --rm
 nslookup web-0.nginx
 ```
 
-## 获取service信息
+## PV/PVC管理
+
+`Persistent Volumes (PVs)` 提供了持久化的存储资源，PV类型多种多样，支持不同的存储后端，如本地存储、网络存储（如NFS、GlusterFS、Ceph等）。
 
 ```bash
-# 获取default命名空间下的
-kubectl get services
-# 获取kube-system命名空间下的
-kubectl -n kube-system get services
-# 获取详情
-kubectl describe service my-service
-
-# 临时调试，端口转发（27017是服务端口，28015是本机端口）
-kubectl port-forward service/mongo 28015:27017
+# 列出所有PV
+kubectl get pv
+# 查看PV详细信息
+kubectl describe pv <pv-name>
+# 列出所有PVC
+kubectl get pvc
+# 查看PVC详细信息
+kubectl describe pvc <pvc-name>
 ```
 
-## 获取Deployment信息
+```yaml
+###### 本地pv
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv-example
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - node01  # 指定节点名称
 
-```bash
-# 获取default命名空间下的
-kubectl get deployments -o wide
-# 获取kube-system命名空间下的
-kubectl -n kube-system get deployments
-# 显示该 Deployment 的相关信息
-kubectl describe deployment <deployment-name>
-# 删除deployment
-kubectl delete deployment nginx-deployment
+#### 创建NFS PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv-example
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: nfs
+  nfs:
+    server: <nfs-server-ip> # nfs服务ip
+    path: "/exports/data"   # nfs共享目录
 
-# 临时调试端口转发
-kubectl port-forward deployment/mongo 28015:27017
+### pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-storage  # 或 nfs，需与PV的storageClassName匹配
 ```
 
-## 删除信息
+## ConfigMap管理
+
+用来存储配置数据，如应用的配置文件，以键值对形式挂载到Pod中，方便应用程序读取和分离配置与代码。
 
 ```bash
-# 删除defalut命名空间下的
-kubectl delete pod xxxx
-kubectl delete service xxxx
-kubectl delete deployment xxxx
-
-# 删除kube-system命名空间下的
-kubectl -n kube-system delete pod xxxx
-kubectl -n kube-system delete service xxxx
-kubectl -n kube-system delete deployment xxxx
-```
-
-## 版本升级、回滚
-
-```bash
-# 升级，修改yaml内容
-kubectl apply -f xxxx-deloyment.yaml --record
-
-# 检查服务更新状态
-kubectl rollout status deployment xxxx-deployment
-
-# 查看升级历史记录
-kubctl rollout history deployment xxxx-deployment
-
-# 回滚版本1
-kubectl rollout undo deployment --to-revision=1
+# 创建ConfigMap
+kubectl create configmap <my-configmap> --from-literal=KEY1=VALUE1
+# 查看ConfigMap
+kubectl get configmaps
+# 删除ConfigMap
+kubectl delete configmap  <my-configmap>
 ```
 
 ## api接口常用命令
 
 ```bash
-# 要现在master节点启动proxy
+# 要先在master节点启动proxy
 kubectl proxy --address='0.0.0.0' --port=8001 --disable-filter=true
 
 # 获取所有节点信息
