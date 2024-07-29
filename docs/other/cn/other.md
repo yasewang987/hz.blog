@@ -475,4 +475,36 @@ cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
 
 %files
 /opt/%{mpath}
+
+#### 工具
+%define _binaries_in_noarch_packages_terminate_build 0
+%define __os_install_post %{nil}
+%define debug_package %{nil}
+%global mcompany service
+%global mtype tools
+%global mpath %{mcompany}/%{mtype}
+Name: %{mcompany}-%{mtype}
+Version: 2024.07
+Release:        22
+Summary:        %{mcompany} %{mtype}
+
+Group:          %{mcompany}
+License:        GPLv3+
+BuildArch: noarch
+
+%description
+%{mcompany} %{mtype}
+
+%prep
+
+
+%build
+
+%install
+rm -rf %{buildroot}/opt/%{mpath}
+mkdir -p %{buildroot}/opt/%{mpath}
+cp -rf %{_builddir}/%{mpath}/* %{buildroot}/opt/%{mpath}
+
+%files
+/opt/%{mpath}
 ```

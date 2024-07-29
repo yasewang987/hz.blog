@@ -87,3 +87,17 @@ stream {
 }
 ```
 
+## nginx配置新的域名后没有生效
+
+如果检查过配置文件没有问题，可以注意看一下是不是日志文件设置之后，没有对应的文件夹。
+
+```conf
+server {
+    listen 80;
+    server_name localhost;
+    # 注意这里，如果没有 /data/logs/api 文件夹，nginx就会报错导致整个server配置不生效
+    access_log  /data/logs/api/access.log  main;
+    error_log  /data/logs/api/error.log;
+}
+```
+

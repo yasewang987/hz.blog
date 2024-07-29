@@ -19,6 +19,10 @@ npu-smi看到如果显卡型号是910B后面没有其他数字说明是910A系�
 * mindie官方文档：https://www.hiascend.com/document/detail/zh/mindie/1.0.RC1/releasenote/releasenote_0001.html
 * mindie-pytorch-cann对应关系包：https://www.hiascend.com/developer/download/community/result?module=ie%2Bpt%2Bcann
 
+## 注意事项
+
+* 如果使用了`torch_npu`需要引入`acl，acl`中依赖了`decorator、psutil`，一定要在做镜像的时候加上
+
 ## 固件驱动安装流程
 
 **注意选择版本需要参考下面具体型号。**
@@ -100,6 +104,15 @@ tar zxf Python-3.9.19.tgz && cd Python-3.9.19
 make
 make install
 
+### 安装torch依赖【这个只有在torhc_npu版本需要执行】
+pip install -i https://pypi.douban.com/simple pyyaml wheel typing_extensions
+# 安装pytorch【这里要特别注意，torch版本要和Ascend-cann-llm_7.0.0_linux-aarch64_torch1.11.0-abi0.tar.gz中的一样】
+pip install -i https://pypi.douban.com/simple torch==2.1.0
+# 下载torch_npu，https://gitee.com/ascend/pytorch/releases，一定要选择对应版本
+pip install torch_npu-2.0.1.post1-cp39-cp39-linux_aarch64.whl
+# 若返回True则说明PyTorch安装成功
+python3 -c "import torch;import torch_npu;print(torch_npu.npu.is_available())"
+
 #### 安装cann相关
 # 平台开发套件软件包，用于用户开发应用、自定义算子和模型转换，适用于命令行方式安装场景
 Ascend-cann-toolkit_7.0.0_linux-aarch64.run
@@ -112,22 +125,13 @@ chmod +x Ascend-cann-kernels-310p_7.0.0_linux.run
 # 生效环境变量
 source /usr/local/Ascend/ascend-toolkit/set_env.sh
 
-### 安装torch依赖【这个只有在torhc_npu版本需要执行】
-pip install -i https://pypi.douban.com/simple pyyaml wheel typing_extensions
-# 安装pytorch【这里要特别注意，torch版本要和Ascend-cann-llm_7.0.0_linux-aarch64_torch1.11.0-abi0.tar.gz中的一样】
-pip install -i https://pypi.douban.com/simple torch==2.0.1
-# 下载torch_npu，https://gitee.com/ascend/pytorch/releases，一定要选择对应版本
-pip install torch_npu-2.0.1.post1-cp39-cp39-linux_aarch64.whl
-# 若返回True则说明PyTorch安装成功
-python3 -c "import torch;import torch_npu;print(torch_npu.npu.is_available())"
-#### 确认下载使用abi0还是abi1包
+#### 下载安装加速库【可选】
+# 确认下载使用abi0还是abi1包
 # 在python环境下运行如下两行。若返回True，则flag=1；若返回False则flag=0
 python
 import torch
 torch.compiled_with_cxx11_abi()
 exit()
-
-#### 下载安装加速库【可选】
 # 昇腾Transformer加速库软件包，提供了基础的高性能的算子，或一种高效的算子组合技术（Graph），方便模型加速
 Ascend-cann-atb_7.0.0_linux-aarch64_abi0.run
 Ascend-cann-atb_7.0.0_linux-aarch64_abi1.run
@@ -154,13 +158,22 @@ cd /tmp
 pip install .
 rm -rf /tmp/atb_speed_sdk
 
-### 调整环境变量
-vim ~/.profile
-# 增加如下配置
+#### 调整环境变量
+vim ~/.profile ~/.bashrc
+## 增加如下配置【普通】
 export ASCEND_BASE=/usr/local/Ascend
-export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1   # 这个配置需要慎重，可能会导致系统命令无法正常使用，建议放到启动脚本里
 export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
 source $ASCEND_BASE/ascend-toolkit/set_env.sh
+## 增加如下配置【langchain】
+# 源码安装
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1:/usr/local/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0:/usr/local/lib/python3.9/site-packages/torch.libs/libgomp-6e1a1d1b.so.1.0.0
+# miniconda3
+export LD_PRELOAD=/root/miniconda3/lib/libgomp.so.1:/root/miniconda3/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0:/root/miniconda3/lib/python3.9/site-packages/torch.libs/libgomp-6e1a1d1b.so.1.0.0
+export ASCEND_BASE=/usr/local/Ascend
+export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
+source $ASCEND_BASE/ascend-toolkit/set_env.sh
+
 # 下面执行看情况【可选】
 source $ASCEND_BASE/atb/set_env.sh
 if [ -f "/data/code/set_env.sh" ]; then
@@ -180,7 +193,8 @@ docker load -i llm.tar
 ## 镜像运行命令
 
 ```bash
-docker run -d --ipc=host --device=/dev/davinci0 --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 18130:18130 --name langchain-0 llm-lc:910a-0710 /bin/bash /data/start.sh
+# 这里千万要注意不要用--device=/dev/davinci0映射设备，直接用--privileged=true，就可以多容器共享显卡
+docker run -d --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 18130:18130 --name langchain-0 llm-lc:910a-0710 /bin/bash /data/start.sh
 ```
 
 ## 昇腾310P3适配（300I DUO）
@@ -757,8 +771,8 @@ cd /data/code/glm2
 ```bash
 # 启动调试容器
 docker run -itd \
---ipc=host \
---device=/dev/davinci0 \
+-e NPU_NUM = 1 \
+--privileged=true \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
@@ -940,7 +954,8 @@ curl -X POST -H 'Content-Type: application/json' -d '{"model":"glm3", "messages"
 ```bash
 # 启动调试容器(将模型和代码都放到data目录下)
 docker run -itd \
---ipc=host \
+-e NPU_NUM = 1 \
+--privileged=true \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
@@ -979,7 +994,8 @@ docker commit test222 llm:910a-ms
 
 ### 启动容器
 docker run -d \
---ipc=host \
+-e NPU_NUM = 1 \
+--privileged=true \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
@@ -1030,7 +1046,8 @@ systemctl restart docker
 ```bash
 # 启动调试容器(将模型和代码都放到data目录下)
 docker run -itd \
---ipc=host \
+--NPU_NUM=1 \
+--privileged=true \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
@@ -1186,7 +1203,8 @@ python3 ../model/glm3/run_chat_server.py
 #--------------
 ### 启动容器
 docker run -d \
---ipc=host \
+--NPU_NUM=1 \
+--privileged=true \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
@@ -1204,13 +1222,224 @@ docker save -o llm.tar llm:910b
 docker load -i llm.tar
 ```
 
+### mindie适配
+
+* 镜像、使用参考资料地址：阿里云盘
+* 目前只支持`safetensors`格式的模型
+
+找到模型目录，修改里面config.json，倒数第五、六行， 将`bflow16`改成`flow16`
+
+主要修改``配置文件`config.json`:
+
+```json
+{
+    "OtherParam":
+    {
+        "ResourceParam" :
+        {
+            "cacheBlockSize" : 128,
+            "preAllocBlocks" : 4
+        },
+        "LogParam" :
+        {
+            "logLevel" : "Info",
+            "logPath" : "/logs/mindservice.log" // 日志文件保存位置
+        },
+        "ServeParam" :
+        {
+            "ipAddress" : "0.0.0.0", // ip地址
+            "port" : 1026, // 对外提供服务的端口
+            "maxLinkNum" : 300,
+            "httpsEnabled" : false,
+            "tlsCaPath" : "security/ca/",
+            "tlsCaFile" : ["ca.pem"],
+            "tlsCert" : "security/certs/server.pem",
+            "tlsPk" : "security/keys/server.key.pem",
+            "tlsPkPwd" : "security/pass/mindie_server_key_pwd.txt",
+            "kmcKsfMaster" : "tools/pmt/master/ksfa",
+            "kmcKsfStandby" : "tools/pmt/standby/ksfb",
+            "tlsCrl" : "security/certs/server_crl.pem"
+        }
+    },
+    "WorkFlowParam":
+    {
+        "TemplateParam" :
+        {
+            "templateType": "Standard",
+            "templateName" : "Standard_llama",
+            "pipelineNumber" : 1
+        }
+    },
+    "ModelDeployParam":
+    {
+        "maxSeqLen" : 8192,  // 这里根据模型的最大上下文设置
+        "npuDeviceIds" : [[0,1,2,3]], // 使用哪些卡
+        "ModelParam" : [
+            {
+                "modelInstanceType": "Standard",
+                "modelName" : "qwen",
+                "modelWeightPath" : "/home/aifirst/zhiyuan/officialgpt_online/model", // 离线模型地址
+                "worldSize" : 4, // 上面配置的卡的总数
+                "cpuMemSize" : 5,
+                "npuMemSize" : 8,
+                "backendType": "atb"
+            }
+        ]
+    },
+    "ScheduleParam":
+    {
+        "maxPrefillBatchSize" : 50,
+        "maxPrefillTokens" : 8192, // 这个参数和上面的maxseqlen一致
+        "prefillTimeMsPerReq" : 150,
+        "prefillPolicyType" : 0,
+
+        "decodeTimeMsPerReq" : 50,
+        "decodePolicyType" : 0,
+
+        "maxBatchSize" : 200,
+        "maxIterTimes" : 4096, // 这里需要注意，请求的时候设置的max_tokens不能超过这个值
+        "maxPreemptCount" : 200,
+        "supportSelectBatch" : false,
+        "maxQueueDelayMicroseconds" : 5000
+    }
+}
+```
+
+```bash
+# mindie容器启动命令
+docker run -d --restart=always --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 8000:1026 --name fc-llm mindie_service:1.0.T56 bash start.sh
+
+#### start.sh 内容如下
+#!/bin/bash
+
+source /usr/local/Ascend/ascend-toolkit/set_env.sh
+source /usr/local/Ascend/mindie/set_env.sh
+source /usr/local/Ascend/mindie/latest/mindie-service/set_env.sh
+source /opt/atb-models/set_env.sh
+# 用上面的config.json覆盖默认的
+/bin/cp -f /data/config.json /usr/local/Ascend/mindie/latest/mindie-service/conf
+cd /usr/local/Ascend/mindie/latest/mindie-service
+# 后台启动
+nohup ./bin/mindieservice_daemon 2>&1 &
+tail -f ./logs/mindservice.log
+```
+
+## 重排-嵌入模型demo
+
+```py
+#### 重排reranker
+from fastapi import FastAPI
+import torch
+import numpy
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from typing import List, Dict
+from pydantic import BaseModel
+import acl
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+# 初始化NPU设备
+torch.npu.set_device(torch.device("npu:0"))
+torch.npu.set_compile_mode(jit_compile=False)
+npucontext, _ = acl.rt.get_context()
+
+app = FastAPI()
+
+model_name = "/data/models/bge-reranker-large"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
+
+device = torch.device("npu")
+model.to(device)
+
+class RerankRequest(BaseModel):
+    query: str
+    documents: List[str]
+
+def rerank(query: str, documents: List[str]) -> List[Dict[str, float]]:
+    inputs = tokenizer([query] * len(documents), documents, return_tensors="pt", padding=True, truncation=True).to(device)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+        scores = outputs.logits.squeeze().cpu().numpy().flatten().tolist()
+
+    ranked_docs = sorted(zip(documents, scores), key=lambda x: x[1], reverse=True)
+
+    return [{"document": doc, "score": score} for doc, score in ranked_docs]
+
+@app.post("/rerank")
+async def rerank_endpoint(request: RerankRequest):
+    acl.rt.set_context(npucontext)
+    query = request.query
+    documents = request.documents
+
+    results = rerank(query, documents)
+
+    return {"results": results}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+## 测试
+curl -X POST -H 'Content-Type: application/json' -d  '{"query": "自然语言处理是什么？", "documents": ["自然语言处理是计算机科学的一个领域。"]}' http://localhost:8000/rerank
+
+#### 嵌入模型embed
+from fastapi import FastAPI
+import torch
+import numpy as np
+from transformers import AutoModel, AutoTokenizer
+from typing import List, Dict
+from pydantic import BaseModel
+import acl
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+app = FastAPI()
+
+torch.npu.set_device(torch.device("npu:0"))
+torch.npu.set_compile_mode(jit_compile=False)
+npucontext, _ = acl.rt.get_context()
+
+model_name = "/data/models/bge-base-zh-v1.5"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+device = torch.device("npu")
+model.to(device)
+
+class EmbeddingRequest(BaseModel):
+    texts: List[str]
+
+def generate_embeddings(texts: List[str]) -> List[np.ndarray]:
+    inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True).to(device)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+        embeddings = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
+
+    return embeddings.tolist()
+
+@app.post("/embeddings")
+async def embedding_endpoint(request: EmbeddingRequest):
+    acl.rt.set_context(npucontext)
+    texts = request.texts
+
+    embeddings = generate_embeddings(texts)
+
+    return {"embeddings": embeddings}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+## 测试
+curl -X POST -H "Content-Type: application/json" -d '{"texts": ["这是一个测试句子。", "这是另一个不同的句子。"]}' http://localhost:8000/embeddings
+```
+
 ## 昇腾适配问题列表
 
 * 碰到`生成内容重复`或者`生成内容异常`，通常需要调整配置文件中的推理超参数解决，配置文件一般是`config.yaml`或者`run_chat_glm2_6b.yaml`
-
-```bash
-
-```
 
 * 碰到报错 `No module named _sqlite3`
 
@@ -1275,9 +1504,9 @@ vim /usr/local/lib/python3.9/site-packages/mindformers/model_runner.py
 
 【不推荐】上面问题还有一个特殊处理方式，例如 `glm3` 需要设置 `use_past=False` ，但是这个设置推理速度会变得很慢。
 
-* `Get soc name failed`或者`dcmi module initialize failed. ret is -8005`一般是容器内找不到硬件了。需要在运行的时候设置 `--device=/dev/davinci0 `
+* `Get soc name failed`或者`dcmi module initialize failed. ret is -8005`一般是容器内找不到硬件了。需要在运行的时候设置 `--privileged=true` 或者`--device=/dev/davinci0 `
 
-* 启动多个容器，第一个正常，第二个就提示包错。一般都是显卡被其他设备占用了，同上处理。也有可能是因为通过 `--device=/dev/davinci4` 映射了单张卡，然后代码里使用 `{npu: 4}` 指定错显卡导致的，需要制定使用 `{npu: 0}`卡。
+* 启动多个容器，第一个正常，第二个就提示包错。一般都是显卡被其他设备占用了。是因为通过 `--device=/dev/davinci4` 映射了单张卡导致的，可以不设置davinci4，直接设置`--privileged=true`这样就可以使用所有卡并且不冲突了。
 
 * `aclnnRsubs failed, detail:EZ9999`，报这个错一般是因为没有装cann的kernel文件，需要重新安装一下kernel.run文件
 
@@ -1291,3 +1520,11 @@ chunk.model_dump_json(exclude_unset=True,exclude_none=True)
 ```
 
 * 报错`max_length`不能大于`seq_length`，则需要修改模型的 `yaml` 文件，将 `seq_length` 改大。
+
+* mindie报错：`list index out of range、status: error, npuBlockNum:0,cpubloknum:0`
+
+找到模型目录，修改里面config.json，倒数第五、六行， 将`bflow16`改成`flow16`
+
+* mindie报错：`缺少chat_template`，则需要在模型目录下的`tokenizer_config.json`增加`chat_template`的配置
+
+* mindie报错：`vcom：recv fin packet, socket fd 22. errono:0`是因为`curl`等请求中没有设置`max_tokens`或者这个值比较小被截断了
