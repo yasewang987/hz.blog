@@ -222,3 +222,6 @@ curl -X PUT http://localhost:9200/_all/_settings?preserve_existing=true -d '{
 -Xmx2g
 ```
 
+* 报错：`received plaintext http traffic on an https channel`
+
+需要关闭 `elasticsearch.yml` 配置文件里的 `https`，全部设置成`false`

@@ -1224,12 +1224,16 @@ docker load -i llm.tar
 
 ### mindie适配
 
+* 固件驱动下载（1.0.23.alpha）：`Ascend-hdk-910b-npu-driver_24.1.rc1_linux-aarch64.run`、`Ascend-hdk-910b-npu-firmware_7.1.0.6.220.run`,https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.beta1&driver=1.0.23.alpha
 * 镜像、使用参考资料地址：阿里云盘
 * 目前只支持`safetensors`格式的模型
 
-找到模型目录，修改里面config.json，倒数第五、六行， 将`bflow16`改成`flow16`
+模型调整：
+* 找到模型目录，修改里面config.json，倒数第五、六行， `torch_dtype`将`bflow16`改成`flow16`
+* 找到`tokenizer_config.json`，增加`chat_template`配置 `"chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",`
 
-主要修改``配置文件`config.json`:
+
+`mindie-service`主要修改``配置文件`config.json`:
 
 ```json
 {
