@@ -16,6 +16,10 @@ http.port: 19200
 运行容器命令（elasticsearch文件夹下运行）：
 
 ```bash
+## 拉取镜像
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+
+## 启动容器
 sudo docker run --name elasticsearch -p 9200:9200 -p 9300:9300 \
 -e "discovery.type=single-node" \
 -v $PWD/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
