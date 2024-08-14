@@ -16,6 +16,8 @@ http.port: 19200
 运行容器命令（elasticsearch文件夹下运行）：
 
 ```bash
+# 需要注意一下需要将本地的目录文件权限改成777，不然可能出现无法写入的报错
+chmod 777 -R $PWD
 sudo docker run --name elasticsearch -p 9200:9200 -p 9300:9300 \
 -e "discovery.type=single-node" \
 -v $PWD/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
@@ -225,3 +227,8 @@ curl -X PUT http://localhost:9200/_all/_settings?preserve_existing=true -d '{
 * 报错：`received plaintext http traffic on an https channel`
 
 需要关闭 `elasticsearch.yml` 配置文件里的 `https`，全部设置成`false`
+
+```bash
+docker exec -it es0813 sed -i 's/true/false/g' /usr/share/elasticsearch/config/elasticsearch.yml
+docker restart es0813
+```

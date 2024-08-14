@@ -18,6 +18,7 @@ npu-smi看到如果显卡型号是910B后面没有其他数字说明是910A系�
 
 * mindie官方文档：https://www.hiascend.com/document/detail/zh/mindie/1.0.RC1/releasenote/releasenote_0001.html
 * mindie-pytorch-cann对应关系包：https://www.hiascend.com/developer/download/community/result?module=ie%2Bpt%2Bcann
+* mindie镜像仓库：https://www.hiascend.com/developer/ascendhub/detail/af85b724a7e5469ebd7ea13c3439d48f
 
 ## 注意事项
 
@@ -1224,6 +1225,8 @@ docker load -i llm.tar
 
 ### mindie适配
 
+#### qwen_7b
+
 * 固件驱动下载（1.0.23.alpha）：`Ascend-hdk-910b-npu-driver_24.1.rc1_linux-aarch64.run`、`Ascend-hdk-910b-npu-firmware_7.1.0.6.220.run`,https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.beta1&driver=1.0.23.alpha
 * 镜像、使用参考资料地址：阿里云盘
 * 目前只支持`safetensors`格式的模型
@@ -1326,6 +1329,55 @@ cd /usr/local/Ascend/mindie/latest/mindie-service
 # 后台启动
 nohup ./bin/mindieservice_daemon 2>&1 &
 tail -f ./logs/mindservice.log
+```
+
+#### glm3-6b
+
+* 固件驱动下载（1.0.23.alpha）：`Ascend-hdk-910b-npu-driver_24.1.rc2_linux-aarch64.run`、`Ascend-hdk-910b-npu-firmware_7.3.0.1.231.run`,https://www.hiascend.com/hardware/firmware-drivers/community?product=4&model=26&cann=8.0.RC2.beta1&driver=1.0.25.alpha
+* 下载官方最新镜像：https://www.hiascend.com/developer/ascendhub/detail/af85b724a7e5469ebd7ea13c3439d48f
+
+```bash
+# 镜像
+swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:1.0.RC2-800I-A2-aarch64
+# 运行调试容器
+docker run -itd --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 8000:1026 --name test111 mindie_swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:1.0.RC2-800I-A2-aarch64 bash
+# 安装mindie相关依赖
+cd /opt/package
+./install_and_enable_cann.sh
+# 添加环境变量
+source /usr/local/Ascend/ascend-toolkit/set_env.sh
+source /usr/local/Ascend/nnal/atb/set_env.sh
+source /usr/local/Ascend/mindie/latest/mindie-service/set_env.sh
+source /usr/local/Ascend/llm_model/set_env.sh
+source /usr/local/Ascend/mindie/set_env.sh
+# 修改/usr/local/Ascend/mindie/latest/mindie-service/conf/config.json
+"ipAddress" : "127.0.0.1"
+"httpsEnabled" : false,
+"npuDeviceIds" : [[0,1,2,3]],
+"worldSize" : 4,
+"maxSeqLen" : 32768,
+"modelName" : "mymodel",
+"modelWeightPath" : "/data/model",
+"maxPrefillTokens" : 32768,
+"maxIterTimes" : 16384,
+# 提交生成新镜像
+docker commit test111 llm:mindie1.0.rc2-glm3
+
+#### 新增启动脚本
+#!/bin/bash
+source /usr/local/Ascend/ascend-toolkit/set_env.sh
+source /usr/local/Ascend/nnal/atb/set_env.sh
+source /usr/local/Ascend/mindie/latest/mindie-service/set_env.sh
+source /usr/local/Ascend/llm_model/set_env.sh
+source /usr/local/Ascend/mindie/set_env.sh
+cd /usr/local/Ascend/mindie/latest/mindie-service
+# 这一行看情况添加
+/bin/cp -f /data/config.json ./conf
+nohup ./bin/mindieservice_daemon 2>&1 &
+tail -f ./logs/mindservice.log
+
+# 最终启动服务命令
+docker run --net=host -d --restart=always --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data --name llm llm:mindie1.0.rc2-glm3 bash start.sh
 ```
 
 ## 重排-嵌入模型demo
