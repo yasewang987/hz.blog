@@ -259,7 +259,8 @@ module.exports = {
                 'source',
                 'devops',
                 'problem',
-                'install'
+                'install',
+                'tools'
             ],
             '/code/python/deploy/': [
                 'nvidia',

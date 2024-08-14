@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fc-deployment
+  namespace: znsj-gpu-sit # 这个不能修改
+spec:
+  selector:
+    matchLabels:
+      app: fc-pod
+  replicas: 1  # 副本数量默认设置成1
+  template:
+    metadata:
+      labels:
+        app: fc-pod
+    spec:
+      nodeSelector:
+        gpu: A10 # （T4/A10/V100）通过node节点标签选择部署到哪种显卡的node节点上
+      containers:
+      - name: fc-crm
+        image: 10.3.5.3:5000/java:k8s0720s
+        ports:
+        - containerPort: 18501
+        command: ["/data/start.sh"]
+        livenessProbe:
+          httpGet:
+            path: /actuator/health # java，其他的自己定义
+            port: 18501
+          failureThreshold: 5 # 根据厂家服务启动时间设置
+          initialDelaySeconds: 90 # 根据厂家启动时间设置
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 2
+            memory: 5Gi
+          limits:
+            cpu: 2
+            memory: 5Gi
+        env: # 可选，可自己定义
+        - name: spring.datasource.url
+          value: "jdbc:mysql://10.3.5.7:28003/dbname?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowMultiQueries=true"
+        - name: spring.datasource.username
+          value: "root"
+        - name: spring.datasource.password
+          value: "yourpassword"
+        - name: spring.redis.host
+          value: "10.3.5.7"
+        - name: spring.redis.port
+          value: "28000"
+        - name: spring.redis.password
+          value: "yourpassword"
+      - name: fc-integration
+        image: 10.3.5.3:5000/py:k8s0718
+        ports:
+        - containerPort: 18350
+        - containerPort: 18400
+        - containerPort: 18450
+        - containerPort: 18600
+        command: ["./start-integration.sh"]
+        startupProbe:
+          httpGet:
+            path: /check # 检查接口需要保证核心服务运行正常，如果多个服务需要合并检测
+            port: 18450
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe: # 可选
+          httpGet:
+            path: /check
+            port: 18450
+          periodSeconds: 60
+        resources:
+          requests:
+            cpu: 16
+            memory: 20Gi
+          limits:
+            cpu: 16
+            memory: 20Gi
+        env: # 可选，可自己定义
+        - name: es_host
+          value: "10.3.5.7"
+        - name: es_port
+          value: "28001"
+        - name: es_password
+          value: "yourpassword"
+        - name: redis_host
+          value: "10.3.5.7"
+        - name: redis_port
+          value: "28000"
+        - name: redis_db
+          value: "0"

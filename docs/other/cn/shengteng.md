@@ -109,6 +109,8 @@ make install
 pip install -i https://pypi.douban.com/simple pyyaml wheel typing_extensions
 # 安装pytorch【这里要特别注意，torch版本要和Ascend-cann-llm_7.0.0_linux-aarch64_torch1.11.0-abi0.tar.gz中的一样】
 pip install -i https://pypi.douban.com/simple torch==2.1.0
+# x86版本
+pip install torch==2.1.0+cpu  --index-url https://download.pytorch.org/whl/cpu
 # 下载torch_npu，https://gitee.com/ascend/pytorch/releases，一定要选择对应版本
 pip install torch_npu-2.0.1.post1-cp39-cp39-linux_aarch64.whl
 # 若返回True则说明PyTorch安装成功

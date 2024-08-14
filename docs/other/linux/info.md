@@ -67,3 +67,59 @@
 * 操作系统库：核心功能
 * 第三方库：图形处理、数学计算等
 * 插件、扩展：应用程序可以通过加载`so`文件来动态添加、更新功能，不需要修改主体代码
+
+## glibc更新
+
+在Linux 平台开发偶尔会遇到glibc库版本过低的问题，但是glibc又是一个非常重要的东西，如果升级失败会导致很多命令都无法使用，是一个非常危险的操作。
+
+glibc是linux系统中最底层的api， 几乎其它任何运行库都会依赖于glibc。glibc除了封装linux操作系统所提供的系统服务外，它本身也提供了许多其它一些必要功能服务的实现。由于 glibc 囊括了几乎所有的 UNIX通行的标准，可以想见其内容包罗万象。而就像其他的 UNIX 系统一样，其内含的档案群分散于系统的树状目录结构中，像一个支架一般撑起整个操作系统。
+
+更新glibc有源码的方式和添加更新源的方式，对于这两种来说，后者会更加安全，不容易出错，但是后者对于控制版本不是很友好。如果在使用源码更新的过程中出现了问题，可以考虑通过其他第三方介质U盘等添加原本的glibc版本的库文件进行恢复。
+
+```bash
+#### glibc 版本查看
+# 方法1 ldd 命令
+ldd --version
+# 方法2 libc.so.6
+strings /lib/x86_64-linux-gnu/libc.so.6 | grep GLIBC
+# 方法3 `getconf`命令
+getconf GNU_LIBC_VERSION
+```
+
+### 源码编译升级glibc 库
+
+```bash
+# 下载源码
+wget http://ftp.gnu.org/gnu/libc/glibc-2.34.tar.gz
+tar -xzf glibc-2.34.tar.gz
+cd glibc-2.34
+
+# 编译安装
+sudo apt update
+sudo apt install build-essential gawk bison libc6-dev libncurses5-dev texinfo git
+mkdir build
+cd build
+../configure --prefix=/opt/glibc-2.34  # 一定要指定目录，不然会出现系统无法使用的情况
+make -j4
+sudo make install
+
+# 更新环境变量（下面的内容一定要放到sh脚本里，然后执行脚本去测试 use_new_glibc.sh）
+#!/bin/bash
+export LD_LIBRARY_PATH=/opt/glibc-2.34/lib:$LD_LIBRARY_PATH
+export PATH=/opt/glibc-2.34/bin:$PATH
+# 测试（大概率还是会有问题）
+source use_new_glibc.sh
+```
+
+### glibc更新方法【推荐】
+
+```bash
+# 编辑文件：/etc/apt/sources.list 添加高版本源
+vim /etc/apt/sources.list
+deb http://mirrors.aliyun.com/ubuntu/ jammy main
+
+# 执行
+sudo apt update
+sudo apt install libc6
+
+```

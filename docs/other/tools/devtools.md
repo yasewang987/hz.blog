@@ -134,3 +134,23 @@ github地址：https://github.com/barry-ran/QtScrcpy
 todesk：
 
 * 远程连接ubuntu系统，如果卡在100%，需要修改 `/etc/gdm3/custom.conf` 将 `#WaylandEnable=false` 的注释给去掉。
+
+## 本地PDF操作
+
+Stirling-PDF：支持 PDF 文件的分割、合并、转换、重新组织、添加图像、旋转、压缩等多种操作，而且完全在本地运行，确保了数据的安全性和隐私性。技术栈：使用Spring Boot + Thymeleaf、PDFBox、LibreOffice、OcrMyPdf等技术构建，保证了应用的性能和稳定性。
+
+核心功能如下：
+* 页面操作：包括PDF查看、编辑、合并、分割、旋转、删除页面等。
+* 转换操作：支持PDF与多种格式之间的转换，如图像、Word、PPT等。
+* 安全与权限：提供密码添加、PDF权限设置、水印添加、PDF签名等功能。
+* 其他高级操作：包括PDF修复、空白页检测、PDF压缩、OCR处理等。
+
+```bash
+# docker启动
+docker run -d -p 8080:8080 \
+-v $PWD/trainingData:/usr/share/tesseract-ocr/4.00/tessdata \
+-v $PWD/extraConfigs:/configs \ 
+-v $PWD/customFiles:/customFiles \
+-e DOCKER_ENABLE_SECURITY=false \
+--name mypdf frooodle/s-pdf:latest
+```

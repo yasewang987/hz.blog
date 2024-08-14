@@ -18,6 +18,10 @@ http.port: 19200
 ```bash
 # 需要注意一下需要将本地的目录文件权限改成777，不然可能出现无法写入的报错
 chmod 777 -R $PWD
+## 拉取镜像
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+
+## 启动容器
 sudo docker run --name elasticsearch -p 9200:9200 -p 9300:9300 \
 -e "discovery.type=single-node" \
 -v $PWD/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \

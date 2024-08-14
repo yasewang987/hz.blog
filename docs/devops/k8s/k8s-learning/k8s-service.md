@@ -8,6 +8,13 @@ Service是一个抽象概念，它定义了逻辑集合下**访问Pod组的策�
 
 举个例子，假设我们的一个服务Service A下面有3个Pod，我们都知道Pod的IP都不是持久化的，重启之后就会有变化。那么Service B想要访问Service A的Pod，它只需跟绑定了这3个Pod的Service A打交道就可以了，无须关心下面的3个Pod的IP和端口等信息的变化。换句话说，就像一个Service Discovery服务发现的组件，你无须关心具体服务的URL，只需知道它们在服务发现中注册的Key就可以通过类似Consul、Eureka之类的服务发现组件中获取它们的URL一样，还是实现了负载均衡效果的URL。
 
+## 其他重点
+
+```bash
+## 不通命名空间的服务访问
+<service-name>.<namespace>.svc.cluster.local:<port>
+```
+
 ## Service创建、运行
 
 ### 一、ClusterIP
