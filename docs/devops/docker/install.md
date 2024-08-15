@@ -188,8 +188,11 @@ chmod +x /usr/local/bin/docker-compose
 nvidia-smi
 ```
 
-## centos离线安装nvidia-container-runtime
+## 离线安装nvidia-container-runtime
 
+一般需要依赖toolkit
+
+### centos
 ```bash
 # 在上网机更新nvidia-container-runtime的yum源
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
@@ -204,6 +207,30 @@ sudo rpm -ivh ./* --nodeps
 systemctl restart docker
 # 验证
 sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
+```
+
+### ubuntu
+
+离线包地址：https://mirror.cs.uchicago.edu/nvidia-docker/libnvidia-container/stable/ubuntu20.04/amd64/
+
+```bash
+# 一般依赖如下几个东西
+libnvidia-container1_1.8.1-1_amd64.deb
+libnvidia-container-tools_1.8.1-1_amd64.deb
+nvidia-container-toolkit_1.8.1-1_amd64.deb
+nvidia-container-runtime_3.8.1-1_all.deb
+
+# 配置文件调整  
+cat /etc/docker/daemon.json
+{
+    "default-runtime": "nvidia",
+    "runtimes": {
+        "nvidia": {
+            "path": "/usr/bin/nvidia-container-runtime",
+            "runtimeArgs": []
+        }
+    }
+}
 ```
 
 ## ubuntu离线安装nvidia-container-toolkit
