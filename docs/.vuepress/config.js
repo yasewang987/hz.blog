@@ -390,7 +390,7 @@ module.exports = {
                 'k8s-cmd',
                 'k8s-problem',
                 'k8s-netcore',
-                'k8s-multicluster'
+                'k8s-manage'
             ],
             '/devops/k8s/k8s-learning/': [
                 'k8s-base',
