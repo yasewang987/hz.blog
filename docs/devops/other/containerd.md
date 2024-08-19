@@ -35,7 +35,7 @@ ctr -n moby images list
 # stop: 停止容器。
 # delete: 删除容器。
 # ls: 列出容器。
-# inspect: 查看容器的详细信息。(看版本是否支持)
+# info: 查看容器信息
 # logs: 查看容器的日志（如果 containerd 版本支持此命令）。
 # 查看所有容器
 ctr c ls
@@ -43,6 +43,8 @@ ctr c ls
 ctr c logs containername
 # 删除容器
 ctr c delete containername
+# 查看磁盘映射目录
+ctr c info containername | grep source
 
 #### tasks
 # kill: 终止任务。
