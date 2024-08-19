@@ -6,6 +6,7 @@
 * [MinIO](./minio.md)
 * [Next-Terminal](./nextterminal.md)
 * [Jumpserver](./jumpserver.md)
+* [Containerd](./containerd.md)
 * [蝉道部署](./zentao.md)
 * [运维实用脚本](./shells.md)
 * [frp内网穿透](./frp.md)

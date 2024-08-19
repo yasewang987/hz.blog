@@ -426,6 +426,7 @@ module.exports = {
                 'minio',
                 'nextterminal',
                 'jumpserver',
+                'containerd',
                 'zentao',
                 'shells',
                 'frp',
