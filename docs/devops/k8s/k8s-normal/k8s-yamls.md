@@ -327,3 +327,189 @@ spec:
         persistentVolumeClaim:
           claimName: mysql-pv-claim
 ```
+
+## elasticsearch
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: znsj-es
+  namespace: znsj-gpu-sit
+spec:
+  serviceName: znsj-es
+  replicas: 1
+  selector:
+    matchLabels:
+      app: znsj-es
+  template:
+    metadata:
+      labels:
+        app: znsj-es
+    spec:
+      imagePullSecrets:
+      - name: "registry-key"
+      containers:
+      - name: elasticsearch
+        image: cr.registry.res.pdcloud.cn/znsj-repo/fc-es:v7.17.7
+        ports:
+        - containerPort: 9200
+          name: rest
+        - containerPort: 9300
+          name: inter-node
+        env:
+        - name: cluster.name
+          value: elasticsearch
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: discovery.seed_hosts
+          value: "elasticsearch-0.elasticsearch"
+        # es7.x版本（集群用这个，单点用single-node，不能一起使用）
+        - name: cluster.initial_master_nodes
+          value: "elasticsearch-0"
+        # 单点用这个，不能和上面共用
+        - name: discovery.type
+          value: single-node
+        volumeMounts:
+        - name: es-data
+          mountPath: /usr/share/elasticsearch/data
+      securityContext:
+        fsGroup: 1000
+      volumes:
+      - name: es-data
+        persistentVolumeClaim:
+          claimName: nas-znsj-es-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: znsj-es-svc
+  namespace: znsj-gpu-sit
+spec:
+  selector:
+    app: znsj-es
+  ports:
+  - port: 9200
+    targetPort: rest
+  type: ClusterIP
+```
+
+## redis
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: fc-redis
+  namespace: znsj-gpu-sit
+spec:
+  serviceName: "fc-redis"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fc-redis
+  template:
+    metadata:
+      labels:
+        app: fc-redis
+    spec:
+      imagePullSecrets:
+      - name: "registry-key"
+      containers:
+      - name: redis
+        image: cr.registry.res.pdcloud.cn/znsj-repo/fc-redis:v1
+        ports:
+        - containerPort: 6379
+          name: redis
+        command:
+        - redis-server
+        - /etc/redis/redis.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fc-redis-svc
+  namespace: znsj-gpu-sit
+spec:
+  selector:
+    app: fc-redis
+  ports:
+  - port: 6379
+    targetPort: redis
+  type: ClusterIP
+```
+
+## prometheus
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: znsj-gpu-sit
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      imagePullSecrets:
+      - name: "registry-key"
+      containers:
+      - name: prometheus
+        image: cr.registry.res.pdcloud.cn/znsj-repo/prometheus:v2.53.2
+        args:
+          - '--config.file=/etc/prometheus/prometheus.yml'
+          - '--storage.tsdb.path=/prometheus'
+        ports:
+        - containerPort: 9090
+          name: web
+        volumeMounts:
+        - name: prometheus-config-volume
+          mountPath: /etc/prometheus
+        - name: prometheus-storage-volume
+          mountPath: /prometheus
+      volumes:
+      - name: prometheus-config-volume
+        configMap:
+          name: prometheus-config
+      - name: prometheus-storage-volume
+        persistentVolumeClaim:
+          claimName: nas-prometheus-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: znsj-gpu-sit
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - port: 9090
+    targetPort: web
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: znsj-gpu-sit
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval:     15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+    - job_name: 'prometheus'
+      static_configs:
+      - targets: ['localhost:9090']
+```
+
