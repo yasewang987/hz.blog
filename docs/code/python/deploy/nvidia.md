@@ -1,8 +1,26 @@
 # Nvidia显卡环境安装
 
+* 如果是数据中心的卡，请记住一定要安装`nvidia-fabricmanager`不然无法使用
+
+* 显卡驱动安装查询：https://www.nvidia.cn/drivers/lookup/
+
 * 安装 [nvidia显卡驱动](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-nvidia-driver.html)
 
     https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
+
+## 常用命令
+
+```bash
+# 显卡驱动安装
+./NVIDIA-Linux-x86_64-535.183.06.run
+
+# cuda安装
+./cuda_12.1.0_530.30.02_linux.run
+
+# cuda卸载
+cd /usr/local/cuda-12.1/bin
+cuda-uninstaller
+```
 
 ## 显卡型号查看
 
@@ -17,10 +35,10 @@ af:00.1 Audio device: NVIDIA Corporation Device 22ba (rev a1)
 # 上面的 2684 到【显卡型号查询网站】查询即可
 ```
 
-## Nvidia显卡驱动和Cudab版本关系
+## Nvidia显卡驱动和Cuda版本关系
 
-* `Nvidia`：英伟达显卡驱动。
-* `CUDA`：为“GPU通用计算”构建的运算平台。
+* 显卡驱动：这是让GPU硬件能够被操作系统识别的基础软件，它处理所有与GPU硬件交互的任务，包括图形渲染、视频解码等。
+* CUDA：在安装了显卡驱动的基础上，CUDA提供了一层额外的功能，使得GPU可以被用作通用计算设备。CUDA包含了库函数、编译器工具链和API接口，允许开发者编写专门针对GPU优化的应用程序。
 * `CUDA Toolkit (nvidia)`: CUDA完整的工具安装包，其中提供了 Nvidia 驱动程序、开发 CUDA 程序相关的开发工具包等可供安装的选项。包括 CUDA 程序的编译器、IDE、调试器等，CUDA 程序所对应的各式库文件以及它们的头文件。
 * `CUDA Toolkit (Pytorch)`： CUDA不完整的工具安装包，其主要包含在使用 CUDA 相关的功能时所依赖的动态链接库。不会安装驱动程序。
 * `NVCC`: 是CUDA的编译器，只是 CUDA Toolkit 中的一部分
@@ -34,6 +52,16 @@ CUDA有两个主要的API：`runtime(运行时) API`和`driver API`，这两个A
 通常情况下，这两个显示都是不一样的，不过不用担心，只要`driver API`比`runtime API`高，一般都没问题。但是最好不要有大版本的差异，有可能会出现不能用的问题。
 
 `cuDNN（CUDA Deep Neural Network library）`：是`NVIDIA`打造的针对深度神经网络的加速库，是一个用于深层神经网络的GPU加速库。如果你要用GPU训练模型，`cuDNN`不是必须的，但是一般会采用这个加速库。
+
+如果你想在Docker容器中利用NVIDIA GPU的计算能力，你需要确保以下组件正确安装和配置：
+
+物理机器上需要安装：
+* NVIDIA显卡驱动：确保你的系统上已经安装了最新版本的NVIDIA显卡驱动。
+* NVIDIA Docker 或 NVIDIA Container Toolkit：这些工具可以让你的Docker容器访问GPU资源。你可以在NVIDIA官网下载并安装。
+
+Docker镜像中需要安装：
+* CUDA Toolkit：提供基本的CUDA功能，包括编译器和库文件。
+* cuDNN（如果需要深度学习应用）：这是一个高度优化的深度神经网络库，通常与CUDA一起使用。
 
 ```bash
 # cuDNN 版本查询
@@ -253,4 +281,15 @@ sudo dkms install -m nvidia -v 418.87.00
 
 # 上面的操作如果提示找不到 nvidia-driver-418.87.00 则需要重新安装nvidia驱动
 # 然后再执行 dkms install -m nvidia -v 418.87.00
+```
+
+* `Error 802: system not yet initialized (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108` 这个错误一般出现在8卡的A100和H800这些显卡中，需要安装 `NVLink/NVSwitch fabric manager`。【一定要注意机器的驱动版本和`nvidia-fabricmanager`版本一致】
+
+```bash
+apt install -y nvidia-fabricmanager-550
+
+# 查看状态
+systemctl status nvidia-fabricmanager
+# 如果重新安装驱动执行一下
+systemctl restart nvidia-fabricmanager
 ```

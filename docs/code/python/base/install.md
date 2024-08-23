@@ -222,12 +222,12 @@ rm -rf ~/.cache
 
 1. 到 [pytorch官网](https://pytorch.org/get-started/locally/#windows-prerequisites) 找到对应的版本安装命令。
 
-    ```bash
-    # cpu版本
-    pip3 install -i https://pypi.douban.com/simple torch torchvision torchaudio
-    # 清华源
-    pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch torchvision torchaudio
-    ```
+```bash
+# cpu版本
+pip3 install -i https://pypi.douban.com/simple torch torchvision torchaudio
+# 清华源
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch torchvision torchaudio
+```
 
 1. 安装完之后验证
     ```bash
