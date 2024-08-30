@@ -65,6 +65,14 @@ location / {
 location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css|ico)?$ {
     proxy_pass http://www.baidu.com;
 }
+#### 前端location重定向到其他前端location
+location /old_path {
+    return 301 /new_path;  # 301永久重定向【推荐301】
+    # 或者使用 return 302 /new_path;  # 302临时重定向
+}
+location /new_path {
+    # 新路径的处理逻辑
+}
 ```
 
 如果配置两个 `root`，http://xxxx/train 会提示404。
