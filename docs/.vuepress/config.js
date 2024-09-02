@@ -533,6 +533,7 @@ module.exports = {
                 'milvus',
                 'hanwuji',
                 'shengteng',
+                'shuguang',
                 'other',
                 'problem',
                 'guomi',
