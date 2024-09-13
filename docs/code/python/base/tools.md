@@ -28,3 +28,7 @@ nuitka --standalone --mingw64 --lto=yes --remove-output hello.py
 nuitka --standalone --mingw64 main.py
 ```
 
+## 性能分析工具
+
+[austin](github.com/P403n1x87/austin)：深入 Python 程序性能分析的工具。这是一款专为 Python 程序设计的性能分析工具，无需修改代码即可轻松定位 Python 程序的性能瓶颈和内存使用情况。它是采用 C 语言编写的 CPython 帧堆栈采样器，具有体积小、运行速度快、零代码侵入等特点，支持 WebUI、TUI、VSCode 等多种可视化方式（需额外安装）。
+
