@@ -1235,8 +1235,11 @@ docker load -i llm.tar
 
 模型调整：
 * 找到模型目录，修改里面config.json，倒数第五、六行， `torch_dtype`将`bflow16`改成`flow16`
-* 找到`tokenizer_config.json`，增加`chat_template`配置 `"chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",`
+* 找到`tokenizer_config.json`，增加`chat_template`配置
 
+```json
+"chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
+```
 
 `mindie-service`主要修改``配置文件`config.json`:
 
