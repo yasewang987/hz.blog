@@ -11,6 +11,9 @@
 ## 常用命令
 
 ```bash
+# 查看显卡信息
+lspci|grep NVIDIA
+
 # 显卡驱动安装
 ./NVIDIA-Linux-x86_64-535.183.06.run
 
@@ -46,7 +49,7 @@ af:00.1 Audio device: NVIDIA Corporation Device 22ba (rev a1)
 
 CUDA有两个主要的API：`runtime(运行时) API`和`driver API`，这两个API都有对应的CUDA版本。
 
-* `driver API`是通过`GPU driver installer`安装的，可理解为系统出场安装的默认驱动，`nvidia-smi`显示的是 `driver API`。
+* `driver API`是通过`GPU driver installer`安装的，可理解为系统出场安装的默认驱动，`nvidia-smi`显示的是 `driver API`，这里显示的 CUDA 版本表示当前驱动最大支持的 CUDA 版本。
 * `runtime API`是通过  `CUDA toolkit`安装的，可理解为用户自己安装的驱动，`nvcc`显示的是`runtime API`。
 
 通常情况下，这两个显示都是不一样的，不过不用担心，只要`driver API`比`runtime API`高，一般都没问题。但是最好不要有大版本的差异，有可能会出现不能用的问题。

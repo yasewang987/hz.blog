@@ -1,6 +1,6 @@
 # Go开发环境安装
 
-[中文部署参考网站](http://docscn.studygolang.com/doc/install#%E5%AE%89%E8%A3%85%E5%8C%85)
+## go官方安装【推荐】
 
 * `GOROOT`: 中包含go语言的基础执行程序 `$GOROOT/bin`,以及go的基础库 `$GOROOT/src/mod`，存放一些内置的开发包和工具。
 * `GOPATH`: 中包含除了基础库之外的其他项目依赖包执行程序 `$GOPATH/bin`,以及go基础库之外的依赖包源码 `$GOPATH/pkg/mod`，用于保存go项目的代码和第三方依赖包。
@@ -50,6 +50,30 @@ go env -w GOPROXY=https://goproxy.cn,direct
 
 # 阿里
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
+```
+
+## gvm
+
+```bash
+apt-get install bsdmainutils
+# 安装gvm
+curl -o gvm-installer https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer 
+chmod +x gvm-installer
+./gvm-installer
+
+# 安装Go1.16.5版本
+gvm install go1.16.5
+# 使用Go1.16.5版本
+gvm use go1.16.5
+# 将Go1.16.5设置为默认版本
+gvm use go1.16.5 --default
+# 卸载Go1.16.5版本
+gvm uninstall go1.16.5
+
+# 完全卸载 GVM
+gvm implode
+# 手动删除
+rm -rf $GVM_ROOT
 ```
 
 ## Go 工作区

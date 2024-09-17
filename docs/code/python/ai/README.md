@@ -1,9 +1,10 @@
 # AI资料列表
 
 * [AI相关软件安装](./install.md)
+* [算法基础概念](./base.md)
 * [张量运算](./tensor.md)
 * [十大NLP技术](./nlp.md)
-* [临时资料记录](./temp.md)
+* [常用工具](./tools.md)
 
 * [机器学习Demo1](./ai1.md)
 * [机器学习离线部署](./ai2.md)

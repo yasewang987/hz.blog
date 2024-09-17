@@ -3,6 +3,9 @@
 ## 其他
 
 ```bash
+# 查看显卡信息
+lspci|grep NVIDIA
+
 # 查看集群信息
 kubectl cluster-info
 

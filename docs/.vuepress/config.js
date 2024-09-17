@@ -256,6 +256,7 @@ module.exports = {
             ],
             '/code/python/base/': [
                 'base',
+                'libdemos',
                 'source',
                 'devops',
                 'problem',
@@ -275,9 +276,10 @@ module.exports = {
             ],
             '/code/python/ai/': [
                 'install',
+                'base',
                 'tensor',
                 'nlp',
-                'temp',
+                'tools',
                 'ai1',
                 'ai2',
                 'ai-vector',
@@ -388,6 +390,7 @@ module.exports = {
             '/devops/k8s/k8s-normal/': [
                 'k8s-yamls',
                 'k8s-cmd',
+                'k8s-base',
                 'k8s-problem',
                 'k8s-netcore',
                 'k8s-manage'
