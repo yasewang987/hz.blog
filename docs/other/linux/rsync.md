@@ -1,18 +1,37 @@
 # rsync指南
 
-rsync 是一个常用的 Linux 应用程序，用于文件同步,也可以当作文件复制工具，替代cp和mv命令。
-
 rsync 的最大特点是会检查发送方和接收方已有的文件，仅传输有变动的部分（默认规则是文件大小或修改时间有变动）。
 
 ## 安装
 
 ```bash
+#### 参数含义
+-v :展示详细的同步信息
+-a :归档模式，相当于 -rlptgoD
+-r :递归目录
+-l :同步软连接文件
+-p :保留权限
+-t :将源文件的"modify time"同步到目标机器
+-g :保持文件属组
+-o :保持文件属主
+-D :和--devices --specials一样，保持设备文件和特殊文件
+-z :发送数据前，先压缩再传输
+-H :保持硬链接
+-n :进行试运行，不作任何更改
+-P same as --partial --progress
+    --partial :支持断点续传
+    --progress :展示传输的进度
+--delete :如果源文件消失，目标文件也会被删除
+--delete-excluded :指定要在目的端删除的文件
+--delete-after :默认情况下，rsync是先清理目的端的文件再开始数据同步；如果使用此选项，则rsync会先进行数据同步，都完成后再删除那些需要清理的文件。
+--exclude=PATTERN :排除匹配PATTERN的文件
+--exclude-from=FILE :如果要排除的文件很多，可以统一写在某一文件中
+-e ssh :使用SSH加密隧道传输
+
 # Debian/Ubuntu
 $ sudo apt-get install rsync
-
 # Red Hat/CentOS
 $ sudo yum install rsync
-
 # Arch Linux
 $ sudo pacman -S rsync
 ```
@@ -243,3 +262,69 @@ ln -s "${BACKUP_PATH}" "${LATEST_LINK}"
 `--version`参数返回 rsync 的版本。
 
 `-z`参数指定同步时压缩数据。
+
+## 配合inotify使用
+
+```bash
+### 参数说明
+-m,–monitor：始终保持事件监听状态   # 重要参数
+-r,–recursive：递归查询目录     # 重要参数
+-q,–quiet：只打印监控事件的信息     # 重要参数
+–excludei：排除文件或目录时，不区分大小写
+-t,–timeout：超时时间
+–timefmt：指定时间输出格式  # 重要参数
+–format：指定时间输出格式       # 重要参数
+-e,–event：后面指定删、增、改等事件 # 重要参数
+
+### inotifywait events 事件说明
+access：读取文件或目录内容
+modify：修改文件或目录内容  # 重要参数（一般选close_write）
+attrib：文件或目录的属性改变
+close_write：修改真实文件内容   # 重要参数
+close_nowrite：文件或目录关闭，在只读模式打开之后关闭的
+close：文件或目录关闭，不管读或是写模式
+open：文件或目录被打开
+moved_to：文件或目录移动到
+moved_from：文件或目录从移动
+move：移动文件或目录移动到监视目录  # 重要参数
+create：在监视目录下创建文件或目录  # 重要参数
+delete：删除监视目录下的文件或目录  # 重要参数
+delete_self：文件或目录被删除，目录本身被删除
+unmount：卸载文件系统
+
+### 安装inotify
+apt install -y inotify-tools
+yum install -y inotify-tools
+
+### 常用命令
+# 创建事件
+inotifywait -mrq  /data --timefmt "%d-%m-%y %H:%M" --format "%T %w%f 事件信息: %e" -e create
+# 删除事件
+inotifywait -mrq  /data --timefmt "%d-%m-%y %H:%M" --format "%T %w%f 事件信息: %e" -e delete
+# 修改事件
+inotifywait -mrq  /data --timefmt "%d-%m-%y %H:%M" --format "%T %w%f 事件信息: %e" -e close_write
+```
+
+配合rsync使用，监控脚本如下：
+
+```bash
+#!/bin/bash
+
+Path=/home/test
+Server=192.168.0.2
+User=sync
+module=sync_file
+
+monitor() {
+  /usr/bin/inotifywait -mrq --format '%w%f' -e create,close_write,delete $1 | while read line; do
+    if [ -f $line ]; then
+      rsync -avz $line --delete ${User}@${Server}::${module} --password-file=/etc/rsyncd.pass
+    else
+      cd $1 &&
+        rsync -avz ./ --delete ${User}@${Server}::${module} --password-file=/etc/rsyncd.pass
+    fi
+  done
+}
+
+monitor $Path;
+```

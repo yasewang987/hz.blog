@@ -26,12 +26,15 @@ pip download shapely==2.0.1 -d /tmp
 
 ```bash
 # 下载最新安装脚本：https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/
-wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py38_22.11.1-1-Linux-x86_64.sh
+wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py310_24.4.0-0-Linux-x86_64.sh
 
 # 安装(默认会在安装在用户目录下 $HOME/miniconda3)
-sh Miniconda3-py38_22.11.1-1-Linux-x86_64.sh
+sh Miniconda3-py310_24.4.0-0-Linux-x86_64.sh
 
-# 添加环境变量-bashrc/profile（WSL中不会自动添加）
+# 初始化
+conda init
+
+# 如果找不到，需要添加环境变量-bashrc/profile（WSL中不会自动添加）
 export PATH=$HOME/miniconda3/bin:$PATH
 
 # 生效
@@ -40,13 +43,21 @@ source .bashrc
 # 环境列表查看
 conda env list
 # 新建虚拟环境
-conda create -n myvenv python=3.8
+conda create -n myvenv python=3.10
 # 克隆环境
 conda create -n myvenv --clone base
 # 进入环境
 conda activate base
 # 退出环境
 conda deactivate
+
+# 升级对应环境的python版本
+conda activate myenv
+conda install python=3.11.9
+# 还有一种方法是通过复制现有的 conda 虚拟环境，并在复制过程中指定新的 Python 版本
+conda create --name newenv --clone myenv
+conda activate newenv
+conda install python=3.11.9
 ```
 
 * 卸载
@@ -207,14 +218,16 @@ rm -rf ~/.cache
 
 ## torch安装验证
 
+阿里torch-cuda的whl安装包下载地址：https://mirrors.aliyun.com/pytorch-wheels/cu121/?spm=a2c6h.25603864.0.0.5bed6223hWyJvX
+
 1. 到 [pytorch官网](https://pytorch.org/get-started/locally/#windows-prerequisites) 找到对应的版本安装命令。
 
-    ```bash
-    # cpu版本
-    pip3 install -i https://pypi.douban.com/simple torch torchvision torchaudio
-    # 清华源
-    pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch torchvision torchaudio
-    ```
+```bash
+# cpu版本
+pip3 install -i https://pypi.douban.com/simple torch torchvision torchaudio
+# 清华源
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple torch torchvision torchaudio
+```
 
 1. 安装完之后验证
     ```bash

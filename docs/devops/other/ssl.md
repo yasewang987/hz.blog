@@ -6,6 +6,13 @@
 
 github地址：https://github.com/acmesh-official/acme.sh
 
+### 常用命令
+
+```bash
+# 查看已运行证书
+acme.sh --list
+```
+
 ### 安装
 ```bash
 #### 安装
@@ -27,14 +34,17 @@ source ~/.bashrc
 # 检验（执行命令后显示提示信息）
 acme.sh --test
 
-### dns方式生成证书（阿里云）
+### dns方式生成证书（阿里云）【一定要先执行】
 # 登陆阿里云选择access key，【创建子账户】并获取对应的key和secret。记录下来。并点击用户名，给这个子账户添加DNS相关权限。
 # 前面两个export执行一次之后就会自动记住，不用放bashrc
 export Ali_Key="key值"
 export Ali_Secret="key Secret"
+# 指定域名
+export yuming=zs.test.cn
 # 如果证书中只包含泛域名，那么签发出来的证书是没有根域的。所以需要额外添加一个根域。
 # --force可以不用
 acme.sh --issue --dns dns_ali -d test.top -d *.test.top --force
+acme.sh --issue --dns dns_ali -d ${yuming} --force
 # 成功了，会提示信息
 [Wed Feb  7 10:15:36 CST 2024] Your cert is in: /root/.acme.sh/*.test.top_ecc/*.test.top.cer
 [Wed Feb  7 10:15:36 CST 2024] Your cert key is in: /root/.acme.sh/*.test.top_ecc/*.test.top.key
@@ -74,7 +84,7 @@ server {
 ### 安装证书(nginx)
 # 安装证书到指定位置
 acme.sh --install-cert -d test.top --key-file /data/ssl/test.top.key --fullchain-file /data/ssl/test.top.pem --reloadcmd "nginx -s reload"
-
+acme.sh --install-cert -d ${yuming} --key-file /opt/funcun/nginx/ssl/${yuming}.key --fullchain-file /opt/funcun/nginx/ssl/${yuming}.pem --reloadcmd "docker exec fc-nginx nginx -s reload"
 # 重启一下nginx
 docker exec -it nginx nginx -s reload
 

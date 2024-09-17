@@ -65,6 +65,14 @@ location / {
 location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|js|css|ico)?$ {
     proxy_pass http://www.baidu.com;
 }
+#### 前端location重定向到其他前端location
+location /old_path {
+    return 301 /new_path;  # 301永久重定向【推荐301】
+    # 或者使用 return 302 /new_path;  # 302临时重定向
+}
+location /new_path {
+    # 新路径的处理逻辑
+}
 ```
 
 如果配置两个 `root`，http://xxxx/train 会提示404。
@@ -926,6 +934,19 @@ server {
         output_buffers 4 32k;
     }
 }
+```
+
+## nginx静态文件支持在线预览
+
+```bash
+vim /etc/nginx/mime.types
+# 增加需要预览的格式
+types {
+ text/html html htm shtml;
+ #以log为扩展名的文件，如果目录下有其它类型的日志文件需要查看，可以进行增加，例如： text/log json;
+ text/log log;
+ text/css css;
+ text/xml xml;
 ```
 
 ## Location配置优先级

@@ -1,36 +1,44 @@
 # 昇腾官方资源
 
+npu-smi看到如果显卡型号是910B后面没有其他数字说明是910A系列的，真*910B都是B几
+
 * 注意：先到资源中心选择对应的服务器型号（一般是加速卡），然后到固件驱动中心选择对应的服务器型号和CANN版本（和资源下载中心的一致）
-* （toolkit、torch、kernels等）资源下载中心：https://www.hiascend.com/developer/download
 * 固件驱动选择中心：https://www.hiascend.com/hardware/firmware-drivers/community
+* docker-runtime: https://gitee.com/ascend/ascend-docker-runtime/releases
+* （toolkit、torch、kernels等）资源下载中心：https://www.hiascend.com/developer/download。实际地址：https://www.hiascend.com/developer/download/community/result?module=pt+cann&product=2&model=17
 * cann安装指南：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC1alpha003/quickstart/quickstart/quickstart_18_0004.html
 * pytorch算子优化：https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/80RC1alpha003/devguide/moddevg/ptmigr/AImpug_0074.html
 
 * 注意2:mindspore的方式安装一定要cann、mindspore、mindformers版本匹配，参考下面的对应关系
 * mindspore官网：https://www.mindspore.cn/install/
 * mindspore和固件驱动对应关系：https://www.mindspore.cn/versions
-* mindformers对应关系：https://mindformers.readthedocs.io/zh-cn/latest/Version_Match.html
+* mindformers官方文档：https://mindformers.readthedocs.io/zh-cn/latest/Version_Match.html
 * mindformers-glm3适配教程：https://mindformers.readthedocs.io/zh-cn/latest/docs/model_cards/glm3.html
+* mindformers-mindspore对应关系（版本查看对应tag标签）：https://gitee.com/mindspore/mindformers/tree/v1.1.0/
 
-# 昇腾硬件适配-310P3（300I DUO）
+* mindie官方文档：https://www.hiascend.com/document/detail/zh/mindie/1.0.RC1/releasenote/releasenote_0001.html
+* mindie-pytorch-cann对应关系包：https://www.hiascend.com/developer/download/community/result?module=ie%2Bpt%2Bcann
+* mindie镜像仓库：https://www.hiascend.com/developer/ascendhub/detail/af85b724a7e5469ebd7ea13c3439d48f
 
-本示例以`Atlas800型号3000`服务器为例
+## 注意事项
 
-## 安装物理系统环境
+* 如果使用了`torch_npu`需要引入`acl，acl`中依赖了`decorator、psutil`，一定要在做镜像的时候加上
 
-主要是`7.0.0`版本的`固件、驱动、CANN-Toolkit、CANN-kernels、Ascend Docker`等，[参考资料](https://www.hiascend.com/document/detail/zh/quick-installation/23.0.0/quickinstg/800_3000/quickinstg_800_3000_0005.html)，可以下载社区版的驱动
+## 固件驱动安装流程
+
+**注意选择版本需要参考下面具体型号。**
 
 第一次安装或者已经卸载老的固件驱动，需按照`驱动 > 固件`的顺序安装驱动固件。
 
 ```bash
-# root登陆用户之后，创建普通用户
+# 【经过试验，可以不用创建用户】root登陆用户之后，创建普通用户
 groupadd HwHiAiUser
 useradd -g HwHiAiUser -d /home/HwHiAiUser -m HwHiAiUser -s /bin/bash
 # 若用户后续需使用从AscendHub拉取的容器镜像，则请用户执行如下命令创建uid和gid为1000的驱动运行用户HwHiAiUser。
 groupadd -g 1000 HwHiAiUser
 useradd -g HwHiAiUser -u 1000 -d /home/HwHiAiUser -m HwHiAiUser -s /bin/bash
 
-# 将上面下载的驱动、固件、ascend-docker等修改权限并安装
+# 将下载的驱动、固件、ascend-docker等修改权限并安装
 chmod +x Ascend-hdk-310p-npu-driver_23.0.1_linux-aarch64.run
 chmod +x Ascend-hdk-310p-npu-firmware_7.1.0.4.220.run
 chmod +x Ascend-docker-runtime_5.0.0_linux-aarch64.run
@@ -70,9 +78,9 @@ systemctl restart docker
 reboot
 ```
 
-## 制作docker镜像
+## 基础镜像制作流程
 
-如果要自己制作容器镜像，镜像内容参考的是官方的`chatglm2-6b`运行例子，[下载链接](https://www.hiascend.com/developer/download/community/result?module=cann&cann=7.0.0.beta1)，选择`tar.gz`和`run`格式文件，具体可以根据cpu的架构和显卡型号选择下载文件，具体参考下面说明文档。
+这里需要用到cann的套件
 
 ```bash
 # 拉取基础镜像
@@ -87,6 +95,26 @@ mkdir /lib64 && ln -sf /lib/ld-linux-aarch64.so.1 /lib64/ld-linux-aarch64.so.1
 # 安装python环境（参考python资料）,生产环境推荐直接安装python不要conda
 miniconda3
 # 退出重新进容器即可生效miniconda的python环境
+# 【源码】安装python（如果python安装到其他目录，需要设置PATH环境变量到python的bin目录下）
+apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
+wget https://mirrors.huaweicloud.com/python/3.9.19/Python-3.9.19.tgz
+tar zxf Python-3.9.19.tgz && cd Python-3.9.19
+./configure --prefix=/usr/local --enable-optimizations
+make
+make install
+
+### 安装torch依赖【这个只有在torhc_npu版本需要执行】
+pip install -i https://pypi.douban.com/simple pyyaml wheel typing_extensions
+# 安装pytorch【这里要特别注意，torch版本要和Ascend-cann-llm_7.0.0_linux-aarch64_torch1.11.0-abi0.tar.gz中的一样】
+pip install -i https://pypi.douban.com/simple torch==2.1.0
+# x86版本
+pip install torch==2.1.0+cpu  --index-url https://download.pytorch.org/whl/cpu
+# 下载torch_npu，https://gitee.com/ascend/pytorch/releases，一定要选择对应版本
+pip install torch_npu-2.0.1.post1-cp39-cp39-linux_aarch64.whl
+# 若返回True则说明PyTorch安装成功
+python3 -c "import torch;import torch_npu;print(torch_npu.npu.is_available())"
 
 #### 安装cann相关
 # 平台开发套件软件包，用于用户开发应用、自定义算子和模型转换，适用于命令行方式安装场景
@@ -100,22 +128,13 @@ chmod +x Ascend-cann-kernels-310p_7.0.0_linux.run
 # 生效环境变量
 source /usr/local/Ascend/ascend-toolkit/set_env.sh
 
-### 安装torch依赖
-pip install -i https://pypi.douban.com/simple pyyaml wheel typing_extensions
-# 安装pytorch（这里要特别注意，torch版本要和Ascend-cann-llm_7.0.0_linux-aarch64_torch1.11.0-abi0.tar.gz中的一样）
-pip install -i https://pypi.douban.com/simple torch==2.0.1
-# 下载torch_npu，https://gitee.com/ascend/pytorch/releases，一定要选择对应版本
-pip install torch_npu-2.0.1.post1-cp39-cp39-linux_aarch64.whl
-# 若返回True则说明PyTorch安装成功
-python3 -c "import torch;import torch_npu;print(torch_npu.npu.is_available())"
-#### 确认下载使用abi0还是abi1包
+#### 下载安装加速库【可选】
+# 确认下载使用abi0还是abi1包
 # 在python环境下运行如下两行。若返回True，则flag=1；若返回False则flag=0
 python
 import torch
 torch.compiled_with_cxx11_abi()
 exit()
-
-#### 下载安装加速库
 # 昇腾Transformer加速库软件包，提供了基础的高性能的算子，或一种高效的算子组合技术（Graph），方便模型加速
 Ascend-cann-atb_7.0.0_linux-aarch64_abi0.run
 Ascend-cann-atb_7.0.0_linux-aarch64_abi1.run
@@ -142,21 +161,30 @@ cd /tmp
 pip install .
 rm -rf /tmp/atb_speed_sdk
 
-### 调整环境变量
-vim ~/.profile
-# 增加如下配置
+#### 调整环境变量
+vim ~/.profile ~/.bashrc
+## 增加如下配置【普通】
 export ASCEND_BASE=/usr/local/Ascend
-export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
-export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64:$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1   # 这个配置需要慎重，可能会导致系统命令无法正常使用，建议放到启动脚本里
+export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
 source $ASCEND_BASE/ascend-toolkit/set_env.sh
+## 增加如下配置【langchain】
+# 源码安装
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1:/usr/local/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0:/usr/local/lib/python3.9/site-packages/torch.libs/libgomp-6e1a1d1b.so.1.0.0
+# miniconda3
+export LD_PRELOAD=/root/miniconda3/lib/libgomp.so.1:/root/miniconda3/lib/python3.9/site-packages/scikit_learn.libs/libgomp-d22c30c5.so.1.0.0:/root/miniconda3/lib/python3.9/site-packages/torch.libs/libgomp-6e1a1d1b.so.1.0.0
+export ASCEND_BASE=/usr/local/Ascend
+export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
+source $ASCEND_BASE/ascend-toolkit/set_env.sh
+
+# 下面执行看情况【可选】
 source $ASCEND_BASE/atb/set_env.sh
 if [ -f "/data/code/set_env.sh" ]; then
   source "/data/code/set_env.sh"
 fi
 
 ### 清理容器内的所有run包和其他数据
-rm -f *.run
-rm -rf ~/.cache
+rm -rf *.run Python-3.9.19* ~/.cache
 
 ### 生成镜像
 docker commit test111 llm:310p
@@ -165,7 +193,20 @@ docker save -o llm.tar llm:310p
 docker load -i llm.tar
 ```
 
-## 准备代码、模型并在物理机运行
+## 镜像运行命令
+
+```bash
+# 这里千万要注意不要用--device=/dev/davinci0映射设备，直接用--privileged=true，就可以多容器共享显卡
+docker run -d --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 18130:18130 --name langchain-0 llm-lc:910a-0710 /bin/bash /data/start.sh
+```
+
+## 昇腾310P3适配（300I DUO）
+
+### torch_npu
+
+* 固件驱动下载（1.0.22.alpha）：https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=17&cann=7.0.0.beta1&driver=1.0.22.alpha
+* CANN套件-toolkit（7.0.0.beta1）：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%207.0.0/Ascend-cann-toolkit_7.0.0_linux-aarch64.run
+* CANN套件-kernel：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%207.0.0/Ascend-cann-kernels-310p_7.0.0_linux.run
 
 * 具体参考`Ascend-cann-llm_7.0.0_linux-aarch64_torch1.11.0-abi0.tar.gz`解压后的`chatglm2_6b`的`README.md`文件
 
@@ -217,41 +258,18 @@ export DATASET=/data/code/models/CEval
 # 可开启CPU Performance模式以提高模型推理性能（物理机器）
 cpupower frequency-set -g performance
 
-#### 启动容器
-# NPU_NUM是设置使用那块显卡，和代码要配合使用
-# 启动空容器，主要测试阶段用
-docker run -itd \
---cap-add=ALL \
--e NPU_NUM=3 \
---device=/dev/davinci0 \   # 这个测试下来发现可以不要
---device=/dev/davinci_manager \
---device=/dev/devmm_svm \
---device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
--v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
--v /data:/data \
---name fc-llm llm:310p \
-/bin/bash
-
 # 做完启动脚本start.sh之后生产环境执行如下
 docker run -d \
---cap-add=ALL \
--e NPU_NUM=3 \
+--cap-add=ALL \   # 这个参数可以选择执行，如果有报错权限问题可以加上
+-e NPU_NUM=3 \   # 根据业务需要添加（如果是映射单卡。代码可以默认使用0卡即可，不用加这个参数）
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
+-v /usr/local/dcmi:/usr/local/dcmi \   # 可以去掉
+-v /etc/ascend_install.info:/etc/ascend_install.info \    # 可以去掉
+-v /etc/vnpu.cfg:/etc/vnpu.cfg \      # 可以去掉
 -v /data:/data \
 --name fc-llm llm:310p \
 /bin/bash /data/code/glm2/start.sh
@@ -293,7 +311,7 @@ python generate_weights.py --model_path ${CHECKPOINT} --tp_size 2
 torchrun --nproc_per_node 2 --master_port 2000 main.py --mode cli_demo --model_path ${CHECKPOINT} --tp_size 2 --device 0
 ```
 
-## chatglm2官方代码适配修改
+### chatglm2官方代码适配修改
 
 下载官方的代码之后将代码放到 `/data/code/glm2` 目录下
 
@@ -715,7 +733,7 @@ if __name__ == "__main__":
     uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)
 ```
 
-### 容器运行启动脚本
+### 容器运行启动脚本-start.sh
 
 ```sh
 #!/bin/bash
@@ -740,89 +758,29 @@ cd /data/code/glm2
 
 直接将微调之后的`pytorch*`带头的几个模型覆盖官方的模型即可。其他文件不用替换（目前测试其他文件替换会出问题）。
 
-# 昇腾910A适配
+## 昇腾910A适配（300T Pro）
 
-## 固件驱动安装
+### glm3适配（ms）
 
-本示例以`atlas 300T Pro`服务器为例（npu-smi看到如果显卡型号是910B后面没有其他数字说明是910A系列的，真*910B都是B几）
+* 固件驱动下载（1.0.23.alpha）：https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.beta1&driver=1.0.23.alpha
+* CANN套件-toolkit（8.0.RC1.beta1）：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%208.0.RC1/Ascend-cann-toolkit_8.0.RC1_linux-aarch64.run
+* CANN套件-kernel：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%208.0.RC1/Ascend-cann-kernels-910_8.0.RC1_linux.run
+* MindFormers（r1.1.0）：直接pip安装 `mindformers==1.1.0`或者 https://www.mindspore.cn/versions#2.3.0-rc2:~:text=mindformers%2D1.1.0%2Dpy3%2Dnone%2Dany.whl
+* MindSpore（2.3.0rc2）：https://www.mindspore.cn/versions#2.3.0-rc2参考下载对应版本，例如python3.9地址：https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.3.0rc2/MindSpore/unified/aarch64/mindspore-2.3.0rc2-cp39-cp39-linux_aarch64.whl
 
-固件驱动、docker-runtime安装方式参考上面310P3，只有版本的差异
 
-下载地址：https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.alpha003&driver=1.0.22.alpha
-
-```bash
-# 驱动
-./Ascend-hdk-910-npu-driver_23.0.2_linux-aarch64.run --full --install-for-all
-# 固件
-./Ascend-hdk-910-npu-firmware_7.1.0.4.220.run --full
-# 重启服务器
-reboot
-### 先安装docker再安装ascend-docker
-./Ascend-docker-runtime_5.0.0_linux-aarch64.run --install
-# 重启docker
-systemctl restart docker
-```
-
-## 制作基础docker镜像
-
-主流程和310P3一样，对应的toolkit和kernels替换成910b支持的版本
-
-下载地址：https://www.hiascend.com/developer/download/community/result?module=pt+cann&pt=6.0.RC1.alpha003&cann=8.0.RC1.alpha003&product=2&model=19
-
-```bash
-# 拉取基础镜像
-docker pull ubuntu:18.04
-# 运行安装环境的空容器
-docker run -itd --name test111 ubuntu:18.04 /bin/bash
-
-docker exec -it test111 bash
-# 初始化操作（速度慢可以改成清华源，注意选择arm版本）
-apt update
-# 安装python（如果python安装到其他目录，需要设置PATH环境变量到python的bin目录下）
-apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
-libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
-wget https://mirrors.huaweicloud.com/python/3.9.19/Python-3.9.19.tgz
-tar zxf Python-3.9.19.tgz && cd Python-3.9.19
-./configure --prefix=/usr/local --enable-optimizations
-make
-make install
-
-# 安装昇腾cann套件（这里有个坑，不要用最新版本的cann套件，容易出问题）
-./Ascend-cann-toolkit_8.0.RC1.alpha001_linux-aarch64.run --install --install-for-all --quiet
-./Ascend-cann-kernels-910_8.0.RC1.alpha001_linux.run --install --install-for-all --quiet
-
-### 调整环境变量（放到.bashrc业务容器启动的时候source执行会不生效）
-vim ~/.profile
-# 增加如下配置
-export ASCEND_BASE=/usr/local/Ascend
-export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
-export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
-source $ASCEND_BASE/ascend-toolkit/set_env.sh
-
-### 清理容器内的所有run包和其他数据
-rm -rf *.run Python-3.9.19* ~/.cache
-history -c
-### 生成过渡镜像
-docker commit test111 llm:temp
-```
-
-## qwen模型适配及运行（trochnpu）
+### qwen模型适配及运行（trochnpu）
 
 ```bash
 # 启动调试容器
 docker run -itd \
---cap-add=ALL \
+-e NPU_NUM = 1 \
+--privileged=true \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data:/data \
 --name fc-llm-test llm:temp \
 /bin/bash
@@ -994,22 +952,19 @@ bash /data/llm/start.sh
 curl -X POST -H 'Content-Type: application/json' -d '{"model":"glm3", "messages":[{"role":"user", "content":"你好"}], "stream":true}' http://127.0.0.1:8002/v1/chat/completions
 ```
 
-## glm2模型适配及运行（mindspore）
+### glm2模型适配及运行（mindspore）
 
 ```bash
 # 启动调试容器(将模型和代码都放到data目录下)
 docker run -itd \
---cap-add=ALL \
+-e NPU_NUM = 1 \
+--privileged=true \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data2:/data \
 --name test222 llm:temp \
 /bin/bash
@@ -1042,18 +997,14 @@ docker commit test222 llm:910a-ms
 
 ### 启动容器
 docker run -d \
--e NPU_NUM=5 \
---cap-add=ALL \
+-e NPU_NUM = 1 \
+--privileged=true \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data2:/data \
 -p 8005:8999 \
 --name fc-llm-5 llm:910a-ms \
@@ -1066,11 +1017,9 @@ docker save -o llm.tar llm:910a-ms
 docker load -i llm.ta
 ```
 
-# 昇腾910B适配
+## 昇腾910B适配（800T A2）
 
-服务器型号：`Altlas 800T A2`
-
-## 固件驱动
+### 固件驱动
 
 参考910A的方式去安装
 
@@ -1087,68 +1036,27 @@ reboot
 systemctl restart docker
 ```
 
-## 制作基础docker镜像
+### glm3模型适配-ms
 
-* 注意如果是mindspore的话，需要确认和cann的对应关系：https://www.mindspore.cn/versions#ascend%E9%85%8D%E5%A5%97%E8%BD%AF%E4%BB%B6%E5%8C%85
-
-```bash
-# 拉取基础镜像
-docker pull ubuntu:18.04
-# 运行安装环境的空容器
-docker run -itd --name test111 ubuntu:18.04 /bin/bash
-
-docker exec -it test111 bash
-# 初始化操作（速度慢可以改成清华源，注意选择arm版本）
-apt update
-# 安装python（如果python安装到其他目录，需要设置PATH环境变量到python的bin目录下）
-apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
-libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-xz-utils tk-dev libffi-dev liblzma-dev git wget vim -y
-wget https://mirrors.huaweicloud.com/python/3.9.19/Python-3.9.19.tgz
-tar zxf Python-3.9.19.tgz && cd Python-3.9.19
-./configure --prefix=/usr/local --enable-optimizations
-make
-make install
-
-# 安装昇腾cann套件（这里有个坑，不要用最新版本的cann套件，容易出问题）
-./Ascend-cann-toolkit_7.0.0_linux-aarch64.run --install --install-for-all --quiet
-./Ascend-cann-kernels-910b_7.0.0_linux.run --install --install-for-all --quiet
-
-### 调整环境变量（放到.bashrc业务容器启动的时候source执行会不生效）
-vim ~/.profile
-# 增加如下配置
-export ASCEND_BASE=/usr/local/Ascend
-export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
-export LD_LIBRARY_PATH=$ASCEND_BASE/driver/lib64/common:$ASCEND_BASE/driver/lib64/driver:$LD_LIBRARY_PATH
-source $ASCEND_BASE/ascend-toolkit/set_env.sh
-
-### 清理容器内的所有run包和其他数据
-rm -f *.run
-rm -rf ~/.cache
-rm -rf Python-3.9.19*
-history -c
-### 生成镜像
-docker commit test111 llm:temp
-```
-
-## glm3模型适配
+* 固件驱动下载（1.0.23.alpha）：https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.beta1&driver=1.0.23.alpha
+* CANN套件-toolkit（8.0.RC1.beta1）：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%208.0.RC1/Ascend-cann-toolkit_8.0.RC1_linux-aarch64.run
+* CANN套件-kernel：https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%208.0.RC1/Ascend-cann-kernels-910b_8.0.RC1_linux.run
+* MindFormers（1.1.0）：直接pip安装 `mindformers==1.1.0`或者 https://www.mindspore.cn/versions#2.3.0-rc2:~:text=mindformers%2D1.1.0%2Dpy3%2Dnone%2Dany.whl
+* MindSpore（2.3.0rc2）：https://www.mindspore.cn/versions#2.3.0-rc2参考下载对应版本，例如python3.9地址：https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.3.0rc2/MindSpore/unified/aarch64/mindspore-2.3.0rc2-cp39-cp39-linux_aarch64.whl
 
 **mindspore方式：**
 
 ```bash
 # 启动调试容器(将模型和代码都放到data目录下)
 docker run -itd \
---cap-add=ALL \
+--NPU_NUM=1 \
+--privileged=true \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data:/data \
 --name test222 llm:temp \
 /bin/bash
@@ -1160,17 +1068,12 @@ pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple /usr/local/Ascend/ascen
 
 
 # 正常安装，到这里选择对应版本的whl包（包含mindformers）：https://www.mindspore.cn/versions#2214
-wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindSpore/unified/aarch64/mindspore-2.2.14-cp39-cp39-linux_aarch64.whl
-wget https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindFormers/any/mindformers-1.0.2-py3-none-any.whl
-pip3 install  -i https://pypi.tuna.tsinghua.edu.cn/simple mindspore-2.2.14-cp39-cp39-linux_aarch64.whl mindformers-1.0.0-py3-none-any.whl 
+pip3 install  -i https://pypi.tuna.tsinghua.edu.cn/simple mindspore-2.3.0rc2-cp39-cp39-linux_aarch64.whl mindformers-1.1.0-py3-none-any.whl 
 # 执行如下代码，如果未报错且输出了mindspore版本，证明mindspore安装成功
 # 注意需确认显卡上没有运行其他程序再执行
 python3 -c "import mindspore;mindspore.set_context(device_id=0,device_target='Ascend');mindspore.run_check()"
-# 【注意】如果程序运行的时候有问题则需要安装低版本的mindformers
-wget https://gitee.com/mindspore/mindformers/releases/download/v1.0.0/mindformers-1.0.0-py3-none-any.whl
-pip3 install mindformers-1.0.0-py3-none-any.whl
 # 【不推荐】源码安装mindformers-注意修改sh脚本中的python和pip版本(https://gitee.com/mindspore/mindformers)
-git clone -b r1.0 https://gitee.com/mindspore/mindformers.git
+git clone https://gitee.com/mindspore/mindformers.git
 cd mindformers
 bash build.sh
 
@@ -1286,7 +1189,7 @@ if __name__ == '__main__':
     uvicorn.run(app, host=args.server_name, port=args.server_port, workers=1)
 ```
 
-## glm3运行
+### glm3运行
 
 ```bash
 ### 清理容器内的所有run包和其他数据
@@ -1303,18 +1206,14 @@ python3 ../model/glm3/run_chat_server.py
 #--------------
 ### 启动容器
 docker run -d \
--e NPU_NUM=2 \
---cap-add=ALL \
+--NPU_NUM=1 \
+--privileged=true \
+--device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
--v /usr/local/dcmi:/usr/local/dcmi \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
--v /usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/common \
--v /usr/local/Ascend/driver/lib64/driver:/usr/local/Ascend/driver/lib64/driver \
--v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
--v /etc/ascend_install.info:/etc/ascend_install.info \
--v /etc/vnpu.cfg:/etc/vnpu.cfg \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /data:/data \
 -p 8002:8000 \
 --name fc-llm-2 llm:910b \
@@ -1326,13 +1225,279 @@ docker save -o llm.tar llm:910b
 docker load -i llm.tar
 ```
 
-# 昇腾适配问题列表
+### mindie适配
 
-* 碰到`生成内容重复`或者`生成内容异常`，通常需要调整配置文件中的推理超参数解决，配置文件一般是`config.yaml`或者`run_chat_glm2_6b.yaml`
+#### qwen_7b
+
+* 固件驱动下载（1.0.23.alpha）：`Ascend-hdk-910b-npu-driver_24.1.rc1_linux-aarch64.run`、`Ascend-hdk-910b-npu-firmware_7.1.0.6.220.run`,https://www.hiascend.com/hardware/firmware-drivers/community?product=2&model=19&cann=8.0.RC1.beta1&driver=1.0.23.alpha
+* 镜像、使用参考资料地址：阿里云盘
+* 目前只支持`safetensors`格式的模型
+
+模型调整：
+* 找到模型目录，修改里面config.json，倒数第五、六行， `torch_dtype`将`bflow16`改成`flow16`
+* 找到`tokenizer_config.json`，增加`chat_template`配置 `"chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",`
+
+
+`mindie-service`主要修改``配置文件`config.json`:
+
+```json
+{
+    "OtherParam":
+    {
+        "ResourceParam" :
+        {
+            "cacheBlockSize" : 128,
+            "preAllocBlocks" : 4
+        },
+        "LogParam" :
+        {
+            "logLevel" : "Info",
+            "logPath" : "/logs/mindservice.log" // 日志文件保存位置
+        },
+        "ServeParam" :
+        {
+            "ipAddress" : "0.0.0.0", // ip地址
+            "port" : 1026, // 对外提供服务的端口
+            "maxLinkNum" : 300,
+            "httpsEnabled" : false,
+            "tlsCaPath" : "security/ca/",
+            "tlsCaFile" : ["ca.pem"],
+            "tlsCert" : "security/certs/server.pem",
+            "tlsPk" : "security/keys/server.key.pem",
+            "tlsPkPwd" : "security/pass/mindie_server_key_pwd.txt",
+            "kmcKsfMaster" : "tools/pmt/master/ksfa",
+            "kmcKsfStandby" : "tools/pmt/standby/ksfb",
+            "tlsCrl" : "security/certs/server_crl.pem"
+        }
+    },
+    "WorkFlowParam":
+    {
+        "TemplateParam" :
+        {
+            "templateType": "Standard",
+            "templateName" : "Standard_llama",
+            "pipelineNumber" : 1
+        }
+    },
+    "ModelDeployParam":
+    {
+        "maxSeqLen" : 8192,  // 这里根据模型的最大上下文设置
+        "npuDeviceIds" : [[0,1,2,3]], // 使用哪些卡
+        "ModelParam" : [
+            {
+                "modelInstanceType": "Standard",
+                "modelName" : "qwen",
+                "modelWeightPath" : "/home/aifirst/zhiyuan/officialgpt_online/model", // 离线模型地址
+                "worldSize" : 4, // 上面配置的卡的总数
+                "cpuMemSize" : 5,
+                "npuMemSize" : 8,
+                "backendType": "atb"
+            }
+        ]
+    },
+    "ScheduleParam":
+    {
+        "maxPrefillBatchSize" : 50,
+        "maxPrefillTokens" : 8192, // 这个参数和上面的maxseqlen一致
+        "prefillTimeMsPerReq" : 150,
+        "prefillPolicyType" : 0,
+
+        "decodeTimeMsPerReq" : 50,
+        "decodePolicyType" : 0,
+
+        "maxBatchSize" : 200,
+        "maxIterTimes" : 4096, // 这里需要注意，请求的时候设置的max_tokens不能超过这个值
+        "maxPreemptCount" : 200,
+        "supportSelectBatch" : false,
+        "maxQueueDelayMicroseconds" : 5000
+    }
+}
+```
 
 ```bash
+# mindie容器启动命令
+docker run -d --restart=always --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 8000:1026 --name fc-llm mindie_service:1.0.T56 bash start.sh
 
+#### start.sh 内容如下
+#!/bin/bash
+
+source /usr/local/Ascend/ascend-toolkit/set_env.sh
+source /usr/local/Ascend/mindie/set_env.sh
+source /usr/local/Ascend/mindie/latest/mindie-service/set_env.sh
+source /opt/atb-models/set_env.sh
+# 用上面的config.json覆盖默认的
+/bin/cp -f /data/config.json /usr/local/Ascend/mindie/latest/mindie-service/conf
+cd /usr/local/Ascend/mindie/latest/mindie-service
+# 后台启动
+nohup ./bin/mindieservice_daemon 2>&1 &
+tail -f ./logs/mindservice.log
 ```
+
+#### glm3-6b
+
+* 固件驱动下载（1.0.23.alpha）：`Ascend-hdk-910b-npu-driver_24.1.rc2_linux-aarch64.run`、`Ascend-hdk-910b-npu-firmware_7.3.0.1.231.run`,https://www.hiascend.com/hardware/firmware-drivers/community?product=4&model=26&cann=8.0.RC2.beta1&driver=1.0.25.alpha
+* 下载官方最新镜像：https://www.hiascend.com/developer/ascendhub/detail/af85b724a7e5469ebd7ea13c3439d48f
+
+```bash
+# 镜像
+swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:1.0.RC2-800I-A2-aarch64
+# 运行调试容器
+docker run -itd --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data -p 8000:1026 --name test111 mindie_swr.cn-south-1.myhuaweicloud.com/ascendhub/mindie:1.0.RC2-800I-A2-aarch64 bash
+# 安装mindie相关依赖
+cd /opt/package
+./install_and_enable_cann.sh
+# 添加环境变量
+source /usr/local/Ascend/ascend-toolkit/set_env.sh
+source /usr/local/Ascend/nnal/atb/set_env.sh
+source /usr/local/Ascend/mindie/latest/mindie-service/set_env.sh
+source /usr/local/Ascend/llm_model/set_env.sh
+source /usr/local/Ascend/mindie/set_env.sh
+# 修改/usr/local/Ascend/mindie/latest/mindie-service/conf/config.json
+"ipAddress" : "127.0.0.1"
+"httpsEnabled" : false,
+"npuDeviceIds" : [[0,1,2,3]],
+"worldSize" : 4,
+"maxSeqLen" : 32768,
+"modelName" : "mymodel",
+"modelWeightPath" : "/data/model",
+"maxPrefillTokens" : 32768,
+"maxIterTimes" : 16384,
+# 提交生成新镜像
+docker commit test111 llm:mindie1.0.rc2-glm3
+
+#### 新增启动脚本
+#!/bin/bash
+source /usr/local/Ascend/ascend-toolkit/set_env.sh
+source /usr/local/Ascend/nnal/atb/set_env.sh
+source /usr/local/Ascend/mindie/latest/mindie-service/set_env.sh
+source /usr/local/Ascend/llm_model/set_env.sh
+source /usr/local/Ascend/mindie/set_env.sh
+cd /usr/local/Ascend/mindie/latest/mindie-service
+# 这一行看情况添加
+/bin/cp -f /data/config.json ./conf
+nohup ./bin/mindieservice_daemon 2>&1 &
+tail -f ./logs/mindservice.log
+
+# 最终启动服务命令
+docker run --net=host -d --restart=always --privileged=true --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /etc/localtime:/etc/localtime -v $PWD:/data -w /data --name llm llm:mindie1.0.rc2-glm3 bash start.sh
+```
+
+## 重排-嵌入模型demo
+
+```py
+#### 重排reranker
+from fastapi import FastAPI
+import torch
+import numpy
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from typing import List, Dict
+from pydantic import BaseModel
+import acl
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+# 初始化NPU设备
+torch.npu.set_device(torch.device("npu:0"))
+torch.npu.set_compile_mode(jit_compile=False)
+npucontext, _ = acl.rt.get_context()
+
+app = FastAPI()
+
+model_name = "/data/models/bge-reranker-large"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
+
+device = torch.device("npu")
+model.to(device)
+
+class RerankRequest(BaseModel):
+    query: str
+    documents: List[str]
+
+def rerank(query: str, documents: List[str]) -> List[Dict[str, float]]:
+    inputs = tokenizer([query] * len(documents), documents, return_tensors="pt", padding=True, truncation=True).to(device)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+        scores = outputs.logits.squeeze().cpu().numpy().flatten().tolist()
+
+    ranked_docs = sorted(zip(documents, scores), key=lambda x: x[1], reverse=True)
+
+    return [{"document": doc, "score": score} for doc, score in ranked_docs]
+
+@app.post("/rerank")
+async def rerank_endpoint(request: RerankRequest):
+    acl.rt.set_context(npucontext)
+    query = request.query
+    documents = request.documents
+
+    results = rerank(query, documents)
+
+    return {"results": results}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+## 测试
+curl -X POST -H 'Content-Type: application/json' -d  '{"query": "自然语言处理是什么？", "documents": ["自然语言处理是计算机科学的一个领域。"]}' http://localhost:8000/rerank
+
+#### 嵌入模型embed
+from fastapi import FastAPI
+import torch
+import numpy as np
+from transformers import AutoModel, AutoTokenizer
+from typing import List, Dict
+from pydantic import BaseModel
+import acl
+import torch_npu
+from torch_npu.contrib import transfer_to_npu
+
+app = FastAPI()
+
+torch.npu.set_device(torch.device("npu:0"))
+torch.npu.set_compile_mode(jit_compile=False)
+npucontext, _ = acl.rt.get_context()
+
+model_name = "/data/models/bge-base-zh-v1.5"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+device = torch.device("npu")
+model.to(device)
+
+class EmbeddingRequest(BaseModel):
+    texts: List[str]
+
+def generate_embeddings(texts: List[str]) -> List[np.ndarray]:
+    inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True).to(device)
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+        embeddings = outputs.last_hidden_state.mean(dim=1).cpu().numpy()
+
+    return embeddings.tolist()
+
+@app.post("/embeddings")
+async def embedding_endpoint(request: EmbeddingRequest):
+    acl.rt.set_context(npucontext)
+    texts = request.texts
+
+    embeddings = generate_embeddings(texts)
+
+    return {"embeddings": embeddings}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+## 测试
+curl -X POST -H "Content-Type: application/json" -d '{"texts": ["这是一个测试句子。", "这是另一个不同的句子。"]}' http://localhost:8000/embeddings
+```
+
+## 昇腾适配问题列表
+
+* 碰到`生成内容重复`或者`生成内容异常`，通常需要调整配置文件中的推理超参数解决，配置文件一般是`config.yaml`或者`run_chat_glm2_6b.yaml`
 
 * 碰到报错 `No module named _sqlite3`
 
@@ -1382,3 +1547,42 @@ max_memory = {0: 33554432000,
                         6: 33554432000,
                         7: 33554432000}
 ```
+
+* 运行mindspore包错：`cannot import name 'swap_cache' from 'mindspore._c_expression'`，直接注释代码
+
+```bash
+vim /usr/local/lib/python3.9/site-packages/mindformers/model_runner.py
+
+# 注释掉包错那行代码，以及 swap_cache 相关的代码
+```
+
+* `module 'mindspore' has no attribute 'hal'`
+
+【推荐】出现这个问题一般是 mindformers、mindspore、cann、固件驱动的版本不匹配，可以参考mindformers的gitee仓库对应的版本去安装其他依赖项。
+
+【不推荐】上面问题还有一个特殊处理方式，例如 `glm3` 需要设置 `use_past=False` ，但是这个设置推理速度会变得很慢。
+
+* `Get soc name failed`或者`dcmi module initialize failed. ret is -8005`一般是容器内找不到硬件了。需要在运行的时候设置 `--privileged=true` 或者`--device=/dev/davinci0 `
+
+* 启动多个容器，第一个正常，第二个就提示包错。一般都是显卡被其他设备占用了。是因为通过 `--device=/dev/davinci4` 映射了单张卡导致的，可以不设置davinci4，直接设置`--privileged=true`这样就可以使用所有卡并且不冲突了。
+
+* `aclnnRsubs failed, detail:EZ9999`，报这个错一般是因为没有装cann的kernel文件，需要重新安装一下kernel.run文件
+
+* `python openai_api.py`后，调用报错：`dumps_kwargs keyword arguments are no longer supported`
+
+```bash
+# 将包错文件中的
+chunk.json(exclude_unset=True, ensure_ascii=False)
+# 替换为
+chunk.model_dump_json(exclude_unset=True,exclude_none=True)
+```
+
+* 报错`max_length`不能大于`seq_length`，则需要修改模型的 `yaml` 文件，将 `seq_length` 改大。
+
+* mindie报错：`list index out of range、status: error, npuBlockNum:0,cpubloknum:0`
+
+找到模型目录，修改里面config.json，倒数第五、六行， 将`bflow16`改成`flow16`
+
+* mindie报错：`缺少chat_template`，则需要在模型目录下的`tokenizer_config.json`增加`chat_template`的配置
+
+* mindie报错：`vcom：recv fin packet, socket fd 22. errono:0`是因为`curl`等请求中没有设置`max_tokens`或者这个值比较小被截断了

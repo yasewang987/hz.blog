@@ -619,6 +619,11 @@ func main() {
     // New会创建一个默认的没有任何中间件的路由
     r := gin.New()
 
+    // 使用 Logger 中间件
+    r.Use(gin.Logger())
+    // 使用 Recovery 中间件
+    r.Use(gin.Recovery())
+
     // 自定义全局中间件
     r.Use(LoggerMiddleware)
 ​

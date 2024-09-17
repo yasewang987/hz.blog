@@ -110,3 +110,28 @@ events {
     worker_connections  10240;
 }
 ```
+
+## nginx开启basic_auth认证
+
+```bash
+# 安装依赖
+yum -y install httpd-tools
+apt install -y apache2-utils
+
+# 生成密钥文件(输入两次密码确认)
+htpasswd -c ./myaccount 用户名
+
+# 修改nginx配置(增加auth_basic相关)
+server{
+    listen 80;
+    server_name  _;
+    index index.html;
+    root /home/wwwroot;       
+    location /
+    {
+        auth_basic "Please enter your username and password";
+        auth_basic_user_file /home/htpasswd; 
+        autoindex on;
+    }
+}
+```

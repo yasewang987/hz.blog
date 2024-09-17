@@ -77,8 +77,14 @@ C-a ] -> paste，把刚刚在 copy mode 选定的内容贴上
 ## 常用操作
 
 ```bash
+# 正常创建
+screen -S session_name
+
 # 创建会话（-m 强制）
 screen -dmS session_name
+
+# 推出会话，后台运行
+ctrl+a ，再按 d
 
 # 关闭会话
 screen -X -S session_name quit

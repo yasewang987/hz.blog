@@ -2,12 +2,23 @@
 
 ## Context 使用规则
 
-* 勿将 Context 作为 struct 的字段使用，而是对每个使用其的函数分别作参数使用，其需定义为函数或方法的第一个参数，一般叫作 ctx；
+* 勿将 Context 作为 struct 的字段使用，而是对每个使用其的函数分别作参数使用，其需定义为函数或方法的`第一个参数`，一般叫作 `ctx`；
 * 勿对 Context 参数传 `nil`，未想好的使用那个 Context，请传`context.TODO`；
-* 使用 context 传值仅可用作请求域的数据，其它类型数据请不要滥用；
-* 同一个 Context 可以传给使用其的多个 goroutine，且 Context 可被多个 goroutine 同时安全访问。
+* 不要存储Context：Context应该在`函数调用链`中传递，而`不`是存储在结构体中
+* 使用`WithCancel`的`defer`模式：在创建可取消的Context时，立即使用defer调用cancel函数。
+* Context值的键应该是`非导出`的：使用自定义类型作为Context值的键，以避免冲突 `type keyType int`
+* 同一个 Context 可以传给使用其的多个 goroutine，且 Context 可被多个 `goroutine` 同时安全访问。
 * 当需要在多个 `goroutine` 中传递上下文信息时，可以使用 `Context` 实现
 * `Context` 除了用来传递上下文信息，还可以用于传递终结执行子任务的相关信号，中止多个执行子任务的 `goroutine`
+* 避免过度使用：不要在每个函数调用中都创建新的Context，除非真的需要。过多的Context创建和取消操作可能会带来额外的开销。
+* 谨慎使用`Value`：Context的Value方法在查找键时需要遍历整个Context链，对于频繁访问的值，考虑使用其他方式传递。
+
+## Context 特性
+
+* 可取消性：Context允许我们在不同的goroutine之间传播取消信号，优雅地终止不再需要的操作。
+* 层次结构：Context可以派生出子Context，形成一个树状的层次结构。当父Context被取消时，其所有的子Context也会被取消。
+* 值传递：Context可以携带请求范围的值，这些值可以在整个调用链中传递。
+* 协程安全：Context被设计为在多个goroutine之间安全使用，无需额外的同步机制。
 
 ## http服务使用小结
 
@@ -75,6 +86,7 @@ type Context interface {
 
     // Err indicates why this context was canceled, after the Done channel
     // is closed.
+		// 返回Context被取消的原因。
     Err() error
 
     // Deadline returns the time when this Context will be canceled, if any.
@@ -98,6 +110,8 @@ Context 是安全的，可被多个 goroutine 同时使用。一个 Context 可�
 // and has no values. Background is typically used in main, init, and tests,
 // and as the top-level Context for incoming requests.
 func Background() Context
+// 当不确定应该使用哪种Context时，可以使用TODO()。
+func TODO() Context
 
 // WithCancel returns a copy of parent whose Done channel is closed as soon as
 // parent.Done is closed or cancel is called.
@@ -115,6 +129,8 @@ type CancelFunc func()
 // any. If the timer is still running, the cancel function releases its
 // resources.
 func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc)
+
+func WithDeadline(parent Context, d time.Time) (Context, CancelFunc)
 
 // WithValue returns a copy of parent whose Value method returns val for key.
 func WithValue(parent Context, key interface{}, val interface{}) Context
@@ -181,4 +197,248 @@ func MyContextDemo3() {
 	// 没有输出
 	get(ctx, myCtxKey("b"))
 }
+```
+
+## 自定义Context
+
+```go
+type MyContext struct {
+    context.Context
+    customValue string
+}
+
+func (c *MyContext) Value(key interface{}) interface{} {
+    if key == "customKey" {
+        return c.customValue
+    }
+    return c.Context.Value(key)
+}
+
+func WithCustomValue(parent context.Context, value string) context.Context {
+    return &MyContext{
+        Context:     parent,
+        customValue: value,
+    }
+}
+
+// 使用
+ctx := WithCustomValue(context.Background(), "myValue")
+```
+
+## Context树的管理
+
+```go
+type ContextNode struct {
+    Ctx        context.Context
+    Cancel     context.CancelFunc
+    Children   []*ContextNode
+    Identifier string
+}
+
+func NewContextTree(root context.Context, identifier string) *ContextNode {
+    ctx, cancel := context.WithCancel(root)
+    return &ContextNode{
+        Ctx:        ctx,
+        Cancel:     cancel,
+        Children:   make([]*ContextNode, 0),
+        Identifier: identifier,
+    }
+}
+
+func (n *ContextNode) AddChild(identifier string) *ContextNode {
+    child := NewContextTree(n.Ctx, identifier)
+    n.Children = append(n.Children, child)
+    return child
+}
+
+func (n *ContextNode) CancelBranch() {
+    n.Cancel()
+    for _, child := range n.Children {
+        child.CancelBranch()
+    }
+}
+
+// 使用
+root := NewContextTree(context.Background(), "root")
+child1 := root.AddChild("child1")
+child2 := root.AddChild("child2")
+grandchild := child1.AddChild("grandchild")
+
+// 取消整个分支
+child1.CancelBranch()
+```
+
+## 常见demo
+
+### 网络服务
+
+* 主函数设置了一个HTTP服务器，监听"/search"路径。
+* handleSearch函数为每个请求创建了一个5秒超时的Context。
+* performSearch函数模拟了三个并发的搜索操作（数据库搜索、API搜索和缓存搜索）。
+* 使用goroutine和channel来并发执行这些搜索操作。
+* 通过select语句，我们可以获取最快返回的结果，或者在Context超时时优雅地退出。
+
+这个例子展示了Context在处理超时、取消操作和协调多个goroutine方面的强大能力。它确保了即使在某些搜索操作变慢的情况下，整个请求也能在预定的时间内完成或被取消。
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "net/http"
+    "time"
+)
+
+func main() {
+    http.HandleFunc("/search", handleSearch)
+    http.ListenAndServe(":8080", nil)
+}
+
+func handleSearch(w http.ResponseWriter, r *http.Request) {
+    // 创建一个5秒超时的Context
+    ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+    defer cancel()
+
+    // 模拟一个耗时的搜索操作
+    result, err := performSearch(ctx, r.URL.Query().Get("q"))
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    fmt.Fprintf(w, "Search Result: %s", result)
+}
+
+func performSearch(ctx context.Context, query string) (string, error) {
+    // 模拟三个并发的搜索操作
+    resultChan := make(chan string, 3)
+    searchFuncs := []func(context.Context, string) (string, error){
+        searchDatabase,
+        searchAPI,
+        searchCache,
+    }
+
+    for _, searchFunc := range searchFuncs {
+        go func(f func(context.Context, string) (string, error)) {
+            result, err := f(ctx, query)
+            if err == nil {
+                select {
+                case resultChan <- result:
+                case <-ctx.Done():
+                }
+            }
+        }(searchFunc)
+    }
+
+    // 等待第一个结果或Context取消
+    select {
+    case result := <-resultChan:
+        return result, nil
+    case <-ctx.Done():
+        return "", ctx.Err()
+    }
+}
+
+func searchDatabase(ctx context.Context, query string) (string, error) {
+    time.Sleep(4 * time.Second) // 模拟耗时操作
+    return "Database Result for " + query, nil
+}
+
+func searchAPI(ctx context.Context, query string) (string, error) {
+    time.Sleep(3 * time.Second) // 模拟耗时操作
+    return "API Result for " + query, nil
+}
+
+func searchCache(ctx context.Context, query string) (string, error) {
+    time.Sleep(1 * time.Second) // 模拟耗时操作
+    return "Cache Result for " + query, nil
+}
+```
+
+### 结合sync.WaitGroup使用
+
+```go
+func WorkerPool(ctx context.Context, tasks <-chan int) {
+    var wg sync.WaitGroup
+    for i := 0; i < 5; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for {
+                select {
+                case task, ok := <-tasks:
+                    if !ok {
+                        return
+                    }
+                    processTask(ctx, task)
+                case <-ctx.Done():
+                    fmt.Println("Worker 被取消")
+                    return
+                }
+            }
+        }()
+    }
+    wg.Wait()
+    fmt.Println("所有worker已退出")
+}
+
+func processTask(ctx context.Context, task int) {
+    select {
+    case <-time.After(time.Second):
+        fmt.Printf("完成任务 %d\n", task)
+    case <-ctx.Done():
+        fmt.Printf("任务 %d 被取消\n", task)
+    }
+}
+
+// 使用
+ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+defer cancel()
+
+tasks := make(chan int, 10)
+go func() {
+    for i := 0; i < 20; i++ {
+        tasks <- i
+    }
+    close(tasks)
+}()
+
+WorkerPool(ctx, tasks)
+```
+
+### 微服务间的调用链路追踪
+
+```go
+type TraceID string
+
+func WithTraceID(ctx context.Context, traceID TraceID) context.Context {
+    return context.WithValue(ctx, "trace_id", traceID)
+}
+
+func GetTraceID(ctx context.Context) (TraceID, bool) {
+    traceID, ok := ctx.Value("trace_id").(TraceID)
+    return traceID, ok
+}
+
+func ServiceA(ctx context.Context) {
+    traceID, ok := GetTraceID(ctx)
+    if !ok {
+        traceID = TraceID(uuid.New().String())
+        ctx = WithTraceID(ctx, traceID)
+    }
+
+    fmt.Printf("ServiceA: 处理请求，TraceID: %s\n", traceID)
+    ServiceB(ctx)
+}
+
+func ServiceB(ctx context.Context) {
+    traceID, _ := GetTraceID(ctx)
+    fmt.Printf("ServiceB: 处理请求，TraceID: %s\n", traceID)
+    // 模拟调用其他服务...
+}
+
+// 使用
+ctx := context.Background()
+ServiceA(ctx)
 ```

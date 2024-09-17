@@ -12,6 +12,15 @@ fi
 ## docker常用命令
 
 ```bash
+#### docker停止
+systemctl stop docker.socket
+systemctl stop docker
+systemctl disable docker.socket
+systemctl disable docker
+
+#### 构建镜像
+docker build -t imagename .
+
 ####### 指定默认工作目录 /data
 docker run -d -w /data aaa
 
@@ -98,6 +107,7 @@ docker save -o abc.tar image:1 image:2
 # 导入使用 docker save 命令导出的镜像,--input , -i : 指定导入的文件
 docker load [OPTIONS]
 docker load -i abc.tar
+docker load < abc.tar.gz
 
 ####### 删除所有镜像
 docker rmi $(docker images -qa)
@@ -135,6 +145,13 @@ docker stats --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}"
 --pid=host
 # 共享内存设置32g
 --shm-size=32g
+```
+
+## docker启动端口绑定ip
+
+```bash
+# 将容器的端口80映射到主机192.168.1.100的端口8080上
+docker run -p 192.168.1.100:8080:80 <镜像名>
 ```
 
 ## docker容器中使用docker命令

@@ -76,6 +76,13 @@ sudo systemctl restart sshd
 service sshd restart
 ```
 
+## ssh使用pem文件登陆
+
+```bash
+chmod 600 key.pem
+ssh -i key.pem root@yourIP
+```
+
 ## SSH免密登录
 
 在做免密登录的时候要先确定哪个用户需要做免密登录，如果没有指定默认的是当前用户，远程服务器是root用户
@@ -308,7 +315,31 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ----cpu----
 # 但如果swpd的值不为0，但是SI，SO的值长期为0，这种情况不会影响系统性能
 ```
 ## 挂载磁盘
+
 ```bash
+#### 新磁盘初始化挂载
+lsblk -f                               # 确认磁盘信息
+mkfs.ext4 /dev/sdb1                    # 格式化磁盘
+pvcreate /dev/sdb1 && pvdisplay        # 创建物理卷并查看
+vgcreate vg0 /dev/sdb1 && vgdisplay    # 创建卷组并查看
+lvcreate -L 100G -n lv0 vg0            # 创建100G的逻辑卷
+mkfs.ext4 /dev/vg0/lv0                 # 格式化逻辑卷
+mount /dev/vg0/lv0 /data               # 挂载逻辑卷
+df -hl                                 # 查看挂载状态
+# 如果逻辑卷空间不够，卷组还有剩余空间可以用一下方法扩容
+lvextend -l +100%FREE /dev/mapper/vg0-lv0    # 扩展逻辑卷使用100%空间
+resize2fs /dev/mapper/vg0-lv0          # 调整文件系统的大小
+df -hl                                 # 查看挂载状态
+#### 新磁盘初始化，并加入已有卷组之后做逻辑卷做扩容
+mkfs.ext4 /dev/sdb1                    # 如果是未挂载的新磁盘可以将其格式化
+pvcreate /dev/sdb1 && pvdisplay        # 创建物理卷并查看
+vgdisplay                              # 查看已有卷组
+vgextend vg0 /dev/sdb1 && vgdisplay    # 添加至已有卷组中并查看
+lvextend -l +100%FREE /dev/mapper/vg0-lv0    # 扩展逻辑卷使用100%空间
+resize2fs /dev/mapper/vg0-lv0          # 调整文件系统的大小
+df -hl                                 # 查看挂载状态
+
+
 # -a,--all:挂载/etc/fstab里面所有的文件系统；
 # -r,--read-only:以只读的权限挂载文件系统；
 # -w,--re,--read-write:以读写权限挂载文件系统；
@@ -956,10 +987,16 @@ tzselect
 cp /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
 ```
 
-## 禁止内核自动更新
+## 禁止/启动内核更新
 
 ```bash
 #### Ubuntu
+# 查看是否禁用
+dpkg --get-selections |grep linux-image
+dpkg --get-selections | grep hold
+# 或者
+apt-mark showhold
+
 # 查看内核版本
 uname -r
 > 5.4.0-105-generic
@@ -972,8 +1009,15 @@ apt-mark hold linux-image-5.4.0-105-generic
 apt-mark hold linux-headers-5.4.0-105-generic
 apt-mark hold linux-modules-extra-5.4.0-105-generic
 apt-mark hold linux-image-generic linux-headers-generic linux-image-extra
-# 查看是否禁用
-dpkg --get-selections |grep linux-image
+
+# 解除锁定更新
+sudo apt-mark unhold linux-generic
+sudo apt-mark unhold linux-image-generic
+sudo apt-mark unhold linux-headers-generic
+# 更新升级
+apt install linux-generic
+# 或者使用hwe
+apt install linux-generic-hwe-20.04
 
 #### Centos
 ```
@@ -1088,4 +1132,33 @@ grep -rn "查找的内容" ./
 
 # 批量替换某个目下所有包含的文件的内容
 sed -i "s/查找的内容/替换后的内容/g" `grep -rl "查找的内容" ./`
+```
+
+## 开启syslog日志服务
+
+开启syslog日志服务之后其他服务器或者硬件防火墙可以通过访问514的udp服务同步日志到指定服务器上
+
+```bash
+# 开启syslog-514的udp
+vim /etc/rsyslog.conf
+# 去掉下面两个注释
+module(load="imudp")
+input(type="imudp" port="514")
+
+# 重启服务
+systemctl restart rsyslog
+
+# 开启防火墙
+ufw allow 514/udp
+
+# 查看服务是否正常开启(如果服务运行会显示有内容)
+lsof -i :514
+
+# 跟踪日志变化
+tail -f /var/log/syslog
+
+# 其他服务器/防火墙执行测试（上面跟踪的日志会显示对应的内容记录）
+logger -n 192.168.0.85 -P 514 -t mytest "This is a test log message."
+# 或者
+echo "This is a test syslog message." | nc -u 192.168.0.85 514
 ```

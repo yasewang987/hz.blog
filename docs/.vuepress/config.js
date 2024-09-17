@@ -256,10 +256,12 @@ module.exports = {
             ],
             '/code/python/base/': [
                 'base',
+                'libdemos',
                 'source',
                 'devops',
                 'problem',
-                'install'
+                'install',
+                'tools'
             ],
             '/code/python/deploy/': [
                 'nvidia',
@@ -274,16 +276,18 @@ module.exports = {
             ],
             '/code/python/ai/': [
                 'install',
+                'base',
                 'tensor',
                 'nlp',
-                'temp',
+                'tools',
                 'ai1',
                 'ai2',
                 'ai-vector',
                 'llama-factory',
                 'prompt',
                 'langchain',
-                'agent'
+                'agent',
+                'ollama'
             ],
             '/microservices/register_config/': [
                 'consul',
@@ -386,9 +390,10 @@ module.exports = {
             '/devops/k8s/k8s-normal/': [
                 'k8s-yamls',
                 'k8s-cmd',
+                'k8s-base',
                 'k8s-problem',
                 'k8s-netcore',
-                'k8s-multicluster'
+                'k8s-manage'
             ],
             '/devops/k8s/k8s-learning/': [
                 'k8s-base',
@@ -424,6 +429,7 @@ module.exports = {
                 'minio',
                 'nextterminal',
                 'jumpserver',
+                'containerd',
                 'zentao',
                 'shells',
                 'frp',
@@ -483,6 +489,7 @@ module.exports = {
                 'awk',
                 'sed',
                 'rsync',
+                'unison',
                 'rpm',
                 'shell',
                 'manjaro',
@@ -494,7 +501,6 @@ module.exports = {
             ],
             '/other/tools/': [
                 'chrome',
-                'win-cmd',
                 'win-tools',
                 'vscode',
                 'resource',
@@ -512,6 +518,7 @@ module.exports = {
             '/other/book/': [
                 'classical1',
                 'regular',
+                'version',
                 'child'
             ],
             '/other/cn/': [
@@ -529,6 +536,7 @@ module.exports = {
                 'milvus',
                 'hanwuji',
                 'shengteng',
+                'shuguang',
                 'other',
                 'problem',
                 'guomi',

@@ -40,3 +40,102 @@
 `/var/spool/`|放置队列数据的目录。就是排队等待其他程序使用的数据，比如邮件队列和打印队列。
 `/var/spool/mail/`|新收到的邮件队列保存位置。系统新收到的邮件会保存在此目录中。
 `/var/spool/cron/`|系统的定时任务队列保存位置。系统的计划任务会保存在这里。
+
+## Linux系统中的日志文件
+
+* `/var/log/syslog`：是一个传统的通用系统日志文件，它记录了系统启动以来发生的所有重要事件。这个文件通常包含来自系统各个部分的消息，包括应用程序、硬件和内核。
+* `/var/log/messages`: 与 /var/log/syslog 类似，是许多现代Linux发行版使用的日志文件。它汇总了系统范围内的消息，包括错误和警告，是进行系统监控和故障排除的重要资源。
+* `/var/log/auth.log`: 专注于记录所有与用户认证相关的事件，例如用户的登录尝试、密码更改和使用sudo的记录。这个日志对于监控系统安全和检测未授权访问至关重要。
+* `/var/log/boot.log`: 记录了系统启动过程中的所有消息。当系统启动失败或服务无法正常加载时，这个日志文件提供了诊断问题的线索。
+* `/var/log/kern.log`: 专门用于记录来自Linux内核的消息。这些消息可能涉及硬件错误、驱动程序问题或其他与内核相关的事件。
+* `/var/log/dmesg`: 存储了内核环缓冲区的日志信息。这些信息通常在系统启动时生成，可以通过 dmesg 命令查看，对于理解系统启动过程中的硬件交互非常有用。
+* `/var/log/daemon.log`: 记录了系统后台守护进程的日志信息。这些守护进程负责执行各种后台任务，如网络服务和系统监控。
+* `/var/log/cron.log`: 记录了cron守护进程的日志，包括计划任务的执行情况。这对于确保定时任务按预期执行和监控任务执行结果非常重要。
+* `/var/log/mail.log`: 记录了邮件服务器的日志信息，包括邮件的发送和接收。这个日志对于监控邮件服务的运行状态和性能至关重要。
+* `/var/log/faillog`: 记录了失败的登录尝试，这对于检测潜在的安全威胁和加强系统安全非常有用。
+* `/var/log/lastlog`: 记录了系统中每个用户的最后一次登录信息，包括登录时间和IP地址。使用 lastlog 命令可以查看这些信息。
+* `/var/log/btmp`: 记录了失败的登录尝试的详细信息。这个二进制文件需要特定的工具来解析，如 lastb 命令。
+* `/var/log/wtmp`: 记录了所有用户的登录和注销信息。使用 last 命令可以查看这些信息，这对于审计用户活动和监控系统访问非常有帮助。
+
+## linux虚拟机创建
+
+* `Thread(s) per core`: 1：每个核有几个线程，分配虚拟机的时候，拓扑默认就是1。如果你的物理CPU支持超线程（`lscpu`查看），可以考虑在虚拟机中启用相同数量的线程。
+* `Core(s) per socket`: 6：每个插槽（一个插槽可以插一个cpu chip）里面有几个核，分配虚拟机的时候，拓扑默认就是1
+* `Socket(s)`: 2：有几个插槽（一个插槽可以插一个cpu chip）
+
+在进程调度时为了保持亲和性，会优先把同一个进程调度到同一个core上，如果不能调度到同一个core，则尽量调度到同一个socket上。
+
+
+## LD_LIBRARY_PATH基础知识
+
+默认会加载 `/usr/lib` 等库，这个环境变量设置需要谨慎，会影响系统的正常使用。
+
+`LD_LIBRARY_PATH`用于定义系统在运行可执行文件时，应当搜索的动态链接库目录（`so文件`），会根据`LD_LIBRARY_PATH`环境变量中列出的目录顺序来搜索。
+
+**好处：**
+
+* 代码重用和模块化：不同的应用可以共用这些so动态库
+* 节省内存：内存在只需要运行一份拷贝
+* 动态链接：so库如果有更新升级，所有使用这个so动态库的功能都同步更新了，不需要重新编译
+
+**使用场景：**
+
+* 操作系统库：核心功能
+* 第三方库：图形处理、数学计算等
+* 插件、扩展：应用程序可以通过加载`so`文件来动态添加、更新功能，不需要修改主体代码
+
+## glibc更新
+
+在Linux 平台开发偶尔会遇到glibc库版本过低的问题，但是glibc又是一个非常重要的东西，如果升级失败会导致很多命令都无法使用，是一个非常危险的操作。
+
+glibc是linux系统中最底层的api， 几乎其它任何运行库都会依赖于glibc。glibc除了封装linux操作系统所提供的系统服务外，它本身也提供了许多其它一些必要功能服务的实现。由于 glibc 囊括了几乎所有的 UNIX通行的标准，可以想见其内容包罗万象。而就像其他的 UNIX 系统一样，其内含的档案群分散于系统的树状目录结构中，像一个支架一般撑起整个操作系统。
+
+更新glibc有源码的方式和添加更新源的方式，对于这两种来说，后者会更加安全，不容易出错，但是后者对于控制版本不是很友好。如果在使用源码更新的过程中出现了问题，可以考虑通过其他第三方介质U盘等添加原本的glibc版本的库文件进行恢复。
+
+```bash
+#### glibc 版本查看
+# 方法1 ldd 命令
+ldd --version
+# 方法2 libc.so.6
+strings /lib/x86_64-linux-gnu/libc.so.6 | grep GLIBC
+# 方法3 `getconf`命令
+getconf GNU_LIBC_VERSION
+```
+
+### 源码编译升级glibc 库
+
+```bash
+# 下载源码
+wget http://ftp.gnu.org/gnu/libc/glibc-2.34.tar.gz
+tar -xzf glibc-2.34.tar.gz
+cd glibc-2.34
+
+# 编译安装
+sudo apt update
+sudo apt install build-essential gawk bison libc6-dev libncurses5-dev texinfo git
+mkdir build
+cd build
+../configure --prefix=/opt/glibc-2.34  # 一定要指定目录，不然会出现系统无法使用的情况
+make -j4
+sudo make install
+
+# 更新环境变量（下面的内容一定要放到sh脚本里，然后执行脚本去测试 use_new_glibc.sh）
+#!/bin/bash
+export LD_LIBRARY_PATH=/opt/glibc-2.34/lib:$LD_LIBRARY_PATH
+export PATH=/opt/glibc-2.34/bin:$PATH
+# 测试（大概率还是会有问题）
+source use_new_glibc.sh
+```
+
+### glibc更新方法【推荐】
+
+```bash
+# 编辑文件：/etc/apt/sources.list 添加高版本源
+vim /etc/apt/sources.list
+deb http://mirrors.aliyun.com/ubuntu/ jammy main
+
+# 执行
+sudo apt update
+sudo apt install libc6
+
+```

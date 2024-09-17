@@ -34,10 +34,10 @@
 
 **ANN** 是向量数据库的核心
 
-* postgres + pgvector 【推荐】
+* postgres + pgvector/pgvectorscale 【推荐】
 * milvus
 * redis-stack(redissearch+redisjson)
-* elasticsearch
+* elasticsearch 【推荐】
 * mongo
 
 ## 向量化模型推荐
@@ -64,12 +64,33 @@ MTEB 包含以下任务类别，每个类别对应不同的评估指标和数据
 7. 摘要（Summarization）：评估机器生成摘要的质量。
 
 ```bash
+#### 文本embedding
 # 8k长度，1024维度【推荐】
 BAAI/bge-m3
 # 512长度，1024维度
 BAAI/bge-large-zh-v1.5
 # 8k长度，768维度
 jina-embeddings-v2-base-zh
+
+#### 图像数据
+# 同样，对于视频搜索，ResNet50 仍然可以将视频转换为 Embedding 向量。然后，对静态视频帧进行相似性搜索，返回给用户最相似的视频作为最匹配结果。
+ResNet50
+
+#### 音频数据
+# 擅长音频分类和标记等任务
+PANNs
+
+#### 多模态图像与文本数据
+SigLIP
+Unum
+
+#### 多模态文本、音频、视频数据
+# 语音转录为文本
+SenseVoice  #【推荐】
+Whisper
+# 文本转换成音频
+CosyVoice  #【推荐】
+Text-to-speech (TTS) 
 ```
 
 ## finetune向量模型
@@ -287,4 +308,88 @@ if __name__ == '__main__':
 
 ```bash
 FT.CREATE idx:bikes_vss ON JSON PREFIX 1 bikes: SCORE 1.0 SCHEMA $.model TEXT WEIGHT 1.0 NOSTEM $.brand TEXT WEIGHT 1.0 NOSTEM  $.price NUMERIC $.type TAG SEPARATOR "," $.description AS description TEXT WEIGHT 1.0 $.description_embeddings AS vector VECTOR FLAT 6 TYPE FLOAT32 DIM 768 DISTANCE_METRIC COSINE
+```
+
+## CosyVoice
+
+```bash
+#### 代码准备
+git clone --recursive https://github.com/FunAudioLLM/CosyVoice.git
+# If you failed to clone submodule due to network failures, please run following command until success
+cd CosyVoice
+git submodule update --init --recursive
+
+#### 环境安装
+conda create -n cosyvoice python=3.8
+conda activate cosyvoice
+# pynini is required by WeTextProcessing, use conda to install it as it can be executed on all platform.
+conda install -y -c conda-forge pynini==2.1.5
+pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com
+# If you encounter sox compatibility issues
+# ubuntu
+sudo apt-get install sox libsox-dev
+
+#### SDK模型下载
+from modelscope import snapshot_download
+snapshot_download('iic/CosyVoice-300M', local_dir='pretrained_models/CosyVoice-300M')
+snapshot_download('iic/CosyVoice-300M-SFT', local_dir='pretrained_models/CosyVoice-300M-SFT')
+snapshot_download('iic/CosyVoice-300M-Instruct', local_dir='pretrained_models/CosyVoice-300M-Instruct')
+snapshot_download('iic/CosyVoice-ttsfrd', local_dir='pretrained_models/CosyVoice-ttsfrd')
+
+
+export PYTHONPATH=third_party/Matcha-TTS #这一步很重要
+
+#### 测试py文件参考下面【会生成几个音频文件】
+```
+
+```py
+from cosyvoice.cli.cosyvoice import CosyVoice
+from cosyvoice.utils.file_utils import load_wav
+import torchaudio
+cosyvoice = CosyVoice('pretrained_models/CosyVoice-300M-SFT')
+# sft usage
+print(cosyvoice.list_avaliable_spks())
+output = cosyvoice.inference_sft('你好，我是通义生成式语音大模型，请问有什么可以帮您的吗？', '中文女')
+torchaudio.save('sft.wav', output['tts_speech'], 22050)
+cosyvoice = CosyVoice('pretrained_models/CosyVoice-300M')
+# zero_shot usage, <|zh|><|en|><|jp|><|yue|><|ko|> for Chinese/English/Japanese/Cantonese/Korean
+prompt_speech_16k = load_wav('zero_shot_prompt.wav', 16000)
+output = cosyvoice.inference_zero_shot('收到好友从远方寄来的生日礼物，那份意外的惊喜与深深的祝福让我心中充满了甜蜜的快乐，笑容如花儿般绽放。', '希望你以后能够做的比我还好呦。', prompt_speech_16k)
+torchaudio.save('zero_shot.wav', output['tts_speech'], 22050)
+# cross_lingual usage
+prompt_speech_16k = load_wav('cross_lingual_prompt.wav', 16000)
+output = cosyvoice.inference_cross_lingual('<|en|>And then later on, fully acquiring that company. So keeping management in line, interest in line with the asset that\'s coming into the family is a reason why sometimes we don\'t buy the whole thing.', prompt_speech_16k)
+torchaudio.save('cross_lingual.wav', output['tts_speech'], 22050)
+
+cosyvoice = CosyVoice('pretrained_models/CosyVoice-300M-Instruct')
+# instruct usage, support <laughter></laughter><strong></strong>[laughter][breath]
+output = cosyvoice.inference_instruct('在面对挑战时，他展现了非凡的<strong>勇气</strong>与<strong>智慧</strong>。', '中文男', 'Theo \'Crimson\', is a fiery, passionate rebel leader. Fights with fervor for justice, but struggles with impulsiveness.')
+torchaudio.save('instruct.wav', output['tts_speech'], 22050)
+```
+
+## SenseVoice
+
+```bash
+git clone https://github.com/FunAudioLLM/SenseVoice.git 
+cd SenseVoice
+# 如果你想快一点儿，可以加上 -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r requirements.txt
+
+#### 测试py文件，执行之后内容如下
+([{'key': 'wav_file_tmp_name', 'text': '<|zh|><|NEUTRAL|><|Speech|><|woitn|>欢迎大家来体验打摩院推出的语音识别模型'}], {'load_data': '0.338', 'extract_feat': '0.020', 'batch_data_time': 5.58})
+```
+
+```py
+from model import SenseVoiceSmall
+
+model_dir = "iic/SenseVoiceSmall"
+m, kwargs = SenseVoiceSmall.from_pretrained(model=model_dir)
+
+res = m.inference(
+    data_in="https://isv-data.oss-cn-hangzhou.aliyuncs.com/ics/MaaS/ASR/test_audio/asr_example_zh.wav",
+    language="zh", # "zn", "en", "yue", "ja", "ko", "nospeech"
+    use_itn=False,
+    **kwargs,
+)
+print(res)
 ```

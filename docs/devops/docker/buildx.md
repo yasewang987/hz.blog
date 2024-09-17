@@ -1,5 +1,6 @@
 # Docker多平台构建builderx
 
+windows安装`docker desktop`之后天然就已经支持了所有的环境，可以直接跳到 `查看当前支持的cpu架构`查看
 
 ## 启用BuildX
 
