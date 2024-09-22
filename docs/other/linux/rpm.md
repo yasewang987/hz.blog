@@ -1,5 +1,7 @@
 # rpm包制作
 
+* 注意：不管arm还是x86版本，推荐统一使用 `ubuntu20.04` 版本
+
 rpm 的版本 `<=4.4.x`，`rpmbuid` 工具其默认的工作路径是 `/usr/src/redhat`。因为权限的问题，普通用户不能制作 rpm 包，制作 rpm 软件包时必须切换到 `root` 身份才可以。
 
 rpm 从 `4.5.x` 版本开始，将 `rpmbuid` 的默认工作路径移动到用户家目录下的 `rpmbuild` 目录里，即 `$HOME/rpmbuild` ，并且推荐用户在制作 rpm 软件包时尽量不要以 root 身份进行操作。
@@ -14,13 +16,13 @@ rpm 从 `4.5.x` 版本开始，将 `rpmbuid` 的默认工作路径移动到用�
 `BUILDROOT`：保存 `%install` 阶段安装的文件，临时存放制作软件包文件目录
 
 ```bash
-# centos
+# centos（不推荐）
 yum install rpm-build  -y 
 yum install -y rpmdevtools
 # 生成文件夹（会在用户目录下生成rpmbuild以及配置文件.rpmmacros）
 rpmdev-setuptree
 
-# ubuntu
+# ubuntu(20.04及以上)
 apt-get install rpm
 
 # 创建文件夹
@@ -253,13 +255,14 @@ cp -rf %{_builddir}/hz/hellohz %{buildroot}/usr/local/bin
 ```bash
 # 安装alien
 apt install -y alien
-# -d #转为deb（一定要加上--scripts不然无法将post、postun等脚本转换过来）
-alien -d --scripts xxx.rpm
-# -r #转为rpm
-alien -r --scripts xxx.deb
 
 # 安装rpm包
 alien -i xxxx.rpm
+
+# -d #转为deb（一定要加上--scripts不然无法将post、postun等脚本转换过来）
+alien -d --scripts xxx.rpm
+# -r #转为rpm 
+alien -r --scripts xxx.deb
 
 # 查看deb包详细脚本内容
 dpkg -e somefile.deb somefolder

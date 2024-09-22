@@ -579,6 +579,43 @@ tar xvf xxx.tar
 
 ---
 
+### 7z
+
+注意事项：
+* 解压缩分卷文件，你需要确保所有的卷都在同一个目录中，否则会出错
+* 压缩或解压缩带有空格的文件或目录，你需要用引号括起来，如`"file with space"`
+* 压缩或解压缩带有特殊字符的文件或目录，你需要用反斜杠转义，如`\*`
+
+```bash
+### 参数
+# -p 表示设置密码
+# -v 表示分卷大小 7z a -v10m archive.7z file1 file2  7z x archive.7z.001（会自动找到其他的分卷文件）
+# -r 递归处理子目录
+# -o 指定输出目录 7z x -ooutput archive.7z  
+# -m 设置压缩方法和参数
+# -t 指定压缩文件的类型
+# -u 更新压缩文件
+### ubuntu(7z)
+apt install -y p7zip-full
+### centos(7za)
+yum install p7zip
+
+# 生成压缩包
+7z a archive.7z file1 file2 dir1
+# 不压缩dir1本身，压缩dir1文件夹里面的所有内容
+7z a archive.7z dir1/*
+# 查看压缩包
+7z l archive.7z
+# 解压
+7z x archive.7z
+# 检查压缩文件完整性（没问题会显示Everything is Ok）
+7z t archive.7z
+# 删除压缩文件里的某个文件
+7z d archive.7z file1
+# 重命名压缩文件中的文件
+7z rn archive.7z file2 newfile
+```
+
 ## 查看安装的软件包
 
 使用dpkg命令  
