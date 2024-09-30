@@ -1083,11 +1083,49 @@ $ grep -B 10 ERROR app.log
 $ grep -C 10 ERROR app.log
 ```
 
-## grep带空格等字符
-
-通过`\`反斜杠转译
+## grep常用命令
 
 ```bash
+# 忽略大小写 (-i)
+grep -i "hello" file.txt
+
+# 显示行号 (-n)
+grep -n "hello" file.txt
+
+# 显示不匹配的行 (-v)
+grep -v "hello" file.txt
+
+# 递归查找 (-r 或 -R)
+grep -r "error" /var/log/
+
+# 精确匹配/完全匹配整行 (-x)
+grep -x "hello" file.txt
+
+# 统计匹配的行数 (-c)
+grep -c "hello" file.txt
+
+# 显示匹配的上下文行数 (-A, -B, -C)
+# -A n：显示匹配行后面的 n 行。
+# -B n：显示匹配行前面的 n 行。
+# -C n：显示匹配行前后的 n 行。
+grep -C 3 "error" file.txt
+
+# 使用正则表达式 (-E, -P)
+grep -E "error|warning" file.txt
+
+# 查找目录中的特定类型文件 --include
+grep -r --include "*.txt" "pattern" /path/to/search
+
+# 排除特定类型文件  --exclude
+grep -r --exclude "*.log" "pattern" /path/to/search
+
+# 查找多个模式 (-e)
+grep -e "pattern1" -e "pattern2" file.txt
+
+# 查找大文件中的匹配行--line-buffered 选项实时输出匹配行
+grep --line-buffered "error" largefile.log
+
+# 包含空格字符（通过`\`反斜杠转译）
 sh -c 'curl -sS http://localhost:18350/check | grep serviceStatus\":\ 0,\ \"serviceItems || exit 1'
 ```
 
@@ -1161,7 +1199,7 @@ getconf PAGESIZE
 patchelf --page-size 65536 core_noavx.so
 ```
 
-## 批量修改文件内容
+## 批量查找/修改文件内容
 
 ```bash
 # 批量查找某个目录下文件包含指定内容

@@ -1,5 +1,6 @@
 # 其他前端资料
 
+* [前端设计工具](./design.md)
 * [qiankun创建微应用](./qiankun.md)
 * [mic-app创建微应用](./microapp.md)
 * [electron介绍](./electron.md)

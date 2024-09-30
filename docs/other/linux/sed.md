@@ -57,6 +57,9 @@ sed '$a xxxxx'
 # 新增多行
 sed '2a Hello \
 World' 1.txt
+
+# 新增特殊字符（空白、单引号等）- 在匹配到http_referer的下面新增一行
+sed -i "/http_referer/a \                      \' cookie:\$http_cookie \'" /etc/nginx/nginx.conf
 ```
 
 **以行为单位的删除**

@@ -17,3 +17,9 @@ cp aaa.class BOOT-INF/classes/common/faw/api/service/
 # 按照路径覆盖到jar包
 jar -uvf test.jar BOOT-INF/classes/common/faw/api/service/aaa.class
 ```
+
+## 查看jar包中的某个文件内容
+
+```bash
+unzip -p funcun-crm-1.0-SNAPSHOT.jar BOOT-INF/classes/git.properties
+```

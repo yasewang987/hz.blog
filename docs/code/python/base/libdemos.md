@@ -115,6 +115,68 @@ async def main():
 asyncio.run(main())
 ```
 
+## 数据验证-Pydantic
+
+Pydantic的核心概念是基于类的数据模型。通过继承`pydantic.BaseModel`，你可以轻松定义复杂的数据结构，并自动获得数据验证、序列化和反序列化功能。
+
+1. 使用Field(default_factory=list)来避免可变默认值的陷阱。
+2. 利用pydantic.SecretStr类型来安全地处理密码等敏感信息。
+3. 使用pydantic.parse_obj_as函数来验证复杂的嵌套数据结构。
+
+### 安装
+
+```bash
+pip install pydantic
+# 安装带有额外依赖的版本
+pip install pydantic[email]
+```
+
+### 常见示例
+
+```py
+### 基础示例
+from pydantic import BaseModel, Field
+from typing import List
+
+class User(BaseModel):
+    id: int
+    name: str = Field(..., min_length=1, max_length=50)
+    email: str
+    age: int = Field(ge=0, le=120)
+    interests: List[str] = []
+# 创建一个用户实例
+user = User(id=1, name="Alice", email="alice@example.com", age=30)
+print(user.json())
+
+### 自定义验证器来实现复杂的业务逻辑
+from pydantic import BaseModel, validator
+
+class Order(BaseModel):
+    item_id: int
+    quantity: int
+
+    @validator('quantity')
+    def check_quantity(cls, v):
+        if v <= 0:
+            raise ValueError('Quantity must be positive')
+        return v
+
+### API请求验证
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str = Field(..., min_length=1, max_length=50)
+    price: float = Field(..., gt=0)
+    is_offer: bool = False
+
+@app.post("/items/")
+async def create_item(item: Item):
+    return {"item": item}
+```
+
 ## CSV文件操作
 
 ### csv库
@@ -215,4 +277,6 @@ predictions = model.predict(future_months)
 future_months['Predicted Sales'] = predictions
 print(future_months)
 ```
+
+
 

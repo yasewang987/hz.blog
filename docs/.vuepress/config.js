@@ -241,6 +241,7 @@ module.exports = {
                 'tailwindcss'
             ],
             '/code/web/other/': [
+                'design',
                 'qiankun',
                 'microapp',
                 'electron',
