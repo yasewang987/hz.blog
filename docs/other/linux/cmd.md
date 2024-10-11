@@ -616,13 +616,17 @@ yum install p7zip
 7z rn archive.7z file2 newfile
 ```
 
-## 查看安装的软件包
+## dkpg常用命令
 
-使用dpkg命令  
-`sudo dpkg --list | grep -i jdk`
+```bash
+# 使用dpkg命令  
+sudo dpkg --list | grep -i jdk
+dpkg -l | grep nvidia
 
-使用ps命令
-`ps -aux  | grep pkgname
+# 删除软件
+dpkg -r nvidia
+```
+
 
 ---
 
@@ -944,11 +948,12 @@ sudo rpm -ivh ./* --nodeps
 ```bash
 # 未安装相应的软件
 apt-get install -d  PackageName
+apt install --download-only nvidia-fabricmanager-535
 
 # 已安装相应的软件
 apt-get install -d --reinstall  PackageName
 
-# 默认保存目录
+# 默认保存目录（转移所有deb包即可）
 /var/cache/apt/archives/
 ```
 

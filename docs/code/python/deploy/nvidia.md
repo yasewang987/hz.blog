@@ -1,6 +1,6 @@
 # Nvidia显卡环境安装
 
-* 如果是数据中心的卡，请记住一定要安装`nvidia-fabricmanager`不然无法使用
+* 如果是数据中心的卡，请记住一定要安装`nvidia-fabricmanager`不然无法使用，检查是否安装 `nvidia-smi -q -i 0 | grep -i -A 2 Fabric` 如果显示 `` 说明已经安装
 
 * 显卡驱动安装查询：https://www.nvidia.cn/drivers/lookup/
 
@@ -17,12 +17,22 @@ lspci|grep NVIDIA
 # 显卡驱动安装
 ./NVIDIA-Linux-x86_64-535.183.06.run
 
+# 查看 GPU 之间的拓扑结构
+nvidia-smi topo -m
+
 # cuda安装
 ./cuda_12.1.0_530.30.02_linux.run
 
 # cuda卸载
 cd /usr/local/cuda-12.1/bin
 cuda-uninstaller
+
+# 检查是否安装fabricmanager
+nvidia-smi -q -i 0 | grep -i -A 2 Fabric
+Status : Success # 已经安装
+
+# 离线下载fabricmanager
+apt install --download-only nvidia-fabricmanager-535
 ```
 
 ## 显卡型号查看
@@ -221,7 +231,7 @@ rpm -aq | grep kernel-devel
 
 ```
 
-## nvidia运行docker容器选择
+## nvidia-docker镜像选择
 
 ### 开发镜像：
 

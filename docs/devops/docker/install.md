@@ -159,12 +159,15 @@ chmod +x /usr/local/bin/docker-compose
 
 #### ubuntu
 # 如果安装不成功，可以一步一步执行，到第二行的时候如果报错，根据报错点开github网页，参考网页上的去安装执行
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
-    && curl -s -L https://nvidia.github.io/nvidia-container-runtime | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | \
+  sudo apt-key add -
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
+  sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+sudo apt-get update
 
 # 安装
-sudo apt-get update \
-    && sudo apt-get install -y nvidia-container-runtime
+sudo apt-get install -y nvidia-container-runtime
 
 #### centos
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
@@ -220,6 +223,9 @@ libnvidia-container1_1.8.1-1_amd64.deb
 libnvidia-container-tools_1.8.1-1_amd64.deb
 nvidia-container-toolkit_1.8.1-1_amd64.deb
 nvidia-container-runtime_3.8.1-1_all.deb
+
+# 安装
+dpkg -i --force-all ./*.deb
 
 # 配置文件调整  
 cat /etc/docker/daemon.json

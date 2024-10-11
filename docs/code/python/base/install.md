@@ -31,11 +31,11 @@ wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py310_24
 # 安装(默认会在安装在用户目录下 $HOME/miniconda3)
 sh Miniconda3-py310_24.4.0-0-Linux-x86_64.sh
 
-# 初始化
-conda init
-
 # 如果找不到，需要添加环境变量-bashrc/profile（WSL中不会自动添加）
 export PATH=$HOME/miniconda3/bin:$PATH
+
+# 初始化
+conda init
 
 # 生效
 source .bashrc
