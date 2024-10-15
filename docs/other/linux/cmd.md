@@ -595,6 +595,16 @@ tar xvf xxx.tar
 # -m 设置压缩方法和参数
 # -t 指定压缩文件的类型
 # -u 更新压缩文件
+
+### 官网绿色安装（选择合适的安装包）
+https://www.7-zip.org/download.html
+# linux中需要解压xz包
+tar -xf 7z2301-linux-arm64.tar.xz
+# 复制到执行目录或者直接执行
+cp 7zz 7zzs /usr/local/bin
+# 使用（参考后面命令，替换7z为7zz）
+7zz x archive.7z
+
 ### ubuntu(7z)
 apt install -y p7zip-full
 ### centos(7za)
