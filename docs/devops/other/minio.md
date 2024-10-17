@@ -64,8 +64,23 @@ MINIO_ROOT_USER=myminioadmin
 # root用户密码（minioadmin）
 MINIO_ROOT_PASSWORD=minio-secret-key-change-me
 
-# cors设置
+### cors设置
 MINIO_API_CORS_ALLOW_ORIGIN="http://aaaa.com,http://bbbb.com"
+### cors设置2
+# 创建配置文件
+vim ./cors.json
+[
+  {
+    "AllowedOrigins": ["http://example1.com", "http://example2.com"],
+    "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAge": 3000
+  }
+]
+# 应用
+export MINIO_CORS=/etc/minio/cors.json
+minio server /data
 ```
 
 ## nginx 反向代理配置
