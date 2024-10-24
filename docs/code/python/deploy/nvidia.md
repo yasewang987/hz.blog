@@ -306,3 +306,12 @@ systemctl status nvidia-fabricmanager
 # 如果重新安装驱动执行一下
 systemctl restart nvidia-fabricmanager
 ```
+
+* H20显卡使用vllm部署模型调用时报错“”
+
+```bash
+# 先确认只部署了一个版本的cublas
+conda list | grep cublas
+# 升级cublas版本
+pip install nvidia-cublas-cu12==12.4.5.8
+```
